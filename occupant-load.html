@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Occupant Load Calculator -- architecture.tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;}
+  html{font-size:15px;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .tool{max-width:760px;margin:0 auto;padding:3rem 2rem 5rem;}
+  .tool-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--black);}
+  .tool-header h1{font-size:1.5rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+  .tool-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:50em;}
+  .section-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
+
+  /* Reference table */
+  .ref-table{margin-bottom:2rem;}
+  .ref-table table{width:100%;border-collapse:collapse;}
+  .ref-table th{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);text-align:left;padding:0.45rem 0.6rem;border-bottom:1px solid var(--gray-200);}
+  .ref-table td{font-size:0.78rem;font-weight:300;padding:0.4rem 0.6rem;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background 0.1s;}
+  .ref-table tr:hover td{background:var(--gray-50);}
+  .ref-table td:nth-child(2){font-family:var(--font-mono);font-size:0.72rem;color:var(--gray-700);white-space:nowrap;}
+  .ref-table td:nth-child(3){font-size:0.68rem;color:var(--gray-400);}
+  .ref-table tr.in-use td{background:var(--gray-50);font-weight:400;}
+
+  /* Zones */
+  .zones-section{margin-bottom:2rem;}
+  .zone-item{display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid var(--gray-100);}
+  .zone-item:last-child{border-bottom:none;}
+  .zone-name{font-size:0.78rem;font-weight:400;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .zone-factor{font-family:var(--font-mono);font-size:0.65rem;color:var(--gray-400);flex-shrink:0;width:50px;text-align:center;}
+  .zone-area{font-family:var(--font-mono);font-size:0.82rem;font-weight:300;padding:0.3rem 0.4rem;border:1px solid var(--gray-300);width:80px;text-align:right;outline:none;background:var(--white);}
+  .zone-area:focus{border-color:var(--black);}
+  .zone-unit{font-size:0.6rem;font-family:var(--font-mono);color:var(--gray-400);flex-shrink:0;width:20px;}
+  .zone-eq{font-family:var(--font-mono);font-size:0.65rem;color:var(--gray-400);flex-shrink:0;}
+  .zone-occ{font-family:var(--font-mono);font-size:0.88rem;font-weight:400;flex-shrink:0;width:50px;text-align:right;}
+  .zone-remove{font-size:0.7rem;color:var(--gray-300);cursor:pointer;padding:0.2rem 0.4rem;background:none;border:none;font-family:var(--font-mono);transition:color 0.15s;flex-shrink:0;}
+  .zone-remove:hover{color:var(--black);}
+  .zone-empty{font-size:0.75rem;color:var(--gray-400);font-weight:300;padding:0.75rem 0;font-style:italic;}
+
+  /* Results */
+  .result-box{padding:1rem 1.25rem;border:1px solid var(--black);margin-bottom:1.5rem;}
+  .result-big{font-family:var(--font-mono);font-size:2.2rem;font-weight:300;margin-bottom:0.15rem;}
+  .result-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);}
+
+  .downstream{margin-top:1.5rem;}
+  .ds-row{display:flex;align-items:baseline;padding:0.5rem 0;border-bottom:1px solid var(--gray-100);}
+  .ds-row:last-child{border-bottom:none;}
+  .ds-label{font-size:0.72rem;font-weight:300;color:var(--gray-700);flex:1;}
+  .ds-value{font-family:var(--font-mono);font-size:0.82rem;font-weight:300;text-align:right;}
+  .ds-note{font-size:0.65rem;color:var(--gray-400);font-weight:300;margin-left:0.5rem;}
+  .ds-section{margin-top:1rem;margin-bottom:0.5rem;font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);}
+
+  .tool-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="tool">
+
+  <div class="tool-header">
+    <h1>Occupant Load Calculator</h1>
+    <p>Click a use from the table to add it. Enter the area. See occupant load, required exits, egress width, and fixture counts.</p>
+  </div>
+
+  <!-- Zones (user's spaces) -->
+  <div class="zones-section">
+    <div class="section-label">Your Spaces</div>
+    <div id="zones"><div class="zone-empty">Click a use below to add a space</div></div>
+  </div>
+
+  <!-- Results -->
+  <div id="resultArea" style="display:none">
+    <div class="result-box">
+      <div class="result-big" id="totalOcc">0</div>
+      <div class="result-label">Total occupant load</div>
+    </div>
+
+    <div class="downstream">
+      <div class="ds-section">Egress (IBC 1005 / 1006)</div>
+      <div class="ds-row"><div class="ds-label">Minimum exits</div><div class="ds-value" id="ds-exits">--</div></div>
+      <div class="ds-row"><div class="ds-label">Total egress width (stairs)</div><div class="ds-value" id="ds-stairW">--</div><div class="ds-note">0.2"/occ</div></div>
+      <div class="ds-row"><div class="ds-label">Total egress width (doors/corridors)</div><div class="ds-value" id="ds-doorW">--</div><div class="ds-note">0.15"/occ</div></div>
+      <div class="ds-row"><div class="ds-label">Min corridor width</div><div class="ds-value" id="ds-corridor">--</div></div>
+
+      <div class="ds-section">Plumbing Fixtures (IPC Table 403.1 -- approximate)</div>
+      <div class="ds-row"><div class="ds-label">Water closets (total M+F)</div><div class="ds-value" id="ds-wc">--</div></div>
+      <div class="ds-row"><div class="ds-label">Lavatories</div><div class="ds-value" id="ds-lav">--</div></div>
+      <div class="ds-row"><div class="ds-label">Drinking fountains</div><div class="ds-value" id="ds-df">--</div></div>
+    </div>
+  </div>
+
+  <!-- Reference table -->
+  <div class="ref-table" style="margin-top:2rem;">
+    <div class="section-label">IBC Table 1004.5 -- click to add</div>
+    <table>
+      <thead><tr><th>Use</th><th>SF / Occupant</th><th>Notes</th></tr></thead>
+      <tbody id="refBody"></tbody>
+    </table>
+  </div>
+
+  <div class="tool-footer">
+    Based on IBC Table 1004.5 and IPC Table 403.1. Fixture counts are approximate -- actual requirements vary by use group and jurisdiction. Always verify against local amendments.
+    <br>architecture.tools
+  </div>
+</div>
+
+<script>
+(function(){
+
+  var LoadFactors = [
+    { use: 'Assembly -- standing space', sf: 5, net: true, note: 'Concentrated, no seats', fg: 'A' },
+    { use: 'Assembly -- unconcentrated (tables/chairs)', sf: 15, net: true, note: 'Restaurants, banquet', fg: 'A' },
+    { use: 'Assembly -- concentrated (chairs only)', sf: 7, net: true, note: 'Lecture, worship, theater', fg: 'A' },
+    { use: 'Assembly -- gaming floors', sf: 11, net: false, note: '', fg: 'A' },
+    { use: 'Business (gross)', sf: 150, net: false, note: 'Offices, banks, government', fg: 'B' },
+    { use: 'Business (net)', sf: 100, net: true, note: 'Offices, banks, government', fg: 'B' },
+    { use: 'Educational -- classroom', sf: 20, net: true, note: '', fg: 'E' },
+    { use: 'Educational -- shops/vocational', sf: 50, net: true, note: '', fg: 'E' },
+    { use: 'Day care', sf: 35, net: true, note: '', fg: 'E' },
+    { use: 'Exercise rooms', sf: 50, net: false, note: '', fg: 'A' },
+    { use: 'Industrial', sf: 100, net: false, note: 'Gross', fg: 'F' },
+    { use: 'Institutional -- sleeping', sf: 120, net: false, note: '', fg: 'I' },
+    { use: 'Institutional -- treatment', sf: 240, net: false, note: '', fg: 'I' },
+    { use: 'Kitchen -- commercial', sf: 200, net: false, note: '', fg: 'B' },
+    { use: 'Library -- reading rooms', sf: 50, net: true, note: '', fg: 'A' },
+    { use: 'Library -- stacks', sf: 100, net: false, note: '', fg: 'A' },
+    { use: 'Mercantile -- ground floor', sf: 30, net: false, note: '', fg: 'M' },
+    { use: 'Mercantile -- upper floors', sf: 60, net: false, note: '', fg: 'M' },
+    { use: 'Mercantile -- basement', sf: 30, net: false, note: '', fg: 'M' },
+    { use: 'Mercantile -- storage/shipping', sf: 300, net: false, note: '', fg: 'S' },
+    { use: 'Parking garage', sf: 200, net: false, note: '', fg: 'S' },
+    { use: 'Residential', sf: 200, net: false, note: '', fg: 'R' },
+    { use: 'Storage', sf: 300, net: false, note: '', fg: 'S' },
+    { use: 'Warehouse', sf: 500, net: false, note: '', fg: 'S' },
+    { use: 'Accessory storage (mech/elec)', sf: 300, net: false, note: '', fg: 'S' },
+    { use: 'Swimming pool', sf: 50, net: false, note: 'Water surface', fg: 'A' },
+    { use: 'Swimming pool deck', sf: 15, net: false, note: '', fg: 'A' },
+  ];
+
+  // Approximate fixture ratios per occupant by fixture group
+  // These are rough IPC 403.1 midpoints -- real code depends on use group
+  var FixtureRatios = {
+    A: { wc: 1/75, lav: 1/200, df: 1/500 },
+    B: { wc: 1/40, lav: 1/80, df: 1/100 },
+    E: { wc: 1/25, lav: 1/50, df: 1/100 },
+    F: { wc: 1/50, lav: 1/80, df: 1/100 },
+    I: { wc: 1/15, lav: 1/15, df: 1/100 },
+    M: { wc: 1/50, lav: 1/100, df: 1/500 },
+    R: { wc: 1/10, lav: 1/10, df: 0 },
+    S: { wc: 1/100, lav: 1/100, df: 1/500 },
+  };
+
+  var zones = []; // { lfIdx, area }
+
+  function addZone(lfIdx, area) {
+    zones.push({ lfIdx: lfIdx, area: area || '' });
+    renderZones();
+  }
+
+  function removeZone(i) {
+    zones.splice(i, 1);
+    renderZones();
+  }
+
+  function renderZones() {
+    var container = document.getElementById('zones');
+    if (zones.length === 0) {
+      container.innerHTML = '<div class="zone-empty">Click a use below to add a space</div>';
+      document.getElementById('resultArea').style.display = 'none';
+      highlightUsedRows();
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < zones.length; i++) {
+      var z = zones[i];
+      var lf = LoadFactors[z.lfIdx];
+      var area = parseFloat(z.area);
+      var occ = (!isNaN(area) && area > 0) ? Math.ceil(area / lf.sf) : 0;
+
+      html += '<div class="zone-item">';
+      html += '<div class="zone-name" title="'+lf.use+'">'+lf.use+'</div>';
+      html += '<div class="zone-factor">/'+lf.sf+'</div>';
+      html += '<input class="zone-area" type="number" data-idx="'+i+'" value="'+(z.area||'')+'" placeholder="area">';
+      html += '<div class="zone-unit">SF</div>';
+      html += '<div class="zone-eq">=</div>';
+      html += '<div class="zone-occ">'+(occ > 0 ? occ : '--')+'</div>';
+      html += '<button class="zone-remove" data-idx="'+i+'">&times;</button>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+
+    // Bind area inputs
+    container.querySelectorAll('.zone-area').forEach(function(el) {
+      el.addEventListener('input', function() {
+        zones[parseInt(el.dataset.idx)].area = el.value;
+        updateResults();
+      });
+      // Auto-focus newly added empty zones
+      if (el.value === '') el.focus();
+    });
+
+    container.querySelectorAll('.zone-remove').forEach(function(el) {
+      el.addEventListener('click', function() {
+        removeZone(parseInt(el.dataset.idx));
+      });
+    });
+
+    updateResults();
+    highlightUsedRows();
+  }
+
+  function updateResults() {
+    var totalOcc = 0;
+    var wcTotal = 0, lavTotal = 0, dfTotal = 0;
+    var hasAny = false;
+
+    for (var i = 0; i < zones.length; i++) {
+      var z = zones[i];
+      var lf = LoadFactors[z.lfIdx];
+      var area = parseFloat(z.area);
+      if (isNaN(area) || area <= 0) continue;
+      hasAny = true;
+      var occ = Math.ceil(area / lf.sf);
+      totalOcc += occ;
+
+      var fr = FixtureRatios[lf.fg] || FixtureRatios['B'];
+      wcTotal += occ * fr.wc;
+      lavTotal += occ * fr.lav;
+      dfTotal += occ * fr.df;
+    }
+
+    if (!hasAny) {
+      document.getElementById('resultArea').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('resultArea').style.display = '';
+    document.getElementById('totalOcc').textContent = totalOcc;
+
+    // Egress
+    var exits = totalOcc <= 49 ? 1 : (totalOcc <= 500 ? 2 : (totalOcc <= 1000 ? 3 : 4));
+    var stairW = Math.ceil(totalOcc * 0.2);
+    var doorW = Math.ceil(totalOcc * 0.15);
+    var corridor = totalOcc > 50 ? '44"' : (totalOcc > 10 ? '36"' : '36"');
+
+    document.getElementById('ds-exits').textContent = exits;
+    document.getElementById('ds-stairW').textContent = stairW + '"';
+    document.getElementById('ds-doorW').textContent = doorW + '"';
+    document.getElementById('ds-corridor').textContent = corridor + ' min';
+
+    // Fixtures
+    document.getElementById('ds-wc').textContent = Math.ceil(wcTotal);
+    document.getElementById('ds-lav').textContent = Math.ceil(lavTotal);
+    document.getElementById('ds-df').textContent = Math.max(1, Math.ceil(dfTotal));
+
+    // Re-render zone occupant numbers
+    document.querySelectorAll('.zone-item').forEach(function(el, idx) {
+      var z = zones[idx];
+      if (!z) return;
+      var lf = LoadFactors[z.lfIdx];
+      var area = parseFloat(z.area);
+      var occ = (!isNaN(area) && area > 0) ? Math.ceil(area / lf.sf) : 0;
+      el.querySelector('.zone-occ').textContent = occ > 0 ? occ : '--';
+    });
+  }
+
+  function highlightUsedRows() {
+    var usedIdx = {};
+    for (var i = 0; i < zones.length; i++) usedIdx[zones[i].lfIdx] = true;
+    document.querySelectorAll('#refBody tr').forEach(function(tr) {
+      tr.classList.toggle('in-use', !!usedIdx[tr.dataset.idx]);
+    });
+  }
+
+  // Build reference table
+  var tbody = document.getElementById('refBody');
+  var html = '';
+  for (var i = 0; i < LoadFactors.length; i++) {
+    var lf = LoadFactors[i];
+    html += '<tr data-idx="'+i+'"><td>'+lf.use+'</td><td>'+lf.sf+' SF'+(lf.net?' net':' gross')+'</td><td>'+lf.note+'</td></tr>';
+  }
+  tbody.innerHTML = html;
+
+  tbody.addEventListener('click', function(e) {
+    var tr = e.target.closest('tr');
+    if (!tr) return;
+    addZone(parseInt(tr.dataset.idx));
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sheet Size Reference -- architecture.tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;}
+  html{font-size:15px;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .tool{max-width:900px;margin:0 auto;padding:3rem 2rem 5rem;}
+
+  .tool-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--black);}
+  .tool-header h1{font-size:1.5rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+  .tool-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:50em;}
+
+  .section-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
+
+  /* Controls */
+  .controls{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:2rem;align-items:flex-end;}
+  .control-group{display:flex;flex-direction:column;}
+  .control-group label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.3rem;}
+  .control-group select,.control-group input{font-family:var(--font-mono);font-size:0.82rem;font-weight:300;padding:0.45rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);outline:none;-webkit-appearance:none;appearance:none;}
+  .control-group select:focus,.control-group input:focus{border-color:var(--black);}
+  .control-group input{width:100px;}
+
+  /* Sheet display */
+  .sheet-display{display:flex;gap:2rem;align-items:flex-start;margin-bottom:2rem;}
+  .sheet-visual{flex-shrink:0;}
+  .sheet-visual svg{display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.08));}
+  .sheet-info{flex:1;min-width:0;}
+
+  .info-row{display:flex;align-items:baseline;padding:0.45rem 0;border-bottom:1px solid var(--gray-100);}
+  .info-row:last-child{border-bottom:none;}
+  .info-label{width:140px;flex-shrink:0;font-size:0.65rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-500);}
+  .info-value{font-family:var(--font-mono);font-size:0.85rem;font-weight:300;}
+
+  /* Scale table */
+  .scale-table{margin-top:2rem;width:100%;border-collapse:collapse;}
+  .scale-table th{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);text-align:left;padding:0.5rem 0.75rem;border-bottom:1px solid var(--gray-200);}
+  .scale-table td{font-family:var(--font-mono);font-size:0.78rem;font-weight:300;padding:0.5rem 0.75rem;border-bottom:1px solid var(--gray-100);}
+  .scale-table tr:last-child td{border-bottom:none;}
+  .scale-table tr.fits{background:var(--gray-50);}
+  .scale-table tr.fits td{font-weight:400;color:var(--black);}
+  .scale-table .fit-badge{font-size:0.5rem;font-family:var(--font-mono);background:var(--black);color:var(--white);padding:1px 4px;letter-spacing:0.03em;margin-left:0.5rem;}
+
+  /* Common sizes reference */
+  .common-sizes{margin-top:2.5rem;}
+  .size-row{display:flex;align-items:baseline;padding:0.4rem 0;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background 0.1s;}
+  .size-row:hover{background:var(--gray-50);}
+  .size-row:last-child{border-bottom:none;}
+  .size-name{font-size:0.78rem;font-weight:400;flex:1;}
+  .size-dim{font-family:var(--font-mono);font-size:0.72rem;font-weight:300;color:var(--gray-500);width:120px;text-align:right;flex-shrink:0;}
+
+  .tool-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
+
+  @media(max-width:640px){
+    .sheet-display{flex-direction:column;}
+    .controls{flex-direction:column;}
+    .scale-table{font-size:0.7rem;}
+    .scale-table th,.scale-table td{padding:0.4rem 0.5rem;}
+  }
+</style>
+</head>
+<body>
+<div class="tool">
+
+  <div class="tool-header">
+    <h1>Sheet Size Reference</h1>
+    <p>See what fits on each ARCH sheet at each scale. Enter your building or lot dimensions to find which sheet and scale work.</p>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Sheet Size</label>
+      <select id="sheetSelect">
+        <option value="A">ARCH A -- 9 x 12</option>
+        <option value="B">ARCH B -- 12 x 18</option>
+        <option value="C">ARCH C -- 18 x 24</option>
+        <option value="D" selected>ARCH D -- 24 x 36</option>
+        <option value="E">ARCH E -- 36 x 48</option>
+        <option value="E1">ARCH E1 -- 30 x 42</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Your Width (ft)</label>
+      <input type="number" id="userWidth" placeholder="e.g. 60" value="">
+    </div>
+    <div class="control-group">
+      <label>Your Depth (ft)</label>
+      <input type="number" id="userDepth" placeholder="e.g. 40" value="">
+    </div>
+  </div>
+
+  <div class="sheet-display">
+    <div class="sheet-visual" id="sheetVisual"></div>
+    <div class="sheet-info" id="sheetInfo"></div>
+  </div>
+
+  <div id="scaleTableContainer"></div>
+
+  <div class="common-sizes">
+    <div class="section-label">Common Building / Lot Sizes -- click to load</div>
+    <div id="commonList"></div>
+  </div>
+
+  <div class="tool-footer">architecture.tools</div>
+</div>
+
+<script>
+(function(){
+
+  // Sheet data: dimensions in inches, title block strip on right side
+  var Sheets = {
+    A:  { name: 'ARCH A',  w: 12, h: 9,  tb: 1.5 },
+    B:  { name: 'ARCH B',  w: 18, h: 12, tb: 2 },
+    C:  { name: 'ARCH C',  w: 24, h: 18, tb: 2.5 },
+    D:  { name: 'ARCH D',  w: 36, h: 24, tb: 3 },
+    E:  { name: 'ARCH E',  w: 48, h: 36, tb: 3.5 },
+    E1: { name: 'ARCH E1', w: 42, h: 30, tb: 3 },
+  };
+
+  // Standard architectural scales: label, inches per foot (scale factor)
+  // e.g. 1/4" = 1'-0" means 0.25 inches on paper = 1 foot real
+  var Scales = [
+    { label: 'Full Size',        factor: 12 },
+    { label: '3" = 1\'-0"',     factor: 3 },
+    { label: '1-1/2" = 1\'-0"', factor: 1.5 },
+    { label: '1" = 1\'-0"',     factor: 1 },
+    { label: '3/4" = 1\'-0"',   factor: 0.75 },
+    { label: '1/2" = 1\'-0"',   factor: 0.5 },
+    { label: '3/8" = 1\'-0"',   factor: 0.375 },
+    { label: '1/4" = 1\'-0"',   factor: 0.25 },
+    { label: '3/16" = 1\'-0"',  factor: 0.1875 },
+    { label: '1/8" = 1\'-0"',   factor: 0.125 },
+    { label: '3/32" = 1\'-0"',  factor: 0.09375 },
+    { label: '1/16" = 1\'-0"',  factor: 0.0625 },
+    { label: '1" = 10\'',       factor: 1/10 },
+    { label: '1" = 20\'',       factor: 1/20 },
+    { label: '1" = 30\'',       factor: 1/30 },
+    { label: '1" = 40\'',       factor: 1/40 },
+    { label: '1" = 50\'',       factor: 1/50 },
+    { label: '1" = 100\'',      factor: 1/100 },
+    { label: '1" = 200\'',      factor: 1/200 },
+  ];
+
+  var CommonSizes = [
+    { name: 'Single-family house (small)', w: 40, d: 30 },
+    { name: 'Single-family house (typical)', w: 60, d: 40 },
+    { name: 'Single-family house (large)', w: 80, d: 50 },
+    { name: 'Residential lot (50 x 100)', w: 100, d: 50 },
+    { name: 'Residential lot (60 x 120)', w: 120, d: 60 },
+    { name: 'Quarter-acre lot', w: 104, d: 104 },
+    { name: 'Half-acre lot', w: 148, d: 148 },
+    { name: 'Townhouse unit', w: 20, d: 50 },
+    { name: 'Small commercial (retail)', w: 100, d: 60 },
+    { name: 'Medium commercial', w: 200, d: 120 },
+    { name: 'Large commercial', w: 400, d: 200 },
+    { name: 'Small office building', w: 120, d: 80 },
+    { name: 'Medium office building', w: 200, d: 150 },
+    { name: 'School (typical wing)', w: 300, d: 80 },
+    { name: 'City block (typical)', w: 660, d: 330 },
+    { name: 'Warehouse / industrial', w: 300, d: 200 },
+    { name: 'Parking lot (50 cars)', w: 200, d: 120 },
+  ];
+
+  function fmtFt(feet) {
+    if (feet >= 1000) return Math.round(feet).toLocaleString() + "'";
+    if (feet === Math.floor(feet)) return feet + "'";
+    return feet.toFixed(1) + "'";
+  }
+
+  function drawSheet(sheet, userW, userD, bestScale) {
+    var maxPx = 280;
+    var scale = maxPx / Math.max(sheet.w, sheet.h);
+    var pw = sheet.w * scale;
+    var ph = sheet.h * scale;
+    var ptb = sheet.tb * scale;
+    var pad = 30;
+    var svgW = pw + pad * 2;
+    var svgH = ph + pad * 2;
+
+    var x0 = pad, y0 = pad;
+
+    var svg = '<svg width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+
+    // Sheet background
+    svg += '<rect x="'+x0+'" y="'+y0+'" width="'+pw+'" height="'+ph+'" fill="white" stroke="#111" stroke-width="1.5"/>';
+
+    // Title block zone
+    svg += '<rect x="'+(x0+pw-ptb)+'" y="'+y0+'" width="'+ptb+'" height="'+ph+'" fill="#f0f0ef" stroke="#ccc" stroke-width="0.5"/>';
+    svg += '<text x="'+(x0+pw-ptb/2)+'" y="'+(y0+ph/2)+'" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#aaa" transform="rotate(-90 '+(x0+pw-ptb/2)+' '+(y0+ph/2)+')">TITLE BLOCK</text>';
+
+    // Drawable area
+    var drawW = pw - ptb - 4; // small margin
+    var drawH = ph - 4;
+    var drawX = x0 + 2;
+    var drawY = y0 + 2;
+
+    svg += '<rect x="'+drawX+'" y="'+drawY+'" width="'+drawW+'" height="'+drawH+'" fill="none" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3 2"/>';
+
+    // User footprint if provided and a best scale exists
+    if (userW && userD && bestScale) {
+      var fpW = userW * bestScale.factor * scale; // pixels
+      var fpD = userD * bestScale.factor * scale;
+
+      // Try both orientations
+      var fits = false;
+      var drawableInW = (sheet.w - sheet.tb - 0.5);
+      var drawableInH = (sheet.h - 0.5);
+      var realFpW = userW * bestScale.factor;
+      var realFpD = userD * bestScale.factor;
+
+      if (realFpW <= drawableInW && realFpD <= drawableInH) {
+        fits = true;
+      } else if (realFpD <= drawableInW && realFpW <= drawableInH) {
+        fits = true;
+        var tmp = fpW; fpW = fpD; fpD = tmp;
+      }
+
+      if (fits && fpW > 2 && fpD > 2) {
+        // Center in drawable area
+        var cx = drawX + drawW / 2;
+        var cy = drawY + drawH / 2;
+        svg += '<rect x="'+(cx - fpW/2)+'" y="'+(cy - fpD/2)+'" width="'+fpW+'" height="'+fpD+'" fill="rgba(17,17,17,0.06)" stroke="#111" stroke-width="1" stroke-dasharray="4 2"/>';
+        svg += '<text x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#555">'+userW+"' x "+userD+"'</text>";
+      }
+    }
+
+    // Sheet label
+    svg += '<text x="'+(x0+pw/2)+'" y="'+(y0+ph+16)+'" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="#888">'+sheet.w+'" x '+sheet.h+'"</text>';
+
+    svg += '</svg>';
+    return svg;
+  }
+
+  function update() {
+    var sheetKey = document.getElementById('sheetSelect').value;
+    var sheet = Sheets[sheetKey];
+    var userW = parseFloat(document.getElementById('userWidth').value) || 0;
+    var userD = parseFloat(document.getElementById('userDepth').value) || 0;
+
+    // Drawable area in inches
+    var drawableW = sheet.w - sheet.tb - 0.5;
+    var drawableH = sheet.h - 0.5;
+
+    // Info panel
+    var infoHTML = '';
+    infoHTML += '<div class="info-row"><div class="info-label">Sheet</div><div class="info-value">'+sheet.name+'</div></div>';
+    infoHTML += '<div class="info-row"><div class="info-label">Dimensions</div><div class="info-value">'+sheet.w+'" x '+sheet.h+'"  ('+sheet.w/12+"' x "+sheet.h/12+"')</div></div>";
+    infoHTML += '<div class="info-row"><div class="info-label">Drawable Area</div><div class="info-value">'+drawableW.toFixed(1)+'" x '+drawableH.toFixed(1)+'"</div></div>';
+    infoHTML += '<div class="info-row"><div class="info-label">Title Block</div><div class="info-value">'+sheet.tb+'" strip on right</div></div>';
+    document.getElementById('sheetInfo').innerHTML = infoHTML;
+
+    // Scale table
+    var tableHTML = '<div class="section-label" style="margin-bottom:0.5rem">What fits at each scale</div>';
+    tableHTML += '<table class="scale-table"><thead><tr><th>Scale</th><th>Max Width</th><th>Max Depth</th>';
+    if (userW && userD) tableHTML += '<th>Your '+userW+"' x "+userD+"'</th>";
+    tableHTML += '</tr></thead><tbody>';
+
+    var bestScale = null;
+
+    for (var i = 0; i < Scales.length; i++) {
+      var sc = Scales[i];
+      // Max real-world dimension that fits
+      var maxW = drawableW / sc.factor;
+      var maxH = drawableH / sc.factor;
+      // Check both orientations for max
+      var maxRealW = Math.max(maxW, maxH);
+      var maxRealH = Math.min(maxW, maxH);
+
+      var fits = false;
+      if (userW && userD) {
+        fits = (userW <= maxW && userD <= maxH) || (userD <= maxW && userW <= maxH);
+        if (fits && !bestScale) bestScale = sc;
+      }
+
+      // Skip scales that produce absurdly large or small areas
+      if (maxW < 1 || maxW > 100000) continue;
+
+      tableHTML += '<tr class="'+(fits?'fits':'')+'">';
+      tableHTML += '<td>'+sc.label+'</td>';
+      tableHTML += '<td>'+fmtFt(maxW)+'</td>';
+      tableHTML += '<td>'+fmtFt(maxH)+'</td>';
+      if (userW && userD) {
+        tableHTML += '<td>'+(fits ? 'Fits' + (bestScale === sc ? '<span class="fit-badge">smallest that fits</span>' : '') : '--')+'</td>';
+      }
+      tableHTML += '</tr>';
+    }
+
+    tableHTML += '</tbody></table>';
+    document.getElementById('scaleTableContainer').innerHTML = tableHTML;
+
+    // Draw sheet
+    document.getElementById('sheetVisual').innerHTML = drawSheet(sheet, userW, userD, bestScale);
+  }
+
+  // Common sizes
+  var cHTML = '';
+  for (var i = 0; i < CommonSizes.length; i++) {
+    var c = CommonSizes[i];
+    cHTML += '<div class="size-row" data-w="'+c.w+'" data-d="'+c.d+'">';
+    cHTML += '<div class="size-name">'+c.name+'</div>';
+    cHTML += '<div class="size-dim">'+c.w+"' x "+c.d+"'</div>";
+    cHTML += '</div>';
+  }
+  document.getElementById('commonList').innerHTML = cHTML;
+
+  document.getElementById('commonList').addEventListener('click', function(e) {
+    var row = e.target.closest('.size-row');
+    if (!row) return;
+    document.getElementById('userWidth').value = row.dataset.w;
+    document.getElementById('userDepth').value = row.dataset.d;
+    update();
+  });
+
+  document.getElementById('sheetSelect').addEventListener('change', update);
+  document.getElementById('userWidth').addEventListener('input', update);
+  document.getElementById('userDepth').addEventListener('input', update);
+
+  update();
+})();
+</script>
+</body>
+</html>

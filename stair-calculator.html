@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stair Calculator -- architecture.tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;}
+  html{font-size:15px;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .tool{max-width:720px;margin:0 auto;padding:3rem 2rem 5rem;}
+  .tool-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--black);}
+  .tool-header h1{font-size:1.5rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+  .tool-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:50em;}
+  .section-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
+  .input-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;align-items:flex-end;}
+  .input-group{display:flex;flex-direction:column;}
+  .input-group label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.3rem;}
+  .input-group input,.input-group select{font-family:var(--font-mono);font-size:0.9rem;font-weight:300;padding:0.45rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);outline:none;-webkit-appearance:none;appearance:none;}
+  .input-group input:focus,.input-group select:focus{border-color:var(--black);}
+  .input-group input{width:120px;}
+
+  .results{margin-bottom:2rem;display:none;}
+  .result-row{display:flex;align-items:baseline;padding:0.55rem 0;border-bottom:1px solid var(--gray-100);}
+  .result-row:last-child{border-bottom:none;}
+  .result-row .rl{width:160px;flex-shrink:0;font-size:0.65rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-500);}
+  .result-row .rv{font-family:var(--font-mono);font-size:0.88rem;font-weight:300;}
+
+  .code-check{margin:1.5rem 0;padding:1rem 1.25rem;border:1px solid var(--gray-100);background:var(--gray-50);}
+  .code-check.pass{border-color:#bbb;}
+  .code-check.fail{border-color:var(--black);background:#fafafa;}
+  .code-check-title{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:0.35rem;}
+  .code-check-items{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.7;}
+  .code-check-items .pass-item::before{content:'Pass ';font-family:var(--font-mono);font-size:0.6rem;color:var(--gray-400);letter-spacing:0.03em;}
+  .code-check-items .fail-item::before{content:'Fail ';font-family:var(--font-mono);font-size:0.6rem;color:var(--black);letter-spacing:0.03em;font-weight:400;}
+
+  .diagram{margin:1.5rem 0;display:flex;justify-content:center;}
+  .diagram svg{display:block;}
+
+  .note-box{padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;margin-top:1rem;}
+
+  .presets{margin-top:2rem;}
+  .preset-row{display:flex;align-items:baseline;padding:0.4rem 0;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background 0.1s;}
+  .preset-row:hover{background:var(--gray-50);}
+  .preset-row:last-child{border-bottom:none;}
+  .preset-name{font-size:0.78rem;font-weight:400;flex:1;}
+  .preset-val{font-family:var(--font-mono);font-size:0.72rem;font-weight:300;color:var(--gray-500);flex-shrink:0;}
+
+  .tool-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
+  @media(max-width:480px){.input-row{flex-direction:column;}.input-group input{width:100%;}}
+</style>
+</head>
+<body>
+<div class="tool">
+
+  <div class="tool-header">
+    <h1>Stair Calculator</h1>
+    <p>Enter total floor-to-floor rise. Get riser count, riser height, tread depth, total run, and IBC code check.</p>
+  </div>
+
+  <div class="section-label">Input</div>
+  <div class="input-row">
+    <div class="input-group">
+      <label>Total Rise</label>
+      <input type="text" id="inRise" placeholder='e.g. 9&apos;-2"' value="9'-2&quot;">
+    </div>
+    <div class="input-group">
+      <label>Code</label>
+      <select id="inCode">
+        <option value="ibc">IBC (commercial)</option>
+        <option value="irc">IRC (residential)</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Target Risers</label>
+      <input type="number" id="inRisers" placeholder="auto" value="">
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="section-label">Stair Dimensions</div>
+    <div class="result-row"><div class="rl">Number of Risers</div><div class="rv" id="r-risers"></div></div>
+    <div class="result-row"><div class="rl">Riser Height</div><div class="rv" id="r-riserH"></div></div>
+    <div class="result-row"><div class="rl">Treads</div><div class="rv" id="r-treads"></div></div>
+    <div class="result-row"><div class="rl">Tread Depth</div><div class="rv" id="r-treadD"></div></div>
+    <div class="result-row"><div class="rl">Total Run</div><div class="rv" id="r-run"></div></div>
+    <div class="result-row"><div class="rl">Stair Angle</div><div class="rv" id="r-angle"></div></div>
+    <div class="result-row"><div class="rl">Comfort Check</div><div class="rv" id="r-comfort"></div></div>
+
+    <div class="code-check" id="codeCheck">
+      <div class="code-check-title" id="codeCheckTitle">IBC Code Check</div>
+      <div class="code-check-items" id="codeCheckItems"></div>
+    </div>
+  </div>
+
+  <div class="diagram" id="diagram"></div>
+
+  <div class="presets">
+    <div class="section-label">Common Floor-to-Floor Heights -- click to load</div>
+    <div id="presetList"></div>
+  </div>
+
+  <div class="note-box">
+    IBC 1011.5: Max riser 7", min riser 4", min tread 11". IRC R311.7: Max riser 7-3/4", min tread 10". Comfort rule: 2R + T should be 24"--25" (ideal ~25"). Nosing: 3/4" to 1-1/4" projection when tread < 11". Always verify against local amendments.
+  </div>
+
+  <div class="tool-footer">architecture.tools</div>
+</div>
+
+<script>
+(function(){
+
+  var CODES = {
+    ibc: { name: 'IBC', maxRiser: 7, minRiser: 4, minTread: 11, maxNosing: 1.25, minNosing: 0.75 },
+    irc: { name: 'IRC', maxRiser: 7.75, minRiser: 4, minTread: 10, maxNosing: 1.25, minNosing: 0.75 }
+  };
+
+  var PRESETS = [
+    { name: 'Standard residential (8\'-0" floor)', rise: "8'-0\"" },
+    { name: 'Standard residential (8\'-1" with finish)', rise: "8'-1\"" },
+    { name: 'Standard residential (9\'-0" ceiling)', rise: "9'-1\"" },
+    { name: '9\'-2" (9\' ceiling + structure)', rise: "9'-2\"" },
+    { name: '10\'-0" commercial', rise: "10'-0\"" },
+    { name: '10\'-8" (10\' ceiling + structure)', rise: "10'-8\"" },
+    { name: '12\'-0" commercial', rise: "12'-0\"" },
+    { name: '13\'-4" (12\' ceiling + structure)', rise: "13'-4\"" },
+    { name: '14\'-0" retail / lobby', rise: "14'-0\"" },
+    { name: 'Half-level split (4\'-6")', rise: "4'-6\"" },
+  ];
+
+  function parseDim(str) {
+    if (!str) return NaN;
+    str = str.trim();
+    var ftMatch = str.match(/^(-?\d+\.?\d*)\s*'[\s-]*(.*)/);
+    if (ftMatch) {
+      var ft = parseFloat(ftMatch[1]);
+      var rest = ftMatch[2].replace(/"/g,'').trim();
+      var inches = 0;
+      if (rest) {
+        if (rest.indexOf('/') >= 0) { inches = parseFrac(rest); }
+        else { inches = parseFloat(rest) || 0; }
+      }
+      return ft * 12 + inches;
+    }
+    if (str.match(/'$/)) return parseFloat(str) * 12;
+    if (str.indexOf('/') >= 0) return parseFrac(str.replace(/"/g,''));
+    return parseFloat(str.replace(/"/g,''));
+  }
+
+  function parseFrac(str) {
+    var parts = str.trim().split(/[\s-]+/);
+    var whole = 0, num = 0, den = 1;
+    for (var i = 0; i < parts.length; i++) {
+      if (parts[i].indexOf('/') >= 0) { var f = parts[i].split('/'); num = parseFloat(f[0]); den = parseFloat(f[1]); }
+      else { whole = parseFloat(parts[i]); }
+    }
+    return whole + (den ? num / den : 0);
+  }
+
+  function fmtIn(inches) {
+    var neg = inches < 0; inches = Math.abs(inches);
+    var whole = Math.floor(inches);
+    var frac = inches - whole;
+    var sign = neg ? '-' : '';
+    // Round to 1/16
+    var s16 = Math.round(frac * 16);
+    if (s16 === 16) { whole++; s16 = 0; }
+    frac = s16 / 16;
+    if (frac === 0) return sign + whole + '"';
+    var bestN = s16, bestD = 16;
+    var g = gcd(bestN, bestD); bestN /= g; bestD /= g;
+    if (whole === 0) return sign + bestN + '/' + bestD + '"';
+    return sign + whole + '-' + bestN + '/' + bestD + '"';
+  }
+
+  function fmtFtIn(inches) {
+    var neg = inches < 0; inches = Math.abs(inches);
+    var ft = Math.floor(inches / 12);
+    var rem = inches - ft * 12;
+    var sign = neg ? '-' : '';
+    return sign + ft + "'-" + fmtIn(rem).replace('"','') + '"';
+  }
+
+  function gcd(a,b){return b===0?a:gcd(b,a%b);}
+
+  function fmtDec(n, dp) {
+    var s = n.toFixed(dp);
+    if (dp > 0) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s || '0';
+  }
+
+  function update() {
+    var totalRise = parseDim(document.getElementById('inRise').value);
+    var codeKey = document.getElementById('inCode').value;
+    var code = CODES[codeKey];
+    var targetRisers = parseInt(document.getElementById('inRisers').value);
+
+    if (isNaN(totalRise) || totalRise <= 0) {
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('diagram').innerHTML = '';
+      return;
+    }
+
+    // Calculate number of risers
+    var numRisers;
+    if (!isNaN(targetRisers) && targetRisers > 0) {
+      numRisers = targetRisers;
+    } else {
+      // Target 7" risers for IBC, 7.5" for IRC
+      var targetH = codeKey === 'irc' ? 7.5 : 7;
+      numRisers = Math.ceil(totalRise / targetH);
+      // Adjust if riser would be too short
+      if (totalRise / numRisers < code.minRiser) numRisers--;
+    }
+
+    var riserH = totalRise / numRisers;
+    var numTreads = numRisers - 1; // one less tread than risers
+
+    // Tread depth: use comfort rule 2R + T = 25
+    var treadD = 25 - 2 * riserH;
+    if (treadD < code.minTread) treadD = code.minTread;
+
+    var totalRun = numTreads * treadD;
+    var angle = Math.atan(totalRise / totalRun) * 180 / Math.PI;
+    var comfort = 2 * riserH + treadD;
+
+    document.getElementById('results').style.display = '';
+    document.getElementById('r-risers').textContent = numRisers;
+    document.getElementById('r-riserH').textContent = fmtIn(riserH) + '  (' + fmtDec(riserH, 3) + '")';
+    document.getElementById('r-treads').textContent = numTreads;
+    document.getElementById('r-treadD').textContent = fmtIn(treadD) + '  (' + fmtDec(treadD, 3) + '")';
+    document.getElementById('r-run').textContent = fmtFtIn(totalRun) + '  (' + fmtDec(totalRun, 1) + '")';
+    document.getElementById('r-angle').textContent = fmtDec(angle, 1) + '\u00B0';
+    document.getElementById('r-comfort').textContent = '2R + T = ' + fmtDec(comfort, 1) + '"' +
+      (comfort >= 24 && comfort <= 25 ? '  (ideal)' : comfort >= 23 && comfort <= 26 ? '  (acceptable)' : '  (outside comfort range)');
+
+    // Code check
+    var checks = [];
+    checks.push({ pass: riserH <= code.maxRiser, text: 'Riser ' + fmtDec(riserH, 3) + '" ' + (riserH <= code.maxRiser ? '<=' : '>') + ' ' + code.maxRiser + '" max' });
+    checks.push({ pass: riserH >= code.minRiser, text: 'Riser ' + fmtDec(riserH, 3) + '" ' + (riserH >= code.minRiser ? '>=' : '<') + ' ' + code.minRiser + '" min' });
+    checks.push({ pass: treadD >= code.minTread, text: 'Tread ' + fmtDec(treadD, 3) + '" ' + (treadD >= code.minTread ? '>=' : '<') + ' ' + code.minTread + '" min' });
+
+    var allPass = checks.every(function(c) { return c.pass; });
+    var checkEl = document.getElementById('codeCheck');
+    checkEl.className = 'code-check ' + (allPass ? 'pass' : 'fail');
+    document.getElementById('codeCheckTitle').textContent = code.name + ' Code Check';
+
+    var cHTML = '';
+    for (var i = 0; i < checks.length; i++) {
+      cHTML += '<div class="'+(checks[i].pass ? 'pass-item' : 'fail-item')+'">'+checks[i].text+'</div>';
+    }
+    document.getElementById('codeCheckItems').innerHTML = cHTML;
+
+    // Diagram
+    drawDiagram(totalRise, totalRun, numRisers, numTreads, riserH, treadD);
+  }
+
+  function drawDiagram(rise, run, nR, nT, rH, tD) {
+    var maxW = 500, maxH = 250;
+    var scale = Math.min(maxW / run, maxH / rise, 4);
+    scale = Math.max(scale, 0.5);
+    var w = run * scale;
+    var h = rise * scale;
+    var pad = 30;
+    var svgW = w + pad * 2;
+    var svgH = h + pad * 2;
+
+    var svg = '<svg width="'+svgW+'" height="'+svgH+'" viewBox="0 0 '+svgW+' '+svgH+'">';
+
+    // Draw steps
+    var x = pad, y = pad + h;
+    var stepW = tD * scale;
+    var stepH = rH * scale;
+
+    svg += '<path d="M '+x+' '+y;
+    for (var i = 0; i < nR; i++) {
+      y -= stepH;
+      svg += ' L '+x+' '+y;
+      if (i < nT) {
+        x += stepW;
+        svg += ' L '+x+' '+y;
+      }
+    }
+    svg += '" fill="none" stroke="#111" stroke-width="1.5"/>';
+
+    // Baseline
+    svg += '<line x1="'+pad+'" y1="'+(pad+h)+'" x2="'+(pad+w)+'" y2="'+(pad+h)+'" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3 2"/>';
+    // Right edge
+    svg += '<line x1="'+(pad+w)+'" y1="'+pad+'" x2="'+(pad+w)+'" y2="'+(pad+h)+'" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3 2"/>';
+
+    // Labels
+    svg += '<text x="'+(pad+w/2)+'" y="'+(pad+h+18)+'" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" fill="#888">Run: '+fmtFtIn(run)+'</text>';
+    svg += '<text x="'+(pad+w+12)+'" y="'+(pad+h/2)+'" text-anchor="start" font-family="DM Mono,monospace" font-size="10" fill="#888">Rise: '+fmtFtIn(rise)+'</text>';
+
+    svg += '</svg>';
+    document.getElementById('diagram').innerHTML = svg;
+  }
+
+  // Presets
+  var pHTML = '';
+  for (var i = 0; i < PRESETS.length; i++) {
+    var p = PRESETS[i];
+    pHTML += '<div class="preset-row" data-rise="'+p.rise.replace(/"/g,'&quot;')+'"><div class="preset-name">'+p.name+'</div><div class="preset-val">'+p.rise+'</div></div>';
+  }
+  document.getElementById('presetList').innerHTML = pHTML;
+
+  document.getElementById('presetList').addEventListener('click', function(e) {
+    var row = e.target.closest('.preset-row');
+    if (!row) return;
+    document.getElementById('inRise').value = row.dataset.rise;
+    update();
+  });
+
+  document.getElementById('inRise').addEventListener('input', update);
+  document.getElementById('inCode').addEventListener('change', update);
+  document.getElementById('inRisers').addEventListener('input', update);
+
+  update();
+})();
+</script>
+</body>
+</html>

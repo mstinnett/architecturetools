@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parking Ratio Calculator -- architecture.tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;}
+  html{font-size:15px;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .tool{max-width:720px;margin:0 auto;padding:3rem 2rem 5rem;}
+  .tool-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--black);}
+  .tool-header h1{font-size:1.5rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+  .tool-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:50em;}
+  .section-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
+
+  .zone-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem;align-items:flex-end;}
+  .input-group{display:flex;flex-direction:column;}
+  .input-group label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.3rem;}
+  .input-group input,.input-group select{font-family:var(--font-mono);font-size:0.85rem;font-weight:300;padding:0.45rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);outline:none;-webkit-appearance:none;appearance:none;}
+  .input-group input:focus,.input-group select:focus{border-color:var(--black);}
+  .input-group input{width:110px;}
+  .input-group select{min-width:220px;}
+  .add-btn{font-size:0.75rem;font-weight:400;color:var(--black);border-bottom:1px solid var(--black);cursor:pointer;display:inline-block;padding-bottom:1px;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-body);margin-bottom:1.5rem;}
+  .add-btn:hover{opacity:0.6;}
+  .rm-btn{font-size:0.7rem;color:var(--gray-400);cursor:pointer;padding:0.4rem 0.5rem;background:none;border:1px solid var(--gray-200);font-family:var(--font-mono);}
+  .rm-btn:hover{color:var(--black);}
+
+  .result-box{padding:1.25rem;border:1px solid var(--black);margin-bottom:1.5rem;display:none;}
+  .result-big{font-family:var(--font-mono);font-size:2rem;font-weight:300;margin-bottom:0.25rem;}
+  .result-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);}
+  .result-detail{font-size:0.78rem;font-weight:300;color:var(--gray-700);margin-top:0.75rem;line-height:1.6;}
+  .detail-row{display:flex;align-items:baseline;padding:0.4rem 0;border-bottom:1px solid var(--gray-100);}
+  .detail-row:last-child{border-bottom:none;}
+  .detail-row .dl{flex:1;font-size:0.78rem;font-weight:300;color:var(--gray-700);}
+  .detail-row .dv{font-family:var(--font-mono);font-size:0.82rem;font-weight:300;flex-shrink:0;}
+
+  .area-note{padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;margin-bottom:1.5rem;}
+
+  .ref-table{margin-top:2.5rem;}
+  .ref-table table{width:100%;border-collapse:collapse;}
+  .ref-table th{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);text-align:left;padding:0.5rem 0.75rem;border-bottom:1px solid var(--gray-200);}
+  .ref-table td{font-size:0.78rem;font-weight:300;padding:0.45rem 0.75rem;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background 0.1s;}
+  .ref-table tr:hover td{background:var(--gray-50);}
+  .ref-table td:nth-child(2),.ref-table td:nth-child(3){font-family:var(--font-mono);font-size:0.72rem;color:var(--gray-500);}
+
+  .tool-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
+  @media(max-width:480px){.zone-row{flex-direction:column;}.input-group input,.input-group select{width:100%;min-width:0;}}
+</style>
+</head>
+<body>
+<div class="tool">
+  <div class="tool-header">
+    <h1>Parking Ratio Calculator</h1>
+    <p>Estimate required parking spaces by use. Ratios are typical suburban zoning -- always verify against your local ordinance. Add multiple uses for mixed-use projects.</p>
+  </div>
+
+  <div id="zones"></div>
+  <button class="add-btn" id="addZone">+ Add another use</button>
+
+  <div class="result-box" id="resultBox">
+    <div class="result-big" id="resultTotal"></div>
+    <div class="result-label">Total parking spaces required</div>
+    <div id="resultDetails"></div>
+    <div class="area-note" id="areaNote" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+  <div class="ref-table">
+    <div class="section-label">Typical Parking Ratios -- click to use</div>
+    <table><thead><tr><th>Use</th><th>Ratio</th><th>Per</th></tr></thead>
+    <tbody id="refBody"></tbody></table>
+  </div>
+
+  <div class="tool-footer">
+    Ratios are typical suburban/ITE ranges. Urban, transit-oriented, or specific jurisdictions vary widely. Many cities are eliminating parking minimums. Always check your local zoning code.
+    <br>architecture.tools
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // Typical parking ratios
+  // unit: 'sf' = per SF of floor area, 'unit' = per dwelling/room/seat etc.
+  var Ratios = [
+    { use: 'Office (general)', ratio: 3.3, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Office (medical/dental)', ratio: 5, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Retail (general)', ratio: 4, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Retail (shopping center)', ratio: 4.5, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Restaurant (sit-down)', ratio: 10, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Restaurant (fast food)', ratio: 12, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Residential (single-family)', ratio: 2, per: 'dwelling unit', unit: 'unit', divisor: 1 },
+    { use: 'Residential (multifamily)', ratio: 1.5, per: 'dwelling unit', unit: 'unit', divisor: 1 },
+    { use: 'Residential (senior)', ratio: 0.5, per: 'dwelling unit', unit: 'unit', divisor: 1 },
+    { use: 'Hotel', ratio: 1, per: 'guest room', unit: 'unit', divisor: 1 },
+    { use: 'Church / worship', ratio: 0.33, per: 'seat', unit: 'unit', divisor: 1 },
+    { use: 'Theater / auditorium', ratio: 0.33, per: 'seat', unit: 'unit', divisor: 1 },
+    { use: 'School (elementary)', ratio: 1.5, per: 'classroom', unit: 'unit', divisor: 1 },
+    { use: 'School (high school)', ratio: 7, per: 'classroom', unit: 'unit', divisor: 1 },
+    { use: 'College / university', ratio: 0.3, per: 'student (FTE)', unit: 'unit', divisor: 1 },
+    { use: 'Hospital', ratio: 2, per: 'bed', unit: 'unit', divisor: 1 },
+    { use: 'Warehouse / industrial', ratio: 1, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Manufacturing', ratio: 1.5, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Day care', ratio: 1, per: '8 children', unit: 'unit', divisor: 1 },
+    { use: 'Gym / health club', ratio: 5, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Library', ratio: 3, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+    { use: 'Bank', ratio: 4, per: '1,000 SF', unit: 'sf', divisor: 1000 },
+  ];
+
+  var zoneCount = 0;
+
+  function useOptions() {
+    var h = '<option value="">-- select use --</option>';
+    for (var i = 0; i < Ratios.length; i++) {
+      h += '<option value="'+i+'">'+Ratios[i].use+'</option>';
+    }
+    return h;
+  }
+
+  function addZone(preset) {
+    zoneCount++;
+    var id = zoneCount;
+    var div = document.createElement('div');
+    div.className = 'zone-row';
+    div.id = 'zone-' + id;
+    div.innerHTML =
+      '<div class="input-group"><label>Use</label><select class="z-use" data-z="'+id+'">'+useOptions()+'</select></div>'+
+      '<div class="input-group"><label id="qty-label-'+id+'">Area (SF) or Units</label><input type="number" class="z-qty" data-z="'+id+'" placeholder="e.g. 10000"></div>'+
+      '<button class="rm-btn" data-z="'+id+'">&times;</button>';
+    document.getElementById('zones').appendChild(div);
+
+    if (preset) {
+      div.querySelector('.z-use').value = preset.use || '';
+      div.querySelector('.z-qty').value = preset.qty || '';
+    }
+
+    div.querySelector('.z-use').addEventListener('change', function() {
+      var idx = this.value;
+      var lbl = document.getElementById('qty-label-'+id);
+      if (idx !== '') {
+        var r = Ratios[parseInt(idx)];
+        lbl.textContent = r.unit === 'sf' ? 'Area (SF)' : 'Count ('+r.per+')';
+      }
+      update();
+    });
+    div.querySelector('.z-qty').addEventListener('input', update);
+    div.querySelector('.rm-btn').addEventListener('click', function() { div.remove(); update(); });
+    update();
+  }
+
+  function update() {
+    var zones = document.querySelectorAll('.zone-row');
+    var totalSpaces = 0;
+    var details = [];
+    var hasInput = false;
+    var totalArea = 0;
+
+    zones.forEach(function(z) {
+      var useIdx = z.querySelector('.z-use').value;
+      var qty = parseFloat(z.querySelector('.z-qty').value);
+      if (useIdx === '' || isNaN(qty) || qty <= 0) return;
+      hasInput = true;
+      var r = Ratios[parseInt(useIdx)];
+      var spaces;
+      if (r.unit === 'sf') {
+        spaces = Math.ceil((qty / r.divisor) * r.ratio);
+        totalArea += qty;
+      } else {
+        spaces = Math.ceil(qty * r.ratio);
+      }
+      totalSpaces += spaces;
+      details.push({ use: r.use, qty: qty, ratio: r.ratio, per: r.per, spaces: spaces, unit: r.unit });
+    });
+
+    var box = document.getElementById('resultBox');
+    if (!hasInput) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    document.getElementById('resultTotal').textContent = totalSpaces;
+
+    var dHTML = '';
+    for (var i = 0; i < details.length; i++) {
+      var d = details[i];
+      var calc = d.unit === 'sf'
+        ? d.qty.toLocaleString() + ' SF x ' + d.ratio + ' / 1,000'
+        : d.qty.toLocaleString() + ' ' + d.per + ' x ' + d.ratio;
+      dHTML += '<div class="detail-row"><div class="dl">'+d.use+'</div><div class="dv">'+calc+' = <strong>'+d.spaces+'</strong></div></div>';
+    }
+    document.getElementById('resultDetails').innerHTML = dHTML;
+
+    // Area estimate
+    var an = document.getElementById('areaNote');
+    if (totalSpaces > 0) {
+      var sfPerSpace = 350; // typical with drive aisles
+      var lotSF = totalSpaces * sfPerSpace;
+      var lotAcres = lotSF / 43560;
+      an.style.display = '';
+      an.innerHTML = 'Estimated parking area: <strong>' + totalSpaces + ' spaces x 350 SF/space = ' +
+        lotSF.toLocaleString() + ' SF</strong> (~' + lotAcres.toFixed(2) + ' acres). ' +
+        'Includes standard 9x18 spaces with 24\' drive aisles. Structured parking: ~350-400 SF/space per level.';
+    } else {
+      an.style.display = 'none';
+    }
+  }
+
+  // Reference table
+  var rHTML = '';
+  for (var i = 0; i < Ratios.length; i++) {
+    var r = Ratios[i];
+    rHTML += '<tr data-idx="'+i+'"><td>'+r.use+'</td><td>'+r.ratio+' spaces</td><td>per '+r.per+'</td></tr>';
+  }
+  document.getElementById('refBody').innerHTML = rHTML;
+
+  document.getElementById('refBody').addEventListener('click', function(e) {
+    var tr = e.target.closest('tr');
+    if (!tr) return;
+    var idx = tr.dataset.idx;
+    var zones = document.querySelectorAll('.zone-row');
+    if (zones.length === 0) {
+      addZone({ use: idx });
+    } else {
+      var last = zones[zones.length-1].querySelector('.z-use');
+      if (last.value === '') { last.value = idx; last.dispatchEvent(new Event('change')); }
+      else { addZone({ use: idx }); }
+    }
+  });
+
+  document.getElementById('addZone').addEventListener('click', function() { addZone(); });
+  addZone();
+})();
+</script>
+</body>
+</html>

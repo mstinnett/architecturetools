@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Screen -- architecture.tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;--accent:#2563eb;}
+  html{font-size:14px;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+  .app{display:flex;height:100vh;overflow:hidden;}
+
+  /* Left: canvas */
+  .canvas-side{flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid var(--gray-200);}
+  .canvas-toolbar{display:flex;align-items:center;gap:0.75rem;padding:0.5rem 1rem;border-bottom:1px solid var(--gray-100);flex-shrink:0;background:var(--gray-50);}
+  .toolbar-btn{font-family:var(--font-mono);font-size:0.65rem;font-weight:300;letter-spacing:0.04em;padding:0.3rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);cursor:pointer;transition:all 0.15s;text-transform:uppercase;}
+  .toolbar-btn:hover{border-color:var(--gray-500);}
+  .toolbar-btn.active{background:var(--black);color:var(--white);border-color:var(--black);}
+  .toolbar-sep{width:1px;height:16px;background:var(--gray-200);}
+  .toolbar-label{font-size:0.6rem;font-family:var(--font-mono);color:var(--gray-400);letter-spacing:0.04em;}
+  .toolbar-input{font-family:var(--font-mono);font-size:0.75rem;font-weight:300;padding:0.25rem 0.4rem;border:1px solid var(--gray-300);width:60px;outline:none;text-align:center;}
+  .toolbar-input:focus{border-color:var(--black);}
+  .toolbar-x{font-family:var(--font-mono);font-size:0.65rem;color:var(--gray-400);}
+
+  .canvas-area{flex:1;position:relative;overflow:hidden;cursor:crosshair;background:#fafaf9;}
+  .canvas-area svg{width:100%;height:100%;display:block;}
+
+  .canvas-status{padding:0.35rem 1rem;font-size:0.6rem;font-family:var(--font-mono);color:var(--gray-400);border-top:1px solid var(--gray-100);flex-shrink:0;background:var(--gray-50);letter-spacing:0.03em;}
+
+  /* Right: numbers */
+  .numbers-side{width:340px;flex-shrink:0;overflow-y:auto;padding:1.25rem;background:var(--white);}
+  .numbers-side h1{font-size:1.1rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.2rem;}
+  .numbers-side .subtitle{font-size:0.72rem;color:var(--gray-500);font-weight:300;margin-bottom:1.5rem;}
+
+  .panel-section{margin-bottom:1.5rem;}
+  .panel-label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.5rem;padding-bottom:0.3rem;border-bottom:1px solid var(--gray-100);}
+
+  .field-row{display:flex;align-items:center;margin-bottom:0.4rem;gap:0.5rem;}
+  .field-label{font-size:0.72rem;font-weight:300;color:var(--gray-700);flex:1;min-width:0;}
+  .field-value{font-family:var(--font-mono);font-size:0.78rem;font-weight:300;text-align:right;flex-shrink:0;}
+  .field-input{font-family:var(--font-mono);font-size:0.78rem;font-weight:300;padding:0.25rem 0.4rem;border:1px solid var(--gray-200);width:80px;text-align:right;outline:none;background:var(--white);}
+  .field-input:focus{border-color:var(--black);}
+  .field-input.narrow{width:55px;}
+  .field-unit{font-size:0.6rem;font-family:var(--font-mono);color:var(--gray-400);width:30px;flex-shrink:0;}
+  .field-select{font-family:var(--font-mono);font-size:0.72rem;font-weight:300;padding:0.25rem 0.35rem;border:1px solid var(--gray-200);background:var(--white);outline:none;-webkit-appearance:none;cursor:pointer;}
+  .field-select:focus{border-color:var(--black);}
+
+  .output-row{display:flex;align-items:baseline;margin-bottom:0.35rem;}
+  .output-label{font-size:0.72rem;font-weight:300;color:var(--gray-700);flex:1;}
+  .output-value{font-family:var(--font-mono);font-size:0.82rem;font-weight:300;text-align:right;}
+  .output-big{font-family:var(--font-mono);font-size:1.3rem;font-weight:300;}
+
+  .result-box{padding:0.75rem;border:1px solid var(--black);margin-top:0.75rem;}
+  .result-box .output-label{font-weight:400;}
+
+  .divider{border:none;border-top:1px solid var(--gray-100);margin:1rem 0;}
+
+  /* Dimension editor overlay */
+  .dim-editor{position:absolute;display:none;z-index:10;}
+  .dim-editor input{font-family:var(--font-mono);font-size:0.82rem;font-weight:300;padding:0.3rem 0.5rem;border:1.5px solid var(--black);width:70px;text-align:center;outline:none;background:var(--white);}
+
+  /* Edge labels on SVG */
+  .edge-label{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;fill:var(--black);cursor:pointer;user-select:none;}
+  .edge-label:hover{fill:var(--accent);}
+  .setback-label{font-family:'DM Mono',monospace;font-size:8px;font-weight:300;fill:var(--gray-400);}
+
+  @media(max-width:768px){
+    .app{flex-direction:column;height:auto;}
+    .canvas-side{height:50vh;border-right:none;border-bottom:1px solid var(--gray-200);}
+    .numbers-side{width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Canvas side -->
+  <div class="canvas-side">
+    <div class="canvas-toolbar">
+      <span class="toolbar-label">Lot</span>
+      <input type="text" class="toolbar-input" id="lotW" value="100" title="Width (ft)">
+      <span class="toolbar-x">x</span>
+      <input type="text" class="toolbar-input" id="lotD" value="60" title="Depth (ft)">
+      <span class="toolbar-label">ft</span>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" id="btnAddPt" title="Double-click an edge to add a corner">+ Point</button>
+      <button class="toolbar-btn" id="btnReset">Reset</button>
+      <div class="toolbar-sep"></div>
+      <span class="toolbar-label" id="snapLabel">Snap: 1 ft</span>
+    </div>
+    <div class="canvas-area" id="canvasArea">
+      <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="dim-editor" id="dimEditor"><input type="text" id="dimInput"></div>
+    </div>
+    <div class="canvas-status" id="status">Drag corners to reshape. Click a dimension to edit it. Double-click an edge or use + Point to add corners.</div>
+  </div>
+
+  <!-- Numbers side -->
+  <div class="numbers-side">
+    <h1>Site Screen</h1>
+    <div class="subtitle">Estimate what a site can support</div>
+
+    <!-- Lot metrics (auto) -->
+    <div class="panel-section">
+      <div class="panel-label">Lot</div>
+      <div class="output-row"><div class="output-label">Lot area</div><div class="output-value" id="out-lotArea">--</div></div>
+      <div class="output-row"><div class="output-label">Lot area (acres)</div><div class="output-value" id="out-lotAcres">--</div></div>
+    </div>
+
+    <!-- Setbacks -->
+    <div class="panel-section">
+      <div class="panel-label">Setbacks</div>
+      <div class="field-row"><div class="field-label">Front</div><input class="field-input narrow setback-input" id="sb-front" value="25" data-edge="front"><div class="field-unit">ft</div></div>
+      <div class="field-row"><div class="field-label">Rear</div><input class="field-input narrow setback-input" id="sb-rear" value="20" data-edge="rear"><div class="field-unit">ft</div></div>
+      <div class="field-row"><div class="field-label">Side (left)</div><input class="field-input narrow setback-input" id="sb-left" value="5" data-edge="left"><div class="field-unit">ft</div></div>
+      <div class="field-row"><div class="field-label">Side (right)</div><input class="field-input narrow setback-input" id="sb-right" value="5" data-edge="right"><div class="field-unit">ft</div></div>
+      <div class="output-row" style="margin-top:0.5rem;"><div class="output-label">Buildable footprint</div><div class="output-value" id="out-buildable">--</div></div>
+    </div>
+
+    <!-- Zoning -->
+    <div class="panel-section">
+      <div class="panel-label">Zoning / Massing</div>
+      <div class="field-row"><div class="field-label">Max FAR</div><input class="field-input narrow calc-input" id="in-far" value="2.0"><div class="field-unit"></div></div>
+      <div class="field-row"><div class="field-label">Max stories</div><input class="field-input narrow calc-input" id="in-stories" value="4"><div class="field-unit"></div></div>
+      <div class="field-row"><div class="field-label">Max lot coverage</div><input class="field-input narrow calc-input" id="in-coverage" value="80"><div class="field-unit">%</div></div>
+      <div class="output-row" style="margin-top:0.5rem;"><div class="output-label">Gross building area</div><div class="output-value" id="out-gba">--</div></div>
+      <div class="output-row"><div class="output-label">Likely footprint</div><div class="output-value" id="out-footprint">--</div></div>
+      <div class="output-row"><div class="output-label">Likely stories</div><div class="output-value" id="out-stories">--</div></div>
+    </div>
+
+    <!-- Program -->
+    <div class="panel-section">
+      <div class="panel-label">Program</div>
+      <div class="field-row"><div class="field-label">Type</div>
+        <select class="field-select calc-input" id="in-type">
+          <option value="sfr">Single-family residential</option>
+          <option value="res_apartment">Apartment</option>
+          <option value="res_townhouse">Townhouse</option>
+          <option value="res_condo">Condo</option>
+          <option value="office">Office</option>
+          <option value="retail">Retail</option>
+          <option value="mixed">Mixed-use (res over retail)</option>
+        </select>
+      </div>
+      <div class="field-row"><div class="field-label">Efficiency</div><input class="field-input narrow calc-input" id="in-efficiency" value="85"><div class="field-unit">%</div></div>
+      <div class="field-row"><div class="field-label">Avg unit size</div><input class="field-input calc-input" id="in-unitSize" value="850"><div class="field-unit">SF</div></div>
+      <div class="output-row" style="margin-top:0.5rem;"><div class="output-label">Net usable area</div><div class="output-value" id="out-net">--</div></div>
+      <div class="output-row"><div class="output-label">Estimated units</div><div class="output-value" id="out-units">--</div></div>
+    </div>
+
+    <!-- Parking -->
+    <div class="panel-section">
+      <div class="panel-label">Parking</div>
+      <div class="field-row"><div class="field-label">Ratio</div><input class="field-input narrow calc-input" id="in-parkRatio" value="1.0"><div class="field-unit" id="parkRatioUnit">/unit</div></div>
+      <div class="field-row"><div class="field-label">Type</div>
+        <select class="field-select calc-input" id="in-parkType">
+          <option value="surface">Surface ($5k/space)</option>
+          <option value="structured">Structured ($25k/space)</option>
+          <option value="underground">Underground ($50k/space)</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div class="output-row" style="margin-top:0.5rem;"><div class="output-label">Spaces required</div><div class="output-value" id="out-spaces">--</div></div>
+      <div class="output-row"><div class="output-label">Parking cost</div><div class="output-value" id="out-parkCost">--</div></div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Value -->
+    <div class="panel-section">
+      <div class="panel-label">Value Assumptions</div>
+      <div class="field-row"><div class="field-label">Sale/value per SF</div><input class="field-input calc-input" id="in-valuePerSF" value="350"><div class="field-unit">$/SF</div></div>
+      <div class="field-row"><div class="field-label">Hard cost per SF</div><input class="field-input calc-input" id="in-hardCost" value="200"><div class="field-unit">$/SF</div></div>
+      <div class="field-row"><div class="field-label">Soft costs</div><input class="field-input narrow calc-input" id="in-softPct" value="25"><div class="field-unit">% hard</div></div>
+      <div class="field-row"><div class="field-label">Developer margin</div><input class="field-input narrow calc-input" id="in-margin" value="15"><div class="field-unit">% value</div></div>
+    </div>
+
+    <!-- Results -->
+    <div class="panel-section">
+      <div class="panel-label">Result</div>
+      <div class="output-row"><div class="output-label">Gross development value</div><div class="output-value" id="out-gdv">--</div></div>
+      <div class="output-row"><div class="output-label">Hard costs</div><div class="output-value" id="out-hard">--</div></div>
+      <div class="output-row"><div class="output-label">Soft costs</div><div class="output-value" id="out-soft">--</div></div>
+      <div class="output-row"><div class="output-label">Parking costs</div><div class="output-value" id="out-parkTotal">--</div></div>
+      <div class="output-row"><div class="output-label">Developer margin</div><div class="output-value" id="out-marginAmt">--</div></div>
+
+      <div class="result-box">
+        <div class="output-row"><div class="output-label">Residual land value</div><div class="output-big" id="out-residual">--</div></div>
+        <div class="output-row"><div class="output-label">Per SF of lot</div><div class="output-value" id="out-perSF">--</div></div>
+        <div class="output-row"><div class="output-label">Per unit</div><div class="output-value" id="out-perUnit">--</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+  // ---- LOT GEOMETRY ----
+  // Points in feet. Default rectangle.
+  var points = [
+    {x:0, y:0},
+    {x:100, y:0},
+    {x:100, y:60},
+    {x:0, y:60}
+  ];
+
+  // Edge types: front(0=bottom), right(1), rear(2=top), left(3)
+  // For default rect: bottom=front, right=right, top=rear, left=left
+  var edgeTypes = ['front','right','rear','left'];
+
+  var snap = 1; // feet
+  var dragging = null; // index of point being dragged
+  var addPointMode = false;
+
+  var svg = document.getElementById('svg');
+  var canvasArea = document.getElementById('canvasArea');
+  var dimEditor = document.getElementById('dimEditor');
+  var dimInput = document.getElementById('dimInput');
+
+  function polygonArea(pts) {
+    var n = pts.length, a = 0;
+    for (var i = 0; i < n; i++) {
+      var j = (i + 1) % n;
+      a += pts[i].x * pts[j].y;
+      a -= pts[j].x * pts[i].y;
+    }
+    return Math.abs(a) / 2;
+  }
+
+  function edgeLength(i) {
+    var j = (i + 1) % points.length;
+    var dx = points[j].x - points[i].x;
+    var dy = points[j].y - points[i].y;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  function edgeMidpoint(i) {
+    var j = (i + 1) % points.length;
+    return { x: (points[i].x + points[j].x) / 2, y: (points[i].y + points[j].y) / 2 };
+  }
+
+  // Inward offset polygon for setbacks
+  function offsetPolygon(pts, distances) {
+    var n = pts.length;
+    if (n < 3) return [];
+
+    // Compute centroid for reliable inward direction
+    var cx = 0, cy = 0;
+    for (var i = 0; i < n; i++) { cx += pts[i].x; cy += pts[i].y; }
+    cx /= n; cy /= n;
+
+    var lines = [];
+    for (var i = 0; i < n; i++) {
+      var j = (i + 1) % n;
+      var dx = pts[j].x - pts[i].x;
+      var dy = pts[j].y - pts[i].y;
+      var len = Math.sqrt(dx * dx + dy * dy);
+      if (len < 0.01) { lines.push(null); continue; }
+
+      var n1x = -dy / len, n1y = dx / len;
+      var n2x = dy / len, n2y = -dx / len;
+
+      var mx = (pts[i].x + pts[j].x) / 2;
+      var my = (pts[i].y + pts[j].y) / 2;
+      var dot1 = (cx - mx) * n1x + (cy - my) * n1y;
+      var dot2 = (cx - mx) * n2x + (cy - my) * n2y;
+      var inx = dot1 > dot2 ? n1x : n2x;
+      var iny = dot1 > dot2 ? n1y : n2y;
+
+      var d = distances[i] || 0;
+      lines.push({
+        p: { x: pts[i].x + inx * d, y: pts[i].y + iny * d },
+        d: { x: dx, y: dy }
+      });
+    }
+
+    var validLines = [];
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i]) validLines.push(lines[i]);
+    }
+    if (validLines.length < 3) return [];
+
+    var result = [];
+    for (var i = 0; i < validLines.length; i++) {
+      var l1 = validLines[i];
+      var l2 = validLines[(i + 1) % validLines.length];
+      var pt = lineIntersect(l1.p, l1.d, l2.p, l2.d);
+      if (pt) result.push(pt);
+    }
+
+    if (result.length < 3) return [];
+
+    // Check if offset polygon winding inverted (setbacks exceed lot dimensions)
+    var origSA = 0, offSA = 0;
+    for (var i = 0; i < pts.length; i++) {
+      var j = (i + 1) % pts.length;
+      origSA += pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+    }
+    for (var i = 0; i < result.length; i++) {
+      var j = (i + 1) % result.length;
+      offSA += result[i].x * result[j].y - result[j].x * result[i].y;
+    }
+    if ((origSA > 0) !== (offSA > 0)) return []; // setbacks crossed, no buildable area
+
+    // Clip offset polygon to original lot (Sutherland-Hodgman)
+    result = clipPolygon(result, pts);
+    return result;
+  }
+
+  // Sutherland-Hodgman polygon clipping: clip subject to convex/concave clip boundary
+  function clipPolygon(subject, clip) {
+    if (subject.length < 3 || clip.length < 3) return [];
+
+    // Determine clip winding via signed area
+    var sa = 0;
+    for (var i = 0; i < clip.length; i++) {
+      var j = (i + 1) % clip.length;
+      sa += clip[i].x * clip[j].y - clip[j].x * clip[i].y;
+    }
+    var cwFlip = sa < 0 ? -1 : 1; // flip inside test for CW polygons
+
+    var output = subject.slice();
+    for (var i = 0; i < clip.length; i++) {
+      if (output.length === 0) return [];
+      var input = output;
+      output = [];
+      var a = clip[i];
+      var b = clip[(i + 1) % clip.length];
+
+      for (var j = 0; j < input.length; j++) {
+        var cur = input[j];
+        var prev = input[(j + input.length - 1) % input.length];
+        var curIn = crossSign(a, b, cur) * cwFlip >= -0.001;
+        var prevIn = crossSign(a, b, prev) * cwFlip >= -0.001;
+
+        if (curIn) {
+          if (!prevIn) {
+            var ix = segLineIntersect(prev, cur, a, b);
+            if (ix) output.push(ix);
+          }
+          output.push(cur);
+        } else if (prevIn) {
+          var ix2 = segLineIntersect(prev, cur, a, b);
+          if (ix2) output.push(ix2);
+        }
+      }
+    }
+    return output;
+  }
+
+  function crossSign(a, b, p) {
+    return (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
+  }
+
+  function segLineIntersect(p1, p2, p3, p4) {
+    var d1x = p2.x - p1.x, d1y = p2.y - p1.y;
+    var d2x = p4.x - p3.x, d2y = p4.y - p3.y;
+    var det = d1x * d2y - d1y * d2x;
+    if (Math.abs(det) < 0.0001) return null;
+    var t = ((p3.x - p1.x) * d2y - (p3.y - p1.y) * d2x) / det;
+    return { x: p1.x + t * d1x, y: p1.y + t * d1y };
+  }
+
+  function lineIntersect(p1, d1, p2, d2) {
+    var det = d1.x * d2.y - d1.y * d2.x;
+    if (Math.abs(det) < 0.0001) return null;
+    var t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / det;
+    return { x: p1.x + t * d1.x, y: p1.y + t * d1.y };
+  }
+
+  // ---- COORDINATE TRANSFORMS ----
+  function getTransform() {
+    var rect = canvasArea.getBoundingClientRect();
+    var w = rect.width, h = rect.height;
+    // Find bounds
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (var i = 0; i < points.length; i++) {
+      if (points[i].x < minX) minX = points[i].x;
+      if (points[i].x > maxX) maxX = points[i].x;
+      if (points[i].y < minY) minY = points[i].y;
+      if (points[i].y > maxY) maxY = points[i].y;
+    }
+    var lotW = maxX - minX || 1;
+    var lotH = maxY - minY || 1;
+    var pad = 80;
+    var scale = Math.min((w - pad*2) / lotW, (h - pad*2) / lotH);
+    var cx = w / 2, cy = h / 2;
+    var lotCx = (minX + maxX) / 2, lotCy = (minY + maxY) / 2;
+    return {
+      scale: scale,
+      toSvgX: function(fx) { return cx + (fx - lotCx) * scale; },
+      toSvgY: function(fy) { return cy + (fy - lotCy) * scale; },
+      toFeetX: function(sx) { return lotCx + (sx - cx) / scale; },
+      toFeetY: function(sy) { return lotCy + (sy - cy) / scale; },
+      w: w, h: h
+    };
+  }
+
+  function snapVal(v) {
+    return Math.round(v / snap) * snap;
+  }
+
+  // ---- RENDERING ----
+  function render() {
+    var t = getTransform();
+    var html = '';
+
+    // Grid (subtle)
+    var gridStep = snap;
+    if (t.scale * gridStep < 8) gridStep = 5;
+    if (t.scale * gridStep < 8) gridStep = 10;
+
+    // Lot polygon fill
+    var lotPath = 'M';
+    for (var i = 0; i < points.length; i++) {
+      lotPath += (i?'L':'') + t.toSvgX(points[i].x).toFixed(1) + ',' + t.toSvgY(points[i].y).toFixed(1);
+    }
+    lotPath += 'Z';
+    html += '<path d="'+lotPath+'" fill="#f5f5f4" stroke="#111" stroke-width="1.5"/>';
+
+    // Setback polygon
+    var sbDists = getSetbackDistances();
+    var sbPts = offsetPolygon(points, sbDists);
+    if (sbPts.length >= 3) {
+      var sbPath = 'M';
+      for (var i = 0; i < sbPts.length; i++) {
+        sbPath += (i?'L':'') + t.toSvgX(sbPts[i].x).toFixed(1) + ',' + t.toSvgY(sbPts[i].y).toFixed(1);
+      }
+      sbPath += 'Z';
+      html += '<path d="'+sbPath+'" fill="rgba(37,99,235,0.06)" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>';
+    }
+
+    // Edge dimensions
+    for (var i = 0; i < points.length; i++) {
+      var len = edgeLength(i);
+      var mid = edgeMidpoint(i);
+      var sx = t.toSvgX(mid.x), sy = t.toSvgY(mid.y);
+      var j = (i + 1) % points.length;
+      var dx = points[j].x - points[i].x;
+      var dy = points[j].y - points[i].y;
+      // Offset label perpendicular to edge, outward
+      var elen = Math.sqrt(dx*dx+dy*dy) || 1;
+      var nx = -dy/elen, ny = dx/elen;
+      // Determine if outward by checking against polygon centroid
+      var cx = 0, cy = 0;
+      for (var k = 0; k < points.length; k++) { cx += points[k].x; cy += points[k].y; }
+      cx /= points.length; cy /= points.length;
+      var toCenter = (mid.x + nx - cx) * (mid.x + nx - cx) + (mid.y + ny - cy) * (mid.y + ny - cy);
+      var fromCenter = (mid.x - nx - cx) * (mid.x - nx - cx) + (mid.y - ny - cy) * (mid.y - ny - cy);
+      var outSign = toCenter > fromCenter ? 1 : -1;
+      var off = 16 * outSign;
+      var lx = sx + nx * off * (t.scale/Math.abs(t.scale));
+      var ly = sy + ny * off * (t.scale/Math.abs(t.scale));
+      // Correct: offset in SVG space
+      var snx = (t.toSvgY(points[j].y) - t.toSvgY(points[i].y));
+      var sny = -(t.toSvgX(points[j].x) - t.toSvgX(points[i].x));
+      var slen = Math.sqrt(snx*snx+sny*sny) || 1;
+      snx /= slen; sny /= slen;
+      // Pick outward direction
+      var testX = sx + snx * 20, testY = sy + sny * 20;
+      // Is test point farther from centroid in SVG?
+      var svgCx = t.toSvgX(cx), svgCy = t.toSvgY(cy);
+      var d1 = (testX-svgCx)*(testX-svgCx)+(testY-svgCy)*(testY-svgCy);
+      var d2 = (sx-snx*20-svgCx)*(sx-snx*20-svgCx)+(sy-sny*20-svgCy)*(sy-sny*20-svgCy);
+      var outOff = d1 > d2 ? 18 : -18;
+
+      var lx = (sx+snx*outOff).toFixed(1);
+      var ly = (sy+sny*outOff+3).toFixed(1);
+      // Invisible hit rect for easier clicking
+      html += '<rect class="edge-label" data-edge="'+i+'" x="'+(parseFloat(lx)-25)+'" y="'+(parseFloat(ly)-10)+'" width="50" height="16" fill="transparent" style="cursor:pointer"/>';
+      html += '<text class="edge-label" data-edge="'+i+'" x="'+lx+'" y="'+ly+'" text-anchor="middle">'+fmtFt(len)+'</text>';
+
+      // Setback distance label (along edge, inside)
+      if (sbDists[i] > 0) {
+        var inOff = outOff > 0 ? -10 : 10;
+        html += '<text class="setback-label" x="'+(sx+snx*inOff).toFixed(1)+'" y="'+(sy+sny*inOff+3).toFixed(1)+'" text-anchor="middle">'+sbDists[i]+"' sb</text>";
+      }
+    }
+
+    // Edge hit zones (wider invisible lines for clicking in add-point mode)
+    if (addPointMode) {
+      for (var i = 0; i < points.length; i++) {
+        var j = (i + 1) % points.length;
+        var sx1 = t.toSvgX(points[i].x), sy1 = t.toSvgY(points[i].y);
+        var sx2 = t.toSvgX(points[j].x), sy2 = t.toSvgY(points[j].y);
+        html += '<line x1="'+sx1.toFixed(1)+'" y1="'+sy1.toFixed(1)+'" x2="'+sx2.toFixed(1)+'" y2="'+sy2.toFixed(1)+'" stroke="rgba(37,99,235,0.15)" stroke-width="12" style="cursor:copy"/>';
+      }
+    }
+
+    // Corner handles
+    for (var i = 0; i < points.length; i++) {
+      var sx = t.toSvgX(points[i].x), sy = t.toSvgY(points[i].y);
+      html += '<circle cx="'+sx.toFixed(1)+'" cy="'+sy.toFixed(1)+'" r="5" fill="'+(dragging===i?'#111':'#fff')+'" stroke="#111" stroke-width="1.5" style="cursor:grab" data-pt="'+i+'"/>';
+    }
+
+    svg.innerHTML = html;
+    updateCalc();
+  }
+
+  function getSetbackDistances() {
+    var dists = [];
+    for (var i = 0; i < points.length; i++) {
+      var type = edgeTypes[i] || 'side';
+      var val = 0;
+      if (type === 'front') val = parseFloat(document.getElementById('sb-front').value) || 0;
+      else if (type === 'rear') val = parseFloat(document.getElementById('sb-rear').value) || 0;
+      else if (type === 'left') val = parseFloat(document.getElementById('sb-left').value) || 0;
+      else if (type === 'right') val = parseFloat(document.getElementById('sb-right').value) || 0;
+      else val = parseFloat(document.getElementById('sb-left').value) || 0; // default to side
+      dists.push(val);
+    }
+    return dists;
+  }
+
+  function fmtFt(v) {
+    if (v === Math.floor(v)) return v + "'";
+    return v.toFixed(1) + "'";
+  }
+
+  function fmtSF(v) { return Math.round(v).toLocaleString() + ' SF'; }
+  function fmtDollar(v) { return '$' + Math.round(v).toLocaleString(); }
+
+  // ---- INTERACTION: DRAG CORNERS / ADD POINT MODE ----
+  canvasArea.addEventListener('mousedown', function(e) {
+    var el = e.target;
+    // If in add-point mode, single click on canvas tries to add a point
+    if (addPointMode && el.tagName !== 'circle') {
+      var added = addPointAtMouse(e);
+      if (added) {
+        // Stay in mode for multiple additions
+        return;
+      }
+    }
+    // Normal drag behavior
+    if (el.tagName === 'circle' && el.dataset.pt !== undefined) {
+      dragging = parseInt(el.dataset.pt);
+      e.preventDefault();
+    }
+  });
+
+  canvasArea.addEventListener('mousemove', function(e) {
+    if (dragging === null) return;
+    var rect = canvasArea.getBoundingClientRect();
+    var t = getTransform();
+    var fx = snapVal(t.toFeetX(e.clientX - rect.left));
+    var fy = snapVal(t.toFeetY(e.clientY - rect.top));
+
+    // Ortho snap: align to neighbor if within 8px on screen
+    var prev = (dragging - 1 + points.length) % points.length;
+    var next = (dragging + 1) % points.length;
+    var orthoFeet = 8 / t.scale; // 8 pixels converted to feet
+    if (Math.abs(fx - points[prev].x) <= orthoFeet) fx = points[prev].x;
+    if (Math.abs(fy - points[prev].y) <= orthoFeet) fy = points[prev].y;
+    if (Math.abs(fx - points[next].x) <= orthoFeet) fx = points[next].x;
+    if (Math.abs(fy - points[next].y) <= orthoFeet) fy = points[next].y;
+
+    points[dragging].x = fx;
+    points[dragging].y = fy;
+    render();
+    updateToolbarDims();
+  });
+
+  window.addEventListener('mouseup', function() {
+    if (dragging !== null) {
+      dragging = null;
+      render();
+    }
+  });
+
+  // ---- ADD POINT ON EDGE ----
+  function addPointAtMouse(e) {
+    var rect = canvasArea.getBoundingClientRect();
+    var t = getTransform();
+    var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    var fx = t.toFeetX(mx), fy = t.toFeetY(my);
+
+    // Find closest edge
+    var bestDist = Infinity, bestEdge = -1, bestT = 0;
+    for (var i = 0; i < points.length; i++) {
+      var j = (i+1) % points.length;
+      var ax = points[i].x, ay = points[i].y;
+      var bx = points[j].x, by = points[j].y;
+      var dx = bx-ax, dy = by-ay;
+      var len2 = dx*dx+dy*dy;
+      if (len2 === 0) continue;
+      var tt = Math.max(0, Math.min(1, ((fx-ax)*dx+(fy-ay)*dy)/len2));
+      var px = ax + tt*dx, py = ay + tt*dy;
+      var dist = Math.sqrt((fx-px)*(fx-px)+(fy-py)*(fy-py));
+      if (dist < bestDist) { bestDist = dist; bestEdge = i; bestT = tt; }
+    }
+
+    if (bestEdge >= 0 && bestDist * t.scale < 25 && bestT > 0.05 && bestT < 0.95) {
+      var j = (bestEdge+1) % points.length;
+      var nx = snapVal(points[bestEdge].x + bestT * (points[j].x - points[bestEdge].x));
+      var ny = snapVal(points[bestEdge].y + bestT * (points[j].y - points[bestEdge].y));
+      points.splice(bestEdge+1, 0, {x: nx, y: ny});
+      edgeTypes.splice(bestEdge+1, 0, edgeTypes[bestEdge] || 'left');
+      render();
+      document.getElementById('status').textContent = 'Point added. Drag to adjust. ' + points.length + ' corners.';
+      return true;
+    }
+    return false;
+  }
+
+  // Double-click always adds a point
+  canvasArea.addEventListener('dblclick', function(e) {
+    addPointAtMouse(e);
+  });
+
+  // ---- CLICK DIMENSION TO EDIT ----
+  svg.addEventListener('click', function(e) {
+    if (e.target.classList.contains('edge-label')) {
+      e.stopPropagation();
+      var edgeIdx = parseInt(e.target.dataset.edge);
+      var rect = canvasArea.getBoundingClientRect();
+      dimEditor.style.display = 'block';
+      dimEditor.style.left = (e.clientX - rect.left - 35) + 'px';
+      dimEditor.style.top = (e.clientY - rect.top - 12) + 'px';
+      dimInput.value = edgeLength(edgeIdx).toFixed(1);
+      dimInput.dataset.edge = edgeIdx;
+      dimInput.select();
+      setTimeout(function() { dimInput.focus(); }, 0);
+    }
+  });
+
+  dimInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      var idx = parseInt(dimInput.dataset.edge);
+      var newLen = parseFloat(dimInput.value);
+      if (!isNaN(newLen) && newLen > 0) {
+        resizeEdge(idx, newLen);
+      }
+      dimEditor.style.display = 'none';
+    }
+    if (e.key === 'Escape') dimEditor.style.display = 'none';
+  });
+
+  dimInput.addEventListener('blur', function() {
+    setTimeout(function() { dimEditor.style.display = 'none'; }, 150);
+  });
+
+  function resizeEdge(idx, newLen) {
+    var j = (idx + 1) % points.length;
+    var dx = points[j].x - points[idx].x;
+    var dy = points[j].y - points[idx].y;
+    var curLen = Math.sqrt(dx*dx + dy*dy);
+    if (curLen === 0) return;
+    var ratio = newLen / curLen;
+    // Move endpoint j
+    points[j].x = snapVal(points[idx].x + dx * ratio);
+    points[j].y = snapVal(points[idx].y + dy * ratio);
+    render();
+    updateToolbarDims();
+  }
+
+  // ---- TOOLBAR DIMS ----
+  function updateToolbarDims() {
+    // Bounding box
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (var i = 0; i < points.length; i++) {
+      if (points[i].x < minX) minX = points[i].x;
+      if (points[i].x > maxX) maxX = points[i].x;
+      if (points[i].y < minY) minY = points[i].y;
+      if (points[i].y > maxY) maxY = points[i].y;
+    }
+    document.getElementById('lotW').value = Math.round(maxX - minX);
+    document.getElementById('lotD').value = Math.round(maxY - minY);
+  }
+
+  // Toolbar dim changes reset to rectangle
+  document.getElementById('lotW').addEventListener('change', function() {
+    var w = parseFloat(this.value) || 100;
+    var d = parseFloat(document.getElementById('lotD').value) || 60;
+    points = [{x:0,y:0},{x:w,y:0},{x:w,y:d},{x:0,y:d}];
+    edgeTypes = ['front','right','rear','left'];
+    render();
+  });
+  document.getElementById('lotD').addEventListener('change', function() {
+    var w = parseFloat(document.getElementById('lotW').value) || 100;
+    var d = parseFloat(this.value) || 60;
+    points = [{x:0,y:0},{x:w,y:0},{x:w,y:d},{x:0,y:d}];
+    edgeTypes = ['front','right','rear','left'];
+    render();
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function() {
+    var w = parseFloat(document.getElementById('lotW').value) || 100;
+    var d = parseFloat(document.getElementById('lotD').value) || 60;
+    points = [{x:0,y:0},{x:w,y:0},{x:w,y:d},{x:0,y:d}];
+    edgeTypes = ['front','right','rear','left'];
+    render();
+  });
+
+  document.getElementById('btnAddPt').addEventListener('click', function() {
+    addPointMode = !addPointMode;
+    this.classList.toggle('active', addPointMode);
+    canvasArea.style.cursor = addPointMode ? 'copy' : 'crosshair';
+    document.getElementById('status').textContent = addPointMode ? 'Click on any edge to add a corner point. Click the button again to exit.' : 'Drag corners to reshape. Click a dimension to edit. Double-click an edge to add a point.';
+  });
+
+  // ---- CALCULATIONS ----
+  var typeDefaults = {
+    sfr: { efficiency: 95, unitSize: 0, parkRatio: 2.0, valuePerSF: 400, hardCost: 200, parkUnit: '/unit' },
+    res_apartment: { efficiency: 85, unitSize: 850, parkRatio: 1.0, valuePerSF: 350, hardCost: 200, parkUnit: '/unit' },
+    res_townhouse: { efficiency: 92, unitSize: 1400, parkRatio: 2.0, valuePerSF: 300, hardCost: 175, parkUnit: '/unit' },
+    res_condo: { efficiency: 82, unitSize: 1000, parkRatio: 1.5, valuePerSF: 500, hardCost: 250, parkUnit: '/unit' },
+    office: { efficiency: 88, unitSize: 0, parkRatio: 3.0, valuePerSF: 300, hardCost: 220, parkUnit: '/1kSF' },
+    retail: { efficiency: 92, unitSize: 0, parkRatio: 4.0, valuePerSF: 250, hardCost: 150, parkUnit: '/1kSF' },
+    mixed: { efficiency: 85, unitSize: 900, parkRatio: 1.0, valuePerSF: 350, hardCost: 210, parkUnit: '/unit' },
+  };
+
+  document.getElementById('in-type').addEventListener('change', function() {
+    var d = typeDefaults[this.value];
+    if (d) {
+      document.getElementById('in-efficiency').value = d.efficiency;
+      if (d.unitSize) document.getElementById('in-unitSize').value = d.unitSize;
+      document.getElementById('in-parkRatio').value = d.parkRatio;
+      document.getElementById('in-valuePerSF').value = d.valuePerSF;
+      document.getElementById('in-hardCost').value = d.hardCost;
+      document.getElementById('parkRatioUnit').textContent = d.parkUnit || '/unit';
+    }
+    updateCalc();
+  });
+
+  function updateCalc() {
+    var lotArea = polygonArea(points);
+    var lotAcres = lotArea / 43560;
+
+    document.getElementById('out-lotArea').textContent = fmtSF(lotArea);
+    document.getElementById('out-lotAcres').textContent = lotAcres.toFixed(2) + ' ac';
+
+    // Buildable footprint
+    var sbDists = getSetbackDistances();
+    var sbPts = offsetPolygon(points, sbDists);
+    var buildableArea = sbPts.length >= 3 ? polygonArea(sbPts) : 0;
+    document.getElementById('out-buildable').textContent = fmtSF(buildableArea);
+
+    // Zoning
+    var maxFAR = parseFloat(document.getElementById('in-far').value) || 0;
+    var maxStories = parseInt(document.getElementById('in-stories').value) || 1;
+    var maxCoverage = (parseFloat(document.getElementById('in-coverage').value) || 100) / 100;
+
+    var maxByFAR = lotArea * maxFAR;
+    var maxFootprint = Math.min(buildableArea, lotArea * maxCoverage);
+    var maxByStories = maxFootprint * maxStories;
+    var grossBuildingArea = Math.min(maxByFAR, maxByStories);
+    var likelyStories = maxFootprint > 0 ? Math.min(maxStories, Math.ceil(grossBuildingArea / maxFootprint)) : 0;
+    var likelyFootprint = likelyStories > 0 ? grossBuildingArea / likelyStories : 0;
+
+    document.getElementById('out-gba').textContent = fmtSF(grossBuildingArea);
+    document.getElementById('out-footprint').textContent = fmtSF(likelyFootprint);
+    document.getElementById('out-stories').textContent = likelyStories;
+
+    // Program
+    var progType = document.getElementById('in-type').value;
+    var efficiency = (parseFloat(document.getElementById('in-efficiency').value) || 85) / 100;
+    var unitSize = parseFloat(document.getElementById('in-unitSize').value) || 0;
+    var netArea = grossBuildingArea * efficiency;
+    var units;
+    if (progType === 'sfr') {
+      units = 1;
+    } else if (unitSize > 0) {
+      units = Math.floor(netArea / unitSize);
+    } else {
+      units = 0;
+    }
+
+    document.getElementById('out-net').textContent = fmtSF(netArea);
+    document.getElementById('out-units').textContent = progType === 'sfr' ? '1 house (' + fmtSF(netArea) + ')' : (units > 0 ? units + ' units' : fmtSF(netArea) + ' leasable');
+
+    // Parking
+    var parkRatio = parseFloat(document.getElementById('in-parkRatio').value) || 0;
+    var parkType = document.getElementById('in-parkType').value;
+    var parkCosts = { surface: 5000, structured: 25000, underground: 50000, none: 0 };
+    var spaces;
+    if (units > 0) {
+      spaces = Math.ceil(units * parkRatio);
+    } else {
+      // Commercial: ratio is per 1000 SF
+      spaces = Math.ceil(netArea / 1000 * parkRatio);
+    }
+    var parkCost = spaces * (parkCosts[parkType] || 0);
+
+    document.getElementById('out-spaces').textContent = spaces > 0 ? spaces : '--';
+    document.getElementById('out-parkCost').textContent = parkCost > 0 ? fmtDollar(parkCost) : '--';
+
+    // Value
+    var valuePerSF = parseFloat(document.getElementById('in-valuePerSF').value) || 0;
+    var hardCostPerSF = parseFloat(document.getElementById('in-hardCost').value) || 0;
+    var softPct = (parseFloat(document.getElementById('in-softPct').value) || 0) / 100;
+    var marginPct = (parseFloat(document.getElementById('in-margin').value) || 0) / 100;
+
+    var gdv = netArea * valuePerSF;
+    var hardCosts = grossBuildingArea * hardCostPerSF;
+    var softCosts = hardCosts * softPct;
+    var margin = gdv * marginPct;
+    var residual = gdv - hardCosts - softCosts - parkCost - margin;
+
+    document.getElementById('out-gdv').textContent = fmtDollar(gdv);
+    document.getElementById('out-hard').textContent = fmtDollar(hardCosts);
+    document.getElementById('out-soft').textContent = fmtDollar(softCosts);
+    document.getElementById('out-parkTotal').textContent = fmtDollar(parkCost);
+    document.getElementById('out-marginAmt').textContent = fmtDollar(margin);
+    document.getElementById('out-residual').textContent = fmtDollar(residual);
+    document.getElementById('out-perSF').textContent = lotArea > 0 ? fmtDollar(residual / lotArea) + '/SF' : '--';
+    document.getElementById('out-perUnit').textContent = units > 0 ? fmtDollar(residual / units) + '/unit' : '--';
+  }
+
+  // Bind all inputs
+  document.querySelectorAll('.setback-input,.calc-input').forEach(function(el) {
+    el.addEventListener('input', function() { render(); });
+  });
+
+  // Initial render
+  render();
+
+})();
+</script>
+</body>
+</html>

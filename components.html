@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Component Recommendations -- architecture.tools</title>
+<link rel="stylesheet" href="/global.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Component Recommendations</h1>
+    <p>The picker tells you which CPU, GPU, RAM, and storage to buy. This page covers everything else: case, motherboard, cooler, PSU, and RAM brand. Updated March 2026.</p>
+    <div style="margin-top:1rem;"><a href="/" class="back-link">Back to the picker</a></div>
+  </div>
+
+  <div class="section" style="margin-bottom:2.5rem;">
+    <div class="section-label">Case</div>
+    <div class="pick">
+      <div class="pick-name">Fractal Design North</div>
+      <div class="pick-price">~$130</div>
+      <div class="pick-note">Mid-tower ATX. Walnut or oak wood slats, mesh front, excellent airflow. Fits GPUs up to 355mm. Two 140mm fans included. The prettiest case in production -- looks right in an architecture office. The Momentum Edition ($179) is quieter with three 120mm fans if you can find it.</div>
+    </div>
+    <div class="pick">
+      <div class="pick-name">Fractal Design North XL</div>
+      <div class="pick-price">~$180</div>
+      <div class="pick-note">E-ATX support, 420mm front radiator, fits the largest GPUs with room to spare (413mm clearance). Same aesthetic as the North, sized up. The Momentum XL Edition ($209) adds rear-connector motherboard support and quieter fans. Get this if you need E-ATX or a 5090-class card.</div>
+    </div>
+    <div class="or-divider">or</div>
+    <div class="pick">
+      <div class="pick-name">Asus ProArt PA602</div>
+      <div class="pick-price">~$270 (Wood Edition ~$300)</div>
+      <div class="pick-note">E-ATX, 420mm top radiator, more drive bays than the Fractal. IR dust indicator, power lock latch, tool-less PCIe mounts. The Wood Edition has wooden side panels that match the ProArt motherboard aesthetic. Bigger and heavier than the North XL but more expansion room.</div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-bottom:2.5rem;">
+    <div class="section-label">Motherboard</div>
+    <div class="pick">
+      <div class="pick-name">Intel Arrow Lake (LGA 1851)</div>
+      <div class="pick-note">For the Ultra 5 245K, Ultra 7 265K, or Ultra 9 285K.</div>
+    </div>
+    <div class="pick" style="margin-left:1.5rem;">
+      <div class="pick-name">Asus ProArt Z890-Creator WiFi</div>
+      <div class="pick-price">~$420</div>
+      <div class="pick-note">Thunderbolt 4, 10G LAN, excellent VRM. The natural pair for a ProArt case. The Creator boards have ports that matter for architecture: Thunderbolt for external storage and docks, multiple M.2 slots, reliable BIOS.</div>
+    </div>
+    <div class="or-divider" style="margin-left:1.5rem;">or</div>
+    <div class="pick" style="margin-left:1.5rem;">
+      <div class="pick-name">MSI MAG Z890 Tomahawk WiFi</div>
+      <div class="pick-price">~$260</div>
+      <div class="pick-note">Strong VRM, WiFi 7, good I/O. Less premium than the ProArt but does the job. No Thunderbolt -- if you need TB4, go ProArt or add a discrete card.</div>
+    </div>
+    <div class="pick" style="margin-top:2rem;">
+      <div class="pick-name">AMD AM5</div>
+      <div class="pick-note">For the Ryzen 7 9800X3D, Ryzen 9 9900X, or Ryzen 9 9950X. AM5 has a longer confirmed upgrade runway than Intel -- support through at least 2027, possibly longer.</div>
+    </div>
+    <div class="pick" style="margin-left:1.5rem;">
+      <div class="pick-name">Asus ProArt X870E-Creator WiFi</div>
+      <div class="pick-price">~$450</div>
+      <div class="pick-note">Thunderbolt 4, dual 10G+2.5G LAN, USB4. The AMD equivalent of the Z890 ProArt Creator.</div>
+    </div>
+    <div class="or-divider" style="margin-left:1.5rem;">or</div>
+    <div class="pick" style="margin-left:1.5rem;">
+      <div class="pick-name">MSI MAG X870 Tomahawk WiFi</div>
+      <div class="pick-price">~$270</div>
+      <div class="pick-note">Solid VRM, WiFi 7, good value. Same story as the Intel Tomahawk: capable and affordable, no Thunderbolt.</div>
+    </div>
+    <div class="note-box" style="margin-top:1rem;">
+      <strong>Budget boards (B650/B760 class):</strong> Fine for the Ultra 5 245K or Ryzen 7 9700X in a review/drafting build. Not recommended for the 285K, 9950X, or any build with a high-end GPU -- VRM and power delivery matter under sustained load.
+    </div>
+  </div>
+
+  <div class="section" style="margin-bottom:2.5rem;">
+    <div class="section-label">Memory (DDR5)</div>
+    <div class="pick">
+      <div class="pick-name">Corsair Vengeance DDR5-6000 CL30</div>
+      <div class="pick-price">~$90 (32 GB) / ~$180 (64 GB) / ~$360 (128 GB)</div>
+      <div class="pick-note">Reliable, widely compatible, reasonable price. DDR5-6000 at CL30 is the sweet spot for both Intel and AMD platforms.</div>
+    </div>
+    <div class="or-divider">or</div>
+    <div class="pick">
+      <div class="pick-name">G.Skill Trident Z5 DDR5-6000 CL30</div>
+      <div class="pick-price">Similar pricing</div>
+      <div class="pick-note">Slightly better binning in some kits, excellent QVL support. Either brand is fine. Pick whichever is cheaper.</div>
+    </div>
+    <div class="note-box" style="margin-top:1rem;">
+      <strong>RAM prices are rising</strong> in early 2026 due to the DRAM shortage. 64 GB kits that were $120 in late 2025 are now $180+. 32 GB is fine for small projects. 64 GB covers most BIM modeling. 128 GB only if you regularly have 500MB+ linked models or run V-Ray production renders.
+    </div>
+  </div>
+
+  <div class="section" style="margin-bottom:2.5rem;">
+    <div class="section-label">Storage (NVMe SSD)</div>
+    <div class="pick">
+      <div class="pick-name">WD Black SN850X</div>
+      <div class="pick-price">~$80 (1 TB) / ~$150 (2 TB) / ~$300 (4 TB)</div>
+      <div class="pick-note">PCIe Gen 4, fast sequential and random I/O. Gen 4 is all you need -- Gen 5 drives are hotter, more expensive, and the real-world difference for architectural workloads is negligible.</div>
+    </div>
+    <div class="or-divider">or</div>
+    <div class="pick">
+      <div class="pick-name">Samsung 990 Pro</div>
+      <div class="pick-price">Similar pricing</div>
+      <div class="pick-note">Slightly faster in synthetic benchmarks, excellent reliability. Samsung or WD -- pick whichever is cheaper.</div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-bottom:2.5rem;">
+    <div class="section-label">CPU Cooler</div>
+    <div class="pick">
+      <div class="pick-name">Thermalright Peerless Assassin 120 SE</div>
+      <div class="pick-price">~$35</div>
+      <div class="pick-note">Dual-tower air cooler. Competes with coolers costing three times as much. Handles the 265K and 9800X3D easily, adequate for the 285K and 9950X at stock. Check RAM clearance on your motherboard.</div>
+    </div>
+    <div class="or-divider">or</div>
+    <div class="pick">
+      <div class="pick-name">Noctua NH-D15</div>
+      <div class="pick-price">~$100</div>
+      <div class="pick-note">The standard. Quieter than the Peerless Assassin, slightly better thermals. If you want a silent office machine, this is the air cooler. Chromax.black version available.</div>
+    </div>
+    <div class="or-divider">or if you want liquid</div>
+    <div class="pick">
+      <div class="pick-name">Arctic Liquid Freezer III 360</div>
+      <div class="pick-price">~$100</div>
+      <div class="pick-note">Best value AIO. Excellent cooling for the 285K and 9950X under sustained all-core loads. The 280mm fits the Fractal North; the 360mm fits the North XL and ProArt PA602 top mount. Air cooling is simpler -- get an AIO if you run sustained CPU renders or if silence under load matters.</div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-bottom:2.5rem;">
+    <div class="section-label">Power Supply</div>
+    <div class="pick">
+      <div class="pick-name">Seasonic Focus GX-850</div>
+      <div class="pick-price">~$120</div>
+      <div class="pick-note">80+ Gold, fully modular, 10-year warranty. 850W is enough for any build below a 5090.</div>
+    </div>
+    <div class="or-divider">or</div>
+    <div class="pick">
+      <div class="pick-name">be quiet! Straight Power 12 850W</div>
+      <div class="pick-price">~$140</div>
+      <div class="pick-note">80+ Platinum, fully modular, very quiet. Slightly better efficiency, noticeably quieter under load.</div>
+    </div>
+    <div class="or-divider">or</div>
+    <div class="pick">
+      <div class="pick-name">Corsair RM850x (2024)</div>
+      <div class="pick-price">~$130</div>
+      <div class="pick-note">80+ Gold, fully modular, zero-RPM fan mode at low loads. Another safe choice.</div>
+    </div>
+    <div class="note-box" style="margin-top:1rem;">
+      <strong>If you are running a 5090:</strong> Step up to 1000W. The 5090 has 575W TDP with transient spikes above that. The Seasonic Focus GX-1000 (~$160), be quiet! Straight Power 12 1000W (~$180), or Corsair RM1000x (~$170).
+    </div>
+  </div>
+
+  <div class="section" style="margin-bottom:2rem;">
+    <div class="section-label">The Build</div>
+    <div class="pick-note" style="max-width:50em;">
+      Building a PC takes about 8 hours start to finish for someone who has never done it -- that includes watching a build guide, unboxing, assembly, BIOS setup, Windows install, and driver installation. The savings over a Puget Systems or BOXX prebuilt are $700--$1,500 depending on the spec. Whether that is worth your time depends on your billing rate and whether you enjoy it.
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;"><a href="/" class="back-link">Back to the picker</a></div>
+  <div class="page-footer">Updated March 2026. No affiliate commissions. Prices are approximate US retail.</div>
+</div>
+</body>
+</html>

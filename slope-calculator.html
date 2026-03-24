@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slope Calculator -- architecture.tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;}
+  html{font-size:15px;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .tool{max-width:680px;margin:0 auto;padding:3rem 2rem 5rem;}
+
+  .tool-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--black);}
+  .tool-header h1{font-size:1.5rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+  .tool-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;}
+
+  .section-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
+
+  /* Input area */
+  .input-area{margin-bottom:2rem;}
+  .input-grid{display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;}
+  .input-group{display:flex;flex-direction:column;}
+  .input-group label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.3rem;}
+  .input-group input{font-family:var(--font-mono);font-size:1.1rem;font-weight:300;padding:0.5rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);width:140px;outline:none;transition:border-color 0.15s;}
+  .input-group input:focus{border-color:var(--black);}
+  .input-group input.has-value{border-color:var(--black);background:var(--gray-50);}
+  .input-group select{font-family:var(--font-mono);font-size:0.78rem;font-weight:300;padding:0.55rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}
+  .input-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;margin-top:0.5rem;}
+
+  /* Diagram */
+  .diagram{margin:2rem 0;display:flex;justify-content:center;}
+  .diagram svg{display:block;}
+  .diagram text{font-family:'DM Mono','SF Mono',monospace;font-weight:300;}
+
+  /* Results */
+  .results{margin-bottom:2rem;}
+  .result-row{display:flex;align-items:baseline;padding:0.6rem 0;border-bottom:1px solid var(--gray-100);}
+  .result-row:last-child{border-bottom:none;}
+  .result-label{width:160px;flex-shrink:0;font-size:0.65rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-500);}
+  .result-value{font-family:var(--font-mono);font-size:0.95rem;font-weight:300;}
+
+  /* Common slopes */
+  .common-slopes{margin-top:2.5rem;}
+  .slope-row{display:flex;align-items:baseline;padding:0.4rem 0;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background 0.1s;}
+  .slope-row:hover{background:var(--gray-50);}
+  .slope-row:last-child{border-bottom:none;}
+  .slope-name{font-size:0.78rem;font-weight:400;flex:1;}
+  .slope-val{font-family:var(--font-mono);font-size:0.72rem;font-weight:300;color:var(--gray-500);width:80px;text-align:right;flex-shrink:0;}
+  .slope-pct{font-family:var(--font-mono);font-size:0.72rem;font-weight:300;color:var(--gray-500);width:60px;text-align:right;flex-shrink:0;}
+  .slope-deg{font-family:var(--font-mono);font-size:0.72rem;font-weight:300;color:var(--gray-400);width:50px;text-align:right;flex-shrink:0;}
+
+  .tool-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
+
+  @media(max-width:480px){
+    .input-grid{flex-direction:column;}
+    .input-group input{width:100%;}
+    .result-label{width:120px;}
+  }
+</style>
+</head>
+<body>
+<div class="tool">
+
+  <div class="tool-header">
+    <h1>Slope Calculator</h1>
+    <p>Enter any two of three values: slope, horizontal run (plan), or vertical rise (section). Get the third, plus distances for both views.</p>
+  </div>
+
+  <div class="input-area">
+    <div class="section-label">Slope -- enter in any format</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Ratio (e.g. 1:12)</label>
+        <input type="text" id="inRatio" placeholder="1:12">
+      </div>
+      <div class="input-group">
+        <label>Percentage</label>
+        <input type="text" id="inPercent" placeholder="8.33">
+      </div>
+      <div class="input-group">
+        <label>Degrees</label>
+        <input type="text" id="inDegrees" placeholder="4.76">
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:1.5rem;">Dimensions -- enter one, get the others</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Horizontal Run (plan)</label>
+        <input type="text" id="inRun" placeholder='e.g. 24&apos;-0"'>
+      </div>
+      <div class="input-group">
+        <label>Vertical Rise (section)</label>
+        <input type="text" id="inRise" placeholder='e.g. 2&apos;-0"'>
+      </div>
+      <div class="input-group">
+        <label>Slope Length</label>
+        <input type="text" id="inSlope" placeholder="along surface">
+      </div>
+    </div>
+    <div class="input-hint">Accepts: feet-inches (4'-6"), decimal feet (4.5'), decimal inches (54"), or mm/m with suffix.</div>
+  </div>
+
+  <div class="diagram" id="diagram"></div>
+
+  <div class="results" id="results" style="display:none">
+    <div class="section-label">Results</div>
+    <div class="result-row"><div class="result-label">Slope Ratio</div><div class="result-value" id="r-ratio"></div></div>
+    <div class="result-row"><div class="result-label">Percentage</div><div class="result-value" id="r-percent"></div></div>
+    <div class="result-row"><div class="result-label">Degrees</div><div class="result-value" id="r-degrees"></div></div>
+    <div class="result-row"><div class="result-label">Horizontal Run</div><div class="result-value" id="r-run"></div></div>
+    <div class="result-row"><div class="result-label">Vertical Rise</div><div class="result-value" id="r-rise"></div></div>
+    <div class="result-row"><div class="result-label">Slope Length</div><div class="result-value" id="r-length"></div></div>
+    <div class="result-row"><div class="result-label">Rise per Foot</div><div class="result-value" id="r-perfoot"></div></div>
+  </div>
+
+  <div class="common-slopes">
+    <div class="section-label">Common Slopes -- click to load</div>
+    <div id="commonList"></div>
+  </div>
+
+  <div class="tool-footer">architecture.tools</div>
+</div>
+
+<script>
+(function(){
+
+  var COMMON = [
+    { name: 'ADA ramp max', ratio: '1:12', pct: 8.33 },
+    { name: 'Accessible ramp preferred', ratio: '1:20', pct: 5 },
+    { name: 'Sidewalk / walkway max', ratio: '1:20', pct: 5 },
+    { name: 'Parking garage ramp', ratio: '1:6.67', pct: 15 },
+    { name: 'Flat roof min drainage', ratio: '1:48', pct: 2.08 },
+    { name: '1/4" per foot', ratio: '1:48', pct: 2.08 },
+    { name: '1/8" per foot', ratio: '1:96', pct: 1.04 },
+    { name: '1/2" per foot', ratio: '1:24', pct: 4.17 },
+    { name: 'Low-slope roof max', ratio: '1:4', pct: 25 },
+    { name: '2:12 roof pitch', ratio: '1:6', pct: 16.67 },
+    { name: '4:12 roof pitch', ratio: '1:3', pct: 33.33 },
+    { name: '6:12 roof pitch', ratio: '1:2', pct: 50 },
+    { name: '8:12 roof pitch', ratio: '2:3', pct: 66.67 },
+    { name: '12:12 roof pitch (45 deg)', ratio: '1:1', pct: 100 },
+    { name: 'Stair (7" rise / 11" run)', ratio: '7:11', pct: 63.64 },
+  ];
+
+  // Parse dimension input -- flexible
+  function parseDim(str) {
+    if (!str) return NaN;
+    str = str.trim();
+    // Meters
+    if (str.match(/m$/i) && !str.match(/mm$/i)) {
+      return parseFloat(str) / 0.0254;
+    }
+    // Millimeters
+    if (str.match(/mm$/i)) {
+      return parseFloat(str) / 25.4;
+    }
+    // Feet-inches: 4'-6", 4'-6 1/2", 4' 6"
+    var ftMatch = str.match(/^(-?\d+\.?\d*)\s*'[\s-]*(.*)/);
+    if (ftMatch) {
+      var ft = parseFloat(ftMatch[1]);
+      var rest = ftMatch[2].replace(/"/g, '').trim();
+      var inVal = 0;
+      if (rest) {
+        if (rest.indexOf('/') >= 0) {
+          inVal = parseFrac(rest);
+        } else {
+          inVal = parseFloat(rest) || 0;
+        }
+      }
+      return ft * 12 + inVal;
+    }
+    // Decimal feet with ' suffix: 4.5'
+    if (str.match(/'$/)) {
+      return parseFloat(str) * 12;
+    }
+    // Fractional inches: 3-5/8", 5/8"
+    if (str.indexOf('/') >= 0) {
+      return parseFrac(str.replace(/"/g, ''));
+    }
+    // Decimal inches (default)
+    return parseFloat(str.replace(/"/g, ''));
+  }
+
+  function parseFrac(str) {
+    var parts = str.trim().split(/[\s-]+/);
+    var whole = 0, num = 0, den = 1;
+    for (var i = 0; i < parts.length; i++) {
+      if (parts[i].indexOf('/') >= 0) {
+        var f = parts[i].split('/');
+        num = parseFloat(f[0]); den = parseFloat(f[1]);
+      } else {
+        whole = parseFloat(parts[i]);
+      }
+    }
+    return whole + (den ? num / den : 0);
+  }
+
+  function parseRatio(str) {
+    if (!str) return NaN;
+    str = str.trim();
+    var parts = str.split(':');
+    if (parts.length === 2) {
+      var rise = parseFloat(parts[0]);
+      var run = parseFloat(parts[1]);
+      if (run === 0) return NaN;
+      return rise / run; // slope as decimal
+    }
+    return NaN;
+  }
+
+  // Format inches as feet-inches
+  function fmtFtIn(inches) {
+    var neg = inches < 0;
+    inches = Math.abs(inches);
+    var ft = Math.floor(inches / 12);
+    var rem = inches - ft * 12;
+    var sign = neg ? '-' : '';
+    // Round remainder to 1/16
+    var sixteenths = Math.round(rem * 16);
+    rem = sixteenths / 16;
+    if (rem >= 12) { ft++; rem -= 12; }
+    if (rem === 0) return sign + ft + "'-0\"";
+    // Format fraction
+    var whole = Math.floor(rem);
+    var frac = rem - whole;
+    if (Math.abs(frac) < 0.001) return sign + ft + "'-" + whole + "\"";
+    // Find fraction
+    var bestNum = 0, bestDen = 1;
+    var denoms = [2,4,8,16];
+    for (var d = 0; d < denoms.length; d++) {
+      var n = Math.round(frac * denoms[d]);
+      if (Math.abs(frac - n/denoms[d]) < 0.001) {
+        bestNum = n; bestDen = denoms[d];
+        var g = gcd(bestNum, bestDen);
+        bestNum /= g; bestDen /= g;
+        break;
+      }
+    }
+    if (bestNum === 0) return sign + ft + "'-" + whole + "\"";
+    if (whole === 0) return sign + ft + "'-" + bestNum + "/" + bestDen + "\"";
+    return sign + ft + "'-" + whole + " " + bestNum + "/" + bestDen + "\"";
+  }
+
+  function gcd(a,b){return b===0?a:gcd(b,a%b);}
+
+  function fmtDec(n, dp) {
+    return n.toFixed(dp).replace(/\.?0+$/, '') || '0';
+  }
+
+  function toRatioStr(slopeDecimal) {
+    // Express as rise:run where rise or run is a nice number
+    if (slopeDecimal === 0) return '0:1';
+    if (slopeDecimal >= 1) {
+      // rise:run where run=1..12
+      for (var r = 1; r <= 12; r++) {
+        var rise = slopeDecimal * r;
+        if (Math.abs(rise - Math.round(rise)) < 0.01) {
+          return Math.round(rise) + ':' + r;
+        }
+      }
+      return fmtDec(slopeDecimal, 2) + ':1';
+    }
+    // rise:run where rise=1
+    var run = 1 / slopeDecimal;
+    if (Math.abs(run - Math.round(run)) < 0.05) {
+      return '1:' + Math.round(run);
+    }
+    return '1:' + fmtDec(run, 1);
+  }
+
+  // Drawing
+  function drawDiagram(run, rise) {
+    if (isNaN(run) || isNaN(rise) || run === 0 && rise === 0) {
+      document.getElementById('diagram').innerHTML = '';
+      return;
+    }
+    var slopeLen = Math.sqrt(run*run + rise*rise);
+    var maxW = 500, maxH = 200;
+    var scale = Math.min(maxW / Math.max(run, 1), maxH / Math.max(rise, 1), maxW / Math.max(slopeLen, 1));
+    // Clamp
+    if (scale * run > maxW) scale = maxW / run;
+    if (scale * rise > maxH) scale = maxH / rise;
+    scale = Math.min(scale, 8); // don't scale tiny values too huge
+    var w = Math.max(scale * run, 60);
+    var h = Math.max(scale * rise, 30);
+    var pad = 60;
+    var svgW = w + pad * 2;
+    var svgH = h + pad * 2;
+
+    var x0 = pad, y0 = pad + h; // bottom left
+    var x1 = pad + w, y1 = pad + h; // bottom right
+    var x2 = pad + w, y2 = pad; // top right
+
+    var svg = '<svg width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+    // Triangle
+    svg += '<line x1="'+x0+'" y1="'+y0+'" x2="'+x1+'" y2="'+y1+'" stroke="#111" stroke-width="1.5"/>'; // run (bottom)
+    svg += '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#111" stroke-width="1.5"/>'; // rise (right)
+    svg += '<line x1="'+x0+'" y1="'+y0+'" x2="'+x2+'" y2="'+y2+'" stroke="#111" stroke-width="1.5"/>'; // slope
+
+    // Right angle marker
+    var sq = 8;
+    svg += '<polyline points="'+(x1-sq)+','+y1+' '+(x1-sq)+','+(y1-sq)+' '+x1+','+(y1-sq)+'" fill="none" stroke="#888" stroke-width="1"/>';
+
+    // Labels
+    var fontSize = 11;
+    // Run label (bottom center)
+    svg += '<text x="'+((x0+x1)/2)+'" y="'+(y0+18)+'" text-anchor="middle" font-size="'+fontSize+'" fill="#111">' + fmtFtIn(run) + '</text>';
+    svg += '<text x="'+((x0+x1)/2)+'" y="'+(y0+30)+'" text-anchor="middle" font-size="9" fill="#888">plan</text>';
+
+    // Rise label (right, vertical center)
+    svg += '<text x="'+(x1+10)+'" y="'+((y1+y2)/2)+'" text-anchor="start" font-size="'+fontSize+'" fill="#111">' + fmtFtIn(rise) + '</text>';
+    svg += '<text x="'+(x1+10)+'" y="'+((y1+y2)/2+13)+'" text-anchor="start" font-size="9" fill="#888">section</text>';
+
+    // Slope label (along hypotenuse)
+    var mx = (x0+x2)/2, my = (y0+y2)/2;
+    svg += '<text x="'+(mx-10)+'" y="'+(my-8)+'" text-anchor="middle" font-size="'+fontSize+'" fill="#555">' + fmtFtIn(slopeLen) + '</text>';
+
+    svg += '</svg>';
+    document.getElementById('diagram').innerHTML = svg;
+  }
+
+  // Which input was last edited (to know what to compute)
+  var lastSlopeInput = null; // 'ratio', 'percent', 'degrees'
+  var lastDimInput = null; // 'run', 'rise', 'slope'
+
+  function getSlope() {
+    // Returns slope as rise/run decimal, or NaN
+    var ratioStr = document.getElementById('inRatio').value.trim();
+    var pctStr = document.getElementById('inPercent').value.trim();
+    var degStr = document.getElementById('inDegrees').value.trim();
+
+    if (lastSlopeInput === 'ratio' && ratioStr) return parseRatio(ratioStr);
+    if (lastSlopeInput === 'percent' && pctStr) return parseFloat(pctStr) / 100;
+    if (lastSlopeInput === 'degrees' && degStr) return Math.tan(parseFloat(degStr) * Math.PI / 180);
+
+    // Fallback: try any filled field
+    if (ratioStr) return parseRatio(ratioStr);
+    if (pctStr) return parseFloat(pctStr) / 100;
+    if (degStr) return Math.tan(parseFloat(degStr) * Math.PI / 180);
+    return NaN;
+  }
+
+  function update() {
+    var slope = getSlope(); // rise/run decimal
+    var runIn = parseDim(document.getElementById('inRun').value);
+    var riseIn = parseDim(document.getElementById('inRise').value);
+    var slopeIn = parseDim(document.getElementById('inSlope').value);
+
+    // Compute slope from two dimensions if no slope input
+    if (isNaN(slope) && !isNaN(runIn) && !isNaN(riseIn) && runIn > 0) {
+      slope = riseIn / runIn;
+    }
+
+    // With slope, compute missing dimension
+    var run = NaN, rise = NaN, slopeLen = NaN;
+
+    if (!isNaN(slope)) {
+      var deg = Math.atan(slope) * 180 / Math.PI;
+      var pct = slope * 100;
+
+      // Fill dimensions
+      if (!isNaN(runIn)) {
+        run = runIn;
+        rise = run * slope;
+      } else if (!isNaN(riseIn)) {
+        rise = riseIn;
+        run = slope !== 0 ? rise / slope : 0;
+      } else if (!isNaN(slopeIn)) {
+        // slopeLen^2 = run^2 + rise^2, and rise = run * slope
+        // slopeLen^2 = run^2 (1 + slope^2)
+        run = slopeIn / Math.sqrt(1 + slope * slope);
+        rise = run * slope;
+      } else {
+        // No dimensions given -- just show slope conversions, use 12" run as default for diagram
+        run = 12;
+        rise = 12 * slope;
+      }
+
+      slopeLen = Math.sqrt(run * run + rise * rise);
+
+      // Show results
+      document.getElementById('results').style.display = '';
+      document.getElementById('r-ratio').textContent = toRatioStr(slope);
+      document.getElementById('r-percent').textContent = fmtDec(pct, 2) + '%';
+      document.getElementById('r-degrees').textContent = fmtDec(deg, 2) + '\u00B0';
+      document.getElementById('r-run').textContent = fmtFtIn(run) + '  (' + fmtDec(run, 2) + '" = ' + fmtDec(run * 25.4, 0) + ' mm)';
+      document.getElementById('r-rise').textContent = fmtFtIn(rise) + '  (' + fmtDec(rise, 2) + '" = ' + fmtDec(rise * 25.4, 0) + ' mm)';
+      document.getElementById('r-length').textContent = fmtFtIn(slopeLen) + '  (' + fmtDec(slopeLen, 2) + '")';
+
+      var risePerFoot = slope * 12;
+      document.getElementById('r-perfoot').textContent = fmtDec(risePerFoot, 3) + '" per foot';
+
+      drawDiagram(run, rise);
+    } else if (!isNaN(runIn) && !isNaN(riseIn)) {
+      // Derive slope from dimensions
+      slope = riseIn / runIn;
+      run = runIn;
+      rise = riseIn;
+      slopeLen = Math.sqrt(run * run + rise * rise);
+      var deg2 = Math.atan(slope) * 180 / Math.PI;
+      var pct2 = slope * 100;
+
+      document.getElementById('results').style.display = '';
+      document.getElementById('r-ratio').textContent = toRatioStr(slope);
+      document.getElementById('r-percent').textContent = fmtDec(pct2, 2) + '%';
+      document.getElementById('r-degrees').textContent = fmtDec(deg2, 2) + '\u00B0';
+      document.getElementById('r-run').textContent = fmtFtIn(run) + '  (' + fmtDec(run, 2) + '")';
+      document.getElementById('r-rise').textContent = fmtFtIn(rise) + '  (' + fmtDec(rise, 2) + '")';
+      document.getElementById('r-length').textContent = fmtFtIn(slopeLen) + '  (' + fmtDec(slopeLen, 2) + '")';
+      document.getElementById('r-perfoot').textContent = fmtDec(slope * 12, 3) + '" per foot';
+
+      drawDiagram(run, rise);
+    } else {
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('diagram').innerHTML = '';
+    }
+
+    // Highlight filled inputs
+    document.querySelectorAll('.input-group input').forEach(function(el) {
+      el.classList.toggle('has-value', el.value.trim() !== '');
+    });
+  }
+
+  // Track which slope field was last edited
+  ['inRatio','inPercent','inDegrees'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', function() {
+      lastSlopeInput = id.replace('in','').toLowerCase();
+      update();
+    });
+  });
+
+  ['inRun','inRise','inSlope'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', function() {
+      lastDimInput = id.replace('in','').toLowerCase();
+      update();
+    });
+  });
+
+  // Common slopes
+  var html = '';
+  for (var i = 0; i < COMMON.length; i++) {
+    var c = COMMON[i];
+    html += '<div class="slope-row" data-ratio="' + c.ratio + '">';
+    html += '<div class="slope-name">' + c.name + '</div>';
+    html += '<div class="slope-val">' + c.ratio + '</div>';
+    html += '<div class="slope-pct">' + fmtDec(c.pct, 1) + '%</div>';
+    html += '<div class="slope-deg">' + fmtDec(Math.atan(c.pct / 100) * 180 / Math.PI, 1) + '\u00B0</div>';
+    html += '</div>';
+  }
+  document.getElementById('commonList').innerHTML = html;
+
+  document.getElementById('commonList').addEventListener('click', function(e) {
+    var row = e.target.closest('.slope-row');
+    if (!row) return;
+    var ratio = row.dataset.ratio;
+    document.getElementById('inRatio').value = ratio;
+    document.getElementById('inPercent').value = '';
+    document.getElementById('inDegrees').value = '';
+    lastSlopeInput = 'ratio';
+    update();
+  });
+
+  function fmtDec(n, dp) {
+    if (isNaN(n)) return '';
+    var s = n.toFixed(dp);
+    if (dp > 0) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s || '0';
+  }
+
+  // Start with ADA ramp
+  document.getElementById('inRatio').value = '1:12';
+  document.getElementById('inRun').value = "30'-0\"";
+  lastSlopeInput = 'ratio';
+  update();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fixture Requirements Calculator -- architecture.tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;}
+  html{font-size:15px;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .tool{max-width:780px;margin:0 auto;padding:3rem 2rem 5rem;}
+  .tool-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--black);}
+  .tool-header h1{font-size:1.5rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+  .tool-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:50em;}
+  .section-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
+
+  .input-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;align-items:flex-end;}
+  .input-group{display:flex;flex-direction:column;}
+  .input-group label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.3rem;}
+  .input-group input,.input-group select{font-family:var(--font-mono);font-size:0.85rem;font-weight:300;padding:0.45rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);outline:none;-webkit-appearance:none;appearance:none;}
+  .input-group input:focus,.input-group select:focus{border-color:var(--black);}
+  .input-group input{width:120px;}
+  .input-group select{min-width:240px;}
+
+  .results{display:none;margin-bottom:1.5rem;}
+  .fixture-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-bottom:1.5rem;}
+  .fixture-card{padding:0.75rem;border:1px solid var(--gray-200);text-align:center;}
+  .fixture-card .fc-val{font-family:var(--font-mono);font-size:1.5rem;font-weight:300;margin-bottom:0.15rem;}
+  .fixture-card .fc-label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-500);}
+  .fixture-card .fc-note{font-size:0.62rem;font-weight:300;color:var(--gray-400);margin-top:0.2rem;}
+
+  .calc-detail{font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;margin-bottom:1rem;}
+  .note-box{padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;margin-top:1rem;}
+  .note-box strong{font-weight:400;color:var(--black);}
+
+  .ref-table{margin-top:2.5rem;}
+  .ref-table table{width:100%;border-collapse:collapse;}
+  .ref-table th{font-size:0.58rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray-400);text-align:left;padding:0.5rem 0.5rem;border-bottom:1px solid var(--gray-200);}
+  .ref-table td{font-size:0.72rem;font-weight:300;padding:0.4rem 0.5rem;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background 0.1s;}
+  .ref-table tr:hover td{background:var(--gray-50);}
+  .ref-table td:nth-child(n+2){font-family:var(--font-mono);font-size:0.68rem;color:var(--gray-500);white-space:nowrap;}
+
+  .tool-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
+  @media(max-width:480px){.input-row{flex-direction:column;}.input-group select{min-width:0;width:100%;}.fixture-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="tool">
+  <div class="tool-header">
+    <h1>Plumbing Fixture Calculator</h1>
+    <p>Enter occupant load and use group to calculate minimum required plumbing fixtures per IPC Table 403.1. Split by gender assumes 50/50 unless otherwise noted.</p>
+  </div>
+
+  <div class="section-label">Input</div>
+  <div class="input-row">
+    <div class="input-group">
+      <label>Use / Occupancy</label>
+      <select id="inUse"></select>
+    </div>
+    <div class="input-group">
+      <label>Occupant Load</label>
+      <input type="number" id="inOcc" placeholder="e.g. 150" value="">
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="section-label">Minimum Fixtures Required</div>
+    <div class="fixture-grid" id="fixtureGrid"></div>
+    <div class="calc-detail" id="calcDetail"></div>
+    <div class="note-box" id="notes"></div>
+  </div>
+
+  <div class="ref-table">
+    <div class="section-label">IPC Table 403.1 -- Minimum Fixtures (click to use)</div>
+    <table>
+      <thead><tr><th>Use</th><th>WC (M)</th><th>WC (F)</th><th>Lav</th><th>DF</th><th>Service Sink</th></tr></thead>
+      <tbody id="refBody"></tbody>
+    </table>
+  </div>
+
+  <div class="tool-footer">
+    Based on IPC Table 403.1. Ratios are expressed as "1 per X occupants." WC = water closets, Lav = lavatories, DF = drinking fountains. Many jurisdictions require all-gender restrooms or have local amendments. Always verify locally.
+    <br>architecture.tools
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // IPC Table 403.1 simplified
+  // Ratios: 1 fixture per N occupants. wc_m/wc_f = water closets, lav = lavatories, df = drinking fountain
+  // ss = service sinks (typically 1 per floor)
+  var Uses = [
+    { use: 'Assembly (theaters, stadiums)', wc_m: 125, wc_f: 65, lav: 200, df: 500, ss: 'floor', note: 'Male WC: urinals may substitute up to 67%' },
+    { use: 'Assembly (restaurants, banquets)', wc_m: 75, wc_f: 75, lav: 200, df: 500, ss: 'floor', note: '' },
+    { use: 'Assembly (worship)', wc_m: 150, wc_f: 75, lav: 200, df: 500, ss: 'floor', note: '' },
+    { use: 'Business (office)', wc_m: 25, wc_f: 25, lav: 40, df: 100, ss: 'floor', note: 'Per IPC for B occupancy' },
+    { use: 'Educational', wc_m: 50, wc_f: 50, lav: 50, df: 100, ss: 'floor', note: '' },
+    { use: 'Industrial / Factory', wc_m: 100, wc_f: 100, lav: 100, df: 400, ss: 'floor', note: '' },
+    { use: 'Institutional (hospital)', wc_m: 10, wc_f: 10, lav: 10, df: 100, ss: 'floor', note: 'Per room in patient areas' },
+    { use: 'Mercantile (retail)', wc_m: 500, wc_f: 500, lav: 750, df: 1000, ss: 'floor', note: 'For customer use. Employee facilities separate.' },
+    { use: 'Residential (apartments)', wc_m: 1, wc_f: 1, lav: 1, df: 0, ss: 'none', note: '1 per dwelling unit (not per occupant)' },
+    { use: 'Storage / Warehouse', wc_m: 100, wc_f: 100, lav: 100, df: 1000, ss: 'floor', note: 'Employee count basis' },
+  ];
+
+  function useOptions() {
+    var h = '<option value="">-- select use --</option>';
+    for (var i = 0; i < Uses.length; i++) {
+      h += '<option value="'+i+'">'+Uses[i].use+'</option>';
+    }
+    return h;
+  }
+  document.getElementById('inUse').innerHTML = useOptions();
+
+  function calcFixtures(occ, ratio) {
+    if (ratio === 0) return 0;
+    return Math.max(1, Math.ceil(occ / ratio));
+  }
+
+  function update() {
+    var useIdx = document.getElementById('inUse').value;
+    var occ = parseInt(document.getElementById('inOcc').value);
+
+    if (useIdx === '' || isNaN(occ) || occ <= 0) {
+      document.getElementById('results').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('results').style.display = '';
+    var u = Uses[parseInt(useIdx)];
+
+    // Assume 50/50 gender split
+    var maleOcc = Math.ceil(occ / 2);
+    var femaleOcc = occ - maleOcc;
+
+    // Special case: residential is per unit, not per occupant
+    var isResidential = u.use.indexOf('Residential') >= 0;
+
+    var wc_m, wc_f, lav, df, ss;
+    if (isResidential) {
+      wc_m = occ; wc_f = 0; // 1 per unit (occ = units)
+      lav = occ;
+      df = 0;
+      ss = 0;
+    } else {
+      wc_m = calcFixtures(maleOcc, u.wc_m);
+      wc_f = calcFixtures(femaleOcc, u.wc_f);
+      lav = calcFixtures(occ, u.lav);
+      df = u.df > 0 ? calcFixtures(occ, u.df) : 0;
+      ss = u.ss === 'floor' ? 1 : 0;
+    }
+
+    var totalWC = wc_m + wc_f;
+
+    var gridHTML = '';
+    if (isResidential) {
+      gridHTML += '<div class="fixture-card"><div class="fc-val">'+wc_m+'</div><div class="fc-label">Water Closets</div><div class="fc-note">1 per unit</div></div>';
+      gridHTML += '<div class="fixture-card"><div class="fc-val">'+lav+'</div><div class="fc-label">Lavatories</div><div class="fc-note">1 per unit</div></div>';
+    } else {
+      gridHTML += '<div class="fixture-card"><div class="fc-val">'+wc_m+'</div><div class="fc-label">WC (Male)</div><div class="fc-note">1 per '+u.wc_m+'</div></div>';
+      gridHTML += '<div class="fixture-card"><div class="fc-val">'+wc_f+'</div><div class="fc-label">WC (Female)</div><div class="fc-note">1 per '+u.wc_f+'</div></div>';
+      gridHTML += '<div class="fixture-card"><div class="fc-val">'+lav+'</div><div class="fc-label">Lavatories</div><div class="fc-note">1 per '+u.lav+'</div></div>';
+      if (df > 0) gridHTML += '<div class="fixture-card"><div class="fc-val">'+df+'</div><div class="fc-label">Drinking Fount.</div><div class="fc-note">1 per '+u.df+'</div></div>';
+      if (ss > 0) gridHTML += '<div class="fixture-card"><div class="fc-val">'+ss+'</div><div class="fc-label">Service Sink</div><div class="fc-note">1 per floor</div></div>';
+    }
+    document.getElementById('fixtureGrid').innerHTML = gridHTML;
+
+    // Calculation detail
+    var detailHTML = '';
+    if (!isResidential) {
+      detailHTML = 'Based on '+occ+' occupants ('+maleOcc+' M / '+femaleOcc+' F). ';
+      detailHTML += 'Total water closets: <strong>'+totalWC+'</strong>. ';
+      detailHTML += 'Male urinals may substitute for up to 67% of male WC in most use groups.';
+    } else {
+      detailHTML = 'Based on '+occ+' dwelling units. Each unit requires its own WC, lav, tub/shower, and kitchen sink.';
+    }
+    document.getElementById('calcDetail').innerHTML = detailHTML;
+
+    // Notes
+    var notesHTML = '';
+    if (u.note) notesHTML += u.note + '<br>';
+    notesHTML += '<strong>ADA:</strong> At least 1 accessible WC and 1 accessible lav per restroom. Drinking fountains: provide both hi and lo. ';
+    notesHTML += '<strong>All-gender:</strong> Many jurisdictions now require or allow single-user all-gender restrooms. Check local code.';
+    document.getElementById('notes').innerHTML = notesHTML;
+  }
+
+  document.getElementById('inUse').addEventListener('change', update);
+  document.getElementById('inOcc').addEventListener('input', update);
+
+  // Reference table
+  var rHTML = '';
+  for (var i = 0; i < Uses.length; i++) {
+    var u = Uses[i];
+    rHTML += '<tr data-idx="'+i+'"><td>'+u.use+'</td><td>1:'+u.wc_m+'</td><td>1:'+u.wc_f+'</td><td>1:'+u.lav+'</td><td>'+(u.df>0?'1:'+u.df:'--')+'</td><td>'+(u.ss==='floor'?'1/floor':'--')+'</td></tr>';
+  }
+  document.getElementById('refBody').innerHTML = rHTML;
+
+  document.getElementById('refBody').addEventListener('click', function(e) {
+    var tr = e.target.closest('tr');
+    if (!tr) return;
+    document.getElementById('inUse').value = tr.dataset.idx;
+    update();
+  });
+})();
+</script>
+</body>
+</html>
