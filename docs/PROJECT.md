@@ -32,8 +32,15 @@ The site uses a minimal, high-contrast design language. No frameworks, no build 
 │   ├── egress-width.html
 │   └── fixture-calc.html
 └── docs/
-    └── PROJECT.md
+    ├── PROJECT.md
+    └── SITE_FRAMEWORK.md          # Canonical drawing-set roadmap and sheet list
 ```
+
+## Framework vs Implementation
+
+`docs/SITE_FRAMEWORK.md` is the canonical product/framework document. It defines the full numbered drawing set (A0-A13), the drawings-first editorial model, and the long-term site structure.
+
+This `PROJECT.md` file documents the current repository and implementation status. Not every planned sheet in the framework exists as a page yet, and not every current page maps 1:1 to a final numbered sheet.
 
 ### assets/css/global.css
 Shared stylesheet. Root-level pages should import it via `<link rel="stylesheet" href="assets/css/global.css">`. Calculator pages inside `calculators/` should import it via `<link rel="stylesheet" href="../assets/css/global.css">`. Contains:
@@ -90,8 +97,12 @@ Data.Laptops = [
 Data.LaptopCategoryLabels = { one: 'One-Machine Solution', desk: 'Desk-Bound Powerhouses', ... };
 ```
 
+## Main Sheets
+
+The pages below are the current top-level implemented sheets in the repo. The broader planned drawing set lives in `docs/SITE_FRAMEWORK.md`.
+
 ### picker.html
-The main hardware recommendation tool. User flow:
+The main hardware recommendation sheet. User flow:
 
 1. **Software toggles** — horizontal scrolling strip with mini-nav (Modeling / Drafting / Viz / Rendering). Baseline (Office/Bluebeam/PM) shown as non-toggleable minimum.
 2. **Project Scale** — Small/Medium vs Large/Complex (side by side with Budget)
@@ -113,7 +124,7 @@ Key decisions:
 - Prebuilt section: mini PCs for review/drafting, gaming desktops for viz (not workstations — workstations use ISV GPUs that are overpriced for viz)
 
 ### components.html
-The golden path detail page. Specific component picks with prices and notes:
+The companion component recommendation sheet. Specific component picks with prices and notes:
 - Cases: Fractal North ($130), North XL ($180), Asus ProArt PA602 ($270)
 - Motherboards: Intel (ProArt Z890-Creator, MSI Z890 Tomahawk) and AMD (ProArt X870E-Creator, MSI X870 Tomahawk)
 - Memory: Corsair Vengeance / G.Skill Trident Z5 DDR5-6000
@@ -122,12 +133,8 @@ The golden path detail page. Specific component picks with prices and notes:
 - PSU: Seasonic Focus GX-850 / be quiet! Straight Power 12 / Corsair RM850x
 - Build time estimate and honest cost comparison vs prebuilt
 
----
-
-## Main Sheets
-
 ### site-screen.html
-Split-screen site feasibility tool. Left: SVG sketch canvas. Right: numbers panel.
+The site feasibility sheet. Split-screen tool with a sketch canvas on the left and numbers on the right.
 
 Sketch features:
 - Starts as a rectangle (W×D in toolbar). Heavy ortho snap (8px screen threshold).
@@ -187,7 +194,7 @@ Enter occupancy and headcount assumptions to estimate plumbing fixture requireme
 ## Content Documents (uploaded reference files)
 
 These markdown files contain the editorial content that informed the data:
-- `architecture-tools-framework.md` — site structure
+- `docs/SITE_FRAMEWORK.md` — canonical site structure and sheet framework
 - `handbook-archetypes.md` — 10 workstation archetypes
 - `handbook-cpu-tiers.md` — CPU performance tiers
 - `handbook-desktops.md` — desktop recommendations
@@ -210,11 +217,14 @@ These markdown files contain the editorial content that informed the data:
 - [ ] Migrate all tools to use `assets/css/global.css` or `../assets/css/global.css` as appropriate (currently only `components.html` and `calculators/dimension-converter.html` import it; others still have inline styles)
 - [ ] Set up as a proper static site (e.g., with a simple server or static host)
 - [ ] Test `assets/data/hardware-data.js` import works when served (requires HTTP server, not file://)
+- [ ] Add `index.html` as the root navigation sheet for the main sheets and calculators
+- [ ] Translate the A0-A13 framework from `docs/SITE_FRAMEWORK.md` into an implementation plan with page/stub decisions
 
 ### Content
 - [ ] Place actual isometric illustrations in picker placeholder divs
 - [ ] Review and edit `assets/data/hardware-data.js` text (Michael should do a pass on every cpuNote, gpuNote, priority)
 - [ ] Verify prebuilt desktop prices and availability
+- [ ] Decide which framework sheets become standalone pages first (likely A0, A1, A2, A6, A12)
 
 ### Calculator follow-up
 - [ ] Review calculator URL conventions and decide whether clean routes should resolve to `/calculators/<slug>` or `/calculators/<slug>.html`
