@@ -41,63 +41,88 @@ Data.PickerOptions = {
 
 // ============================================================================
 // WINDOWS DESKTOP SPECS (build-your-own)
-// Keys: LowCheapest, LowValue, LowBest, HighCheapest, HighValue, HighBest
+// Structure: workloadProfile -> projectScale (small|large) -> budgetTier
+// budgetTier keys: cheapest, value, best
 // Fields: cpu, cpuNote, gpu, gpuNote, ram, ramNote, storage, priceRange
 // Prices reflect March 2026 US street prices.
 // ============================================================================
 Data.WindowsSpecs = {
   review: {
-    LowCheapest:  { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'Minimum spend that still feels fast for office work', gpu: 'NVIDIA RTX 4060',    gpuNote: 'Only here to drive displays cleanly',      ram: '16 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$900--$1,100' },
-    LowValue:     { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'More than enough for documents',                     gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,100--$1,400' },
-    LowBest:      { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Headroom for the future',                            gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$1,500--$1,800' },
-    HighCheapest: { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'Enough for large document sets if budget is tight', gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '32 GB DDR5',  ramNote: 'Lets drawings, PDFs, and browser tabs coexist', storage: '1 TB NVMe', priceRange: '$1,100--$1,400' },
-    HighValue:    { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Headroom for larger document sets',                  gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '64 GB DDR5',  ramNote: 'Larger reference sets open simultaneously', storage: '2 TB NVMe', priceRange: '$1,500--$1,800' },
-    HighBest:     { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Same chip -- documents are not demanding',          gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$1,500--$1,800' },
+    small: {
+      cheapest: { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'Minimum spend that still feels fast for office work', gpu: 'NVIDIA RTX 4060',    gpuNote: 'Only here to drive displays cleanly',      ram: '16 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$900--$1,100' },
+      value:    { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'More than enough for documents',                     gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,100--$1,400' },
+      best:     { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Headroom for the future',                            gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$1,500--$1,800' },
+    },
+    large: {
+      cheapest: { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'Enough for large document sets if budget is tight', gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '32 GB DDR5',  ramNote: 'Lets drawings, PDFs, and browser tabs coexist', storage: '1 TB NVMe', priceRange: '$1,100--$1,400' },
+      value:    { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Headroom for larger document sets',                  gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '64 GB DDR5',  ramNote: 'Larger reference sets open simultaneously', storage: '2 TB NVMe', priceRange: '$1,500--$1,800' },
+      best:     { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Same chip -- documents are not demanding',          gpu: 'NVIDIA RTX 4060',    gpuNote: 'Viewport display only',                     ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$1,500--$1,800' },
+    },
     priority: 'Your work is document-primary. The monitor is the most important purchase.'
   },
   drafting: {
-    LowCheapest:  { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'Cheapest CPU I would still buy for CAD',            gpu: 'NVIDIA RTX 4060',    gpuNote: 'AutoCAD viewport is not demanding',         ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,100--$1,400' },
-    LowValue:     { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best value for single-thread CAD',                  gpu: 'NVIDIA RTX 4060',    gpuNote: 'AutoCAD viewport is not demanding',         ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,300--$1,600' },
-    LowBest:      { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Top single-thread',                                 gpu: 'NVIDIA RTX 5070',    gpuNote: 'Comfortable headroom',                      ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$2,200--$2,600' },
-    HighCheapest: { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Acceptable for larger xrefs if budget is tight',   gpu: 'NVIDIA RTX 4060',    gpuNote: 'Still enough for complex 2D work',          ram: '32 GB DDR5',  ramNote: 'Manageable if you avoid keeping everything open', storage: '1 TB NVMe', priceRange: '$1,400--$1,700' },
-    HighValue:    { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best value for single-thread CAD',                  gpu: 'NVIDIA RTX 4060',    gpuNote: 'AutoCAD viewport is not demanding',         ram: '64 GB DDR5',  ramNote: 'Large drawing sets with xrefs',             storage: '2 TB NVMe', priceRange: '$1,600--$1,900' },
-    HighBest:     { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Faster regen on complex drawings',                  gpu: 'NVIDIA RTX 5070',    gpuNote: 'Comfortable headroom',                      ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$2,400--$2,800' },
+    small: {
+      cheapest: { cpu: 'Intel Core Ultra 5 245K',  cpuNote: 'Cheapest CPU I would still buy for CAD',            gpu: 'NVIDIA RTX 4060',    gpuNote: 'AutoCAD viewport is not demanding',         ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,100--$1,400' },
+      value:    { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best value for single-thread CAD',                  gpu: 'NVIDIA RTX 4060',    gpuNote: 'AutoCAD viewport is not demanding',         ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,300--$1,600' },
+      best:     { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Top single-thread',                                 gpu: 'NVIDIA RTX 5070',    gpuNote: 'Comfortable headroom',                      ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$2,200--$2,600' },
+    },
+    large: {
+      cheapest: { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Acceptable for larger xrefs if budget is tight',   gpu: 'NVIDIA RTX 4060',    gpuNote: 'Still enough for complex 2D work',          ram: '32 GB DDR5',  ramNote: 'Manageable if you avoid keeping everything open', storage: '1 TB NVMe', priceRange: '$1,400--$1,700' },
+      value:    { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best value for single-thread CAD',                  gpu: 'NVIDIA RTX 4060',    gpuNote: 'AutoCAD viewport is not demanding',         ram: '64 GB DDR5',  ramNote: 'Large drawing sets with xrefs',             storage: '2 TB NVMe', priceRange: '$1,600--$1,900' },
+      best:     { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Faster regen on complex drawings',                  gpu: 'NVIDIA RTX 5070',    gpuNote: 'Comfortable headroom',                      ram: '64 GB DDR5',  ramNote: '',                                          storage: '2 TB NVMe', priceRange: '$2,400--$2,800' },
+    },
     priority: '2D drafting is single-thread CPU bound but not demanding. Display quality matters more than compute.'
   },
   modeling: {
-    LowCheapest:  { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'The floor for a modeling desktop that still feels good', gpu: 'NVIDIA RTX 4060',    gpuNote: 'Enough for modeling, light for viz',        ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,600--$1,900' },
-    LowValue:     { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best value for Revit -- 90-95% of the 285K',       gpu: 'NVIDIA RTX 5070',    gpuNote: 'Transparent for modeling, ready for occasional Enscape', ram: '64 GB DDR5',  ramNote: '',                        storage: '2 TB NVMe', priceRange: '$1,900--$2,300' },
-    LowBest:      { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Top single-thread -- view regen, family loading',  gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'Ready for viz if your role expands -- 16 GB VRAM', ram: '64 GB DDR5',  ramNote: '',                       storage: '2 TB NVMe', priceRange: '$2,600--$3,100' },
-    HighCheapest: { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Tight-budget choice for large linked models',      gpu: 'NVIDIA RTX 5070',    gpuNote: 'Enough for modeling, still not a viz-first build', ram: '64 GB DDR5', ramNote: 'The minimum I would buy for large-model work', storage: '2 TB NVMe', priceRange: '$2,100--$2,500' },
-    HighValue:    { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Large models with linked consultants need top single-thread', gpu: 'NVIDIA RTX 5070',    gpuNote: 'Transparent for modeling', ram: '128 GB DDR5', ramNote: 'Multiple linked models open simultaneously', storage: '2 TB NVMe', priceRange: '$2,600--$3,100' },
-    HighBest:     { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Top single-thread for complex view regeneration',   gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'Headroom for Enscape walkthroughs of large models', ram: '128 GB DDR5', ramNote: '500MB+ models with full consultant links', storage: '4 TB NVMe', priceRange: '$3,100--$3,700' },
+    small: {
+      cheapest: { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'The floor for a modeling desktop that still feels good', gpu: 'NVIDIA RTX 4060',    gpuNote: 'Enough for modeling, light for viz',        ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,600--$1,900' },
+      value:    { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best value for Revit -- 90-95% of the 285K',       gpu: 'NVIDIA RTX 5070',    gpuNote: 'Transparent for modeling, ready for occasional Enscape', ram: '64 GB DDR5',  ramNote: '',                        storage: '2 TB NVMe', priceRange: '$1,900--$2,300' },
+      best:     { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Top single-thread -- view regen, family loading',  gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'Ready for viz if your role expands -- 16 GB VRAM', ram: '64 GB DDR5',  ramNote: '',                       storage: '2 TB NVMe', priceRange: '$2,600--$3,100' },
+    },
+    large: {
+      cheapest: { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Tight-budget choice for large linked models',      gpu: 'NVIDIA RTX 5070',    gpuNote: 'Enough for modeling, still not a viz-first build', ram: '64 GB DDR5', ramNote: 'The minimum I would buy for large-model work', storage: '2 TB NVMe', priceRange: '$2,100--$2,500' },
+      value:    { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Large models with linked consultants need top single-thread', gpu: 'NVIDIA RTX 5070',    gpuNote: 'Transparent for modeling', ram: '128 GB DDR5', ramNote: 'Multiple linked models open simultaneously', storage: '2 TB NVMe', priceRange: '$2,600--$3,100' },
+      best:     { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Top single-thread for complex view regeneration',   gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'Headroom for Enscape walkthroughs of large models', ram: '128 GB DDR5', ramNote: '500MB+ models with full consultant links', storage: '4 TB NVMe', priceRange: '$3,100--$3,700' },
+    },
     priority: 'BIM modeling is single-thread CPU bound. Clock speed governs how Revit, Rhino, and SketchUp feel. The GPU is nearly invisible.'
   },
   viz: {
-    LowCheapest:  { cpu: 'AMD Ryzen 7 9800X3D',  cpuNote: 'Strong scene handling without jumping to halo pricing', gpu: 'NVIDIA RTX 5070',    gpuNote: '12 GB VRAM is the cheapest point that still makes sense', ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,900--$2,300' },
-    LowValue:     { cpu: 'AMD Ryzen 7 9800X3D',  cpuNote: 'Strong single-thread, excellent multi-thread for scene loading', gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM -- the viz sweet spot at current prices', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,400--$2,900' },
-    LowBest:      { cpu: 'AMD Ryzen 9 9950X',    cpuNote: '16-core -- scene loading and CPU-side rendering',       gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- maximum viz. Currently selling $2,900+ due to memory shortage', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$4,500--$5,500' },
-    HighCheapest: { cpu: 'AMD Ryzen 9 9950X',    cpuNote: 'The cheapest CPU I would trust for large viz scenes',   gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM is the practical minimum at this scale', ram: '64 GB DDR5',  ramNote: 'You will need to manage scene size carefully', storage: '2 TB NVMe', priceRange: '$2,700--$3,200' },
-    HighValue:    { cpu: 'AMD Ryzen 9 9950X',    cpuNote: '16-core -- large scenes benefit from multi-thread',     gpu: 'NVIDIA RTX 5080',    gpuNote: '16 GB VRAM -- large scenes with heavy geometry', ram: '128 GB DDR5', ramNote: 'Viz software loads the full scene into RAM', storage: '2 TB NVMe', priceRange: '$3,200--$3,800' },
-    HighBest:     { cpu: 'AMD Ryzen 9 9950X',    cpuNote: 'Maximum multi-thread for complex scene handling',       gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- large scenes need VRAM headroom. $2,900+ street price', ram: '128 GB DDR5', ramNote: 'Running out of VRAM crashes the software', storage: '4 TB NVMe', priceRange: '$5,000--$6,000' },
+    small: {
+      cheapest: { cpu: 'AMD Ryzen 7 9800X3D',  cpuNote: 'Strong scene handling without jumping to halo pricing', gpu: 'NVIDIA RTX 5070',    gpuNote: '12 GB VRAM is the cheapest point that still makes sense', ram: '32 GB DDR5',  ramNote: '',                                          storage: '1 TB NVMe', priceRange: '$1,900--$2,300' },
+      value:    { cpu: 'AMD Ryzen 7 9800X3D',  cpuNote: 'Strong single-thread, excellent multi-thread for scene loading', gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM -- the viz sweet spot at current prices', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,400--$2,900' },
+      best:     { cpu: 'AMD Ryzen 9 9950X',    cpuNote: '16-core -- scene loading and CPU-side rendering',       gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- maximum viz. Currently selling $2,900+ due to memory shortage', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$4,500--$5,500' },
+    },
+    large: {
+      cheapest: { cpu: 'AMD Ryzen 9 9950X',    cpuNote: 'The cheapest CPU I would trust for large viz scenes',   gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM is the practical minimum at this scale', ram: '64 GB DDR5',  ramNote: 'You will need to manage scene size carefully', storage: '2 TB NVMe', priceRange: '$2,700--$3,200' },
+      value:    { cpu: 'AMD Ryzen 9 9950X',    cpuNote: '16-core -- large scenes benefit from multi-thread',     gpu: 'NVIDIA RTX 5080',    gpuNote: '16 GB VRAM -- large scenes with heavy geometry', ram: '128 GB DDR5', ramNote: 'Viz software loads the full scene into RAM', storage: '2 TB NVMe', priceRange: '$3,200--$3,800' },
+      best:     { cpu: 'AMD Ryzen 9 9950X',    cpuNote: 'Maximum multi-thread for complex scene handling',       gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- large scenes need VRAM headroom. $2,900+ street price', ram: '128 GB DDR5', ramNote: 'Running out of VRAM crashes the software', storage: '4 TB NVMe', priceRange: '$5,000--$6,000' },
+    },
     priority: 'Interactive viz is GPU bound. Enscape, Lumion, D5, TwinMotion scale directly with GPU power and VRAM. GPU prices are inflated in early 2026 due to a GDDR7 memory shortage -- the 5070 Ti is the best value right now.'
   },
   modeling_viz: {
-    LowCheapest:  { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Cheapest balanced CPU for mixed modeling and viz',  gpu: 'NVIDIA RTX 5070',    gpuNote: 'Enough GPU to cross into real-time viz without overspending', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,100--$2,500' },
-    LowValue:     { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best single-thread for Revit, strong enough for viz', gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM -- handles both workflows', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,300--$2,800' },
-    LowBest:      { cpu: 'AMD Ryzen 9 9950X',        cpuNote: '16-core -- strong single-thread plus serious multi-thread', gpu: 'NVIDIA RTX 5080',    gpuNote: '16 GB VRAM -- serious viz without the 5090 markup', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$3,000--$3,600' },
-    HighCheapest: { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Budget-conscious choice for large mixed workloads', gpu: 'NVIDIA RTX 5070',    gpuNote: 'Will do the job, but this is where I stop cutting', ram: '64 GB DDR5',  ramNote: 'Enough for big models if you are disciplined', storage: '2 TB NVMe', priceRange: '$2,500--$3,000' },
-    HighValue:    { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Large linked models need top single-thread',        gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM -- large model viz',             ram: '128 GB DDR5', ramNote: 'Modeling plus viz open simultaneously eats memory', storage: '2 TB NVMe', priceRange: '$2,800--$3,400' },
-    HighBest:     { cpu: 'AMD Ryzen 9 9950X',        cpuNote: 'Best all-around for large models plus heavy viz',   gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- no compromises. $2,900+ street price', ram: '128 GB DDR5', ramNote: '', storage: '4 TB NVMe', priceRange: '$5,000--$6,000' },
+    small: {
+      cheapest: { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Cheapest balanced CPU for mixed modeling and viz',  gpu: 'NVIDIA RTX 5070',    gpuNote: 'Enough GPU to cross into real-time viz without overspending', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,100--$2,500' },
+      value:    { cpu: 'Intel Core Ultra 7 265K',  cpuNote: 'Best single-thread for Revit, strong enough for viz', gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM -- handles both workflows', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,300--$2,800' },
+      best:     { cpu: 'AMD Ryzen 9 9950X',        cpuNote: '16-core -- strong single-thread plus serious multi-thread', gpu: 'NVIDIA RTX 5080',    gpuNote: '16 GB VRAM -- serious viz without the 5090 markup', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$3,000--$3,600' },
+    },
+    large: {
+      cheapest: { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Budget-conscious choice for large mixed workloads', gpu: 'NVIDIA RTX 5070',    gpuNote: 'Will do the job, but this is where I stop cutting', ram: '64 GB DDR5',  ramNote: 'Enough for big models if you are disciplined', storage: '2 TB NVMe', priceRange: '$2,500--$3,000' },
+      value:    { cpu: 'Intel Core Ultra 9 285K',  cpuNote: 'Large linked models need top single-thread',        gpu: 'NVIDIA RTX 5070 Ti', gpuNote: '16 GB VRAM -- large model viz',             ram: '128 GB DDR5', ramNote: 'Modeling plus viz open simultaneously eats memory', storage: '2 TB NVMe', priceRange: '$2,800--$3,400' },
+      best:     { cpu: 'AMD Ryzen 9 9950X',        cpuNote: 'Best all-around for large models plus heavy viz',   gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- no compromises. $2,900+ street price', ram: '128 GB DDR5', ramNote: '', storage: '4 TB NVMe', priceRange: '$5,000--$6,000' },
+    },
     priority: 'You need both: fast single-core for modeling and a capable GPU for viz. The 5070 Ti at ~$1,000 is the honest sweet spot in early 2026.'
   },
   production: {
-    LowCheapest:  { cpu: 'AMD Ryzen 9 9900X', cpuNote: '12 cores is the floor for a render box that still makes sense', gpu: 'NVIDIA RTX 5070',    gpuNote: 'Enough for GPU hybrid rendering without overspending', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,300--$2,800' },
-    LowValue:     { cpu: 'AMD Ryzen 9 9950X', cpuNote: '16-core -- best for CPU rendering plus strong single-thread',   gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'GPU hybrid rendering plus viz -- 16 GB VRAM', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,600--$3,100' },
-    LowBest:      { cpu: 'AMD Ryzen 9 9950X', cpuNote: '16-core -- still the right chip at top budget',               gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- GPU hybrid at maximum. $2,900+ street price', ram: '128 GB DDR5', ramNote: '', storage: '4 TB NVMe', priceRange: '$5,000--$6,000' },
-    HighCheapest: { cpu: 'AMD Ryzen 9 9950X', cpuNote: 'The cheapest CPU I would trust for large production scenes',  gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'Still enough VRAM for serious hybrid rendering work', ram: '64 GB DDR5',  ramNote: 'You will need to manage scene size more carefully', storage: '2 TB NVMe', priceRange: '$2,900--$3,400' },
-    HighValue:    { cpu: 'AMD Ryzen 9 9950X', cpuNote: '16-core -- large scenes render longer, cores matter more',    gpu: 'NVIDIA RTX 5080',    gpuNote: '16 GB VRAM -- large scene GPU rendering',   ram: '128 GB DDR5', ramNote: 'V-Ray loads the full scene into RAM before rendering', storage: '4 TB NVMe', priceRange: '$3,400--$4,000' },
-    HighBest:     { cpu: 'AMD Ryzen 9 9950X', cpuNote: 'Maximum cores for production rendering',                      gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- no scene too large. $2,900+ street price', ram: '128 GB DDR5', ramNote: '', storage: '4 TB NVMe', priceRange: '$5,200--$6,200' },
+    small: {
+      cheapest: { cpu: 'AMD Ryzen 9 9900X', cpuNote: '12 cores is the floor for a render box that still makes sense', gpu: 'NVIDIA RTX 5070',    gpuNote: 'Enough for GPU hybrid rendering without overspending', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,300--$2,800' },
+      value:    { cpu: 'AMD Ryzen 9 9950X', cpuNote: '16-core -- best for CPU rendering plus strong single-thread',   gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'GPU hybrid rendering plus viz -- 16 GB VRAM', ram: '64 GB DDR5',  ramNote: '', storage: '2 TB NVMe', priceRange: '$2,600--$3,100' },
+      best:     { cpu: 'AMD Ryzen 9 9950X', cpuNote: '16-core -- still the right chip at top budget',               gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- GPU hybrid at maximum. $2,900+ street price', ram: '128 GB DDR5', ramNote: '', storage: '4 TB NVMe', priceRange: '$5,000--$6,000' },
+    },
+    large: {
+      cheapest: { cpu: 'AMD Ryzen 9 9950X', cpuNote: 'The cheapest CPU I would trust for large production scenes',  gpu: 'NVIDIA RTX 5070 Ti', gpuNote: 'Still enough VRAM for serious hybrid rendering work', ram: '64 GB DDR5',  ramNote: 'You will need to manage scene size more carefully', storage: '2 TB NVMe', priceRange: '$2,900--$3,400' },
+      value:    { cpu: 'AMD Ryzen 9 9950X', cpuNote: '16-core -- large scenes render longer, cores matter more',    gpu: 'NVIDIA RTX 5080',    gpuNote: '16 GB VRAM -- large scene GPU rendering',   ram: '128 GB DDR5', ramNote: 'V-Ray loads the full scene into RAM before rendering', storage: '4 TB NVMe', priceRange: '$3,400--$4,000' },
+      best:     { cpu: 'AMD Ryzen 9 9950X', cpuNote: 'Maximum cores for production rendering',                      gpu: 'NVIDIA RTX 5090',    gpuNote: '32 GB VRAM -- no scene too large. $2,900+ street price', ram: '128 GB DDR5', ramNote: '', storage: '4 TB NVMe', priceRange: '$5,200--$6,200' },
+    },
     priority: 'V-Ray and Corona are multi-thread CPU bound with GPU hybrid modes. The Ryzen 9 9950X leads. Note: the 5090 is severely marked up in early 2026. The 5080 is the better value for GPU hybrid rendering right now.'
   }
 };
@@ -105,61 +130,86 @@ Data.WindowsSpecs = {
 
 // ============================================================================
 // MAC DESKTOP SPECS
-// Keys: LowCheapest, LowValue, LowBest, HighCheapest, HighValue, HighBest
+// Structure: workloadProfile -> projectScale (small|large) -> budgetTier
+// budgetTier keys: cheapest, value, best
 // ============================================================================
 Data.MacSpecs = {
   review: {
-    LowCheapest:  { chip: 'Mac Mini -- M4',        cpuNote: 'Quiet, small, and enough for documents',                    memory: '16 GB unified',  storage: '512 GB SSD', price: '$800--$1,000' },
-    LowValue:     { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'More than enough for documents',                            memory: '24 GB unified',  storage: '512 GB SSD', price: '$1,400--$1,600' },
-    LowBest:      { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Same chip -- no need to go higher',                         memory: '48 GB unified',  storage: '1 TB SSD',   price: '$1,800--$2,000' },
-    HighCheapest: { chip: 'Mac Mini -- M4',        cpuNote: '24 GB is the floor once file sizes grow',                   memory: '24 GB unified',  storage: '512 GB SSD', price: '$1,000--$1,200' },
-    HighValue:    { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Same chip -- documents are not demanding at any scale',    memory: '48 GB unified',  storage: '1 TB SSD',   price: '$1,800--$2,000' },
-    HighBest:     { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Same chip -- display matters more',                         memory: '48 GB unified',  storage: '1 TB SSD',   price: '$1,800--$2,000' },
+    small: {
+      cheapest: { chip: 'Mac Mini -- M4',        cpuNote: 'Quiet, small, and enough for documents',                    memory: '16 GB unified',  storage: '512 GB SSD', price: '$800--$1,000' },
+      value:    { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'More than enough for documents',                            memory: '24 GB unified',  storage: '512 GB SSD', price: '$1,400--$1,600' },
+      best:     { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Same chip -- no need to go higher',                         memory: '48 GB unified',  storage: '1 TB SSD',   price: '$1,800--$2,000' },
+    },
+    large: {
+      cheapest: { chip: 'Mac Mini -- M4',        cpuNote: '24 GB is the floor once file sizes grow',                   memory: '24 GB unified',  storage: '512 GB SSD', price: '$1,000--$1,200' },
+      value:    { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Same chip -- documents are not demanding at any scale',    memory: '48 GB unified',  storage: '1 TB SSD',   price: '$1,800--$2,000' },
+      best:     { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Same chip -- display matters more',                         memory: '48 GB unified',  storage: '1 TB SSD',   price: '$1,800--$2,000' },
+    },
     priority: 'Document-primary. The display matters more than the Mac.'
   },
   drafting: {
-    LowCheapest:  { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'The cheapest Mac desktop I would still buy for CAD',        memory: '24 GB unified',  storage: '512 GB SSD', price: '$1,400--$1,600' },
-    LowValue:     { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Strong single-thread for 2D CAD',                           memory: '24 GB unified',  storage: '1 TB SSD',   price: '$1,600--$1,800' },
-    LowBest:      { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Headroom for larger drawings',                              memory: '36 GB unified',  storage: '1 TB SSD',   price: '$2,000--$2,400' },
-    HighCheapest: { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Still workable for big drawing sets if budget is tight',   memory: '24 GB unified',  storage: '1 TB SSD',   price: '$1,600--$1,800' },
-    HighValue:    { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Large drawing sets with many xrefs',                        memory: '36 GB unified',  storage: '1 TB SSD',   price: '$2,000--$2,400' },
-    HighBest:     { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Headroom for complex drawings and multitasking',            memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
+    small: {
+      cheapest: { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'The cheapest Mac desktop I would still buy for CAD',        memory: '24 GB unified',  storage: '512 GB SSD', price: '$1,400--$1,600' },
+      value:    { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Strong single-thread for 2D CAD',                           memory: '24 GB unified',  storage: '1 TB SSD',   price: '$1,600--$1,800' },
+      best:     { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Headroom for larger drawings',                              memory: '36 GB unified',  storage: '1 TB SSD',   price: '$2,000--$2,400' },
+    },
+    large: {
+      cheapest: { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Still workable for big drawing sets if budget is tight',   memory: '24 GB unified',  storage: '1 TB SSD',   price: '$1,600--$1,800' },
+      value:    { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Large drawing sets with many xrefs',                        memory: '36 GB unified',  storage: '1 TB SSD',   price: '$2,000--$2,400' },
+      best:     { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Headroom for complex drawings and multitasking',            memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
+    },
     priority: '2D drafting on Mac is well-served by the M4 Pro.'
   },
   modeling: {
-    LowCheapest:  { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Acceptable for ArchiCAD, Rhino, and SketchUp if models stay moderate', memory: '48 GB unified',  storage: '1 TB SSD', price: '$1,800--$2,100' },
-    LowValue:     { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Strong GPU cores for ArchiCAD/Rhino/SketchUp',             memory: '36 GB unified',  storage: '1 TB SSD',   price: '$2,000--$2,400' },
-    LowBest:      { chip: 'Mac Studio -- M4 Max',  cpuNote: 'More memory for larger models',                            memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
-    HighCheapest: { chip: 'Mac Studio -- M4 Max',  cpuNote: 'The minimum Mac desktop I would buy for large models',     memory: '48 GB unified',  storage: '1 TB SSD',   price: '$2,400--$2,800' },
-    HighValue:    { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Large models need memory and GPU bandwidth',               memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
-    HighBest:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large complex models benefit from Ultra GPU cores',       memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
+    small: {
+      cheapest: { chip: 'Mac Mini -- M4 Pro',    cpuNote: 'Acceptable for ArchiCAD, Rhino, and SketchUp if models stay moderate', memory: '48 GB unified',  storage: '1 TB SSD', price: '$1,800--$2,100' },
+      value:    { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Strong GPU cores for ArchiCAD/Rhino/SketchUp',             memory: '36 GB unified',  storage: '1 TB SSD',   price: '$2,000--$2,400' },
+      best:     { chip: 'Mac Studio -- M4 Max',  cpuNote: 'More memory for larger models',                            memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
+    },
+    large: {
+      cheapest: { chip: 'Mac Studio -- M4 Max',  cpuNote: 'The minimum Mac desktop I would buy for large models',     memory: '48 GB unified',  storage: '1 TB SSD',   price: '$2,400--$2,800' },
+      value:    { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Large models need memory and GPU bandwidth',               memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
+      best:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large complex models benefit from Ultra GPU cores',       memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
+    },
     priority: 'ArchiCAD, Vectorworks, SketchUp, Rhino v8 all run on Mac. Performance scales with GPU cores and unified memory.'
   },
   viz: {
-    LowCheapest:  { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Cheapest Mac desktop I would still call a viz machine',    memory: '48 GB unified',  storage: '1 TB SSD',   price: '$2,300--$2,700' },
-    LowValue:     { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Enough for Enscape/TwinMotion at SFR scale',               memory: '64 GB unified',  storage: '1 TB SSD',   price: '$2,500--$3,000' },
-    LowBest:      { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum GPU cores and bandwidth',                         memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
-    HighCheapest: { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large scenes really do need the Ultra tier on Mac',      memory: '96 GB unified',  storage: '2 TB SSD',   price: '$3,600--$4,300' },
-    HighValue:    { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large scenes need maximum GPU cores',                     memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
-    HighBest:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum config for large scene visualization',            memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
+    small: {
+      cheapest: { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Cheapest Mac desktop I would still call a viz machine',    memory: '48 GB unified',  storage: '1 TB SSD',   price: '$2,300--$2,700' },
+      value:    { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Enough for Enscape/TwinMotion at SFR scale',               memory: '64 GB unified',  storage: '1 TB SSD',   price: '$2,500--$3,000' },
+      best:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum GPU cores and bandwidth',                         memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
+    },
+    large: {
+      cheapest: { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large scenes really do need the Ultra tier on Mac',      memory: '96 GB unified',  storage: '2 TB SSD',   price: '$3,600--$4,300' },
+      value:    { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large scenes need maximum GPU cores',                     memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
+      best:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum config for large scene visualization',            memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
+    },
     priority: 'Enscape works on Mac. TwinMotion runs via Rosetta. Lumion and D5 are Windows-only.'
   },
   modeling_viz: {
-    LowCheapest:  { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Cheapest balanced Mac for modeling plus viz',              memory: '48 GB unified',  storage: '1 TB SSD',   price: '$2,500--$2,900' },
-    LowValue:     { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Balanced for modeling and viz',                            memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
-    LowBest:      { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum headroom for both workflows',                     memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
-    HighCheapest: { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Budget-conscious choice for large mixed workloads',        memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
-    HighValue:    { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large models plus viz need Ultra GPU cores',             memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
-    HighBest:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum config for large-scale modeling and viz',        memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
+    small: {
+      cheapest: { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Cheapest balanced Mac for modeling plus viz',              memory: '48 GB unified',  storage: '1 TB SSD',   price: '$2,500--$2,900' },
+      value:    { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Balanced for modeling and viz',                            memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
+      best:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum headroom for both workflows',                     memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
+    },
+    large: {
+      cheapest: { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Budget-conscious choice for large mixed workloads',        memory: '64 GB unified',  storage: '2 TB SSD',   price: '$2,800--$3,200' },
+      value:    { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large models plus viz need Ultra GPU cores',             memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
+      best:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum config for large-scale modeling and viz',        memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
+    },
     priority: 'Unified memory serves as both RAM and VRAM.'
   },
   production: {
-    LowCheapest:  { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Entry point if you insist on Mac for rendering',           memory: '64 GB unified',  storage: '2 TB SSD',   price: '$3,200--$3,800' },
-    LowValue:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum cores for V-Ray CPU plus Metal GPU',             memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
-    LowBest:      { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum config',                                          memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
-    HighCheapest: { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'The cheapest Mac desktop I would trust for large renders', memory: '128 GB unified', storage: '2 TB SSD',  price: '$4,000--$5,000' },
-    HighValue:    { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large scenes need max memory for rendering',             memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
-    HighBest:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum everything -- still slower than a mid-range Windows PC with an RTX 4070 for V-Ray', memory: '192 GB unified', storage: '4 TB SSD', price: '$5,500--$7,000' },
+    small: {
+      cheapest: { chip: 'Mac Studio -- M4 Max',  cpuNote: 'Entry point if you insist on Mac for rendering',           memory: '64 GB unified',  storage: '2 TB SSD',   price: '$3,200--$3,800' },
+      value:    { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum cores for V-Ray CPU plus Metal GPU',             memory: '128 GB unified', storage: '2 TB SSD',   price: '$4,000--$5,000' },
+      best:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum config',                                          memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
+    },
+    large: {
+      cheapest: { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'The cheapest Mac desktop I would trust for large renders', memory: '128 GB unified', storage: '2 TB SSD',  price: '$4,000--$5,000' },
+      value:    { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Large scenes need max memory for rendering',             memory: '192 GB unified', storage: '4 TB SSD',   price: '$5,500--$7,000' },
+      best:     { chip: 'Mac Studio -- M4 Ultra', cpuNote: 'Maximum everything -- still slower than a mid-range Windows PC with an RTX 4070 for V-Ray', memory: '192 GB unified', storage: '4 TB SSD', price: '$5,500--$7,000' },
+    },
     priority: 'V-Ray supports Metal GPU since V-Ray 7. A mid-range Windows PC with an RTX 4070 still outrenders a maxed Mac Studio. Mac wins on ecosystem, display, and silence.'
   }
 };

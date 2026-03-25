@@ -125,6 +125,8 @@
   .laptop-rec-badge{font-size:0.5rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.04em;text-transform:uppercase;background:var(--black);color:var(--white);padding:1px 5px;flex-shrink:0;display:none;}
   .laptop-row.is-rec .laptop-rec-badge{display:inline-block;}
   .laptop-note{font-size:0.68rem;color:var(--gray-500);font-weight:300;margin-top:0.1rem;}
+  .laptop-equivalence-note{margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--gray-100);font-size:0.64rem;color:var(--gray-600);font-weight:300;line-height:1.55;}
+  .laptop-equivalence-label{display:block;margin-bottom:0.15rem;font-size:0.5rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);}
   .laptop-meta{display:flex;gap:1rem;flex-shrink:0;align-items:baseline;}
   .laptop-weight{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;color:var(--gray-400);white-space:nowrap;}
   .laptop-price{font-size:0.72rem;font-family:var(--font-mono);font-weight:300;color:var(--gray-700);white-space:nowrap;}
@@ -274,7 +276,14 @@
   // All data comes from Data.* (data.js). This file is pure logic.
 
   var defaultPickerState = Data.PickerOptions.defaultState;
-  var budgetSuffixByBudget = { cheapest: 'Cheapest', value: 'Value', best: 'Best' };
+  var workloadProfileLabels = {
+    review: 'document review',
+    drafting: '2D drafting',
+    modeling: '3D modeling',
+    viz: 'visualization',
+    modeling_viz: 'modeling plus visualization',
+    production: 'production rendering'
+  };
 
   function defaultDeskMonitors() { return defaultPickerState.deskMonitors.slice(); }
 
@@ -351,6 +360,28 @@
   }
   function isRecommendedForBudget(item, activeProfile, budgetId) {
     return !!(item.recommendedFor && item.recommendedFor[activeProfile] && item.recommendedFor[activeProfile][budgetId]);
+  }
+  function budgetOptionLabel(budgetId) {
+    for (var budgetOptionIndex = 0; budgetOptionIndex < Data.PickerOptions.budgetOptions.length; budgetOptionIndex++) {
+      var budgetOption = Data.PickerOptions.budgetOptions[budgetOptionIndex];
+      if (budgetOption.id === budgetId) return budgetOption.label;
+    }
+    return budgetId;
+  }
+  function selectedDesktopSpec(specsByWorkload, workloadProfileId) {
+    return specsByWorkload[workloadProfileId][State.scale][State.budget];
+  }
+  function windowsDesktopReferenceSummary(windowsSpec) {
+    return windowsSpec.cpu + ' / ' + windowsSpec.gpu + ' / ' + windowsSpec.ram;
+  }
+  function prebuiltEquivalenceNoteHTML(prebuilt, workloadProfileId, windowsDesktopSpec) {
+    if (!windowsDesktopSpec) return '';
+    var equivalenceNote = 'Similar fit for ' + workloadProfileLabels[workloadProfileId] + ', not an exact parts match.';
+    if (prebuilt.type === 'mini' && (workloadProfileId === 'review' || workloadProfileId === 'drafting')) {
+      equivalenceNote += ' The DIY tower uses its GPU mostly for display output here; this mini PC gets into the same recommendation tier with integrated graphics instead.';
+    }
+    equivalenceNote += ' Current ' + budgetOptionLabel(State.budget) + ' DIY target: ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
+    return '<div class="laptop-equivalence-note"><span class="laptop-equivalence-label">Comparable target</span>' + equivalenceNote + '</div>';
   }
 
   function monitorSVG(monitor, scale) {
@@ -444,7 +475,7 @@
   }
 
   // ---- Prebuilt desktop rendering ----
-  function buildPrebuiltHTML(activeProfile) {
+  function buildPrebuiltHTML(activeProfile, windowsDesktopSpec) {
     var prebuiltTypes = ['mini', 'office', 'workstation', 'gaming'];
     var prebuiltMarkup = '<div class="section-label" style="margin-top:2rem">Prebuilt Options</div>';
     for (var typeIndex = 0; typeIndex < prebuiltTypes.length; typeIndex++) {
@@ -463,7 +494,7 @@
         var matchedPrebuilt = matchingPrebuilts[matchIndex];
         var isRecommended = isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
         prebuiltMarkup += '<div class="laptop-row' + (isRecommended ? ' is-rec' : '') + '">';
-        prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div></div>';
+        prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
         prebuiltMarkup += '<div class="laptop-meta"><span class="laptop-price">' + matchedPrebuilt.price + '</span></div>';
         prebuiltMarkup += '</div>';
       }
@@ -474,11 +505,10 @@
 
   // ---- MAIN UPDATE ----
   function update() {
-    var platform = effectivePlatform();
+    var activePlatform = effectivePlatform();
     var platformAvailability = availablePlatforms();
-    var activeProfile = workloadProfile();
-    var isMacPlatform = platform === 'mac';
-    var specKey = (State.scale === 'large' ? 'High' : 'Low') + budgetSuffixByBudget[State.budget];
+    var activeWorkloadProfile = workloadProfile();
+    var isMacPlatform = activePlatform === 'mac';
 
     // Platform visibility
     var platformArea = document.getElementById('platArea');
@@ -488,24 +518,24 @@
 
     // Desktop spec
     if (isMacPlatform) {
-      var macSpec = Data.MacSpecs[activeProfile][specKey];
+      var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile);
       document.getElementById('d-illus').innerHTML = '<span>[ isometric Mac Studio ]</span>';
-      document.getElementById('d-price').textContent = macSpec.price + ' + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
-      document.getElementById('d-spec').innerHTML = macSpecHTML(macSpec);
+      document.getElementById('d-price').textContent = selectedMacDesktopSpec.price + ' + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
+      document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
       document.getElementById('d-paths').innerHTML = '<div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div>';
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeProfile].priority + '</p>';
+      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
       document.getElementById('d-prebuilts').innerHTML = '';
     } else {
-      var windowsSpec = Data.WindowsSpecs[activeProfile][specKey];
-      var towerPriceBounds = parsePriceRange(windowsSpec.priceRange);
+      var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile);
+      var towerPriceBounds = parsePriceRange(selectedWindowsDesktopSpec.priceRange);
       document.getElementById('d-illus').innerHTML = '<span>[ isometric tower ]</span>';
-      document.getElementById('d-price').textContent = windowsSpec.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
-      document.getElementById('d-spec').innerHTML = windowsSpecHTML(windowsSpec);
+      document.getElementById('d-price').textContent = selectedWindowsDesktopSpec.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
+      document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
       document.getElementById('d-paths').innerHTML =
         '<div class="purchase-path"><div class="purchase-path-label">Build it yourself</div><p>Case, motherboard, cooler, PSU, and RAM recommendations are on the components page. Takes about 8 hours start to finish.</p><a href="/components" class="card-link">Component recommendations</a><a href="https://pcpartpicker.com" target="_blank" rel="noopener" class="card-link">PCPartPicker</a></div>' +
         '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Better components, burn-in testing, real support. Premium is typically $700--$1,500. Expect ' + formatPrice(Math.round(towerPriceBounds.low * 1.25 / 100) * 100) + '--' + formatPrice(Math.round(towerPriceBounds.high * 1.35 / 100) * 100) + ' for the tower.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[activeProfile].priority + '</p>';
-      document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeProfile);
+      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[activeWorkloadProfile].priority + '</p>';
+      document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
     }
 
     // Desktop monitors
@@ -525,18 +555,18 @@
       var matchingLaptops = [];
       for (var laptopIndex = 0; laptopIndex < Data.Laptops.length; laptopIndex++) {
         var laptop = Data.Laptops[laptopIndex];
-        if (laptop.category !== activeCategory || laptop.platform !== platform) continue;
+        if (laptop.category !== activeCategory || laptop.platform !== activePlatform) continue;
         if (!isMacPlatform && mobileStrategy === 'two') {
           matchingLaptops.push(laptop);
           continue;
         }
-        if (hasWorkloadProfile(laptop.workloadProfiles, activeProfile)) matchingLaptops.push(laptop);
+        if (hasWorkloadProfile(laptop.workloadProfiles, activeWorkloadProfile)) matchingLaptops.push(laptop);
       }
       if (matchingLaptops.length === 0) continue;
       mobileMarkup += '<div class="laptop-category"><div class="laptop-category-label">' + Data.LaptopCategoryLabels[activeCategory] + '</div>';
       for (var matchIndex = 0; matchIndex < matchingLaptops.length; matchIndex++) {
         var matchedLaptop = matchingLaptops[matchIndex];
-        var isRecommendedLaptop = isRecommendedForBudget(matchedLaptop, activeProfile, State.budget);
+        var isRecommendedLaptop = isRecommendedForBudget(matchedLaptop, activeWorkloadProfile, State.budget);
         mobileMarkup += '<div class="laptop-row' + (isRecommendedLaptop ? ' is-rec' : '') + '"><div class="laptop-name">' + matchedLaptop.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedLaptop.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + matchedLaptop.weight + '</span><span class="laptop-price">' + matchedLaptop.price + '</span></div></div>';
       }
       mobileMarkup += '</div>';
