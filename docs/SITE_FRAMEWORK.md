@@ -97,7 +97,7 @@ Something like a stacked bar or a ranked list per type:
 
 ---
 
-### A7 — Mobile Alternatives
+### A7 — Mobile First Setups
 
 **Drawing:** The existing mobile alternatives isometric (updated). Desk with tower + dual monitors vs desk with docked laptop + dual monitors. Add a third: laptop-only travel setup.
 
