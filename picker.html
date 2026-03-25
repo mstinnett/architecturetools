@@ -272,7 +272,11 @@
 (function(){
   // All data comes from Data.* (data.js). This file is pure logic.
 
-  var State = { apps: {}, platform: 'win', desk: [], budget: 'value', scale: 'small', mobileStrategy: 'one' };
+  var DEFAULT_DESK_MONITORS = ['m5k27', 'm5k27'];
+
+  function defaultDeskMonitors() { return DEFAULT_DESK_MONITORS.slice(); }
+
+  var State = { apps: {}, platform: 'win', desk: defaultDeskMonitors(), budget: 'value', scale: 'small', mobileStrategy: 'one' };
 
   function availablePlatforms() {
     for (var k in State.apps) { if (!State.apps[k]) continue; if (Data.Apps[k].platform === 'win') return 'win'; }
@@ -286,7 +290,7 @@
   }
   function findMonitor(id) { for (var i=0; i<Data.Monitors.length; i++) if (Data.Monitors[i].id===id) return Data.Monitors[i]; return null; }
   function monitorTotal() { var t=0; for (var i=0; i<State.desk.length; i++) { var m=findMonitor(State.desk[i]); if (m) t+=m.price; } return t; }
-  function monitorPrice() { return State.desk.length===0 ? 1600 : monitorTotal(); }
+  function monitorPrice() { return monitorTotal(); }
   function formatPrice(n) { return '$' + n.toLocaleString('en-US'); }
 
   function monitorSVG(m,s) {
@@ -458,7 +462,7 @@
     el.addEventListener('click', function() { var t=document.getElementById(el.dataset.target); if (t) t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'}); });
   });
   document.querySelectorAll('.plat-opt').forEach(function(el) {
-    el.addEventListener('click', function() { document.querySelectorAll('.plat-opt').forEach(function(p){p.classList.remove('active');}); el.classList.add('active'); State.platform=el.dataset.platform; State.desk=[]; update(); });
+    el.addEventListener('click', function() { document.querySelectorAll('.plat-opt').forEach(function(p){p.classList.remove('active');}); el.classList.add('active'); State.platform=el.dataset.platform; State.desk=defaultDeskMonitors(); update(); });
   });
   document.querySelectorAll('#budgetOptions .option-pill').forEach(function(el) {
     el.addEventListener('click', function() { document.querySelectorAll('#budgetOptions .option-pill').forEach(function(p){p.classList.remove('active');}); el.classList.add('active'); State.budget=el.dataset.budget; update(); });
