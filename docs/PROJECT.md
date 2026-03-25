@@ -14,20 +14,25 @@ The site uses a minimal, high-contrast design language. No frameworks, no build 
 
 ```
 /
-├── global.css              # Shared design tokens and component styles
-├── data.js                 # ALL hardware data — the only file edited for hardware updates
-├── picker.html             # Hardware picker (imports data.js)
-├── components.html         # Component recommendations (case, mobo, cooler, PSU, RAM)
+├── picker.html                     # Hardware picker (imports shared hardware data)
+├── components.html                 # Component recommendations (case, mobo, cooler, PSU, RAM)
 ├── dimension-converter.html
 ├── slope-calculator.html
 ├── sheet-sizes.html
 ├── occupant-load.html
 ├── stair-calculator.html
-├── site-screen.html        # Site feasibility sketch tool (standalone, complex)
+├── site-screen.html                # Site feasibility sketch tool (standalone, complex)
+├── assets/
+│   ├── css/
+│   │   └── global.css              # Shared design tokens and component styles
+│   └── data/
+│       └── hardware-data.js        # ALL hardware recommendation data
+└── docs/
+    └── PROJECT.md
 ```
 
-### global.css
-Shared stylesheet. All pages should import it via `<link rel="stylesheet" href="/global.css">`. Contains:
+### assets/css/global.css
+Shared stylesheet. Root-level pages should import it via `<link rel="stylesheet" href="assets/css/global.css">`. Contains:
 - Design tokens (colors, type scale, spacing) in CSS custom properties
 - Reset
 - Layout classes: `.page` (720px), `.page-wide` (1080px), `.page-full`
@@ -35,53 +40,50 @@ Shared stylesheet. All pages should import it via `<link rel="stylesheet" href="
 - Higher contrast than original (--black: #0a0a0a, grays darker across the board)
 - Base 16px, type scale from --text-xs (11px) to --text-2xl (40px)
 
-**Status:** Created but not yet applied to all pages. `components.html` and `dimension-converter.html` have been converted. The picker and other tools still have inline styles from earlier iterations that need to be migrated to global.css classes.
+**Status:** Created but not yet applied to all pages. `components.html` and `dimension-converter.html` import it. The picker and other tools still have inline styles from earlier iterations that need to be migrated to shared classes.
 
-### data.js
-External data file loaded by picker.html. All hardware recommendations live here. Structure:
+### assets/data/hardware-data.js
+External data file loaded by `picker.html`. All hardware recommendations live here. Structure:
 
 ```javascript
 var Data = {};
 
 Data.Apps = { revit: { group: 'modeling', platform: 'win' }, ... };
 
-// Build-your-own specs: 6 profiles × 4 tiers
+// Build-your-own specs
 // Profiles: review, drafting, modeling, viz, modeling_viz, production
-// Tiers: LowValue, LowBest, HighValue, HighBest
-// (Low/High = project scale, Value/Best = budget)
+// Structure: workloadProfile -> projectScale (small|large) -> budgetTier (cheapest|value|best)
 Data.WindowsSpecs = {
   review: {
-    LowValue: { cpu, cpuNote, gpu, gpuNote, ram, ramNote, storage, priceRange },
-    LowBest: { ... },
-    HighValue: { ... },
-    HighBest: { ... },
+    small: { cheapest: { cpu, cpuNote, gpu, gpuNote, ram, ramNote, storage, priceRange }, value: { ... }, best: { ... } },
+    large: { cheapest: { ... }, value: { ... }, best: { ... } },
     priority: 'Where the money matters text'
   },
   // ... drafting, modeling, viz, modeling_viz, production
 };
 
 Data.MacSpecs = {
-  // Same profile/tier structure
+  // Same profile/projectScale/budgetTier structure
   // Fields: chip, cpuNote, memory, storage, price, priority
 };
 
 Data.Prebuilts = [
   // type: 'mini' | 'office' | 'workstation' | 'gaming'
-  // Each has: name, price, note, profiles[], rec{}
-  { type: 'mini', name: 'ASUS ExpertCenter PB64', price: '$600--$900', note: '...', profiles: ['review','drafting'], rec: { review_value: 1 } },
+  // Each has: name, price, note, workloadProfiles[], recommendedFor{}
+  { type: 'mini', name: 'ASUS ExpertCenter PB64', price: '$600--$900', note: '...', workloadProfiles: ['review','drafting'], recommendedFor: { review: { value: true } } },
   // ...
 ];
-Data.PrebuiltCategories = { mini: 'Mini PC', office: 'Office Tower', workstation: 'Entry Workstation', gaming: 'Gaming Desktop' };
-Data.PrebuiltNote = { mini: '...', office: '...', workstation: '...', gaming: '...' };
+Data.PrebuiltTypeLabels = { mini: 'Mini PC', office: 'Office Tower', workstation: 'Entry Workstation', gaming: 'Gaming Desktop' };
+Data.PrebuiltTypeNotes = { mini: '...', office: '...', workstation: '...', gaming: '...' };
 
 Data.Monitors = [ { id, name, price, platform, width, height }, ... ];
 
 Data.Laptops = [
   // category: 'one' | 'desk' | 'travel' | 'student' | 'mac_p' | 'mac_s'
-  { category, platform, name, price, weight, note, profiles[], rec{} },
+  { category, platform, name, price, weight, note, workloadProfiles[], recommendedFor{} },
   // ...
 ];
-Data.LaptopCategories = { one: 'One-Machine Solution', desk: 'Desk-Bound Powerhouses', ... };
+Data.LaptopCategoryLabels = { one: 'One-Machine Solution', desk: 'Desk-Bound Powerhouses', ... };
 ```
 
 ### picker.html
@@ -90,7 +92,7 @@ The main hardware recommendation tool. User flow:
 1. **Software toggles** — horizontal scrolling strip with mini-nav (Modeling / Drafting / Viz / Rendering). Baseline (Office/Bluebeam/PM) shown as non-toggleable minimum.
 2. **Project Scale** — Small/Medium vs Large/Complex (side by side with Budget)
 3. **Budget** — Best Value vs Best Available
-4. These three inputs determine a workload profile + tier key, which indexes into Data.WindowsSpecs or Data.MacSpecs.
+4. These three inputs determine a workload profile plus `small|large` scale and `cheapest|value|best` budget, which index into `Data.WindowsSpecs` or `Data.MacSpecs`.
 
 Results:
 - **Desktop | Mobile** primary tabs
@@ -188,13 +190,13 @@ These markdown files contain the editorial content that informed the data:
 ## What Needs Doing
 
 ### Immediate
-- [ ] Migrate all tools to use global.css (currently only components.html and dimension-converter.html use it; others have inline styles)
+- [ ] Migrate all tools to use `assets/css/global.css` (currently only `components.html` and `dimension-converter.html` import it; others still have inline styles)
 - [ ] Set up as a proper static site (e.g., with a simple server or static host)
-- [ ] Test data.js import works when served (requires HTTP server, not file://)
+- [ ] Test `assets/data/hardware-data.js` import works when served (requires HTTP server, not file://)
 
 ### Content
 - [ ] Place actual isometric illustrations in picker placeholder divs
-- [ ] Review and edit all data.js text (Michael should do a pass on every cpuNote, gpuNote, priority)
+- [ ] Review and edit `assets/data/hardware-data.js` text (Michael should do a pass on every cpuNote, gpuNote, priority)
 - [ ] Verify prebuilt desktop prices and availability
 
 ### Tools not yet built
