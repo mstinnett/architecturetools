@@ -92,9 +92,12 @@
   .mon-desk.drag-over{border-color:var(--black);background:var(--gray-50);}
   .mon-desk-label{position:absolute;top:0.4rem;left:0.6rem;font-size:0.55rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);}
   .mon-desk-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:1.5rem 0;width:100%;}
-  .mon-on-desk{cursor:pointer;transition:opacity 0.15s;display:flex;flex-direction:column;align-items:center;gap:0.2rem;}
-  .mon-on-desk:hover{opacity:0.6;}
-  .mon-on-desk-name{font-size:0.58rem;font-family:var(--font-mono);font-weight:300;color:var(--gray-500);}
+  .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;border-radius:2px;}
+  .mon-on-desk-visual{position:relative;display:block;color:inherit;}
+  .mon-on-desk-name{font-size:0.58rem;font-family:var(--font-mono);font-weight:300;color:var(--gray-500);transition:color 0.15s ease;}
+  .mon-remove-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:300;line-height:1;color:var(--black);background:rgba(245,245,244,0.8);opacity:0;transition:opacity 0.15s ease;pointer-events:none;}
+  .mon-on-desk:hover .mon-remove-mark{opacity:1;}
+  .mon-on-desk:hover .mon-on-desk-name{color:var(--black);}
 
   .mon-shelf-label{font-size:0.55rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.4rem;}
   .mon-shelf{display:flex;flex-wrap:wrap;gap:0.4rem;}
@@ -106,6 +109,7 @@
   .mon-avail-price{font-size:0.55rem;font-family:var(--font-mono);font-weight:300;color:var(--gray-500);}
   .mon-avail .mbadge{display:none;position:absolute;top:2px;right:2px;font-size:0.4rem;font-family:var(--font-mono);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.03em;}
   .mon-avail.recommended .mbadge{display:block;}
+  .mon-avail svg,.mon-on-desk svg{display:block;}
 
   .mon-total{display:flex;justify-content:space-between;align-items:baseline;padding-top:0.5rem;border-top:1px solid var(--gray-200);margin-top:0.5rem;}
   .mon-total-label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-500);}
@@ -206,10 +210,7 @@
     </div>
     <div>
       <div class="section-label">Budget</div>
-      <div class="option-row" id="budgetOptions">
-        <div class="option-pill active" data-budget="value"><div>Best Value</div><div class="pill-detail">90% of the performance, better price</div></div>
-        <div class="option-pill" data-budget="best"><div>Best Available</div><div class="pill-detail">Top tier, no compromise</div></div>
-      </div>
+      <div class="option-row" id="budgetOptions"></div>
     </div>
   </div>
 
@@ -272,140 +273,239 @@
 (function(){
   // All data comes from Data.* (data.js). This file is pure logic.
 
-  var DEFAULT_DESK_MONITORS = ['m5k27', 'm5k27'];
+  var defaultPickerState = Data.PickerOptions.defaultState;
+  var budgetSuffixByBudget = { cheapest: 'Cheapest', value: 'Value', best: 'Best' };
 
-  function defaultDeskMonitors() { return DEFAULT_DESK_MONITORS.slice(); }
+  function defaultDeskMonitors() { return defaultPickerState.deskMonitors.slice(); }
 
-  var State = { apps: {}, platform: 'win', desk: defaultDeskMonitors(), budget: 'value', scale: 'small', mobileStrategy: 'one' };
+  var State = {
+    apps: {},
+    platform: defaultPickerState.platform,
+    desk: defaultDeskMonitors(),
+    budget: defaultPickerState.budget,
+    scale: defaultPickerState.scale,
+    mobileStrategy: defaultPickerState.mobileStrategy
+  };
+
+  function renderBudgetOptions() {
+    var budgetOptionsContainer = document.getElementById('budgetOptions');
+    var budgetOptionsMarkup = '';
+    for (var budgetIndex = 0; budgetIndex < Data.PickerOptions.budgetOptions.length; budgetIndex++) {
+      var budgetOption = Data.PickerOptions.budgetOptions[budgetIndex];
+      budgetOptionsMarkup += '<div class="option-pill' + (State.budget === budgetOption.id ? ' active' : '') + '" data-budget="' + budgetOption.id + '"><div>' + budgetOption.label + '</div><div class="pill-detail">' + budgetOption.detail + '</div></div>';
+    }
+    budgetOptionsContainer.innerHTML = budgetOptionsMarkup;
+  }
+
+  function syncStaticOptionSelections() {
+    document.querySelectorAll('.plat-opt').forEach(function(optionElement) {
+      optionElement.classList.toggle('active', optionElement.dataset.platform === State.platform);
+    });
+    document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) {
+      optionElement.classList.toggle('active', optionElement.dataset.scale === State.scale);
+    });
+    document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(optionElement) {
+      optionElement.classList.toggle('active', optionElement.dataset.mobilestrategy === State.mobileStrategy);
+    });
+  }
 
   function availablePlatforms() {
-    for (var k in State.apps) { if (!State.apps[k]) continue; if (Data.Apps[k].platform === 'win') return 'win'; }
+    for (var appId in State.apps) { if (!State.apps[appId]) continue; if (Data.Apps[appId].platform === 'win') return 'win'; }
     return 'both';
   }
   function effectivePlatform() { return availablePlatforms() === 'win' ? 'win' : State.platform; }
   function workloadProfile() {
-    var m=0,d=0,v=0,r=0;
-    for (var k in State.apps) { if (!State.apps[k]) continue; var g = Data.Apps[k].group; if (g==='modeling') m=1; if (g==='drafting') d=1; if (g==='viz') v=1; if (g==='render') r=1; }
-    if (r) return 'production'; if (v&&(m||d)) return 'modeling_viz'; if (v) return 'viz'; if (m) return 'modeling'; if (d) return 'drafting'; return 'review';
+    var hasModeling = 0, hasDrafting = 0, hasVisualization = 0, hasRendering = 0;
+    for (var appId in State.apps) {
+      if (!State.apps[appId]) continue;
+      var appGroup = Data.Apps[appId].group;
+      if (appGroup === 'modeling') hasModeling = 1;
+      if (appGroup === 'drafting') hasDrafting = 1;
+      if (appGroup === 'viz') hasVisualization = 1;
+      if (appGroup === 'render') hasRendering = 1;
+    }
+    if (hasRendering) return 'production';
+    if (hasVisualization && (hasModeling || hasDrafting)) return 'modeling_viz';
+    if (hasVisualization) return 'viz';
+    if (hasModeling) return 'modeling';
+    if (hasDrafting) return 'drafting';
+    return 'review';
   }
-  function findMonitor(id) { for (var i=0; i<Data.Monitors.length; i++) if (Data.Monitors[i].id===id) return Data.Monitors[i]; return null; }
-  function monitorTotal() { var t=0; for (var i=0; i<State.desk.length; i++) { var m=findMonitor(State.desk[i]); if (m) t+=m.price; } return t; }
+  function findMonitor(monitorId) { for (var monitorIndex = 0; monitorIndex < Data.Monitors.length; monitorIndex++) if (Data.Monitors[monitorIndex].id === monitorId) return Data.Monitors[monitorIndex]; return null; }
+  function monitorTotal() { var total = 0; for (var deskIndex = 0; deskIndex < State.desk.length; deskIndex++) { var monitor = findMonitor(State.desk[deskIndex]); if (monitor) total += monitor.price; } return total; }
   function monitorPrice() { return monitorTotal(); }
-  function formatPrice(n) { return '$' + n.toLocaleString('en-US'); }
-
-  function monitorSVG(m,s) {
-    var w=Math.round(m.width*s),h=Math.round(m.height*s),bw=Math.round(14*s),sh=Math.round(4*s),tw=Math.max(w,bw),th=h+sh+2,cx=tw/2;
-    return '<svg width="'+tw+'" height="'+th+'" viewBox="0 0 '+tw+' '+th+'" fill="none"><rect x="'+((tw-w)/2)+'" y="0" width="'+w+'" height="'+h+'" stroke="currentColor" stroke-width="1" fill="none" rx="1"/><line x1="'+cx+'" y1="'+h+'" x2="'+cx+'" y2="'+(h+sh)+'" stroke="currentColor" stroke-width="1"/><line x1="'+(cx-bw/2)+'" y1="'+(h+sh)+'" x2="'+(cx+bw/2)+'" y2="'+(h+sh)+'" stroke="currentColor" stroke-width="1"/></svg>';
+  function formatPrice(amount) { return '$' + amount.toLocaleString('en-US'); }
+  function monitorLabel() { return State.desk.length === 1 ? 'monitor' : 'monitors'; }
+  function parsePriceRange(priceRange) {
+    var priceBounds = priceRange.split('--');
+    return {
+      low: parseInt(priceBounds[0].replace(/[^0-9]/g, ''), 10),
+      high: parseInt(priceBounds[1].replace(/[^0-9]/g, ''), 10)
+    };
   }
-
-  function buildMonitorHTML(prefix) {
-    var p=effectivePlatform(), rec=p==='mac'?['masd']:['m5k27'];
-    var h='<div class="section-label">Monitors</div>';
-    h+='<div class="mon-desk" id="'+prefix+'-desk"><span class="mon-desk-label">Your desk</span>';
-    if (State.desk.length===0) { h+='<div class="mon-desk-hint">Drag monitors here</div>'; }
-    else { for (var i=0; i<State.desk.length; i++) { var m=findMonitor(State.desk[i]); h+='<div class="mon-on-desk" data-idx="'+i+'" title="Click to remove">'+monitorSVG(m,1.2)+'<span class="mon-on-desk-name">'+m.name+'</span></div>'; } }
-    h+='</div>';
-    if (State.desk.length>0) h+='<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+formatPrice(monitorTotal())+'</span></div>';
-    h+='<div class="mon-shelf-label" style="margin-top:1rem;">Available</div><div class="mon-shelf">';
-    for (var j=0; j<Data.Monitors.length; j++) {
-      var mon=Data.Monitors[j]; if (mon.platform!=='both'&&mon.platform!==p) continue;
-      var ir=rec.indexOf(mon.id)>=0;
-      h+='<div class="mon-avail'+(ir?' recommended':'')+'" draggable="true" data-mid="'+mon.id+'">'+monitorSVG(mon,0.7)+'<span class="mbadge">rec</span><div class="mon-avail-name">'+mon.name+'</div><div class="mon-avail-price">'+formatPrice(mon.price)+'</div></div>';
+  function hasWorkloadProfile(workloadProfiles, targetProfile) {
+    for (var profileIndex = 0; profileIndex < workloadProfiles.length; profileIndex++) {
+      if (workloadProfiles[profileIndex] === targetProfile) return true;
     }
-    h+='</div>';
-    return h;
+    return false;
+  }
+  function isRecommendedForBudget(item, activeProfile, budgetId) {
+    return !!(item.recommendedFor && item.recommendedFor[activeProfile] && item.recommendedFor[activeProfile][budgetId]);
   }
 
-  function bindMonitorEvents(prefix) {
-    var side=document.getElementById(prefix==='d'?'d-side':'m-side');
-    side.querySelectorAll('.mon-avail').forEach(function(el) {
-      el.addEventListener('dragstart', function(e) { e.dataTransfer.effectAllowed='copy'; e.dataTransfer.setData('text/plain',el.dataset.mid); setTimeout(function(){el.style.opacity='0.5';},0); el.addEventListener('dragend',function(){el.style.opacity='';},{once:true}); });
-      el.addEventListener('click', function() { if (State.desk.length<4) { State.desk.push(el.dataset.mid); update(); } });
-    });
-    var desk=side.querySelector('.mon-desk');
-    if (desk) {
-      desk.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect='copy'; desk.classList.add('drag-over'); });
-      desk.addEventListener('dragleave', function(e) { if (!desk.contains(e.relatedTarget)) desk.classList.remove('drag-over'); });
-      desk.addEventListener('drop', function(e) { e.preventDefault(); desk.classList.remove('drag-over'); var id=e.dataTransfer.getData('text/plain'); if (id&&State.desk.length<4) { State.desk.push(id); update(); } });
+  function monitorSVG(monitor, scale) {
+    var screenWidth = Math.round(monitor.width * scale);
+    var screenHeight = Math.round(monitor.height * scale);
+    var baseWidth = Math.round(14 * scale);
+    var standHeight = Math.round(4 * scale);
+    var totalWidth = Math.max(screenWidth, baseWidth);
+    var totalHeight = screenHeight + standHeight + 2;
+    var centerX = totalWidth / 2;
+    var screenX = ((totalWidth - screenWidth) / 2) + 0.5;
+    var baseY = screenHeight + standHeight - 0.5;
+    return '<svg width="' + totalWidth + '" height="' + totalHeight + '" viewBox="0 0 ' + totalWidth + ' ' + totalHeight + '" fill="none" aria-hidden="true"><rect x="' + screenX.toFixed(1) + '" y="0.5" width="' + Math.max(screenWidth - 1, 1) + '" height="' + Math.max(screenHeight - 1, 1) + '" stroke="currentColor" stroke-width="1" fill="none" rx="1"/><line x1="' + centerX.toFixed(1) + '" y1="' + (screenHeight - 0.5).toFixed(1) + '" x2="' + centerX.toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="currentColor" stroke-width="1"/><line x1="' + (centerX - (baseWidth / 2)).toFixed(1) + '" y1="' + baseY.toFixed(1) + '" x2="' + (centerX + (baseWidth / 2)).toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="currentColor" stroke-width="1"/></svg>';
+  }
+
+  function buildMonitorHTML(panelPrefix) {
+    var platform = effectivePlatform();
+    var recommendedMonitorIds = platform === 'mac' ? ['masd'] : ['m5k27'];
+    var monitorMarkup = '<div class="section-label">Monitors</div>';
+    monitorMarkup += '<div class="mon-desk" id="' + panelPrefix + '-desk"><span class="mon-desk-label">Your desk</span>';
+    if (State.desk.length === 0) {
+      monitorMarkup += '<div class="mon-desk-hint">Drag monitors here</div>';
+    } else {
+      for (var deskIndex = 0; deskIndex < State.desk.length; deskIndex++) {
+        var deskMonitor = findMonitor(State.desk[deskIndex]);
+        if (!deskMonitor) continue;
+        monitorMarkup += '<div class="mon-on-desk" data-idx="' + deskIndex + '" title="Click to remove"><span class="mon-on-desk-visual">' + monitorSVG(deskMonitor, 1.2) + '<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">' + deskMonitor.name + '</span></div>';
+      }
     }
-    side.querySelectorAll('.mon-on-desk').forEach(function(el) {
-      el.addEventListener('click', function() { State.desk.splice(parseInt(el.dataset.idx),1); update(); });
+    monitorMarkup += '</div>';
+    if (State.desk.length > 0) monitorMarkup += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">' + formatPrice(monitorTotal()) + '</span></div>';
+    monitorMarkup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available</div><div class="mon-shelf">';
+    for (var monitorIndex = 0; monitorIndex < Data.Monitors.length; monitorIndex++) {
+      var availableMonitor = Data.Monitors[monitorIndex];
+      if (availableMonitor.platform !== 'both' && availableMonitor.platform !== platform) continue;
+      var isRecommended = recommendedMonitorIds.indexOf(availableMonitor.id) >= 0;
+      monitorMarkup += '<div class="mon-avail' + (isRecommended ? ' recommended' : '') + '" draggable="true" data-mid="' + availableMonitor.id + '">' + monitorSVG(availableMonitor, 0.7) + '<span class="mbadge">rec</span><div class="mon-avail-name">' + availableMonitor.name + '</div><div class="mon-avail-price">' + formatPrice(availableMonitor.price) + '</div></div>';
+    }
+    monitorMarkup += '</div>';
+    return monitorMarkup;
+  }
+
+  function bindMonitorEvents(panelPrefix) {
+    var monitorSidebar = document.getElementById(panelPrefix === 'd' ? 'd-side' : 'm-side');
+    monitorSidebar.querySelectorAll('.mon-avail').forEach(function(availableMonitorElement) {
+      availableMonitorElement.addEventListener('dragstart', function(event) {
+        event.dataTransfer.effectAllowed = 'copy';
+        event.dataTransfer.setData('text/plain', availableMonitorElement.dataset.mid);
+        setTimeout(function() { availableMonitorElement.style.opacity = '0.5'; }, 0);
+        availableMonitorElement.addEventListener('dragend', function() { availableMonitorElement.style.opacity = ''; }, { once: true });
+      });
+      availableMonitorElement.addEventListener('click', function() {
+        if (State.desk.length < 4) {
+          State.desk.push(availableMonitorElement.dataset.mid);
+          update();
+        }
+      });
+    });
+    var monitorDesk = monitorSidebar.querySelector('.mon-desk');
+    if (monitorDesk) {
+      monitorDesk.addEventListener('dragover', function(event) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; monitorDesk.classList.add('drag-over'); });
+      monitorDesk.addEventListener('dragleave', function(event) { if (!monitorDesk.contains(event.relatedTarget)) monitorDesk.classList.remove('drag-over'); });
+      monitorDesk.addEventListener('drop', function(event) {
+        event.preventDefault();
+        monitorDesk.classList.remove('drag-over');
+        var monitorId = event.dataTransfer.getData('text/plain');
+        if (monitorId && State.desk.length < 4) {
+          State.desk.push(monitorId);
+          update();
+        }
+      });
+    }
+    monitorSidebar.querySelectorAll('.mon-on-desk').forEach(function(deskMonitorElement) {
+      deskMonitorElement.addEventListener('click', function() {
+        State.desk.splice(parseInt(deskMonitorElement.dataset.idx, 10), 1);
+        update();
+      });
     });
   }
 
-  function windowsSpecHTML(s) {
-    return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">'+s.cpu+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>'+
-      '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">'+s.gpu+'</div><div class="spec-item-note">'+s.gpuNote+'</div></div>'+
-      '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">'+s.ram+'</div>'+(s.ramNote?'<div class="spec-item-note">'+s.ramNote+'</div>':'')+'</div>'+
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div>';
+  function windowsSpecHTML(spec) {
+    return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">' + spec.cpu + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">' + spec.gpu + '</div><div class="spec-item-note">' + spec.gpuNote + '</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">' + spec.ram + '</div>' + (spec.ramNote ? '<div class="spec-item-note">' + spec.ramNote + '</div>' : '') + '</div>' +
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div></div>';
   }
-  function macSpecHTML(s) {
-    return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">'+s.chip+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>'+
-      '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">'+s.memory+'</div><div class="spec-item-note">Unified -- RAM and GPU memory</div></div>'+
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div>';
+  function macSpecHTML(spec) {
+    return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">' + spec.chip + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + spec.memory + '</div><div class="spec-item-note">Unified -- RAM and GPU memory</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div></div>';
   }
 
   // ---- Prebuilt desktop rendering ----
-  function buildPrebuiltHTML(profile) {
-    var types = ['mini', 'office', 'workstation', 'gaming'];
-    var h = '<div class="section-label" style="margin-top:2rem">Prebuilt Options</div>';
-    for (var ti = 0; ti < types.length; ti++) {
-      var type = types[ti];
-      var items = [];
-      for (var i = 0; i < Data.Prebuilts.length; i++) {
-        var pb = Data.Prebuilts[i];
-        if (pb.type !== type) continue;
-        for (var pi = 0; pi < pb.profiles.length; pi++) { if (pb.profiles[pi] === profile) { items.push(pb); break; } }
+  function buildPrebuiltHTML(activeProfile) {
+    var prebuiltTypes = ['mini', 'office', 'workstation', 'gaming'];
+    var prebuiltMarkup = '<div class="section-label" style="margin-top:2rem">Prebuilt Options</div>';
+    for (var typeIndex = 0; typeIndex < prebuiltTypes.length; typeIndex++) {
+      var prebuiltType = prebuiltTypes[typeIndex];
+      var matchingPrebuilts = [];
+      for (var prebuiltIndex = 0; prebuiltIndex < Data.Prebuilts.length; prebuiltIndex++) {
+        var prebuilt = Data.Prebuilts[prebuiltIndex];
+        if (prebuilt.type !== prebuiltType) continue;
+        if (hasWorkloadProfile(prebuilt.workloadProfiles, activeProfile)) matchingPrebuilts.push(prebuilt);
       }
-      if (items.length === 0) continue;
-      h += '<div class="laptop-category">';
-      h += '<div class="laptop-category-label">' + Data.PrebuiltCategories[type] + '</div>';
-      if (Data.PrebuiltNote[type]) h += '<div class="laptop-list-note" style="margin-bottom:0.5rem;margin-top:0">' + Data.PrebuiltNote[type] + '</div>';
-      for (var j = 0; j < items.length; j++) {
-        var pb2 = items[j];
-        var rk = profile + '_' + State.budget;
-        var isRec = pb2.rec && pb2.rec[rk];
-        h += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '">';
-        h += '<div class="laptop-name">' + pb2.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + pb2.note + '</div></div>';
-        h += '<div class="laptop-meta"><span class="laptop-price">' + pb2.price + '</span></div>';
-        h += '</div>';
+      if (matchingPrebuilts.length === 0) continue;
+      prebuiltMarkup += '<div class="laptop-category">';
+      prebuiltMarkup += '<div class="laptop-category-label">' + Data.PrebuiltTypeLabels[prebuiltType] + '</div>';
+      if (Data.PrebuiltTypeNotes[prebuiltType]) prebuiltMarkup += '<div class="laptop-list-note" style="margin-bottom:0.5rem;margin-top:0">' + Data.PrebuiltTypeNotes[prebuiltType] + '</div>';
+      for (var matchIndex = 0; matchIndex < matchingPrebuilts.length; matchIndex++) {
+        var matchedPrebuilt = matchingPrebuilts[matchIndex];
+        var isRecommended = isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
+        prebuiltMarkup += '<div class="laptop-row' + (isRecommended ? ' is-rec' : '') + '">';
+        prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div></div>';
+        prebuiltMarkup += '<div class="laptop-meta"><span class="laptop-price">' + matchedPrebuilt.price + '</span></div>';
+        prebuiltMarkup += '</div>';
       }
-      h += '</div>';
+      prebuiltMarkup += '</div>';
     }
-    return h;
+    return prebuiltMarkup;
   }
 
   // ---- MAIN UPDATE ----
   function update() {
-    var p = effectivePlatform(), a = availablePlatforms(), profile = workloadProfile(), im = p === 'mac';
-    var specKey = (State.scale === 'large' ? 'High' : 'Low') + (State.budget === 'best' ? 'Best' : 'Value');
+    var platform = effectivePlatform();
+    var platformAvailability = availablePlatforms();
+    var activeProfile = workloadProfile();
+    var isMacPlatform = platform === 'mac';
+    var specKey = (State.scale === 'large' ? 'High' : 'Low') + budgetSuffixByBudget[State.budget];
 
     // Platform visibility
-    var pa = document.getElementById('platArea'), pf = document.getElementById('platForced');
-    if (a === 'win') { pa.classList.add('hidden'); pf.classList.remove('hidden'); }
-    else { pa.classList.remove('hidden'); pf.classList.add('hidden'); }
+    var platformArea = document.getElementById('platArea');
+    var forcedPlatformArea = document.getElementById('platForced');
+    if (platformAvailability === 'win') { platformArea.classList.add('hidden'); forcedPlatformArea.classList.remove('hidden'); }
+    else { platformArea.classList.remove('hidden'); forcedPlatformArea.classList.add('hidden'); }
 
     // Desktop spec
-    if (im) {
-      var ms = Data.MacSpecs[profile][specKey];
+    if (isMacPlatform) {
+      var macSpec = Data.MacSpecs[activeProfile][specKey];
       document.getElementById('d-illus').innerHTML = '<span>[ isometric Mac Studio ]</span>';
-      document.getElementById('d-price').textContent = ms.price + ' + ' + formatPrice(monitorPrice()) + ' monitor';
-      document.getElementById('d-spec').innerHTML = macSpecHTML(ms);
+      document.getElementById('d-price').textContent = macSpec.price + ' + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
+      document.getElementById('d-spec').innerHTML = macSpecHTML(macSpec);
       document.getElementById('d-paths').innerHTML = '<div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div>';
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[profile].priority + '</p>';
+      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeProfile].priority + '</p>';
       document.getElementById('d-prebuilts').innerHTML = '';
     } else {
-      var ws = Data.WindowsSpecs[profile][specKey];
-      var lo = parseInt(ws.priceRange.replace(/[^0-9]/g, '').substring(0, 4));
-      var hi = parseInt(ws.priceRange.split('--')[1].replace(/[^0-9]/g, ''));
+      var windowsSpec = Data.WindowsSpecs[activeProfile][specKey];
+      var towerPriceBounds = parsePriceRange(windowsSpec.priceRange);
       document.getElementById('d-illus').innerHTML = '<span>[ isometric tower ]</span>';
-      document.getElementById('d-price').textContent = ws.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' monitors';
-      document.getElementById('d-spec').innerHTML = windowsSpecHTML(ws);
+      document.getElementById('d-price').textContent = windowsSpec.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
+      document.getElementById('d-spec').innerHTML = windowsSpecHTML(windowsSpec);
       document.getElementById('d-paths').innerHTML =
         '<div class="purchase-path"><div class="purchase-path-label">Build it yourself</div><p>Case, motherboard, cooler, PSU, and RAM recommendations are on the components page. Takes about 8 hours start to finish.</p><a href="/components" class="card-link">Component recommendations</a><a href="https://pcpartpicker.com" target="_blank" rel="noopener" class="card-link">PCPartPicker</a></div>' +
-        '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Better components, burn-in testing, real support. Premium is typically $700--$1,500. Expect ' + formatPrice(Math.round(lo*1.25/100)*100) + '--' + formatPrice(Math.round(hi*1.35/100)*100) + ' for the tower.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[profile].priority + '</p>';
-      document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(profile);
+        '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Better components, burn-in testing, real support. Premium is typically $700--$1,500. Expect ' + formatPrice(Math.round(towerPriceBounds.low * 1.25 / 100) * 100) + '--' + formatPrice(Math.round(towerPriceBounds.high * 1.35 / 100) * 100) + ' for the tower.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
+      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[activeProfile].priority + '</p>';
+      document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeProfile);
     }
 
     // Desktop monitors
@@ -413,68 +513,110 @@
     bindMonitorEvents('d');
 
     // Mobile
-    document.getElementById('m-strat-row').style.display = im ? 'none' : '';
-    var ms2 = State.mobileStrategy;
-    var wc = { one: ['one','desk','travel','student'], two: ['travel'] };
-    var mc = { one: ['mac_p','mac_s'], two: ['mac_p','mac_s'] };
-    var cats = im ? mc[ms2] : wc[ms2];
-    var mHTML = '';
-    if (!im && ms2 === 'two') mHTML += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. Travel machine handles documents.</div>';
-    for (var ci = 0; ci < cats.length; ci++) {
-      var cat = cats[ci], ic = [];
-      for (var li = 0; li < Data.Laptops.length; li++) {
-        var l = Data.Laptops[li];
-        if (l.category !== cat || l.platform !== p) continue;
-        if (!im && ms2 === 'two') { ic.push(l); continue; }
-        for (var pi = 0; pi < l.profiles.length; pi++) { if (l.profiles[pi] === profile) { ic.push(l); break; } }
+    document.getElementById('m-strat-row').style.display = isMacPlatform ? 'none' : '';
+    var mobileStrategy = State.mobileStrategy;
+    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], two: ['travel'] };
+    var macCategoriesByStrategy = { one: ['mac_p', 'mac_s'], two: ['mac_p', 'mac_s'] };
+    var activeCategories = isMacPlatform ? macCategoriesByStrategy[mobileStrategy] : windowsCategoriesByStrategy[mobileStrategy];
+    var mobileMarkup = '';
+    if (!isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. Travel machine handles documents.</div>';
+    for (var categoryIndex = 0; categoryIndex < activeCategories.length; categoryIndex++) {
+      var activeCategory = activeCategories[categoryIndex];
+      var matchingLaptops = [];
+      for (var laptopIndex = 0; laptopIndex < Data.Laptops.length; laptopIndex++) {
+        var laptop = Data.Laptops[laptopIndex];
+        if (laptop.category !== activeCategory || laptop.platform !== platform) continue;
+        if (!isMacPlatform && mobileStrategy === 'two') {
+          matchingLaptops.push(laptop);
+          continue;
+        }
+        if (hasWorkloadProfile(laptop.workloadProfiles, activeProfile)) matchingLaptops.push(laptop);
       }
-      if (ic.length === 0) continue;
-      mHTML += '<div class="laptop-category"><div class="laptop-category-label">' + Data.LaptopCategories[cat] + '</div>';
-      for (var lj = 0; lj < ic.length; lj++) {
-        var la = ic[lj], rk = profile + '_' + State.budget, ir = la.rec && la.rec[rk];
-        mHTML += '<div class="laptop-row' + (ir ? ' is-rec' : '') + '"><div class="laptop-name">' + la.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + la.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + la.weight + '</span><span class="laptop-price">' + la.price + '</span></div></div>';
+      if (matchingLaptops.length === 0) continue;
+      mobileMarkup += '<div class="laptop-category"><div class="laptop-category-label">' + Data.LaptopCategoryLabels[activeCategory] + '</div>';
+      for (var matchIndex = 0; matchIndex < matchingLaptops.length; matchIndex++) {
+        var matchedLaptop = matchingLaptops[matchIndex];
+        var isRecommendedLaptop = isRecommendedForBudget(matchedLaptop, activeProfile, State.budget);
+        mobileMarkup += '<div class="laptop-row' + (isRecommendedLaptop ? ' is-rec' : '') + '"><div class="laptop-name">' + matchedLaptop.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedLaptop.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + matchedLaptop.weight + '</span><span class="laptop-price">' + matchedLaptop.price + '</span></div></div>';
       }
-      mHTML += '</div>';
+      mobileMarkup += '</div>';
     }
-    if (!im && ms2 === 'one') mHTML += '<div class="laptop-list-note">Add a Thunderbolt/USB-C dock (~$200) and your desk monitors.</div>';
-    if (im) mHTML += '<div class="laptop-list-note">Pair with an Apple Studio Display or Asus 5K/6K. Thunderbolt docking is native.</div>';
-    document.getElementById('m-content').innerHTML = mHTML;
+    if (!isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Add a Thunderbolt/USB-C dock (~$200) and your desk monitors.</div>';
+    if (isMacPlatform) mobileMarkup += '<div class="laptop-list-note">Pair with an Apple Studio Display or Asus 5K/6K. Thunderbolt docking is native.</div>';
+    document.getElementById('m-content').innerHTML = mobileMarkup;
 
-    var mn;
-    if (im) mn = 'Every MacBook docks natively over Thunderbolt. The MacBook Pro with M4 Pro or Max is a genuine one-machine solution.';
-    else if (ms2 === 'one') mn = 'One laptop, one set of files. Dock it at your desk, undock and go. Thermals limit sustained rendering -- burst work is real.';
-    else mn = 'Light laptop for travel, desktop for production. Two machines means syncing files. No thermal compromise on either end.';
-    document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mn + '</p>';
+    var mobilePriorityNote;
+    if (isMacPlatform) mobilePriorityNote = 'Every MacBook docks natively over Thunderbolt. The MacBook Pro with M4 Pro or Max is a genuine one-machine solution.';
+    else if (mobileStrategy === 'one') mobilePriorityNote = 'One laptop, one set of files. Dock it at your desk, undock and go. Thermals limit sustained rendering -- burst work is real.';
+    else mobilePriorityNote = 'Light laptop for travel, desktop for production. Two machines means syncing files. No thermal compromise on either end.';
+    document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
     document.getElementById('m-side').innerHTML = buildMonitorHTML('m');
     bindMonitorEvents('m');
   }
 
+  renderBudgetOptions();
+  syncStaticOptionSelections();
+
   // ---- EVENTS ----
-  document.querySelectorAll('.app-toggle:not(.baseline)').forEach(function(el) {
-    el.addEventListener('click', function() {
-      el.classList.toggle('active'); State.apps[el.dataset.app] = el.classList.contains('active');
-      if (availablePlatforms() === 'win') { State.platform = 'win'; document.querySelectorAll('.plat-opt').forEach(function(p){p.classList.remove('active');}); document.querySelector('.plat-opt[data-platform="win"]').classList.add('active'); }
+  document.querySelectorAll('.app-toggle:not(.baseline)').forEach(function(appToggle) {
+    appToggle.addEventListener('click', function() {
+      appToggle.classList.toggle('active');
+      State.apps[appToggle.dataset.app] = appToggle.classList.contains('active');
+      if (availablePlatforms() === 'win') {
+        State.platform = 'win';
+        document.querySelectorAll('.plat-opt').forEach(function(platformOption) { platformOption.classList.remove('active'); });
+        document.querySelector('.plat-opt[data-platform="win"]').classList.add('active');
+      }
       update();
     });
   });
-  document.querySelectorAll('.sw-nav-item').forEach(function(el) {
-    el.addEventListener('click', function() { var t=document.getElementById(el.dataset.target); if (t) t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'}); });
+  document.querySelectorAll('.sw-nav-item').forEach(function(navItem) {
+    navItem.addEventListener('click', function() {
+      var targetSection = document.getElementById(navItem.dataset.target);
+      if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    });
   });
-  document.querySelectorAll('.plat-opt').forEach(function(el) {
-    el.addEventListener('click', function() { document.querySelectorAll('.plat-opt').forEach(function(p){p.classList.remove('active');}); el.classList.add('active'); State.platform=el.dataset.platform; State.desk=defaultDeskMonitors(); update(); });
+  document.querySelectorAll('.plat-opt').forEach(function(platformOption) {
+    platformOption.addEventListener('click', function() {
+      document.querySelectorAll('.plat-opt').forEach(function(optionElement) { optionElement.classList.remove('active'); });
+      platformOption.classList.add('active');
+      State.platform = platformOption.dataset.platform;
+      State.desk = defaultDeskMonitors();
+      update();
+    });
   });
-  document.querySelectorAll('#budgetOptions .option-pill').forEach(function(el) {
-    el.addEventListener('click', function() { document.querySelectorAll('#budgetOptions .option-pill').forEach(function(p){p.classList.remove('active');}); el.classList.add('active'); State.budget=el.dataset.budget; update(); });
+  document.querySelectorAll('#budgetOptions .option-pill').forEach(function(budgetOption) {
+    budgetOption.addEventListener('click', function() {
+      document.querySelectorAll('#budgetOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
+      budgetOption.classList.add('active');
+      State.budget = budgetOption.dataset.budget;
+      update();
+    });
   });
-  document.querySelectorAll('#scaleOptions .option-pill').forEach(function(el) {
-    el.addEventListener('click', function() { document.querySelectorAll('#scaleOptions .option-pill').forEach(function(p){p.classList.remove('active');}); el.classList.add('active'); State.scale=el.dataset.scale; update(); });
+  document.querySelectorAll('#scaleOptions .option-pill').forEach(function(scaleOption) {
+    scaleOption.addEventListener('click', function() {
+      document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
+      scaleOption.classList.add('active');
+      State.scale = scaleOption.dataset.scale;
+      update();
+    });
   });
-  document.querySelectorAll('.results-tab').forEach(function(t) {
-    t.addEventListener('click', function() { document.querySelectorAll('.results-tab').forEach(function(x){x.classList.remove('active');}); document.querySelectorAll('.results-panel').forEach(function(x){x.classList.remove('active');}); t.classList.add('active'); document.getElementById('panel-'+t.dataset.restab).classList.add('active'); });
+  document.querySelectorAll('.results-tab').forEach(function(resultsTab) {
+    resultsTab.addEventListener('click', function() {
+      document.querySelectorAll('.results-tab').forEach(function(tabElement) { tabElement.classList.remove('active'); });
+      document.querySelectorAll('.results-panel').forEach(function(panelElement) { panelElement.classList.remove('active'); });
+      resultsTab.classList.add('active');
+      document.getElementById('panel-' + resultsTab.dataset.restab).classList.add('active');
+    });
   });
-  document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(el) {
-    el.addEventListener('click', function() { document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(p){p.classList.remove('active');}); el.classList.add('active'); State.mobileStrategy=el.dataset.mobilestrategy; update(); });
+  document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(strategyOption) {
+    strategyOption.addEventListener('click', function() {
+      document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
+      strategyOption.classList.add('active');
+      State.mobileStrategy = strategyOption.dataset.mobilestrategy;
+      update();
+    });
   });
 
   update();
