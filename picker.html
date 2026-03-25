@@ -285,12 +285,23 @@
     production: 'production rendering'
   };
 
-  function defaultDeskMonitors() { return defaultPickerState.deskMonitors.slice(); }
+  function defaultDeskMonitorsForBudget(budgetId) {
+    var defaultMonitorIds = Data.PickerOptions.deskMonitorDefaults[budgetId] || Data.PickerOptions.deskMonitorDefaults[defaultPickerState.budget];
+    return defaultMonitorIds.slice();
+  }
+  function recommendedMonitorIdsForBudget(budgetId) {
+    var defaultMonitorIds = defaultDeskMonitorsForBudget(budgetId);
+    var uniqueMonitorIds = [];
+    for (var monitorIndex = 0; monitorIndex < defaultMonitorIds.length; monitorIndex++) {
+      if (uniqueMonitorIds.indexOf(defaultMonitorIds[monitorIndex]) < 0) uniqueMonitorIds.push(defaultMonitorIds[monitorIndex]);
+    }
+    return uniqueMonitorIds;
+  }
 
   var State = {
     apps: {},
     platform: defaultPickerState.platform,
-    desk: defaultDeskMonitors(),
+    desk: defaultDeskMonitorsForBudget(defaultPickerState.budget),
     budget: defaultPickerState.budget,
     scale: defaultPickerState.scale,
     mobileStrategy: defaultPickerState.mobileStrategy
@@ -399,7 +410,7 @@
 
   function buildMonitorHTML(panelPrefix) {
     var platform = effectivePlatform();
-    var recommendedMonitorIds = platform === 'mac' ? ['masd'] : ['m5k27'];
+    var recommendedMonitorIds = recommendedMonitorIdsForBudget(State.budget);
     var monitorMarkup = '<div class="section-label">Monitors</div>';
     monitorMarkup += '<div class="mon-desk" id="' + panelPrefix + '-desk"><span class="mon-desk-label">Your desk</span>';
     if (State.desk.length === 0) {
@@ -612,7 +623,7 @@
       document.querySelectorAll('.plat-opt').forEach(function(optionElement) { optionElement.classList.remove('active'); });
       platformOption.classList.add('active');
       State.platform = platformOption.dataset.platform;
-      State.desk = defaultDeskMonitors();
+      State.desk = defaultDeskMonitorsForBudget(State.budget);
       update();
     });
   });
@@ -621,6 +632,7 @@
       document.querySelectorAll('#budgetOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
       budgetOption.classList.add('active');
       State.budget = budgetOption.dataset.budget;
+      State.desk = defaultDeskMonitorsForBudget(State.budget);
       update();
     });
   });

@@ -29,13 +29,17 @@ Data.PickerOptions = {
     scale: 'small',
     budget: 'value',
     mobileStrategy: 'one',
-    deskMonitors: ['m5k27', 'm5k27'],
   },
   budgetOptions: [
     { id: 'cheapest', label: 'Cheapest', detail: 'Minimum spec that still makes sense' },
     { id: 'value',    label: 'Best Value', detail: '90% of the performance, better price' },
     { id: 'best',     label: 'Best Available', detail: 'Top tier, no compromise' },
   ],
+  deskMonitorDefaults: {
+    cheapest: ['m4k27', 'm4k27'],
+    value: ['m5k27', 'm5k27'],
+    best: ['m6k32', 'm6k32'],
+  },
 };
 
 
@@ -267,7 +271,6 @@ Data.Monitors = [
   { id: 'm5k27', name: '27" 5K',         price: 800,  platform: 'both', width: 39, height: 25 },
   { id: 'm6k32', name: '32" 6K',         price: 1300, platform: 'both', width: 46, height: 29 },
   { id: 'm4k27', name: '27" 4K',         price: 500,  platform: 'both', width: 39, height: 24 },
-  { id: 'm4k24', name: '24" 4K',         price: 350,  platform: 'both', width: 34, height: 22 },
   { id: 'muw34', name: '34" UW',         price: 1000, platform: 'win',  width: 52, height: 22 },
   { id: 'masd',  name: 'Studio Display', price: 1600, platform: 'both', width: 39, height: 25 },
 ];
