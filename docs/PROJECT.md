@@ -14,25 +14,29 @@ The site uses a minimal, high-contrast design language. No frameworks, no build 
 
 ```
 /
-├── picker.html                     # Hardware picker (imports shared hardware data)
-├── components.html                 # Component recommendations (case, mobo, cooler, PSU, RAM)
-├── dimension-converter.html
-├── slope-calculator.html
-├── sheet-sizes.html
-├── occupant-load.html
-├── stair-calculator.html
-├── site-screen.html                # Site feasibility sketch tool (standalone, complex)
+├── picker.html                     # Main hardware recommendation sheet
+├── components.html                 # Main component recommendation sheet
+├── site-screen.html                # Main site feasibility sheet
 ├── assets/
 │   ├── css/
 │   │   └── global.css              # Shared design tokens and component styles
 │   └── data/
 │       └── hardware-data.js        # ALL hardware recommendation data
+├── calculators/
+│   ├── dimension-converter.html
+│   ├── slope-calculator.html
+│   ├── sheet-sizes.html
+│   ├── occupant-load.html
+│   ├── stair-calculator.html
+│   ├── parking-ratio.html
+│   ├── egress-width.html
+│   └── fixture-calc.html
 └── docs/
     └── PROJECT.md
 ```
 
 ### assets/css/global.css
-Shared stylesheet. Root-level pages should import it via `<link rel="stylesheet" href="assets/css/global.css">`. Contains:
+Shared stylesheet. Root-level pages should import it via `<link rel="stylesheet" href="assets/css/global.css">`. Calculator pages inside `calculators/` should import it via `<link rel="stylesheet" href="../assets/css/global.css">`. Contains:
 - Design tokens (colors, type scale, spacing) in CSS custom properties
 - Reset
 - Layout classes: `.page` (720px), `.page-wide` (1080px), `.page-full`
@@ -40,7 +44,7 @@ Shared stylesheet. Root-level pages should import it via `<link rel="stylesheet"
 - Higher contrast than original (--black: #0a0a0a, grays darker across the board)
 - Base 16px, type scale from --text-xs (11px) to --text-2xl (40px)
 
-**Status:** Created but not yet applied to all pages. `components.html` and `dimension-converter.html` import it. The picker and other tools still have inline styles from earlier iterations that need to be migrated to shared classes.
+**Status:** Created but not yet applied to all pages. `components.html` and `calculators/dimension-converter.html` import it. The picker and the other calculators still have inline styles from earlier iterations that need to be migrated to shared classes.
 
 ### assets/data/hardware-data.js
 External data file loaded by `picker.html`. All hardware recommendations live here. Structure:
@@ -120,24 +124,7 @@ The golden path detail page. Specific component picks with prices and notes:
 
 ---
 
-## Utility Tools
-
-Each is a standalone single-page tool. Same design language. No external dependencies except fonts.
-
-### slope-calculator.html
-Enter slope (ratio/percentage/degrees) + a dimension (horizontal run, vertical rise, or slope length). Get all conversions. SVG triangle diagram with edges labeled "plan" and "section". Common slopes table (ADA ramp, roof pitches, drainage, stairs) — click to load.
-
-### dimension-converter.html
-Type a dimension in any format (decimal inches, fractional, feet-inches, mm, cm, m). See all conversions + precision bracket table showing the value rounded to 1", 1/2", 1/4", ... 1/64" with error in mm at each precision.
-
-### sheet-sizes.html
-Pick an ARCH sheet (A through E1), optionally enter building width × depth. See drawable area, scale table showing max dimensions at each architectural scale, SVG sheet drawing with your footprint overlay, and "smallest scale that fits" badge. Common building/lot sizes clickable.
-
-### occupant-load.html
-Click a use from the IBC Table 1004.5 reference table to add it as a zone. Enter area. See occupant count per zone and total. Below the total: minimum exits, egress width (stairs and doors), and approximate plumbing fixture counts (IPC Table 403.1). No dropdown — the table IS the input.
-
-### stair-calculator.html
-Enter total floor-to-floor rise. Auto-calculates riser count, riser height, tread depth, total run, stair angle, comfort check (2R+T). IBC/IRC code check with pass/fail. SVG stair diagram. Common floor-to-floor presets clickable.
+## Main Sheets
 
 ### site-screen.html
 Split-screen site feasibility tool. Left: SVG sketch canvas. Right: numbers panel.
@@ -159,11 +146,41 @@ Numbers chain:
 
 ---
 
+## Calculators
+
+Each is a standalone single-page tool. Same design language. No external dependencies except fonts.
+
+### calculators/slope-calculator.html
+Enter slope (ratio/percentage/degrees) + a dimension (horizontal run, vertical rise, or slope length). Get all conversions. SVG triangle diagram with edges labeled "plan" and "section". Common slopes table (ADA ramp, roof pitches, drainage, stairs) — click to load.
+
+### calculators/dimension-converter.html
+Type a dimension in any format (decimal inches, fractional, feet-inches, mm, cm, m). See all conversions + precision bracket table showing the value rounded to 1", 1/2", 1/4", ... 1/64" with error in mm at each precision.
+
+### calculators/sheet-sizes.html
+Pick an ARCH sheet (A through E1), optionally enter building width × depth. See drawable area, scale table showing max dimensions at each architectural scale, SVG sheet drawing with your footprint overlay, and "smallest scale that fits" badge. Common building/lot sizes clickable.
+
+### calculators/occupant-load.html
+Click a use from the IBC Table 1004.5 reference table to add it as a zone. Enter area. See occupant count per zone and total. Below the total: minimum exits, egress width (stairs and doors), and approximate plumbing fixture counts (IPC Table 403.1). No dropdown — the table IS the input.
+
+### calculators/stair-calculator.html
+Enter total floor-to-floor rise. Auto-calculates riser count, riser height, tread depth, total run, stair angle, comfort check (2R+T). IBC/IRC code check with pass/fail. SVG stair diagram. Common floor-to-floor presets clickable.
+
+### calculators/parking-ratio.html
+Enter required parking ratio by unit, bedroom, square foot, or seat count. See required stall count and sensitivity across multiple program areas.
+
+### calculators/egress-width.html
+Enter occupant load and egress assumptions. See required stair, door, and level egress width with simple IBC multipliers and comparisons.
+
+### calculators/fixture-calc.html
+Enter occupancy and headcount assumptions to estimate plumbing fixture requirements in more detail than the quick rollup shown inside the occupant-load tool.
+
+---
+
 ## Design Decisions
 
-- **No frameworks.** Vanilla JS, no React, no Tailwind, no build step. Each page is self-contained HTML that can be opened in a browser.
+- **No frameworks.** Vanilla JS, no React, no Tailwind, no build step. Each page is a static HTML file that can be opened in a browser or served directly.
 - **External data for the picker only.** The utility tools have small amounts of hardcoded data (load factors, common slopes, sheet sizes) that don't change often.
-- **Human-readable variable names.** `WindowsSpecs`, `MacSpecs`, `Laptops`, `LowValue`, `HighBest`, `workloadProfile()`, `effectivePlatform()`, etc. No single-letter names in any data structure.
+- **Human-readable variable names.** `WindowsSpecs`, `MacSpecs`, `deskMonitorDefaults`, `selectedDesktopSpec()`, `workloadProfile()`, `effectivePlatform()`, etc. No compressed synthetic names like `LowValue`.
 - **DM Sans + DM Mono.** Body text in DM Sans (300/400/500 weights). All labels, values, and technical content in DM Mono.
 - **Illustration placeholders.** The picker has `[ isometric tower illustration ]` placeholder divs. Real isometric line drawings exist as uploaded PNG files but haven't been placed yet.
 
@@ -190,7 +207,7 @@ These markdown files contain the editorial content that informed the data:
 ## What Needs Doing
 
 ### Immediate
-- [ ] Migrate all tools to use `assets/css/global.css` (currently only `components.html` and `dimension-converter.html` import it; others still have inline styles)
+- [ ] Migrate all tools to use `assets/css/global.css` or `../assets/css/global.css` as appropriate (currently only `components.html` and `calculators/dimension-converter.html` import it; others still have inline styles)
 - [ ] Set up as a proper static site (e.g., with a simple server or static host)
 - [ ] Test `assets/data/hardware-data.js` import works when served (requires HTTP server, not file://)
 
@@ -199,10 +216,9 @@ These markdown files contain the editorial content that informed the data:
 - [ ] Review and edit `assets/data/hardware-data.js` text (Michael should do a pass on every cpuNote, gpuNote, priority)
 - [ ] Verify prebuilt desktop prices and availability
 
-### Tools not yet built
-- [ ] Parking ratio calculator
-- [ ] Egress width calculator
-- [ ] Plumbing fixture requirements calculator (more detailed than the quick counts in occupant-load)
+### Calculator follow-up
+- [ ] Review calculator URL conventions and decide whether clean routes should resolve to `/calculators/<slug>` or `/calculators/<slug>.html`
+- [ ] Add a calculator index or navigation sheet so the grouped tools are easier to browse
 
 ### Site Screen refinements
 - [ ] Arc edges for cul-de-sac lot frontage
