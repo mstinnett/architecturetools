@@ -2,7 +2,7 @@
    All pages import this. Override locally only when necessary.
    ========================================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
 
 /* ---- TOKENS ---- */
 :root {
@@ -22,8 +22,7 @@
   --accent-light: rgba(37,99,235,0.08);
 
   /* Type */
-  --font-body: 'DM Sans', -apple-system, system-ui, sans-serif;
-  --font-mono: 'DM Mono', 'SF Mono', 'Consolas', monospace;
+  --font-body: 'Verlag', 'Jost', 'Futura PT', sans-serif;
 
   /* Scale — base 16px, everything derives from rem */
   --text-xs: 0.6875rem;   /* 11px — micro labels */
@@ -43,9 +42,9 @@
   --space-2xl: 3rem;
 
   /* Borders */
-  --border-light: 1px solid var(--gray-100);
-  --border-mid: 1px solid var(--gray-200);
-  --border-heavy: 1px solid var(--black);
+  --border-light: 1px solid var(--gray-700);
+  --border-mid: 1px solid var(--gray-700);
+  --border-heavy: 2px solid var(--black);
 }
 
 /* ---- RESET ---- */
@@ -53,6 +52,7 @@
 html { font-size: 16px; }
 body {
   font-family: var(--font-body);
+  font-weight: 300;
   color: var(--black);
   background: var(--white);
   line-height: 1.55;
@@ -88,9 +88,9 @@ body {
 /* ---- SECTION LABELS ---- */
 .section-label {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gray-500);
   margin-bottom: var(--space-md);
@@ -100,9 +100,9 @@ body {
 .panel-section { margin-bottom: var(--space-lg); }
 .panel-label {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gray-500);
   margin-bottom: var(--space-sm);
@@ -126,16 +126,16 @@ body {
 }
 .input-group label {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
-  font-weight: 300;
-  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gray-500);
   margin-bottom: var(--space-xs);
 }
 .input-group input,
 .input-group select {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: 300;
   padding: 0.5rem 0.65rem;
@@ -166,7 +166,7 @@ body {
   min-width: 0;
 }
 .field-input {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 300;
   padding: 0.3rem 0.45rem;
@@ -180,13 +180,13 @@ body {
 .field-input.narrow { width: 60px; }
 .field-unit {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   color: var(--gray-400);
   width: 35px;
   flex-shrink: 0;
 }
 .field-select {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 300;
   padding: 0.3rem 0.4rem;
@@ -206,7 +206,7 @@ body {
 }
 .option-pill {
   padding: 0.55rem 1rem;
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--gray-700);
   cursor: pointer;
   user-select: none;
   font-size: var(--text-sm);
@@ -216,7 +216,8 @@ body {
 }
 .option-pill:hover { border-color: var(--gray-600); }
 .option-pill.active {
-  border-color: var(--black);
+  border: 2px solid var(--black);
+  padding: calc(0.55rem - 1px) calc(1rem - 1px);
   background: var(--black);
   color: var(--white);
 }
@@ -230,7 +231,7 @@ body {
 
 .app-toggle {
   padding: 0.4rem 0.75rem;
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--gray-700);
   cursor: pointer;
   user-select: none;
   font-size: var(--text-sm);
@@ -242,7 +243,8 @@ body {
 }
 .app-toggle:hover { border-color: var(--gray-600); }
 .app-toggle.active {
-  border-color: var(--black);
+  border: 2px solid var(--black);
+  padding: calc(0.4rem - 1px) calc(0.75rem - 1px);
   background: var(--black);
   color: var(--white);
 }
@@ -259,14 +261,14 @@ body {
   width: 160px;
   flex-shrink: 0;
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   color: var(--gray-500);
 }
 .result-value {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-md);
   font-weight: 300;
 }
@@ -283,13 +285,13 @@ body {
   flex: 1;
 }
 .output-value {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: 300;
   text-align: right;
 }
 .output-big {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 1.5rem;
   font-weight: 300;
 }
@@ -308,10 +310,10 @@ body {
 }
 .priority-box-label {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: var(--gray-500);
   margin-bottom: 0.35rem;
 }
@@ -363,14 +365,14 @@ body {
 .ref-table table { width: 100%; border-collapse: collapse; }
 .ref-table th {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gray-500);
   text-align: left;
   padding: 0.5rem 0.65rem;
-  border-bottom: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-700);
 }
 .ref-table td {
   font-size: var(--text-sm);
@@ -384,17 +386,17 @@ body {
 .scale-table { width: 100%; border-collapse: collapse; }
 .scale-table th {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gray-500);
   text-align: left;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-700);
 }
 .scale-table td {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 300;
   padding: 0.5rem 0.75rem;
@@ -410,10 +412,10 @@ body {
 }
 .spec-item-label {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: var(--gray-500);
   margin-bottom: 0.2rem;
 }
@@ -432,13 +434,13 @@ body {
 /* ---- DIVIDERS ---- */
 .divider {
   border: none;
-  border-top: 1px solid var(--gray-200);
+  border-top: 2px solid var(--black);
   margin: var(--space-2xl) 0;
 }
 
 /* ---- PRICE ---- */
 .price-summary {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-lg);
   font-weight: 300;
   margin-bottom: var(--space-lg);
@@ -449,10 +451,10 @@ body {
 .purchase-path { margin-bottom: 1rem; }
 .purchase-path-label {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: var(--gray-500);
   margin-bottom: 0.35rem;
 }
@@ -476,7 +478,7 @@ body {
   margin-bottom: 0.15rem;
 }
 .pick-price {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 300;
   color: var(--gray-600);
@@ -490,10 +492,10 @@ body {
 }
 .or-divider {
   font-size: var(--text-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 300;
   color: var(--gray-400);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   margin: var(--space-md) 0;
 }
@@ -501,11 +503,11 @@ body {
 /* ---- BADGES ---- */
 .fit-badge, .rec-badge {
   font-size: 0.55rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   background: var(--black);
   color: var(--white);
   padding: 1px 5px;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -513,7 +515,7 @@ body {
 .page-footer {
   margin-top: var(--space-2xl);
   padding-top: var(--space-lg);
-  border-top: 1px solid var(--gray-200);
+  border-top: 1px solid var(--gray-700);
   font-size: var(--text-xs);
   color: var(--gray-500);
   font-weight: 300;
