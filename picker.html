@@ -17,6 +17,12 @@
   .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.75rem;}
   .input-section{margin-bottom:2.5rem;}
 
+  /* Controls cluster */
+  .controls-cluster{margin-bottom:2.5rem;}
+  .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+  .controls-row:last-child{margin-bottom:0;}
+  .control-group{display:flex;flex-direction:column;align-items:flex-start;}
+
   /* Software nav + scroll */
   .sw-nav{display:flex;gap:1.5rem;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);}
   .sw-nav-item{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;}
@@ -140,8 +146,7 @@
     .picker{padding:2rem 1.25rem 3rem;}
     .result-columns{flex-direction:column;}
     .result-side{width:100%;}
-    .results-bar{flex-direction:column;align-items:flex-start;gap:0.5rem;}
-    .plat-area{padding-bottom:0.5rem;}
+    .controls-row{gap:1.5rem;}
     .spec-block{gap:1rem 2rem;}
   }
 </style>
@@ -202,36 +207,43 @@
     </div>
   </div>
 
-  <div class="input-section" style="display:flex;gap:3rem;flex-wrap:wrap;">
-    <div>
-      <div class="section-label">Project Scale</div>
-      <div class="option-row" id="scaleOptions">
-        <div class="option-pill active" data-scale="small"><div>Small / Medium</div><div class="pill-detail">SFR, small office, single models</div></div>
-        <div class="option-pill" data-scale="large"><div>Large / Complex</div><div class="pill-detail">Large buildings, multiple linked files</div></div>
+  <div class="controls-cluster">
+    <div class="controls-row">
+      <div class="control-group">
+        <div class="section-label">Platform</div>
+        <div class="option-row" id="platArea">
+          <div class="option-pill active" data-platform="win"><div>Windows</div></div>
+          <div class="option-pill" data-platform="mac"><div>Mac</div></div>
+        </div>
+        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
+          <span class="plat-forced">Windows -- required by selected apps</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Project Scale</div>
+        <div class="option-row" id="scaleOptions">
+          <div class="option-pill active" data-scale="small"><div>Small / Medium</div><div class="pill-detail">SFR, small office, single models</div></div>
+          <div class="option-pill" data-scale="large"><div>Large / Complex</div><div class="pill-detail">Large buildings, multiple linked files</div></div>
+        </div>
       </div>
     </div>
-    <div>
-      <div class="section-label">Budget</div>
-      <div class="option-row" id="budgetOptions"></div>
+    <div class="controls-row">
+      <div class="control-group">
+        <div class="section-label">Budget</div>
+        <div class="option-row" id="budgetOptions"></div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Machine Type</div>
+        <div class="option-row" id="machineTypeOptions">
+          <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
+          <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
+          <div class="option-pill" data-machinetype="desktop_laptop"><div>Desktop + Laptop</div></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <hr class="divider">
-
-  <div class="results-bar">
-    <div class="results-tabs">
-      <button class="results-tab active" data-restab="desktop">Desktop</button>
-      <button class="results-tab" data-restab="mobile">Mobile</button>
-    </div>
-    <div class="plat-area" id="platArea">
-      <span class="plat-label">Platform</span>
-      <span class="plat-opt active" data-platform="win">Windows</span>
-      <span class="plat-opt" data-platform="mac">Mac</span>
-    </div>
-    <div class="plat-area hidden" id="platForced">
-      <span class="plat-forced">Windows -- required by selected apps</span>
-    </div>
-  </div>
 
   <!-- Desktop -->
   <div class="results-panel active" id="panel-desktop">
@@ -248,15 +260,8 @@
     </div>
   </div>
 
-  <!-- Mobile -->
+  <!-- Laptop -->
   <div class="results-panel" id="panel-mobile">
-    <div class="strategy-row" id="m-strat-row">
-      <div class="section-label">Strategy</div>
-      <div class="option-row" id="mobileStrategyOptions">
-        <div class="option-pill active" data-mobilestrategy="one"><div>One Machine, Docked</div><div class="pill-detail">Laptop + dock + external monitor</div></div>
-        <div class="option-pill" data-mobilestrategy="two"><div>Two Machines</div><div class="pill-detail">Light laptop + desktop at desk</div></div>
-      </div>
-    </div>
     <div class="result-columns">
       <div class="result-main">
         <div class="card-illustration" id="m-illus"><span>[ isometric docked laptop ]</span></div>
@@ -304,7 +309,7 @@
     desk: defaultDeskMonitorsForBudget(defaultPickerState.budget),
     budget: defaultPickerState.budget,
     scale: defaultPickerState.scale,
-    mobileStrategy: defaultPickerState.mobileStrategy
+    machineType: 'desktop'
   };
 
   function renderBudgetOptions() {
@@ -318,14 +323,14 @@
   }
 
   function syncStaticOptionSelections() {
-    document.querySelectorAll('.plat-opt').forEach(function(optionElement) {
+    document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) {
       optionElement.classList.toggle('active', optionElement.dataset.platform === State.platform);
     });
     document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) {
       optionElement.classList.toggle('active', optionElement.dataset.scale === State.scale);
     });
-    document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(optionElement) {
-      optionElement.classList.toggle('active', optionElement.dataset.mobilestrategy === State.mobileStrategy);
+    document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) {
+      optionElement.classList.toggle('active', optionElement.dataset.machinetype === State.machineType);
     });
   }
 
@@ -527,6 +532,12 @@
     if (platformAvailability === 'win') { platformArea.classList.add('hidden'); forcedPlatformArea.classList.remove('hidden'); }
     else { platformArea.classList.remove('hidden'); forcedPlatformArea.classList.add('hidden'); }
 
+    // Panel visibility based on machine type
+    var showDesktop = State.machineType === 'desktop' || State.machineType === 'desktop_laptop';
+    var showLaptop = State.machineType === 'laptop' || State.machineType === 'desktop_laptop';
+    document.getElementById('panel-desktop').classList.toggle('active', showDesktop);
+    document.getElementById('panel-mobile').classList.toggle('active', showLaptop);
+
     // Desktop spec
     if (isMacPlatform) {
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile);
@@ -553,9 +564,8 @@
     document.getElementById('d-side').innerHTML = buildMonitorHTML('d');
     bindMonitorEvents('d');
 
-    // Mobile
-    document.getElementById('m-strat-row').style.display = isMacPlatform ? 'none' : '';
-    var mobileStrategy = State.mobileStrategy;
+    // Laptop
+    var mobileStrategy = State.machineType === 'desktop_laptop' ? 'two' : 'one';
     var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], two: ['travel'] };
     var macCategoriesByStrategy = { one: ['mac_p', 'mac_s'], two: ['mac_p', 'mac_s'] };
     var activeCategories = isMacPlatform ? macCategoriesByStrategy[mobileStrategy] : windowsCategoriesByStrategy[mobileStrategy];
@@ -606,8 +616,8 @@
       State.apps[appToggle.dataset.app] = appToggle.classList.contains('active');
       if (availablePlatforms() === 'win') {
         State.platform = 'win';
-        document.querySelectorAll('.plat-opt').forEach(function(platformOption) { platformOption.classList.remove('active'); });
-        document.querySelector('.plat-opt[data-platform="win"]').classList.add('active');
+        document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) { platformOption.classList.remove('active'); });
+        document.querySelector('#platArea .option-pill[data-platform="win"]').classList.add('active');
       }
       update();
     });
@@ -618,9 +628,9 @@
       if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
     });
   });
-  document.querySelectorAll('.plat-opt').forEach(function(platformOption) {
+  document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) {
     platformOption.addEventListener('click', function() {
-      document.querySelectorAll('.plat-opt').forEach(function(optionElement) { optionElement.classList.remove('active'); });
+      document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
       platformOption.classList.add('active');
       State.platform = platformOption.dataset.platform;
       State.desk = defaultDeskMonitorsForBudget(State.budget);
@@ -644,19 +654,11 @@
       update();
     });
   });
-  document.querySelectorAll('.results-tab').forEach(function(resultsTab) {
-    resultsTab.addEventListener('click', function() {
-      document.querySelectorAll('.results-tab').forEach(function(tabElement) { tabElement.classList.remove('active'); });
-      document.querySelectorAll('.results-panel').forEach(function(panelElement) { panelElement.classList.remove('active'); });
-      resultsTab.classList.add('active');
-      document.getElementById('panel-' + resultsTab.dataset.restab).classList.add('active');
-    });
-  });
-  document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(strategyOption) {
-    strategyOption.addEventListener('click', function() {
-      document.querySelectorAll('#mobileStrategyOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      strategyOption.classList.add('active');
-      State.mobileStrategy = strategyOption.dataset.mobilestrategy;
+  document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(machineTypeOption) {
+    machineTypeOption.addEventListener('click', function() {
+      document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
+      machineTypeOption.classList.add('active');
+      State.machineType = machineTypeOption.dataset.machinetype;
       update();
     });
   });
