@@ -19,7 +19,8 @@
 
   /* Controls cluster */
   .controls-cluster{margin-bottom:2.5rem;}
-  .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;}
+  .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+  .controls-row:last-child{margin-bottom:0;}
   .control-group{display:flex;flex-direction:column;align-items:flex-start;}
 
   /* Machine type strip (below divider) — full-width tabs */
@@ -30,10 +31,13 @@
   .machine-type-strip .option-pill:hover{border-color:var(--gray-500);}
   .machine-type-strip .option-pill.active{border:2px solid var(--black);padding:calc(0.75rem - 1px) calc(1rem - 1px);}
 
-  /* Merged desk zone */
-  .desk-zone{min-height:160px;border:1px dashed var(--gray-700);padding:1.5rem 1.5rem 1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;justify-content:center;position:relative;transition:all 0.2s ease;}
+  /* Merged desk zone — monitors row on top, machine underneath */
+  .desk-zone{border:1px dashed var(--gray-700);padding:1rem 1rem 0.75rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;transition:all 0.2s ease;}
   .desk-zone.drag-over{border-color:var(--black);background:var(--gray-50);}
-  .desk-machine{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0 0.75rem;min-height:80px;}
+  .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
+  .desk-machine{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0.5rem 0.75rem;min-height:60px;}
+  .desk-zone .mon-desk-hint{padding:0.75rem 0;}
+  .shelf-full .mon-avail{opacity:0.35;pointer-events:none;cursor:default;}
 
   /* Software nav + scroll */
   .sw-nav{display:flex;gap:1.5rem;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);}
@@ -225,6 +229,8 @@
         <div class="section-label">Budget</div>
         <div class="option-row" id="budgetOptions"></div>
       </div>
+    </div>
+    <div class="controls-row">
       <div class="control-group">
         <div class="section-label">Project Scale</div>
         <div class="option-row" id="scaleOptions">
@@ -429,7 +435,7 @@
 
   function buildDeskZoneHTML(machineHTML) {
     var markup = '<span class="mon-desk-label">Your desk</span>';
-    markup += '<div class="desk-machine">' + machineHTML + '</div>';
+    markup += '<div class="desk-monitors">';
     if (State.desk.length === 0) {
       markup += '<div class="mon-desk-hint">Drag monitors here</div>';
     } else {
@@ -439,6 +445,8 @@
         markup += '<div class="mon-on-desk" data-idx="' + i + '" title="Click to remove"><span class="mon-on-desk-visual">' + monitorSVG(mon, 1.2) + '<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">' + mon.name + '</span></div>';
       }
     }
+    markup += '</div>';
+    markup += '<div class="desk-machine">' + machineHTML + '</div>';
     return markup;
   }
 
@@ -447,7 +455,7 @@
     var recommendedMonitorIds = recommendedMonitorIdsForBudget(State.budget);
     var markup = '';
     if (State.desk.length > 0) markup += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">' + formatPrice(monitorTotal()) + '</span></div>';
-    markup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available</div><div class="mon-shelf">';
+    markup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available' + (State.desk.length >= 4 ? ' — desk full' : '') + '</div><div class="mon-shelf">';
     for (var i = 0; i < Data.Monitors.length; i++) {
       var mon = Data.Monitors[i];
       if (mon.platform !== 'both' && mon.platform !== platform) continue;
@@ -574,6 +582,7 @@
     // Desktop desk zone (merged machine + monitors) and shelf
     document.getElementById('d-desk').innerHTML = buildDeskZoneHTML(machineIllusHTML);
     document.getElementById('d-shelf-area').innerHTML = buildShelfHTML();
+    document.getElementById('d-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
     bindDeskZoneEvents('d-desk', 'd-shelf-area');
 
     // Laptop
@@ -617,6 +626,7 @@
     var laptopIllusHTML = isMacPlatform ? '<span>[ isometric MacBook ]</span>' : '<span>[ isometric docked laptop ]</span>';
     document.getElementById('m-desk').innerHTML = buildDeskZoneHTML(laptopIllusHTML);
     document.getElementById('m-shelf-area').innerHTML = buildShelfHTML();
+    document.getElementById('m-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
     bindDeskZoneEvents('m-desk', 'm-shelf-area');
   }
 
