@@ -18,6 +18,8 @@
   --gray-100: #e8e8e8;
   --gray-50: #f4f4f3;
   --white: #fff;
+  --page-bg: #f9f9f8;
+  --selected-bg: #333;
   --accent: #2563eb;
   --accent-light: rgba(37,99,235,0.08);
 
@@ -54,15 +56,15 @@ body {
   font-family: var(--font-body);
   font-weight: 300;
   color: var(--black);
-  background: var(--white);
+  background: var(--page-bg);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ---- LAYOUT ---- */
-.page        { max-width: 720px;  margin: 0 auto; padding: var(--space-2xl) var(--space-xl) 5rem; }
-.page-wide   { max-width: 1080px; margin: 0 auto; padding: var(--space-2xl) var(--space-xl) 5rem; }
+.page        { max-width: 720px;  margin: 0 auto; padding: var(--space-2xl) var(--space-xl) 5rem; background: var(--white); }
+.page-wide   { max-width: 1080px; margin: 0 auto; padding: var(--space-2xl) var(--space-xl) 5rem; background: var(--white); }
 .page-full   { margin: 0; padding: 0; }
 
 /* ---- PAGE HEADER ---- */
@@ -216,9 +218,9 @@ body {
 }
 .option-pill:hover { border-color: var(--gray-600); }
 .option-pill.active {
-  border: 2px solid var(--black);
+  border: 2px solid var(--selected-bg);
   padding: calc(0.55rem - 1px) calc(1rem - 1px);
-  background: var(--black);
+  background: var(--selected-bg);
   color: var(--white);
 }
 .option-pill .pill-detail {
@@ -243,9 +245,9 @@ body {
 }
 .app-toggle:hover { border-color: var(--gray-600); }
 .app-toggle.active {
-  border: 2px solid var(--black);
+  border: 2px solid var(--selected-bg);
   padding: calc(0.4rem - 1px) calc(0.75rem - 1px);
-  background: var(--black);
+  background: var(--selected-bg);
   color: var(--white);
 }
 

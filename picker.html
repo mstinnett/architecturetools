@@ -7,10 +7,10 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
+  :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#f9f9f8;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
   html{font-size:15px;}
-  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
-  .picker{max-width:1060px;margin:0 auto;padding:3rem 2rem 5rem;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .picker{max-width:1060px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);}
   .picker-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
   .picker-header h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.4rem;}
   .picker-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:44em;}
@@ -29,11 +29,11 @@
   .machine-type-strip .option-pill{flex:1;text-align:center;font-size:0.95rem;padding:0.75rem 1rem;border-color:var(--gray-200);display:flex;align-items:center;justify-content:center;}
   .machine-type-strip .option-pill+.option-pill{border-left:none;}
   .machine-type-strip .option-pill:hover{border-color:var(--gray-500);}
-  .machine-type-strip .option-pill.active{border:2px solid var(--black);padding:calc(0.75rem - 1px) calc(1rem - 1px);}
+  .machine-type-strip .option-pill.active{border:2px solid var(--selected-bg);padding:calc(0.75rem - 1px) calc(1rem - 1px);}
 
   /* Merged desk zone — monitors row on top, machine underneath */
   .desk-zone{border:1px dashed var(--gray-700);padding:1rem 1rem 0.75rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;transition:all 0.2s ease;}
-  .desk-zone.drag-over{border-color:var(--black);background:var(--gray-50);}
+  .desk-zone.drag-over{border-color:var(--selected-bg);background:var(--gray-50);}
   .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
   .desk-machine{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0.5rem 0.75rem;min-height:60px;}
   .desk-zone .mon-desk-hint{padding:0.75rem 0;}
@@ -52,7 +52,7 @@
   .sw-group-apps{display:flex;gap:0.3rem;flex-wrap:nowrap;}
   .app-toggle{padding:0.35rem 0.7rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;font-size:0.72rem;font-weight:400;transition:all 0.15s ease;background:var(--white);position:relative;white-space:nowrap;}
   .app-toggle:hover{border-color:var(--gray-500);}
-  .app-toggle.active{border:2px solid var(--black);padding:calc(0.35rem - 1px) calc(0.7rem - 1px);background:var(--black);color:var(--white);}
+  .app-toggle.active{border:2px solid var(--selected-bg);padding:calc(0.35rem - 1px) calc(0.7rem - 1px);background:var(--selected-bg);color:var(--white);}
   .app-toggle.baseline{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500);cursor:default;font-style:italic;}
   .app-toggle.win-only::after{content:'win';font-size:0.4rem;font-family:var(--font-body);letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);position:absolute;top:1px;right:3px;}
   .app-toggle.active.win-only::after{color:rgba(255,255,255,0.4);}
@@ -61,7 +61,7 @@
   .option-row{display:flex;flex-wrap:wrap;gap:0.4rem;}
   .option-pill{padding:0.5rem 0.9rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;font-size:0.78rem;font-weight:400;transition:all 0.15s ease;background:var(--white);}
   .option-pill:hover{border-color:var(--gray-500);}
-  .option-pill.active{border:2px solid var(--black);padding:calc(0.5rem - 1px) calc(0.9rem - 1px);background:var(--black);color:var(--white);}
+  .option-pill.active{border:2px solid var(--selected-bg);padding:calc(0.5rem - 1px) calc(0.9rem - 1px);background:var(--selected-bg);color:var(--white);}
   .option-pill .pill-detail{font-size:0.68rem;font-weight:300;opacity:0.7;margin-top:0.1rem;}
   .option-pill.active .pill-detail{opacity:0.6;}
 
