@@ -22,8 +22,13 @@
   .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;}
   .control-group{display:flex;flex-direction:column;align-items:flex-start;}
 
-  /* Machine type strip (below divider) */
-  .machine-type-strip{display:flex;justify-content:center;margin-bottom:1.5rem;}
+  /* Machine type strip (below divider) — full-width tabs */
+  .machine-type-strip{margin-bottom:1.5rem;}
+  .machine-type-strip .option-row{display:flex;gap:0;width:100%;}
+  .machine-type-strip .option-pill{flex:1;text-align:center;font-size:0.95rem;padding:0.75rem 1rem;border-color:var(--gray-200);display:flex;align-items:center;justify-content:center;}
+  .machine-type-strip .option-pill+.option-pill{border-left:none;}
+  .machine-type-strip .option-pill:hover{border-color:var(--gray-500);}
+  .machine-type-strip .option-pill.active{border:2px solid var(--black);padding:calc(0.75rem - 1px) calc(1rem - 1px);}
 
   /* Merged desk zone */
   .desk-zone{min-height:160px;border:1px dashed var(--gray-700);padding:1.5rem 1.5rem 1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;justify-content:center;position:relative;transition:all 0.2s ease;}
@@ -217,14 +222,8 @@
   <div class="controls-cluster">
     <div class="controls-row">
       <div class="control-group">
-        <div class="section-label">Platform</div>
-        <div class="option-row" id="platArea">
-          <div class="option-pill active" data-platform="win"><div>Windows</div></div>
-          <div class="option-pill" data-platform="mac"><div>Mac</div></div>
-        </div>
-        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
-          <span class="plat-forced">Windows -- required by selected apps</span>
-        </div>
+        <div class="section-label">Budget</div>
+        <div class="option-row" id="budgetOptions"></div>
       </div>
       <div class="control-group">
         <div class="section-label">Project Scale</div>
@@ -234,8 +233,14 @@
         </div>
       </div>
       <div class="control-group">
-        <div class="section-label">Budget</div>
-        <div class="option-row" id="budgetOptions"></div>
+        <div class="section-label">Platform</div>
+        <div class="option-row" id="platArea">
+          <div class="option-pill active" data-platform="win"><div>Windows</div></div>
+          <div class="option-pill" data-platform="mac"><div>Mac</div></div>
+        </div>
+        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
+          <span class="plat-forced">Windows -- required by selected apps</span>
+        </div>
       </div>
     </div>
   </div>
@@ -252,24 +257,32 @@
 
   <!-- Desktop -->
   <div class="results-panel active" id="panel-desktop">
-    <div class="desk-zone" id="d-desk"></div>
-    <div id="d-shelf-area"></div>
-    <div class="price-summary" id="d-price"></div>
-    <div class="spec-block" id="d-spec"></div>
-    <div class="purchase-paths" id="d-paths"></div>
-    <div id="d-priority" class="priority-box"></div>
-    <div class="desktop-prebuilts" id="d-prebuilts"></div>
+    <div class="result-columns">
+      <div class="result-main">
+        <div class="price-summary" id="d-price"></div>
+        <div class="spec-block" id="d-spec"></div>
+        <div class="purchase-paths" id="d-paths"></div>
+        <div id="d-priority" class="priority-box"></div>
+        <div class="desktop-prebuilts" id="d-prebuilts"></div>
+      </div>
+      <div class="result-side">
+        <div class="desk-zone" id="d-desk"></div>
+        <div id="d-shelf-area"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Laptop -->
   <div class="results-panel" id="panel-mobile">
     <div class="result-columns">
       <div class="result-main">
-        <div class="card-illustration" id="m-illus"><span>[ isometric docked laptop ]</span></div>
         <div id="m-content"></div>
         <div id="m-priority" class="priority-box"></div>
       </div>
-      <div class="result-side" id="m-side"></div>
+      <div class="result-side">
+        <div class="desk-zone" id="m-desk"></div>
+        <div id="m-shelf-area"></div>
+      </div>
     </div>
   </div>
 
@@ -414,71 +427,6 @@
     return '<svg width="' + totalWidth + '" height="' + totalHeight + '" viewBox="0 0 ' + totalWidth + ' ' + totalHeight + '" fill="none" aria-hidden="true"><rect x="' + screenX.toFixed(1) + '" y="0.5" width="' + Math.max(screenWidth - 1, 1) + '" height="' + Math.max(screenHeight - 1, 1) + '" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="' + centerX.toFixed(1) + '" y1="' + (screenHeight - 0.5).toFixed(1) + '" x2="' + centerX.toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/><line x1="' + (centerX - (baseWidth / 2)).toFixed(1) + '" y1="' + baseY.toFixed(1) + '" x2="' + (centerX + (baseWidth / 2)).toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/></svg>';
   }
 
-  function buildMonitorHTML(panelPrefix) {
-    var platform = effectivePlatform();
-    var recommendedMonitorIds = recommendedMonitorIdsForBudget(State.budget);
-    var monitorMarkup = '<div class="section-label">Monitors</div>';
-    monitorMarkup += '<div class="mon-desk" id="' + panelPrefix + '-desk"><span class="mon-desk-label">Your desk</span>';
-    if (State.desk.length === 0) {
-      monitorMarkup += '<div class="mon-desk-hint">Drag monitors here</div>';
-    } else {
-      for (var deskIndex = 0; deskIndex < State.desk.length; deskIndex++) {
-        var deskMonitor = findMonitor(State.desk[deskIndex]);
-        if (!deskMonitor) continue;
-        monitorMarkup += '<div class="mon-on-desk" data-idx="' + deskIndex + '" title="Click to remove"><span class="mon-on-desk-visual">' + monitorSVG(deskMonitor, 1.2) + '<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">' + deskMonitor.name + '</span></div>';
-      }
-    }
-    monitorMarkup += '</div>';
-    if (State.desk.length > 0) monitorMarkup += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">' + formatPrice(monitorTotal()) + '</span></div>';
-    monitorMarkup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available</div><div class="mon-shelf">';
-    for (var monitorIndex = 0; monitorIndex < Data.Monitors.length; monitorIndex++) {
-      var availableMonitor = Data.Monitors[monitorIndex];
-      if (availableMonitor.platform !== 'both' && availableMonitor.platform !== platform) continue;
-      var isRecommended = recommendedMonitorIds.indexOf(availableMonitor.id) >= 0;
-      monitorMarkup += '<div class="mon-avail' + (isRecommended ? ' recommended' : '') + '" draggable="true" data-mid="' + availableMonitor.id + '">' + monitorSVG(availableMonitor, 0.7) + '<span class="mbadge">rec</span><div class="mon-avail-name">' + availableMonitor.name + '</div><div class="mon-avail-price">' + formatPrice(availableMonitor.price) + '</div></div>';
-    }
-    monitorMarkup += '</div>';
-    return monitorMarkup;
-  }
-
-  function bindMonitorEvents(panelPrefix) {
-    var monitorSidebar = document.getElementById('m-side');
-    monitorSidebar.querySelectorAll('.mon-avail').forEach(function(availableMonitorElement) {
-      availableMonitorElement.addEventListener('dragstart', function(event) {
-        event.dataTransfer.effectAllowed = 'copy';
-        event.dataTransfer.setData('text/plain', availableMonitorElement.dataset.mid);
-        setTimeout(function() { availableMonitorElement.style.opacity = '0.5'; }, 0);
-        availableMonitorElement.addEventListener('dragend', function() { availableMonitorElement.style.opacity = ''; }, { once: true });
-      });
-      availableMonitorElement.addEventListener('click', function() {
-        if (State.desk.length < 4) {
-          State.desk.push(availableMonitorElement.dataset.mid);
-          update();
-        }
-      });
-    });
-    var monitorDesk = monitorSidebar.querySelector('.mon-desk');
-    if (monitorDesk) {
-      monitorDesk.addEventListener('dragover', function(event) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; monitorDesk.classList.add('drag-over'); });
-      monitorDesk.addEventListener('dragleave', function(event) { if (!monitorDesk.contains(event.relatedTarget)) monitorDesk.classList.remove('drag-over'); });
-      monitorDesk.addEventListener('drop', function(event) {
-        event.preventDefault();
-        monitorDesk.classList.remove('drag-over');
-        var monitorId = event.dataTransfer.getData('text/plain');
-        if (monitorId && State.desk.length < 4) {
-          State.desk.push(monitorId);
-          update();
-        }
-      });
-    }
-    monitorSidebar.querySelectorAll('.mon-on-desk').forEach(function(deskMonitorElement) {
-      deskMonitorElement.addEventListener('click', function() {
-        State.desk.splice(parseInt(deskMonitorElement.dataset.idx, 10), 1);
-        update();
-      });
-    });
-  }
-
   function buildDeskZoneHTML(machineHTML) {
     var markup = '<span class="mon-desk-label">Your desk</span>';
     markup += '<div class="desk-machine">' + machineHTML + '</div>';
@@ -510,9 +458,9 @@
     return markup;
   }
 
-  function bindDeskZoneEvents() {
-    var deskZone = document.getElementById('d-desk');
-    var shelfArea = document.getElementById('d-shelf-area');
+  function bindDeskZoneEvents(deskId, shelfId) {
+    var deskZone = document.getElementById(deskId);
+    var shelfArea = document.getElementById(shelfId);
     shelfArea.querySelectorAll('.mon-avail').forEach(function(el) {
       el.addEventListener('dragstart', function(e) {
         e.dataTransfer.effectAllowed = 'copy';
@@ -626,7 +574,7 @@
     // Desktop desk zone (merged machine + monitors) and shelf
     document.getElementById('d-desk').innerHTML = buildDeskZoneHTML(machineIllusHTML);
     document.getElementById('d-shelf-area').innerHTML = buildShelfHTML();
-    bindDeskZoneEvents();
+    bindDeskZoneEvents('d-desk', 'd-shelf-area');
 
     // Laptop
     var mobileStrategy = State.machineType === 'desktop_laptop' ? 'two' : 'one';
@@ -666,8 +614,10 @@
     else mobilePriorityNote = 'Light laptop for travel, desktop for production. Two machines means syncing files. No thermal compromise on either end.';
     document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
-    document.getElementById('m-side').innerHTML = buildMonitorHTML('m');
-    bindMonitorEvents('m');
+    var laptopIllusHTML = isMacPlatform ? '<span>[ isometric MacBook ]</span>' : '<span>[ isometric docked laptop ]</span>';
+    document.getElementById('m-desk').innerHTML = buildDeskZoneHTML(laptopIllusHTML);
+    document.getElementById('m-shelf-area').innerHTML = buildShelfHTML();
+    bindDeskZoneEvents('m-desk', 'm-shelf-area');
   }
 
   renderBudgetOptions();
