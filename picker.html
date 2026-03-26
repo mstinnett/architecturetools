@@ -19,9 +19,16 @@
 
   /* Controls cluster */
   .controls-cluster{margin-bottom:2.5rem;}
-  .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-bottom:1.5rem;}
-  .controls-row:last-child{margin-bottom:0;}
+  .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;}
   .control-group{display:flex;flex-direction:column;align-items:flex-start;}
+
+  /* Machine type strip (below divider) */
+  .machine-type-strip{display:flex;justify-content:center;margin-bottom:1.5rem;}
+
+  /* Merged desk zone */
+  .desk-zone{min-height:160px;border:1px dashed var(--gray-700);padding:1.5rem 1.5rem 1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;justify-content:center;position:relative;transition:all 0.2s ease;}
+  .desk-zone.drag-over{border-color:var(--black);background:var(--gray-50);}
+  .desk-machine{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0 0.75rem;min-height:80px;}
 
   /* Software nav + scroll */
   .sw-nav{display:flex;gap:1.5rem;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);}
@@ -146,7 +153,7 @@
     .picker{padding:2rem 1.25rem 3rem;}
     .result-columns{flex-direction:column;}
     .result-side{width:100%;}
-    .controls-row{gap:1.5rem;}
+    .controls-row{gap:1.5rem 2rem;}
     .spec-block{gap:1rem 2rem;}
   }
 </style>
@@ -226,38 +233,32 @@
           <div class="option-pill" data-scale="large"><div>Large / Complex</div><div class="pill-detail">Large buildings, multiple linked files</div></div>
         </div>
       </div>
-    </div>
-    <div class="controls-row">
       <div class="control-group">
         <div class="section-label">Budget</div>
         <div class="option-row" id="budgetOptions"></div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Machine Type</div>
-        <div class="option-row" id="machineTypeOptions">
-          <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
-          <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
-          <div class="option-pill" data-machinetype="desktop_laptop"><div>Desktop + Laptop</div></div>
-        </div>
       </div>
     </div>
   </div>
 
   <hr class="divider">
 
+  <div class="machine-type-strip">
+    <div class="option-row" id="machineTypeOptions">
+      <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
+      <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
+      <div class="option-pill" data-machinetype="desktop_laptop"><div>Desktop + Laptop</div></div>
+    </div>
+  </div>
+
   <!-- Desktop -->
   <div class="results-panel active" id="panel-desktop">
-    <div class="result-columns">
-      <div class="result-main">
-        <div class="card-illustration" id="d-illus"><span>[ isometric tower illustration ]</span></div>
-        <div class="price-summary" id="d-price"></div>
-        <div class="spec-block" id="d-spec"></div>
-        <div class="purchase-paths" id="d-paths"></div>
-        <div id="d-priority" class="priority-box"></div>
-        <div class="desktop-prebuilts" id="d-prebuilts"></div>
-      </div>
-      <div class="result-side" id="d-side"></div>
-    </div>
+    <div class="desk-zone" id="d-desk"></div>
+    <div id="d-shelf-area"></div>
+    <div class="price-summary" id="d-price"></div>
+    <div class="spec-block" id="d-spec"></div>
+    <div class="purchase-paths" id="d-paths"></div>
+    <div id="d-priority" class="priority-box"></div>
+    <div class="desktop-prebuilts" id="d-prebuilts"></div>
   </div>
 
   <!-- Laptop -->
@@ -441,7 +442,7 @@
   }
 
   function bindMonitorEvents(panelPrefix) {
-    var monitorSidebar = document.getElementById(panelPrefix === 'd' ? 'd-side' : 'm-side');
+    var monitorSidebar = document.getElementById('m-side');
     monitorSidebar.querySelectorAll('.mon-avail').forEach(function(availableMonitorElement) {
       availableMonitorElement.addEventListener('dragstart', function(event) {
         event.dataTransfer.effectAllowed = 'copy';
@@ -473,6 +474,67 @@
     monitorSidebar.querySelectorAll('.mon-on-desk').forEach(function(deskMonitorElement) {
       deskMonitorElement.addEventListener('click', function() {
         State.desk.splice(parseInt(deskMonitorElement.dataset.idx, 10), 1);
+        update();
+      });
+    });
+  }
+
+  function buildDeskZoneHTML(machineHTML) {
+    var markup = '<span class="mon-desk-label">Your desk</span>';
+    markup += '<div class="desk-machine">' + machineHTML + '</div>';
+    if (State.desk.length === 0) {
+      markup += '<div class="mon-desk-hint">Drag monitors here</div>';
+    } else {
+      for (var i = 0; i < State.desk.length; i++) {
+        var mon = findMonitor(State.desk[i]);
+        if (!mon) continue;
+        markup += '<div class="mon-on-desk" data-idx="' + i + '" title="Click to remove"><span class="mon-on-desk-visual">' + monitorSVG(mon, 1.2) + '<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">' + mon.name + '</span></div>';
+      }
+    }
+    return markup;
+  }
+
+  function buildShelfHTML() {
+    var platform = effectivePlatform();
+    var recommendedMonitorIds = recommendedMonitorIdsForBudget(State.budget);
+    var markup = '';
+    if (State.desk.length > 0) markup += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">' + formatPrice(monitorTotal()) + '</span></div>';
+    markup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available</div><div class="mon-shelf">';
+    for (var i = 0; i < Data.Monitors.length; i++) {
+      var mon = Data.Monitors[i];
+      if (mon.platform !== 'both' && mon.platform !== platform) continue;
+      var isRec = recommendedMonitorIds.indexOf(mon.id) >= 0;
+      markup += '<div class="mon-avail' + (isRec ? ' recommended' : '') + '" draggable="true" data-mid="' + mon.id + '">' + monitorSVG(mon, 0.7) + '<span class="mbadge">rec</span><div class="mon-avail-name">' + mon.name + '</div><div class="mon-avail-price">' + formatPrice(mon.price) + '</div></div>';
+    }
+    markup += '</div>';
+    return markup;
+  }
+
+  function bindDeskZoneEvents() {
+    var deskZone = document.getElementById('d-desk');
+    var shelfArea = document.getElementById('d-shelf-area');
+    shelfArea.querySelectorAll('.mon-avail').forEach(function(el) {
+      el.addEventListener('dragstart', function(e) {
+        e.dataTransfer.effectAllowed = 'copy';
+        e.dataTransfer.setData('text/plain', el.dataset.mid);
+        setTimeout(function() { el.style.opacity = '0.5'; }, 0);
+        el.addEventListener('dragend', function() { el.style.opacity = ''; }, { once: true });
+      });
+      el.addEventListener('click', function() {
+        if (State.desk.length < 4) { State.desk.push(el.dataset.mid); update(); }
+      });
+    });
+    deskZone.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; deskZone.classList.add('drag-over'); });
+    deskZone.addEventListener('dragleave', function(e) { if (!deskZone.contains(e.relatedTarget)) deskZone.classList.remove('drag-over'); });
+    deskZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      deskZone.classList.remove('drag-over');
+      var mid = e.dataTransfer.getData('text/plain');
+      if (mid && State.desk.length < 4) { State.desk.push(mid); update(); }
+    });
+    deskZone.querySelectorAll('.mon-on-desk').forEach(function(el) {
+      el.addEventListener('click', function() {
+        State.desk.splice(parseInt(el.dataset.idx, 10), 1);
         update();
       });
     });
@@ -538,10 +600,11 @@
     document.getElementById('panel-desktop').classList.toggle('active', showDesktop);
     document.getElementById('panel-mobile').classList.toggle('active', showLaptop);
 
-    // Desktop spec
+    // Desktop spec + desk zone
+    var machineIllusHTML;
     if (isMacPlatform) {
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile);
-      document.getElementById('d-illus').innerHTML = '<span>[ isometric Mac Studio ]</span>';
+      machineIllusHTML = '<span>[ isometric Mac Studio ]</span>';
       document.getElementById('d-price').textContent = selectedMacDesktopSpec.price + ' + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
       document.getElementById('d-paths').innerHTML = '<div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div>';
@@ -550,7 +613,7 @@
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile);
       var towerPriceBounds = parsePriceRange(selectedWindowsDesktopSpec.priceRange);
-      document.getElementById('d-illus').innerHTML = '<span>[ isometric tower ]</span>';
+      machineIllusHTML = '<span>[ isometric tower ]</span>';
       document.getElementById('d-price').textContent = selectedWindowsDesktopSpec.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
       document.getElementById('d-paths').innerHTML =
@@ -560,9 +623,10 @@
       document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
     }
 
-    // Desktop monitors
-    document.getElementById('d-side').innerHTML = buildMonitorHTML('d');
-    bindMonitorEvents('d');
+    // Desktop desk zone (merged machine + monitors) and shelf
+    document.getElementById('d-desk').innerHTML = buildDeskZoneHTML(machineIllusHTML);
+    document.getElementById('d-shelf-area').innerHTML = buildShelfHTML();
+    bindDeskZoneEvents();
 
     // Laptop
     var mobileStrategy = State.machineType === 'desktop_laptop' ? 'two' : 'one';
