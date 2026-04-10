@@ -313,3 +313,36 @@ Data.LaptopCategoryLabels = {
   mac_p:   'MacBook',
   mac_s:   'Student',
 };
+
+
+// ============================================================================
+// EDITORIAL MODEL — Workloads, tiers, form factors
+// These drive the three-band selector on the picker page.
+// A future CMS/admin layer would manage these definitions and their mappings.
+// ============================================================================
+
+Data.Workloads = {
+  bim:        { label: 'BIM',                profile: 'modeling',     defaultApps: ['revit'],            description: 'Revit, ArchiCAD, Rhino. Single-thread CPU bound.' },
+  balanced:   { label: 'Balanced BIM + Viz', profile: 'modeling_viz', defaultApps: ['revit', 'enscape'], description: 'Modeling with real-time visualization. Most common.' },
+  viz:        { label: 'Viz-first',          profile: 'viz',          defaultApps: ['enscape'],          description: 'Enscape, Lumion, D5, TwinMotion. GPU bound.' },
+  cpu_render: { label: 'CPU Render',         profile: 'production',   defaultApps: ['vray'],             description: 'V-Ray, Corona. Multi-core CPU + GPU hybrid.' },
+};
+
+Data.Tiers = {
+  student: { label: 'Student', budget: 'cheapest', scale: 'small', description: 'Minimum viable for school or early career' },
+  ninety:  { label: '90%',     budget: 'value',    scale: 'small', description: '90% of performance at a better price' },
+  top:     { label: 'Top',     budget: 'best',     scale: 'small', description: 'No compromise — best available' },
+};
+
+Data.FormFactors = {
+  laptop:         { label: 'Laptop',           machineType: 'laptop' },
+  sff:            { label: 'SFF Desktop',      machineType: 'desktop', prebuiltTypes: ['mini'] },
+  desktop:        { label: 'Desktop',          machineType: 'desktop' },
+  desktop_laptop: { label: 'Desktop + Laptop', machineType: 'desktop_laptop' },
+};
+
+Data.EditorialDefaults = {
+  workload: 'balanced',
+  tier: 'ninety',
+  form: 'desktop',
+};

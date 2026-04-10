@@ -3,852 +3,801 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hardware Picker -- architecture.tools</title>
+<title>What computer should I buy for architecture? — architecture.tools</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
   :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#f9f9f8;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
   html{font-size:15px;}
   body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;}
-  .picker{max-width:1060px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);}
-  .picker-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
-  .picker-header h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.2rem;}
-  .picker-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:44em;}
-  .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.75rem;}
-  .input-section{margin-bottom:2.5rem;}
 
-  /* Controls cluster */
-  .controls-cluster{margin-bottom:2.5rem;}
-  .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-bottom:1.5rem;}
-  .controls-row:last-child{margin-bottom:0;}
-  .control-group{display:flex;flex-direction:column;align-items:flex-start;}
+  /* ---- PAGE SHELL ---- */
+  .picker-page{max-width:1060px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);}
+  .page-title{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:2px solid var(--black);}
+  .page-title h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.15rem;}
+  .page-title p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:44em;}
 
-  /* Machine type strip (below divider) — full-width tabs */
-  .machine-type-strip{margin-bottom:1.5rem;}
-  .machine-type-strip .option-row{display:flex;gap:0;width:100%;}
-  .machine-type-strip .option-pill{flex:1;text-align:center;font-size:0.95rem;padding:0.75rem 1rem;border-color:var(--gray-200);display:flex;align-items:center;justify-content:center;}
-  .machine-type-strip .option-pill+.option-pill{border-left:none;}
-  .machine-type-strip .option-pill:hover{border-color:var(--gray-500);}
-  .machine-type-strip .option-pill.active{border:2px solid var(--selected-bg);padding:calc(0.75rem - 1px) calc(1rem - 1px);}
+  /* ---- HERO COMPOSITION ---- */
+  .hero-composition{display:grid;grid-template-columns:1fr 210px;gap:2rem;margin-bottom:2rem;align-items:start;}
+  .hero-scene{border:1px solid var(--gray-200);background:var(--white);position:relative;overflow:hidden;}
+  .hero-svg{width:100%;height:auto;display:block;}
 
-  /* Merged desk zone — monitors row on top, machine underneath */
-  .desk-zone{border:1px dashed var(--gray-700);padding:1rem 1rem 0.75rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;}
-  .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
-  .desk-machine{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0.5rem 0.75rem;min-height:60px;}
-  .desk-zone .mon-desk-hint{padding:0.75rem 0;}
-  .shelf-full .mon-avail{opacity:0.35;pointer-events:none;cursor:default;}
+  /* ---- CONTROL BANDS ---- */
+  .control-bands{display:flex;flex-direction:column;gap:1.5rem;}
+  .band-label{font-size:0.6rem;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.4rem;}
+  .band-options{display:flex;flex-direction:column;gap:0.25rem;}
+  .band-pill{display:block;width:100%;text-align:left;padding:0.45rem 0.7rem;border:1px solid var(--gray-300);cursor:pointer;font-size:0.75rem;font-weight:400;font-family:var(--font-body);background:var(--white);transition:all 0.15s ease;color:var(--black);line-height:1.4;}
+  .band-pill:hover{border-color:var(--gray-700);}
+  .band-pill.active{border:2px solid var(--selected-bg);padding:calc(0.45rem - 1px) calc(0.7rem - 1px);background:var(--selected-bg);color:var(--white);}
+  .band-pill .pill-sub{font-size:0.62rem;font-weight:300;opacity:0.6;display:block;margin-top:0.05rem;}
 
-  /* Software nav + scroll */
-  .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;}
-  .sw-nav-item{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;}
-  .sw-nav-item:hover{color:var(--black);}
-  .sw-nav-item.sw-active{color:var(--black);}
-  .sw-nav-indicator{position:absolute;border:1px solid var(--black);background:rgba(0,0,0,0.04);top:-2px;bottom:-1px;pointer-events:none;}
-  .sw-scroll-wrap{display:flex;align-items:stretch;gap:0.5rem;}
-  .sw-scroll{flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:0.5rem;scrollbar-width:none;}
-  .sw-scroll::-webkit-scrollbar{display:none;}
-  .sw-chevron{flex-shrink:0;width:2.25rem;border:1px solid var(--gray-300);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--gray-500);transition:border-color 0.15s,color 0.15s;padding:0;line-height:1;}
-  .sw-chevron:hover{border-color:var(--black);color:var(--black);}
-  .sw-chevron[hidden]{display:none;}
-  .sw-strip{display:flex;gap:2rem;min-width:max-content;padding:0.25rem 0;}
-  .sw-group{display:flex;flex-direction:column;gap:0.3rem;}
-  .sw-group-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;white-space:nowrap;}
-  .sw-group-apps{display:flex;gap:0.3rem;flex-wrap:nowrap;}
-  .app-toggle{padding:0.35rem 0.7rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;font-size:0.72rem;font-weight:400;transition:all 0.15s ease;background:var(--white);position:relative;white-space:nowrap;}
-  .app-toggle:hover{border-color:var(--gray-500);}
-  .app-toggle.active{border:2px solid var(--selected-bg);padding:calc(0.35rem - 1px) calc(0.7rem - 1px);background:var(--selected-bg);color:var(--white);}
-  .app-toggle.baseline{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500);cursor:default;font-style:italic;}
-  .app-toggle.win-only::after{content:'win';font-size:0.4rem;font-family:var(--font-body);letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);position:absolute;top:1px;right:3px;}
-  .app-toggle.active.win-only::after{color:rgba(255,255,255,0.4);}
+  .platform-row{display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;}
+  .platform-row .band-label{margin-bottom:0;}
+  .plat-pill{padding:0.2rem 0.5rem;font-size:0.62rem;font-weight:400;cursor:pointer;border:1px solid var(--gray-300);background:var(--white);font-family:var(--font-body);transition:all 0.15s;}
+  .plat-pill:hover{border-color:var(--gray-700);}
+  .plat-pill.active{border:2px solid var(--black);padding:calc(0.2rem - 1px) calc(0.5rem - 1px);background:var(--black);color:var(--white);}
+  .plat-forced{font-size:0.58rem;font-weight:300;color:var(--gray-400);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.3rem;}
 
-  /* Pills */
-  .option-row{display:flex;flex-wrap:wrap;gap:0.4rem;}
-  .option-pill{padding:0.5rem 0.9rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;font-size:0.78rem;font-weight:400;transition:all 0.15s ease;background:var(--white);}
-  .option-pill:hover{border-color:var(--gray-500);}
-  .option-pill.active{border:2px solid var(--selected-bg);padding:calc(0.5rem - 1px) calc(0.9rem - 1px);background:var(--selected-bg);color:var(--white);}
-  .option-pill .pill-detail{font-size:0.68rem;font-weight:300;opacity:0.7;margin-top:0.1rem;}
-  .option-pill.active .pill-detail{opacity:0.6;}
-
-  .divider{border:none;border-top:2px solid var(--black);margin:3rem 0;}
-
-  /* Results bar */
-  .results-bar{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--black);margin-bottom:0;}
-  .results-tabs{display:flex;gap:0;}
-  .results-tab{padding:0.65rem 1.5rem;font-size:0.85rem;font-weight:400;cursor:pointer;border:1px solid transparent;border-bottom:none;background:none;color:var(--gray-400);font-family:var(--font-body);transition:all 0.15s ease;position:relative;bottom:-2px;}
-  .results-tab:hover{color:var(--black);}
-  .results-tab.active{color:var(--black);font-weight:500;border:2px solid var(--black);border-bottom:2px solid var(--white);padding:calc(0.65rem - 1px) calc(1.5rem - 1px);background:var(--white);}
-  .plat-area{padding-bottom:0.65rem;display:flex;align-items:center;gap:0.5rem;}
-  .plat-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
-  .plat-opt{padding:0.25rem 0.55rem;font-size:0.65rem;font-weight:400;cursor:pointer;border:1px solid var(--gray-700);background:var(--white);transition:all 0.15s;user-select:none;}
-  .plat-opt:hover{border-color:var(--gray-500);}
-  .plat-opt.active{border:2px solid var(--black);padding:calc(0.25rem - 1px) calc(0.55rem - 1px);background:var(--black);color:var(--white);}
-  .plat-forced{font-size:0.6rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);letter-spacing:0.1em;text-transform:uppercase;}
-  .hidden{display:none !important;}
-
-  .results-panel{display:none;padding-top:1.5rem;}
-  .results-panel.active{display:block;}
-
-  /* Desktop + Laptop split layout */
-  .panel-label{display:none;font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);padding-bottom:0.75rem;border-bottom:1px solid var(--black);margin-bottom:1.5rem;}
-  .picker.split-mode{max-width:1350px;}
-  .panels-split{display:grid;grid-template-columns:1fr 1fr;align-items:start;}
-  .panels-split #panel-desktop{padding-right:2rem;border-right:2px solid var(--black);}
-  .panels-split #panel-mobile{padding-left:2rem;}
-  .panels-split #panel-monitors{grid-column:1/-1;padding-top:1.5rem;margin-top:1.5rem;border-top:1px solid var(--gray-200);}
-  .panels-split .result-columns{flex-direction:column;align-items:stretch;}
-  .panels-split .result-side{width:100%;}
-  .panels-split .panel-label{display:block;}
-  .panels-split #panel-desktop .result-side{display:none;}
-  .panels-split #panel-mobile .result-side{display:none;}
-  @media(min-width:1200px){
-    .panels-split{grid-template-columns:1fr 1fr 260px;}
-    .panels-split #panel-mobile{padding-right:2rem;}
-    .panels-split #panel-monitors{grid-column:3;grid-row:1;padding-top:1.5rem;margin-top:0;border-top:none;border-left:2px solid var(--black);padding-left:2rem;}
-  }
-
-  /* Two-column */
-  .result-columns{display:flex;gap:2.5rem;align-items:flex-start;}
-  .result-main{flex:1;min-width:0;}
-  .result-side{width:320px;flex-shrink:0;}
-
-  .card-illustration{background:var(--gray-50);border:1px solid var(--gray-700);height:160px;display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-family:var(--font-body);font-weight:300;margin-bottom:1.5rem;}
-
-  .spec-block{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:1.5rem;}
+  /* ---- RECOMMENDATION ---- */
+  .recommendation{margin-bottom:2rem;padding-top:1.5rem;border-top:2px solid var(--black);}
+  .rec-headline{font-size:0.65rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.5rem;}
+  .rec-price{font-family:var(--font-body);font-size:1.05rem;font-weight:500;margin-bottom:1.25rem;}
+  .spec-block{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:1.25rem;}
+  .spec-item{min-width:120px;}
   .spec-item-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.2rem;}
   .spec-item-value{font-size:0.88rem;font-weight:400;}
   .spec-item-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;margin-top:0.1rem;max-width:20em;}
-
-  .card-link{display:inline-block;font-size:0.75rem;font-weight:400;color:var(--black);border-bottom:1px solid var(--black);text-decoration:none;padding-bottom:1px;transition:opacity 0.15s;margin-right:1.5rem;}
-  .card-link:hover{opacity:0.6;}
-  .purchase-paths{margin-bottom:1rem;}
-  .purchase-path{margin-bottom:1rem;}
-  .purchase-path-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
-  .purchase-path p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;margin-bottom:0.5rem;}
-
-  .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);}
+  .priority-box{padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);margin-bottom:1rem;}
   .priority-box-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
   .priority-box p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
-  .price-summary{font-family:var(--font-body);font-size:1rem;font-weight:500;margin-bottom:1.5rem;}
-  .desktop-prebuilts{margin-top:1.5rem;}
 
-  /* Monitor sidebar: desk on top, shelf below */
-  .mon-desk{min-height:100px;border:1px dashed var(--gray-700);padding:0.75rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:flex-end;justify-content:center;position:relative;}
-  .mon-desk-label{position:absolute;top:0.4rem;left:0.6rem;font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
-  .mon-desk-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:1.5rem 0;width:100%;}
-  .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;border-radius:2px;}
-  .mon-on-desk-visual{position:relative;display:block;color:inherit;}
-  .mon-on-desk-name{font-size:0.58rem;font-family:var(--font-body);font-weight:300;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);transition:color 0.15s ease;}
-  .mon-remove-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:300;line-height:1;color:var(--black);background:rgba(245,245,244,0.8);opacity:0;transition:opacity 0.15s ease;pointer-events:none;}
+  /* ---- MONITOR SECTION ---- */
+  .monitor-section{margin-bottom:2rem;}
+  .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.75rem;}
+  .desk-zone{border:1px dashed var(--gray-300);padding:0.75rem;margin-bottom:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:flex-end;justify-content:center;min-height:80px;position:relative;}
+  .desk-zone-label{position:absolute;top:0.4rem;left:0.6rem;font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
+  .desk-zone-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:1rem 0;width:100%;}
+  .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;}
+  .mon-on-desk-visual{position:relative;display:block;}
+  .mon-on-desk-name{font-size:0.58rem;font-family:var(--font-body);font-weight:300;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);transition:color 0.15s;}
+  .mon-remove-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:300;line-height:1;color:var(--black);background:rgba(245,245,244,0.8);opacity:0;transition:opacity 0.15s;pointer-events:none;}
   .mon-on-desk:hover .mon-remove-mark{opacity:1;}
   .mon-on-desk:hover .mon-on-desk-name{color:var(--black);}
-
+  .mon-total{display:flex;justify-content:space-between;align-items:baseline;padding-top:0.5rem;border-top:1px solid var(--gray-200);margin-top:0.5rem;}
+  .mon-total-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);}
+  .mon-total-price{font-family:var(--font-body);font-size:0.82rem;font-weight:300;}
   .mon-shelf-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.4rem;}
   .mon-shelf{display:flex;flex-wrap:wrap;gap:0.4rem;}
-  .mon-avail{display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;transition:all 0.15s;background:var(--white);position:relative;}
-  .mon-avail:hover{border-color:var(--gray-500);}
+  .shelf-full .mon-avail{opacity:0.35;pointer-events:none;}
+  .mon-avail{display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.4rem;border:1px solid var(--gray-300);cursor:pointer;user-select:none;transition:all 0.15s;background:var(--white);position:relative;}
+  .mon-avail:hover{border-color:var(--gray-700);}
   .mon-avail.recommended{border:2px solid var(--black);padding:calc(0.4rem - 1px);}
   .mon-avail-name{font-size:0.6rem;font-weight:400;white-space:nowrap;}
-  .mon-avail-price{font-size:0.55rem;font-family:var(--font-body);font-weight:300;color:var(--gray-500);}
+  .mon-avail-price{font-size:0.55rem;font-weight:300;color:var(--gray-500);}
   .mon-avail .mbadge{display:none;position:absolute;top:2px;right:2px;font-size:0.4rem;font-family:var(--font-body);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
   .mon-avail.recommended .mbadge{display:block;}
   .mon-avail svg,.mon-on-desk svg{display:block;}
 
-  .mon-total{display:flex;justify-content:space-between;align-items:baseline;padding-top:0.5rem;border-top:1px solid var(--gray-700);margin-top:0.5rem;}
-  .mon-total-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);}
-  .mon-total-price{font-family:var(--font-body);font-size:0.82rem;font-weight:300;}
+  /* ---- MOBILE MONITOR CONTROLS ---- */
+  .mobile-mon-controls{display:none;}
+  .mobile-mon-row{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--gray-100);}
+  .mobile-mon-info{display:flex;align-items:center;gap:0.5rem;}
+  .mobile-mon-name{font-size:0.78rem;font-weight:400;}
+  .mobile-mon-price{font-size:0.68rem;color:var(--gray-500);font-weight:300;}
+  .mobile-mon-qty{display:flex;align-items:center;gap:0.4rem;}
+  .mobile-mon-btn{width:28px;height:28px;border:1px solid var(--gray-300);background:var(--white);cursor:pointer;font-size:1rem;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;transition:border-color 0.15s;}
+  .mobile-mon-btn:hover{border-color:var(--black);}
+  .mobile-mon-count{font-size:0.78rem;font-weight:400;min-width:1.5em;text-align:center;}
 
-  /* Laptop list */
+  /* ---- SOFTWARE SECTION ---- */
+  .section-toggle{font-size:0.82rem;font-weight:400;cursor:pointer;padding:0.85rem 0;list-style:none;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--gray-200);color:var(--gray-700);transition:color 0.15s;}
+  .section-toggle:hover{color:var(--black);}
+  .section-toggle::-webkit-details-marker{display:none;}
+  .section-toggle::after{content:'+';font-size:1.1rem;font-weight:300;color:var(--gray-400);transition:color 0.15s;}
+  details[open] .section-toggle::after{content:'\2212';}
+  .section-toggle:hover::after{color:var(--black);}
+  .software-content{padding:0.5rem 0 1.5rem;}
+  .sw-groups{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:1rem;}
+  .sw-group{display:flex;flex-direction:column;gap:0.3rem;}
+  .sw-group-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.1rem;}
+  .sw-group-apps{display:flex;gap:0.3rem;flex-wrap:wrap;}
+  .app-toggle{padding:0.35rem 0.7rem;border:1px solid var(--gray-300);cursor:pointer;user-select:none;font-size:0.72rem;font-weight:400;transition:all 0.15s ease;background:var(--white);position:relative;white-space:nowrap;font-family:var(--font-body);}
+  .app-toggle:hover{border-color:var(--gray-700);}
+  .app-toggle.active{border:2px solid var(--selected-bg);padding:calc(0.35rem - 1px) calc(0.7rem - 1px);background:var(--selected-bg);color:var(--white);}
+  .app-toggle.win-only::after{content:'win';font-size:0.4rem;font-family:var(--font-body);letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);position:absolute;top:1px;right:3px;}
+  .app-toggle.active.win-only::after{color:rgba(255,255,255,0.4);}
+
+  /* ---- DETAILS SECTION ---- */
+  .details-content{padding:0.5rem 0 1.5rem;}
+  .purchase-paths{margin-bottom:1rem;}
+  .purchase-path{margin-bottom:1rem;}
+  .purchase-path-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
+  .purchase-path p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;margin-bottom:0.5rem;}
+  .card-link{display:inline-block;font-size:0.75rem;font-weight:400;color:var(--black);border-bottom:1px solid var(--black);text-decoration:none;padding-bottom:1px;transition:opacity 0.15s;margin-right:1.5rem;}
+  .card-link:hover{opacity:0.6;}
+  .desktop-prebuilts{margin-top:1.5rem;}
   .laptop-category{margin-bottom:1.5rem;}
-  .laptop-category-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.5rem;padding-bottom:0.35rem;border-bottom:1px solid var(--gray-700);}
-  .laptop-row{display:flex;align-items:baseline;padding:0.5rem 0;border-bottom:1px solid var(--gray-700);gap:0.75rem;}
+  .laptop-category-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.5rem;padding-bottom:0.35rem;border-bottom:1px solid var(--gray-200);}
+  .laptop-row{display:flex;align-items:baseline;padding:0.5rem 0;border-bottom:1px solid var(--gray-100);gap:0.75rem;}
   .laptop-row:last-child{border-bottom:none;}
   .laptop-row.is-rec{background:var(--gray-50);margin:0 -0.5rem;padding:0.5rem;border-bottom-color:transparent;}
   .laptop-name{font-size:0.82rem;font-weight:400;flex:1;min-width:0;}
   .laptop-rec-badge{font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;background:var(--black);color:var(--white);padding:1px 5px;flex-shrink:0;display:none;}
   .laptop-row.is-rec .laptop-rec-badge{display:inline-block;}
   .laptop-note{font-size:0.68rem;color:var(--gray-500);font-weight:300;margin-top:0.1rem;}
-  .laptop-equivalence-note{margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--gray-700);font-size:0.64rem;color:var(--gray-600);font-weight:300;line-height:1.55;}
-  .laptop-equivalence-label{display:block;margin-bottom:0.15rem;font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
   .laptop-meta{display:flex;gap:1rem;flex-shrink:0;align-items:baseline;}
-  .laptop-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);white-space:nowrap;}
-  .laptop-price{font-size:0.72rem;font-family:var(--font-body);font-weight:300;color:var(--gray-700);white-space:nowrap;}
+  .laptop-weight{font-size:0.65rem;font-weight:300;color:var(--gray-400);white-space:nowrap;}
+  .laptop-price{font-size:0.72rem;font-weight:300;color:var(--gray-700);white-space:nowrap;}
   .laptop-list-note{margin-top:0.75rem;font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;font-style:italic;}
-  .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.5;}
-
-  /* Progressive disclosure — featured recommendation */
   .laptop-rec-featured{padding-bottom:1.25rem;margin-bottom:1rem;border-bottom:1px solid var(--gray-200);}
   .laptop-rec-featured-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.5rem;}
   .laptop-rec-featured-name{font-size:1rem;font-weight:500;margin-bottom:0.35rem;}
   .laptop-rec-featured-meta{display:flex;gap:1rem;align-items:baseline;margin-bottom:0.35rem;}
-  .laptop-rec-featured-price{font-size:0.82rem;font-family:var(--font-body);font-weight:400;}
-  .laptop-rec-featured-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);}
+  .laptop-rec-featured-price{font-size:0.82rem;font-weight:400;}
+  .laptop-rec-featured-weight{font-size:0.65rem;font-weight:300;color:var(--gray-400);}
   .laptop-rec-featured-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;line-height:1.5;}
-  .laptop-see-all-btn{width:100%;border:1px solid var(--gray-300);background:none;cursor:pointer;font-size:0.85rem;font-family:var(--font-body);font-weight:400;color:var(--gray-700);padding:1rem 1.25rem;text-align:left;display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;transition:border-color 0.15s,color 0.15s;}
-  .laptop-see-all-btn:hover{border-color:var(--black);color:var(--black);}
-  .laptop-see-all-btn::after{content:'+';font-size:1.2rem;font-weight:300;color:var(--gray-400);line-height:1;transition:color 0.15s;}
-  .laptop-see-all-btn.is-open::after{content:'−';}
-  .laptop-see-all-btn:hover::after{color:var(--black);}
-  .laptop-all-list{display:none;margin-top:1rem;}
-  .laptop-all-list.is-open{display:block;}
+  .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.5;}
 
-  .strategy-row{margin-bottom:1.5rem;}
-  .picker-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-700);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
+  /* ---- FOOTER ---- */
+  .picker-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
 
+  /* ---- UTILITY ---- */
+  .hidden{display:none !important;}
+
+  /* ---- RESPONSIVE ---- */
   @media(max-width:820px){
-    .picker{padding:2rem 1.25rem 3rem;}
-    .picker-header{margin-bottom:2rem;padding-bottom:1.5rem;}
-    .divider{margin:2rem 0;}
-    .result-columns{flex-direction:column;align-items:stretch;}
-    .result-side{width:100%;}
-    .controls-row{gap:1.5rem 2rem;}
+    .picker-page{padding:2rem 1.25rem 3rem;}
+    .hero-composition{grid-template-columns:1fr;gap:1.5rem;}
+    .control-bands{flex-direction:column;gap:1.25rem;}
+    .band-options{flex-direction:row;flex-wrap:wrap;gap:0.3rem;}
+    .band-pill{width:auto;flex:1;text-align:center;min-width:0;}
+    .band-pill .pill-sub{display:none;}
     .spec-block{gap:1rem 2rem;}
-    .machine-type-strip .option-pill{font-size:0.8rem;padding:0.65rem 0.6rem;}
-    .panels-split{grid-template-columns:1fr;}
-    .panels-split #panel-desktop{padding-right:0;border-right:none;border-bottom:2px solid var(--black);padding-bottom:1.5rem;margin-bottom:1.5rem;}
-    .panels-split #panel-mobile{padding-left:0;}
-    .panels-split #panel-monitors{grid-column:1;}
+    .desktop-mon-controls{display:none;}
+    .mobile-mon-controls{display:block;}
   }
-  @media(max-width:580px){
-    .picker{padding:1.5rem 1rem 2.5rem;}
-    .sw-nav{display:none;}
+  @media(max-width:480px){
+    .picker-page{padding:1.5rem 1rem 2.5rem;}
+    .band-pill{font-size:0.68rem;padding:0.4rem 0.5rem;}
+    .band-pill.active{padding:calc(0.4rem - 1px) calc(0.5rem - 1px);}
   }
 </style>
 </head>
 <body>
-<div class="picker">
-  <div class="picker-header">
+<div class="picker-page">
+
+  <!-- ===== HEADER ===== -->
+  <header class="page-title">
     <h1>What computer should I buy for architecture?</h1>
-    <p>Toggle the software you use — recommendation updates live.</p>
+    <p>The drawing is the recommendation. Adjust the three bands to change it.</p>
+  </header>
+
+  <!-- ===== HERO + CONTROLS ===== -->
+  <div class="hero-composition">
+    <div class="hero-scene" id="heroScene">
+      <!-- Hero isometric SVG rendered by JS -->
+    </div>
+    <aside class="control-bands">
+      <div class="band">
+        <div class="band-label">Workload</div>
+        <div class="band-options" id="workloadBand"></div>
+      </div>
+      <div class="band">
+        <div class="band-label">Value</div>
+        <div class="band-options" id="tierBand"></div>
+      </div>
+      <div class="band">
+        <div class="band-label">Form</div>
+        <div class="band-options" id="formBand"></div>
+      </div>
+      <div class="platform-row" id="platformRow">
+        <span class="band-label">Platform</span>
+        <button class="plat-pill active" data-platform="win">Windows</button>
+        <button class="plat-pill" data-platform="mac">Mac</button>
+      </div>
+      <div id="platForced" class="plat-forced hidden">Windows — required by selected apps</div>
+    </aside>
   </div>
 
-  <div class="input-section">
-    <div class="sw-nav" id="swNav">
-      <span class="sw-nav-indicator" id="swNavIndicator" hidden></span>
-      <span class="sw-nav-item" data-target="grp-modeling">Modeling / BIM</span>
-      <span class="sw-nav-item" data-target="grp-drafting">Drafting</span>
-      <span class="sw-nav-item" data-target="grp-viz">Visualization</span>
-      <span class="sw-nav-item" data-target="grp-render">Production Rendering</span>
-      <span class="sw-nav-item" data-target="grp-baseline">Baseline</span>
+  <!-- ===== RECOMMENDATION ===== -->
+  <section class="recommendation" id="recommendation">
+    <!-- Rendered by JS -->
+  </section>
+
+  <!-- ===== MONITORS ===== -->
+  <section class="monitor-section" id="monitorSection">
+    <div class="section-label">Monitors</div>
+    <div class="desktop-mon-controls" id="desktopMonControls">
+      <div class="desk-zone" id="deskZone">
+        <span class="desk-zone-label">Your desk</span>
+      </div>
+      <div id="shelfArea"></div>
     </div>
-    <div class="sw-scroll-wrap">
-    <button class="sw-chevron" id="swChevLeft" hidden type="button">&#8249;</button>
-    <div class="sw-scroll" id="swScroll">
-      <div class="sw-strip">
-        <div class="sw-group" id="grp-modeling">
+    <div class="mobile-mon-controls" id="mobileMonControls">
+      <!-- Rendered by JS: add/remove buttons per monitor type -->
+    </div>
+  </section>
+
+  <!-- ===== SOFTWARE REFINEMENT ===== -->
+  <details class="software-section" id="softwareSection">
+    <summary class="section-toggle">Specific software</summary>
+    <div class="software-content">
+      <div class="sw-groups" id="swGroups">
+        <div class="sw-group">
           <div class="sw-group-label">Modeling / BIM</div>
           <div class="sw-group-apps">
-            <div class="app-toggle win-only" data-app="revit">Revit</div>
-            <div class="app-toggle" data-app="archicad">ArchiCAD</div>
-            <div class="app-toggle" data-app="vectorworks">Vectorworks</div>
-            <div class="app-toggle" data-app="sketchup">SketchUp</div>
-            <div class="app-toggle" data-app="rhino">Rhino</div>
+            <button class="app-toggle win-only active" data-app="revit">Revit</button>
+            <button class="app-toggle" data-app="archicad">ArchiCAD</button>
+            <button class="app-toggle" data-app="vectorworks">Vectorworks</button>
+            <button class="app-toggle" data-app="sketchup">SketchUp</button>
+            <button class="app-toggle" data-app="rhino">Rhino</button>
           </div>
         </div>
-        <div class="sw-group" id="grp-drafting">
-          <div class="sw-group-label">Drafting</div>
-          <div class="sw-group-apps"><div class="app-toggle win-only" data-app="autocad">AutoCAD</div></div>
-        </div>
-        <div class="sw-group" id="grp-viz">
+        <div class="sw-group">
           <div class="sw-group-label">Visualization</div>
           <div class="sw-group-apps">
-            <div class="app-toggle" data-app="enscape">Enscape</div>
-            <div class="app-toggle win-only" data-app="lumion">Lumion</div>
-            <div class="app-toggle win-only" data-app="d5">D5 Render</div>
-            <div class="app-toggle" data-app="twinmotion">TwinMotion</div>
-            <div class="app-toggle win-only" data-app="unreal">Unreal Engine</div>
+            <button class="app-toggle active" data-app="enscape">Enscape</button>
+            <button class="app-toggle win-only" data-app="lumion">Lumion</button>
+            <button class="app-toggle win-only" data-app="d5">D5 Render</button>
+            <button class="app-toggle" data-app="twinmotion">TwinMotion</button>
+            <button class="app-toggle win-only" data-app="unreal">Unreal Engine</button>
           </div>
         </div>
-        <div class="sw-group" id="grp-render">
+        <div class="sw-group">
           <div class="sw-group-label">Production Rendering</div>
           <div class="sw-group-apps">
-            <div class="app-toggle" data-app="vray">V-Ray</div>
-            <div class="app-toggle" data-app="corona">Corona</div>
+            <button class="app-toggle" data-app="vray">V-Ray</button>
+            <button class="app-toggle" data-app="corona">Corona</button>
           </div>
         </div>
-        <div class="sw-group" id="grp-baseline">
-          <div class="sw-group-label">Baseline</div>
-          <div class="sw-group-apps"><div class="app-toggle baseline">Office / Bluebeam / PM -- minimum system</div></div>
+        <div class="sw-group">
+          <div class="sw-group-label">Drafting</div>
+          <div class="sw-group-apps">
+            <button class="app-toggle win-only" data-app="autocad">AutoCAD</button>
+          </div>
         </div>
       </div>
     </div>
-    <button class="sw-chevron" id="swChevRight" type="button">&#8250;</button>
+  </details>
+
+  <!-- ===== DETAILS ===== -->
+  <details class="details-section" id="detailsSection">
+    <summary class="section-toggle">Build / buy details</summary>
+    <div class="details-content" id="detailsContent">
+      <!-- Rendered by JS -->
     </div>
-  </div>
+  </details>
 
-  <div class="controls-cluster">
-    <div class="controls-row">
-      <div class="control-group">
-        <div class="section-label">Budget</div>
-        <div class="option-row" id="budgetOptions"></div>
-      </div>
-    </div>
-    <div class="controls-row">
-      <div class="control-group">
-        <div class="section-label">Project Scale</div>
-        <div class="option-row" id="scaleOptions">
-          <div class="option-pill active" data-scale="small"><div>Small / Medium</div><div class="pill-detail">SFR, small office, single models</div></div>
-          <div class="option-pill" data-scale="large"><div>Large / Complex</div><div class="pill-detail">Large buildings, multiple linked files</div></div>
-        </div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Platform</div>
-        <div class="option-row" id="platArea">
-          <div class="option-pill active" data-platform="win"><div>Windows</div></div>
-          <div class="option-pill" data-platform="mac"><div>Mac</div></div>
-        </div>
-        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
-          <span class="plat-forced">Windows -- required by selected apps</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <div class="machine-type-strip">
-    <div class="option-row" id="machineTypeOptions">
-      <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
-      <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
-      <div class="option-pill" data-machinetype="desktop_laptop"><div>Desktop + Laptop</div></div>
-    </div>
-  </div>
-
-  <div id="panelsWrapper">
-  <!-- Desktop -->
-  <div class="results-panel active" id="panel-desktop">
-    <div class="panel-label">Desktop</div>
-    <div class="result-columns">
-      <div class="result-main">
-        <div class="price-summary" id="d-price"></div>
-        <div class="spec-block" id="d-spec"></div>
-        <div id="d-priority" class="priority-box"></div>
-        <button class="laptop-see-all-btn" id="d-details-btn" type="button">Build / buy details</button>
-        <div class="laptop-all-list" id="d-details">
-          <div class="purchase-paths" id="d-paths"></div>
-          <div class="desktop-prebuilts" id="d-prebuilts"></div>
-        </div>
-      </div>
-      <div class="result-side">
-        <div class="desk-zone" id="d-desk"></div>
-        <div id="d-shelf-area"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Laptop -->
-  <div class="results-panel" id="panel-mobile">
-    <div class="panel-label">Laptop</div>
-    <div class="result-columns">
-      <div class="result-main">
-        <div id="m-content"></div>
-        <div id="m-priority" class="priority-box"></div>
-      </div>
-      <div class="result-side">
-        <div class="desk-zone" id="m-desk"></div>
-        <div id="m-shelf-area"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Monitors (shared panel in Desktop+Laptop mode) -->
-  <div class="results-panel" id="panel-monitors">
-    <div class="panel-label">Monitors</div>
-    <div class="desk-zone" id="shared-desk"></div>
-    <div id="shared-shelf-area"></div>
-  </div>
-  </div>
-
-  <div class="picker-footer">Updated March 2026. No affiliate commissions. Prices are approximate US retail.</div>
+  <footer class="picker-footer">Updated March 2026. No affiliate commissions. Prices are approximate US retail.</footer>
 </div>
 
 <script src="assets/data/hardware-data.js"></script>
 <script>
 (function(){
-  // All data comes from Data.* (assets/data/hardware-data.js). This file is pure logic.
-
-  var defaultPickerState = Data.PickerOptions.defaultState;
-  var workloadProfileLabels = {
-    review: 'document review',
-    drafting: '2D drafting',
-    modeling: '3D modeling',
-    viz: 'visualization',
-    modeling_viz: 'modeling plus visualization',
-    production: 'production rendering'
-  };
-
-  function defaultDeskMonitorsForBudget(budgetId) {
-    var defaultMonitorIds = Data.PickerOptions.deskMonitorDefaults[budgetId] || Data.PickerOptions.deskMonitorDefaults[defaultPickerState.budget];
-    return defaultMonitorIds.slice();
-  }
-  function recommendedMonitorIdsForBudget(budgetId) {
-    var defaultMonitorIds = defaultDeskMonitorsForBudget(budgetId);
-    var uniqueMonitorIds = [];
-    for (var monitorIndex = 0; monitorIndex < defaultMonitorIds.length; monitorIndex++) {
-      if (uniqueMonitorIds.indexOf(defaultMonitorIds[monitorIndex]) < 0) uniqueMonitorIds.push(defaultMonitorIds[monitorIndex]);
-    }
-    return uniqueMonitorIds;
-  }
-
+  // ================================================================
+  // STATE
+  // ================================================================
   var State = {
-    apps: {},
-    platform: defaultPickerState.platform,
-    desk: defaultDeskMonitorsForBudget(defaultPickerState.budget),
-    budget: defaultPickerState.budget,
-    scale: defaultPickerState.scale,
-    machineType: 'desktop'
+    workload: Data.EditorialDefaults.workload,
+    tier: Data.EditorialDefaults.tier,
+    form: Data.EditorialDefaults.form,
+    apps: { revit: true, enscape: true },
+    desk: Data.PickerOptions.deskMonitorDefaults['value'].slice(),
+    platform: 'win'
   };
 
-  function renderBudgetOptions() {
-    var budgetOptionsContainer = document.getElementById('budgetOptions');
-    var budgetOptionsMarkup = '';
-    for (var budgetIndex = 0; budgetIndex < Data.PickerOptions.budgetOptions.length; budgetIndex++) {
-      var budgetOption = Data.PickerOptions.budgetOptions[budgetIndex];
-      budgetOptionsMarkup += '<div class="option-pill' + (State.budget === budgetOption.id ? ' active' : '') + '" data-budget="' + budgetOption.id + '"><div>' + budgetOption.label + '</div><div class="pill-detail">' + budgetOption.detail + '</div></div>';
-    }
-    budgetOptionsContainer.innerHTML = budgetOptionsMarkup;
+  // ================================================================
+  // ENGINE — derive specs from state
+  // ================================================================
+  function effectiveProfile() { return Data.Workloads[State.workload].profile; }
+  function effectiveBudget() {
+    var base = Data.Tiers[State.tier].budget;
+    if (State.form === 'desktop_laptop') return base === 'best' ? 'value' : 'cheapest';
+    return base;
   }
-
-  function syncStaticOptionSelections() {
-    document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) {
-      optionElement.classList.toggle('active', optionElement.dataset.platform === State.platform);
-    });
-    document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) {
-      optionElement.classList.toggle('active', optionElement.dataset.scale === State.scale);
-    });
-    document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) {
-      optionElement.classList.toggle('active', optionElement.dataset.machinetype === State.machineType);
-    });
-  }
-
-  function availablePlatforms() {
-    for (var appId in State.apps) { if (!State.apps[appId]) continue; if (Data.Apps[appId].platform === 'win') return 'win'; }
-    return 'both';
-  }
-  function effectivePlatform() { return availablePlatforms() === 'win' ? 'win' : State.platform; }
-  function workloadProfile() {
-    var hasModeling = 0, hasDrafting = 0, hasVisualization = 0, hasRendering = 0;
-    for (var appId in State.apps) {
-      if (!State.apps[appId]) continue;
-      var appGroup = Data.Apps[appId].group;
-      if (appGroup === 'modeling') hasModeling = 1;
-      if (appGroup === 'drafting') hasDrafting = 1;
-      if (appGroup === 'viz') hasVisualization = 1;
-      if (appGroup === 'render') hasRendering = 1;
-    }
-    if (hasRendering) return 'production';
-    if (hasVisualization && (hasModeling || hasDrafting)) return 'modeling_viz';
-    if (hasVisualization) return 'viz';
-    if (hasModeling) return 'modeling';
-    if (hasDrafting) return 'drafting';
-    return 'review';
-  }
-  function findMonitor(monitorId) { for (var monitorIndex = 0; monitorIndex < Data.Monitors.length; monitorIndex++) if (Data.Monitors[monitorIndex].id === monitorId) return Data.Monitors[monitorIndex]; return null; }
-  function monitorTotal() { var total = 0; for (var deskIndex = 0; deskIndex < State.desk.length; deskIndex++) { var monitor = findMonitor(State.desk[deskIndex]); if (monitor) total += monitor.price; } return total; }
-  function monitorPrice() { return monitorTotal(); }
-  function formatPrice(amount) { return '$' + amount.toLocaleString('en-US'); }
-  function monitorLabel() { return State.desk.length === 1 ? 'monitor' : 'monitors'; }
-  function parsePriceRange(priceRange) {
-    var priceBounds = priceRange.split('--');
-    return {
-      low: parseInt(priceBounds[0].replace(/[^0-9]/g, ''), 10),
-      high: parseInt(priceBounds[1].replace(/[^0-9]/g, ''), 10)
-    };
-  }
-  function hasWorkloadProfile(workloadProfiles, targetProfile) {
-    for (var profileIndex = 0; profileIndex < workloadProfiles.length; profileIndex++) {
-      if (workloadProfiles[profileIndex] === targetProfile) return true;
-    }
+  function effectiveScale() { return Data.Tiers[State.tier].scale; }
+  function needsWindows() {
+    for (var a in State.apps) { if (State.apps[a] && Data.Apps[a] && Data.Apps[a].platform === 'win') return true; }
     return false;
   }
-  function isRecommendedForBudget(item, activeProfile, budgetId) {
-    return !!(item.recommendedFor && item.recommendedFor[activeProfile] && item.recommendedFor[activeProfile][budgetId]);
-  }
-  function budgetOptionLabel(budgetId) {
-    for (var budgetOptionIndex = 0; budgetOptionIndex < Data.PickerOptions.budgetOptions.length; budgetOptionIndex++) {
-      var budgetOption = Data.PickerOptions.budgetOptions[budgetOptionIndex];
-      if (budgetOption.id === budgetId) return budgetOption.label;
-    }
-    return budgetId;
-  }
-  function selectedDesktopSpec(specsByWorkload, workloadProfileId, budgetId) {
-    return specsByWorkload[workloadProfileId][State.scale][budgetId || State.budget];
-  }
-  function downgradedBudget(budgetId) {
-    if (budgetId === 'best') return 'value';
-    return 'cheapest';
-  }
-  function windowsDesktopReferenceSummary(windowsSpec) {
-    return windowsSpec.cpu + ' / ' + windowsSpec.gpu + ' / ' + windowsSpec.ram;
-  }
-  function prebuiltEquivalenceNoteHTML(prebuilt, workloadProfileId, windowsDesktopSpec) {
-    if (!windowsDesktopSpec) return '';
-    var equivalenceNote = 'Similar fit for ' + workloadProfileLabels[workloadProfileId] + ', not an exact parts match.';
-    if (prebuilt.type === 'mini' && (workloadProfileId === 'review' || workloadProfileId === 'drafting')) {
-      equivalenceNote += ' The DIY tower uses its GPU mostly for display output here; this mini PC gets into the same recommendation tier with integrated graphics instead.';
-    }
-    equivalenceNote += ' Current ' + budgetOptionLabel(State.budget) + ' DIY target: ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
-    return '<div class="laptop-equivalence-note"><span class="laptop-equivalence-label">Comparable target</span>' + equivalenceNote + '</div>';
+  function effectivePlatform() { return needsWindows() ? 'win' : State.platform; }
+  function isMac() { return effectivePlatform() === 'mac'; }
+  function findMonitor(id) { for (var i = 0; i < Data.Monitors.length; i++) if (Data.Monitors[i].id === id) return Data.Monitors[i]; return null; }
+  function monitorTotal() { var t = 0; for (var i = 0; i < State.desk.length; i++) { var m = findMonitor(State.desk[i]); if (m) t += m.price; } return t; }
+  function fmt(n) { return '$' + n.toLocaleString('en-US'); }
+  function monLabel() { return State.desk.length === 1 ? 'monitor' : 'monitors'; }
+  function defaultDeskMonitors(budgetId) { return (Data.PickerOptions.deskMonitorDefaults[budgetId] || Data.PickerOptions.deskMonitorDefaults['value']).slice(); }
+  function recMonitorIds(budgetId) { var d = defaultDeskMonitors(budgetId), u = []; for (var i = 0; i < d.length; i++) if (u.indexOf(d[i]) < 0) u.push(d[i]); return u; }
+  function parsePriceRange(r) { var p = r.split('--'); return { lo: parseInt(p[0].replace(/[^0-9]/g,''),10), hi: parseInt(p[1].replace(/[^0-9]/g,''),10) }; }
+
+  function getDesktopSpec() {
+    var profile = effectiveProfile(), budget = effectiveBudget(), scale = effectiveScale();
+    if (isMac()) return { type: 'mac', spec: Data.MacSpecs[profile][scale][budget], priority: Data.MacSpecs[profile].priority };
+    return { type: 'win', spec: Data.WindowsSpecs[profile][scale][budget], priority: Data.WindowsSpecs[profile].priority };
   }
 
-  function monitorSVG(monitor, scale) {
-    var screenWidth = Math.round(monitor.width * scale);
-    var screenHeight = Math.round(monitor.height * scale);
-    var baseWidth = Math.round(14 * scale);
-    var standHeight = Math.round(4 * scale);
-    var totalWidth = Math.max(screenWidth, baseWidth);
-    var totalHeight = screenHeight + standHeight + 2;
-    var centerX = totalWidth / 2;
-    var screenX = ((totalWidth - screenWidth) / 2) + 0.5;
-    var baseY = screenHeight + standHeight - 0.5;
-    return '<svg width="' + totalWidth + '" height="' + totalHeight + '" viewBox="0 0 ' + totalWidth + ' ' + totalHeight + '" fill="none" aria-hidden="true"><rect x="' + screenX.toFixed(1) + '" y="0.5" width="' + Math.max(screenWidth - 1, 1) + '" height="' + Math.max(screenHeight - 1, 1) + '" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="' + centerX.toFixed(1) + '" y1="' + (screenHeight - 0.5).toFixed(1) + '" x2="' + centerX.toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/><line x1="' + (centerX - (baseWidth / 2)).toFixed(1) + '" y1="' + baseY.toFixed(1) + '" x2="' + (centerX + (baseWidth / 2)).toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/></svg>';
+  // ================================================================
+  // SCENE — hero isometric SVG
+  // Replace these functions with Make2D-derived SVG assets later.
+  // Each returns an SVG <g> string. The coordinate system:
+  //   iso(x, y, z): x=right, y=back, z=up
+  //   Desk surface at z=15, floor at z=0
+  // ================================================================
+  var SC = { cx: 270, cy: 262, s: 7 };
+  function _sx(x,y) { return SC.cx + (x - y) * 0.866 * SC.s; }
+  function _sy(x,y,z) { return SC.cy + (x + y) * 0.5 * SC.s - (z||0) * SC.s; }
+  function _sp(x,y,z) { return _sx(x,y).toFixed(1)+','+_sy(x,y,z).toFixed(1); }
+  function _face(pts,sw) { return '<polygon points="'+pts.map(function(p){return _sp(p[0],p[1],p[2]);}).join(' ')+'" stroke-width="'+(sw||1)+'"/>'; }
+  function _isoBox(x,y,z,w,d,h,sw) {
+    return _face([[x,y,z],[x+w,y,z],[x+w,y,z+h],[x,y,z+h]],sw) +
+           _face([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+h],[x+w,y,z+h]],sw) +
+           _face([[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]],sw);
   }
 
-  function buildDeskZoneHTML(machineHTML) {
-    var markup = '<span class="mon-desk-label">Your desk</span>';
-    markup += '<div class="desk-monitors">';
+  /* PLACEHOLDER SCENE ASSETS — swap with Make2D SVG imports later */
+  function _sceneDesk() {
+    var g = '<g class="scene-desk">';
+    g += _face([[-12,-6,15],[12,-6,15],[12,6,15],[-12,6,15]], 1.5);
+    g += _face([[-12,-6,15],[12,-6,15],[12,-6,14],[-12,-6,14]], 0.75);
+    g += _face([[12,-6,15],[12,6,15],[12,6,14],[12,-6,14]], 0.75);
+    // Desk legs (4 corners)
+    var legs = [[-11,-5],[-11,5],[11,-5],[11,5]];
+    for (var i = 0; i < legs.length; i++) {
+      g += '<line x1="'+_sx(legs[i][0],legs[i][1]).toFixed(1)+'" y1="'+_sy(legs[i][0],legs[i][1],14).toFixed(1)+'" x2="'+_sx(legs[i][0],legs[i][1]).toFixed(1)+'" y2="'+_sy(legs[i][0],legs[i][1],0).toFixed(1)+'" stroke-width="0.5"/>';
+    }
+    g += '</g>';
+    return g;
+  }
+
+  function _sceneTower(mac) {
+    var g = '<g class="scene-tower">';
+    if (mac) {
+      // Mac Studio — squat box
+      g += _isoBox(14, -1, 12, 5, 5, 2, 1);
+      // Apple logo hint
+      var cx = _sx(16.5, 1.5); var cy = _sy(16.5, 1.5, 13.5);
+      g += '<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="1.5" stroke-width="0.5"/>';
+    } else {
+      // PC tower
+      g += _isoBox(14, -2, 0, 4, 8, 14, 1);
+      // Power button
+      var px = _sx(16, -2), py = _sy(16, -2, 13);
+      g += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="1.8" stroke-width="0.5"/>';
+    }
+    g += '</g>';
+    return g;
+  }
+
+  function _sceneSFF(mac) {
+    var g = '<g class="scene-sff">';
+    if (mac) {
+      g += _isoBox(5, 1, 15, 4, 4, 1.2, 1);
+    } else {
+      g += _isoBox(5, 0, 15, 5, 5, 2, 1);
+    }
+    g += '</g>';
+    return g;
+  }
+
+  function _sceneLaptop() {
+    var g = '<g class="scene-laptop">';
+    // Base
+    g += _face([[-5,-4,15.2],[4,-4,15.2],[4,1,15.2],[-5,1,15.2]], 1);
+    g += _face([[-5,-4,15.2],[4,-4,15.2],[4,-4,15],[-5,-4,15]], 0.5);
+    // Screen panel (angled back from hinge at y=1)
+    g += _face([[-5,1,15.2],[4,1,15.2],[4,2,21],[-5,2,21]], 1.5);
+    // Keyboard dots
+    for (var r = 0; r < 3; r++) {
+      for (var c = 0; c < 5; c++) {
+        var kx = -3.5 + c * 1.6, ky = -3 + r * 1.2;
+        g += '<circle cx="'+_sx(kx,ky).toFixed(1)+'" cy="'+_sy(kx,ky,15.3).toFixed(1)+'" r="0.6" stroke-width="0.3"/>';
+      }
+    }
+    g += '</g>';
+    return g;
+  }
+
+  function _sceneClosedLaptop() {
+    var g = '<g class="scene-closed-laptop">';
+    g += _isoBox(-16, -2, 15, 7, 5, 0.8, 0.75);
+    g += '</g>';
+    return g;
+  }
+
+  function _sceneKeyboard() {
+    var g = '<g class="scene-keyboard">';
+    g += _face([[-4,-5,15.1],[3,-5,15.1],[3,-3,15.1],[-4,-3,15.1]], 0.75);
+    for (var r = 0; r < 2; r++) for (var c = 0; c < 4; c++) {
+      var kx = -3 + c * 1.5, ky = -4.5 + r * 1.2;
+      g += '<circle cx="'+_sx(kx,ky).toFixed(1)+'" cy="'+_sy(kx,ky,15.15).toFixed(1)+'" r="0.4" stroke-width="0.25"/>';
+    }
+    g += '</g>';
+    return g;
+  }
+
+  function _sceneMouse() {
+    var g = '<g class="scene-mouse">';
+    var mx = 5, my = -4.5;
+    g += '<ellipse cx="'+_sx(mx,my).toFixed(1)+'" cy="'+_sy(mx,my,15.2).toFixed(1)+'" rx="'+( 0.866*SC.s*0.8).toFixed(1)+'" ry="'+(0.5*SC.s*0.8 + 2).toFixed(1)+'" stroke-width="0.75"/>';
+    g += '</g>';
+    return g;
+  }
+
+  function _sceneMonitors(deskMons) {
+    if (!deskMons || deskMons.length === 0) return '';
+    var g = '<g class="scene-monitors">';
+    var n = deskMons.length;
+    var spacing = Math.min(10, 22 / n);
+    var startX = -spacing * (n - 1) / 2;
+    for (var i = 0; i < n; i++) {
+      var mon = findMonitor(deskMons[i]);
+      if (!mon) continue;
+      var mx = startX + i * spacing;
+      var my = 3;
+      var sw = mon.width / 8;
+      var sh = mon.height / 8;
+      var standH = 1.5;
+      // Screen panel (faces toward viewer, in XZ plane at y=my)
+      g += '<g class="scene-mon">';
+      g += _face([[mx-sw/2,my,15+standH],[mx+sw/2,my,15+standH],[mx+sw/2,my,15+standH+sh],[mx-sw/2,my,15+standH+sh]], 1.5);
+      // Stand
+      var bx = _sx(mx,my), by = _sy(mx,my,15);
+      var sy2 = _sy(mx,my,15+standH);
+      g += '<line x1="'+bx.toFixed(1)+'" y1="'+by.toFixed(1)+'" x2="'+bx.toFixed(1)+'" y2="'+sy2.toFixed(1)+'" stroke-width="0.75"/>';
+      // Base
+      g += '<line x1="'+_sx(mx-1.5,my).toFixed(1)+'" y1="'+_sy(mx-1.5,my,15).toFixed(1)+'" x2="'+_sx(mx+1.5,my).toFixed(1)+'" y2="'+_sy(mx+1.5,my,15).toFixed(1)+'" stroke-width="0.75"/>';
+      g += '</g>';
+    }
+    g += '</g>';
+    return g;
+  }
+
+  function renderHeroScene() {
+    var form = State.form;
+    var mac = isMac();
+    var svg = '<svg viewBox="0 0 560 380" class="hero-svg" xmlns="http://www.w3.org/2000/svg">';
+    svg += '<g fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round">';
+    // Draw back-to-front for proper overlap
+    svg += _sceneMonitors(State.desk);
+    svg += _sceneDesk();
+    if (form === 'desktop' || form === 'desktop_laptop') svg += _sceneTower(mac);
+    if (form === 'sff') svg += _sceneSFF(mac);
+    if (form === 'laptop') svg += _sceneLaptop();
+    else { svg += _sceneKeyboard(); svg += _sceneMouse(); }
+    if (form === 'desktop_laptop') svg += _sceneClosedLaptop();
+    svg += '</g></svg>';
+    document.getElementById('heroScene').innerHTML = svg;
+  }
+
+  // ================================================================
+  // MONITOR SVG (for desk zone and shelf — reused from original)
+  // ================================================================
+  function monitorSVG(mon, scale) {
+    var sw = Math.round(mon.width * scale), sh = Math.round(mon.height * scale);
+    var bw = Math.round(14 * scale), stH = Math.round(4 * scale);
+    var tw = Math.max(sw, bw), th = sh + stH + 2, cx = tw / 2;
+    var sx = ((tw - sw) / 2) + 0.5, by = sh + stH - 0.5;
+    return '<svg width="'+tw+'" height="'+th+'" viewBox="0 0 '+tw+' '+th+'" fill="none"><rect x="'+sx.toFixed(1)+'" y="0.5" width="'+Math.max(sw-1,1)+'" height="'+Math.max(sh-1,1)+'" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="'+cx.toFixed(1)+'" y1="'+(sh-0.5).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/><line x1="'+(cx-bw/2).toFixed(1)+'" y1="'+by.toFixed(1)+'" x2="'+(cx+bw/2).toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/></svg>';
+  }
+
+  // ================================================================
+  // VIEW — render all sections
+  // ================================================================
+  function renderBands() {
+    var wHTML = '', tHTML = '', fHTML = '';
+    for (var wk in Data.Workloads) {
+      var w = Data.Workloads[wk];
+      wHTML += '<button class="band-pill'+(State.workload===wk?' active':'')+'" data-workload="'+wk+'">'+w.label+'<span class="pill-sub">'+w.description+'</span></button>';
+    }
+    for (var tk in Data.Tiers) {
+      var t = Data.Tiers[tk];
+      tHTML += '<button class="band-pill'+(State.tier===tk?' active':'')+'" data-tier="'+tk+'">'+t.label+'<span class="pill-sub">'+t.description+'</span></button>';
+    }
+    for (var fk in Data.FormFactors) {
+      var f = Data.FormFactors[fk];
+      fHTML += '<button class="band-pill'+(State.form===fk?' active':'')+'" data-form="'+fk+'">'+f.label+'</button>';
+    }
+    document.getElementById('workloadBand').innerHTML = wHTML;
+    document.getElementById('tierBand').innerHTML = tHTML;
+    document.getElementById('formBand').innerHTML = fHTML;
+  }
+
+  function renderPlatformControls() {
+    var forced = needsWindows();
+    document.getElementById('platformRow').classList.toggle('hidden', forced);
+    document.getElementById('platForced').classList.toggle('hidden', !forced);
+    document.querySelectorAll('.plat-pill').forEach(function(el) {
+      el.classList.toggle('active', el.dataset.platform === effectivePlatform());
+    });
+  }
+
+  function renderRecommendation() {
+    var form = State.form, mac = isMac();
+    var showDesktop = form === 'desktop' || form === 'sff' || form === 'desktop_laptop';
+    var showLaptop = form === 'laptop' || form === 'desktop_laptop';
+    var html = '';
+
+    if (showDesktop) {
+      var info = getDesktopSpec();
+      var s = info.spec;
+      var formLabel = form === 'sff' ? 'SFF Desktop' : 'Desktop';
+      if (form === 'desktop_laptop') formLabel = 'Desktop (in two-machine setup)';
+      html += '<div class="rec-headline">'+formLabel+' \u00b7 '+Data.Workloads[State.workload].label+' \u00b7 '+Data.Tiers[State.tier].label+'</div>';
+      if (mac) {
+        html += '<div class="rec-price">'+s.price+' + '+fmt(monitorTotal())+' '+monLabel()+'</div>';
+        html += '<div class="spec-block"><div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">'+s.chip+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
+        html += '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">'+s.memory+'</div><div class="spec-item-note">Unified \u2014 RAM and GPU memory</div></div>';
+        html += '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div></div>';
+      } else {
+        html += '<div class="rec-price">'+s.priceRange+' tower + '+fmt(monitorTotal())+' '+monLabel()+'</div>';
+        html += '<div class="spec-block"><div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">'+s.cpu+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
+        html += '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">'+s.gpu+'</div><div class="spec-item-note">'+s.gpuNote+'</div></div>';
+        html += '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">'+s.ram+'</div>'+(s.ramNote?'<div class="spec-item-note">'+s.ramNote+'</div>':'')+'</div>';
+        html += '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div></div>';
+      }
+      html += '<div class="priority-box"><div class="priority-box-label">Where the money matters</div><p>'+info.priority+'</p></div>';
+    }
+
+    if (showLaptop) {
+      html += renderLaptopRecommendation();
+    }
+
+    document.getElementById('recommendation').innerHTML = html;
+  }
+
+  function renderLaptopRecommendation() {
+    var mac = isMac(), profile = effectiveProfile();
+    var twoMachine = State.form === 'desktop_laptop';
+    var winCats = twoMachine ? ['travel','student'] : ['one','desk','travel','student'];
+    var macCats = twoMachine ? ['mac_s'] : ['mac_p','mac_s'];
+    var cats = mac ? macCats : winCats;
+    var laptopBudget = twoMachine ? 'cheapest' : Data.Tiers[State.tier].budget;
+
+    var matches = [];
+    for (var ci = 0; ci < cats.length; ci++) {
+      for (var li = 0; li < Data.Laptops.length; li++) {
+        var lap = Data.Laptops[li];
+        if (lap.category !== cats[ci] || lap.platform !== effectivePlatform()) continue;
+        if (!twoMachine) { var found = false; for (var wp = 0; wp < lap.workloadProfiles.length; wp++) if (lap.workloadProfiles[wp] === profile) found = true; if (!found) continue; }
+        matches.push({ laptop: lap, category: cats[ci] });
+      }
+    }
+
+    var recIdx = -1;
+    for (var ri = 0; ri < matches.length; ri++) {
+      var lr = matches[ri].laptop;
+      if (lr.recommendedFor && lr.recommendedFor[profile] && lr.recommendedFor[profile][laptopBudget]) { recIdx = ri; break; }
+    }
+
+    var html = '';
+    if (twoMachine) html += '<div class="two-machine-desk-note">Desktop at your desk. The second machine handles documents and meetings \u2014 budget is the priority.</div>';
+
+    if (recIdx >= 0) {
+      var rec = matches[recIdx].laptop, recCat = matches[recIdx].category;
+      html += '<div class="laptop-rec-featured"><div class="laptop-rec-featured-label">Recommended laptop \u00b7 '+Data.LaptopCategoryLabels[recCat]+'</div>';
+      html += '<div class="laptop-rec-featured-name">'+rec.name+'</div>';
+      html += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-price">'+rec.price+'</span><span class="laptop-rec-featured-weight">'+rec.weight+'</span></div>';
+      html += '<div class="laptop-rec-featured-note">'+rec.note+'</div></div>';
+    }
+    return html;
+  }
+
+  // ================================================================
+  // MONITOR RENDERING
+  // ================================================================
+  function renderDesktopMonitors() {
+    var platform = effectivePlatform();
+    var recIds = recMonitorIds(Data.Tiers[State.tier].budget);
+    // Desk zone
+    var dz = '<span class="desk-zone-label">Your desk</span>';
     if (State.desk.length === 0) {
-      markup += '<div class="mon-desk-hint">Tap to add</div>';
+      dz += '<div class="desk-zone-hint">Click a monitor below to add</div>';
     } else {
       for (var i = 0; i < State.desk.length; i++) {
         var mon = findMonitor(State.desk[i]);
         if (!mon) continue;
-        markup += '<div class="mon-on-desk" data-idx="' + i + '" title="Tap to remove"><span class="mon-on-desk-visual">' + monitorSVG(mon, 1.2) + '<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">' + mon.name + '</span></div>';
+        dz += '<div class="mon-on-desk" data-idx="'+i+'" title="Click to remove"><span class="mon-on-desk-visual">'+monitorSVG(mon,1.2)+'<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">'+mon.name+'</span></div>';
       }
     }
-    markup += '</div>';
-    if (machineHTML) markup += '<div class="desk-machine">' + machineHTML + '</div>';
-    return markup;
-  }
-
-  function buildShelfHTML() {
-    var platform = effectivePlatform();
-    var recommendedMonitorIds = recommendedMonitorIdsForBudget(State.budget);
-    var markup = '';
-    if (State.desk.length > 0) markup += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">' + formatPrice(monitorTotal()) + '</span></div>';
-    markup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available' + (State.desk.length >= 4 ? ' — desk full' : '') + '</div><div class="mon-shelf">';
-    for (var i = 0; i < Data.Monitors.length; i++) {
-      var mon = Data.Monitors[i];
-      if (mon.platform !== 'both' && mon.platform !== platform) continue;
-      var isRec = recommendedMonitorIds.indexOf(mon.id) >= 0;
-      markup += '<div class="mon-avail' + (isRec ? ' recommended' : '') + '" data-mid="' + mon.id + '" title="Tap to add">' + monitorSVG(mon, 0.7) + '<span class="mbadge">rec</span><div class="mon-avail-name">' + mon.name + '</div><div class="mon-avail-price">' + formatPrice(mon.price) + '</div></div>';
+    document.getElementById('deskZone').innerHTML = dz;
+    // Shelf
+    var sh = '';
+    if (State.desk.length > 0) sh += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
+    sh += '<div class="mon-shelf-label" style="margin-top:0.75rem;">Available'+(State.desk.length >= 4 ? ' \u2014 desk full' : '')+'</div><div class="mon-shelf">';
+    for (var j = 0; j < Data.Monitors.length; j++) {
+      var m = Data.Monitors[j];
+      if (m.platform !== 'both' && m.platform !== platform) continue;
+      var isRec = recIds.indexOf(m.id) >= 0;
+      sh += '<div class="mon-avail'+(isRec?' recommended':'')+'" data-mid="'+m.id+'" title="Click to add">'+monitorSVG(m,0.7)+'<span class="mbadge">rec</span><div class="mon-avail-name">'+m.name+'</div><div class="mon-avail-price">'+fmt(m.price)+'</div></div>';
     }
-    markup += '</div>';
-    return markup;
+    sh += '</div>';
+    var shelfEl = document.getElementById('shelfArea');
+    shelfEl.innerHTML = sh;
+    shelfEl.classList.toggle('shelf-full', State.desk.length >= 4);
+    bindDesktopMonitorEvents();
   }
 
-  function bindDeskZoneEvents(deskId, shelfId) {
-    var deskZone = document.getElementById(deskId);
-    var shelfArea = document.getElementById(shelfId);
-    shelfArea.querySelectorAll('.mon-avail').forEach(function(el) {
-      el.addEventListener('click', function() {
-        if (State.desk.length < 4) { State.desk.push(el.dataset.mid); update(); }
-      });
+  function renderMobileMonitors() {
+    var platform = effectivePlatform();
+    var html = '';
+    for (var i = 0; i < Data.Monitors.length; i++) {
+      var m = Data.Monitors[i];
+      if (m.platform !== 'both' && m.platform !== platform) continue;
+      var count = 0;
+      for (var d = 0; d < State.desk.length; d++) if (State.desk[d] === m.id) count++;
+      html += '<div class="mobile-mon-row"><div class="mobile-mon-info">'+monitorSVG(m,0.5)+'<span class="mobile-mon-name">'+m.name+'</span><span class="mobile-mon-price">'+fmt(m.price)+'</span></div>';
+      html += '<div class="mobile-mon-qty"><button class="mobile-mon-btn" data-action="remove" data-mid="'+m.id+'">&minus;</button><span class="mobile-mon-count">'+count+'</span><button class="mobile-mon-btn" data-action="add" data-mid="'+m.id+'">+</button></div></div>';
+    }
+    if (State.desk.length > 0) html += '<div class="mon-total" style="margin-top:0.5rem;"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
+    document.getElementById('mobileMonControls').innerHTML = html;
+    bindMobileMonitorEvents();
+  }
+
+  function bindDesktopMonitorEvents() {
+    document.querySelectorAll('#deskZone .mon-on-desk').forEach(function(el) {
+      el.addEventListener('click', function() { State.desk.splice(parseInt(el.dataset.idx,10),1); update(); });
     });
-    deskZone.querySelectorAll('.mon-on-desk').forEach(function(el) {
+    document.querySelectorAll('#shelfArea .mon-avail').forEach(function(el) {
+      el.addEventListener('click', function() { if (State.desk.length < 4) { State.desk.push(el.dataset.mid); update(); } });
+    });
+  }
+
+  function bindMobileMonitorEvents() {
+    document.querySelectorAll('#mobileMonControls .mobile-mon-btn').forEach(function(el) {
       el.addEventListener('click', function() {
-        State.desk.splice(parseInt(el.dataset.idx, 10), 1);
+        var mid = el.dataset.mid;
+        if (el.dataset.action === 'add') { if (State.desk.length < 4) State.desk.push(mid); }
+        else { var idx = State.desk.indexOf(mid); if (idx >= 0) State.desk.splice(idx,1); }
         update();
       });
     });
   }
 
-  function windowsSpecHTML(spec) {
-    return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">' + spec.cpu + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">' + spec.gpu + '</div><div class="spec-item-note">' + spec.gpuNote + '</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">' + spec.ram + '</div>' + (spec.ramNote ? '<div class="spec-item-note">' + spec.ramNote + '</div>' : '') + '</div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div></div>';
-  }
-  function macSpecHTML(spec) {
-    return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">' + spec.chip + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + spec.memory + '</div><div class="spec-item-note">Unified -- RAM and GPU memory</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div></div>';
-  }
+  // ================================================================
+  // DETAILS RENDERING
+  // ================================================================
+  function renderDetails() {
+    var form = State.form, mac = isMac(), profile = effectiveProfile(), budget = effectiveBudget();
+    var html = '';
+    var showDesktop = form === 'desktop' || form === 'sff' || form === 'desktop_laptop';
+    var showLaptop = form === 'laptop' || form === 'desktop_laptop';
 
-  // ---- Prebuilt desktop rendering ----
-  function buildPrebuiltHTML(activeProfile, windowsDesktopSpec) {
-    var prebuiltTypes = ['mini', 'office', 'workstation', 'gaming'];
-    var prebuiltMarkup = '<div class="section-label" style="margin-top:2rem">Prebuilt Options</div>';
-    for (var typeIndex = 0; typeIndex < prebuiltTypes.length; typeIndex++) {
-      var prebuiltType = prebuiltTypes[typeIndex];
-      var matchingPrebuilts = [];
-      for (var prebuiltIndex = 0; prebuiltIndex < Data.Prebuilts.length; prebuiltIndex++) {
-        var prebuilt = Data.Prebuilts[prebuiltIndex];
-        if (prebuilt.type !== prebuiltType) continue;
-        if (hasWorkloadProfile(prebuilt.workloadProfiles, activeProfile)) matchingPrebuilts.push(prebuilt);
-      }
-      if (matchingPrebuilts.length === 0) continue;
-      prebuiltMarkup += '<div class="laptop-category">';
-      prebuiltMarkup += '<div class="laptop-category-label">' + Data.PrebuiltTypeLabels[prebuiltType] + '</div>';
-      if (Data.PrebuiltTypeNotes[prebuiltType]) prebuiltMarkup += '<div class="laptop-list-note" style="margin-bottom:0.5rem;margin-top:0">' + Data.PrebuiltTypeNotes[prebuiltType] + '</div>';
-      for (var matchIndex = 0; matchIndex < matchingPrebuilts.length; matchIndex++) {
-        var matchedPrebuilt = matchingPrebuilts[matchIndex];
-        var isRecommended = isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
-        prebuiltMarkup += '<div class="laptop-row' + (isRecommended ? ' is-rec' : '') + '">';
-        prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
-        prebuiltMarkup += '<div class="laptop-meta"><span class="laptop-price">' + matchedPrebuilt.price + '</span></div>';
-        prebuiltMarkup += '</div>';
-      }
-      prebuiltMarkup += '</div>';
+    if (showDesktop && !mac) {
+      var spec = getDesktopSpec().spec;
+      var pr = parsePriceRange(spec.priceRange);
+      html += '<div class="purchase-paths">';
+      html += '<div class="purchase-path"><div class="purchase-path-label">Build it yourself</div><p>Case, motherboard, cooler, PSU, and RAM recommendations are on the components page.</p><a href="/components" class="card-link">Component recommendations</a><a href="https://pcpartpicker.com" target="_blank" rel="noopener" class="card-link">PCPartPicker</a></div>';
+      html += '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Premium is typically $700\u20131,500. Expect '+fmt(Math.round(pr.lo*1.25/100)*100)+'\u2013'+fmt(Math.round(pr.hi*1.35/100)*100)+' for the tower.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
+      html += '</div>';
+      html += buildPrebuiltHTML(profile, spec);
     }
-    return prebuiltMarkup;
+    if (showDesktop && mac) {
+      html += '<div class="purchase-paths"><div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div></div>';
+    }
+    if (showLaptop) {
+      html += buildLaptopListHTML();
+    }
+    document.getElementById('detailsContent').innerHTML = html;
   }
 
-  // ---- MAIN UPDATE ----
+  function buildPrebuiltHTML(profile, winSpec) {
+    var types = ['mini','office','workstation','gaming'];
+    if (State.form === 'sff') types = ['mini'];
+    var html = '<div class="section-label" style="margin-top:1.5rem">Prebuilt Options</div>';
+    for (var ti = 0; ti < types.length; ti++) {
+      var type = types[ti], items = [];
+      for (var pi = 0; pi < Data.Prebuilts.length; pi++) {
+        var pb = Data.Prebuilts[pi];
+        if (pb.type !== type) continue;
+        var fits = false; for (var wi = 0; wi < pb.workloadProfiles.length; wi++) if (pb.workloadProfiles[wi] === profile) fits = true;
+        if (fits) items.push(pb);
+      }
+      if (items.length === 0) continue;
+      html += '<div class="laptop-category"><div class="laptop-category-label">'+Data.PrebuiltTypeLabels[type]+'</div>';
+      if (Data.PrebuiltTypeNotes[type]) html += '<div class="laptop-list-note" style="margin-bottom:0.5rem;margin-top:0">'+Data.PrebuiltTypeNotes[type]+'</div>';
+      for (var ii = 0; ii < items.length; ii++) {
+        var item = items[ii];
+        var isRec = !!(item.recommendedFor && item.recommendedFor[profile] && item.recommendedFor[profile][effectiveBudget()]);
+        html += '<div class="laptop-row'+(isRec?' is-rec':'')+'"><div class="laptop-name">'+item.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+item.note+'</div></div><div class="laptop-meta"><span class="laptop-price">'+item.price+'</span></div></div>';
+      }
+      html += '</div>';
+    }
+    return html;
+  }
+
+  function buildLaptopListHTML() {
+    var mac = isMac(), profile = effectiveProfile(), twoMachine = State.form === 'desktop_laptop';
+    var winCats = twoMachine ? ['travel','student'] : ['one','desk','travel','student'];
+    var macCats = twoMachine ? ['mac_s'] : ['mac_p','mac_s'];
+    var cats = mac ? macCats : winCats;
+    var laptopBudget = twoMachine ? 'cheapest' : Data.Tiers[State.tier].budget;
+    var html = '<div class="section-label" style="margin-top:1.5rem">Laptop Options</div>';
+
+    for (var ci = 0; ci < cats.length; ci++) {
+      var cat = cats[ci], items = [];
+      for (var li = 0; li < Data.Laptops.length; li++) {
+        var lap = Data.Laptops[li];
+        if (lap.category !== cat || lap.platform !== effectivePlatform()) continue;
+        if (!twoMachine) { var found = false; for (var wp = 0; wp < lap.workloadProfiles.length; wp++) if (lap.workloadProfiles[wp] === profile) found = true; if (!found) continue; }
+        items.push(lap);
+      }
+      if (items.length === 0) continue;
+      html += '<div class="laptop-category"><div class="laptop-category-label">'+Data.LaptopCategoryLabels[cat]+'</div>';
+      for (var ii = 0; ii < items.length; ii++) {
+        var l = items[ii];
+        var isRec = !!(l.recommendedFor && l.recommendedFor[profile] && l.recommendedFor[profile][laptopBudget]);
+        html += '<div class="laptop-row'+(isRec?' is-rec':'')+'"><div class="laptop-name">'+l.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+l.note+'</div></div><div class="laptop-meta"><span class="laptop-weight">'+l.weight+'</span><span class="laptop-price">'+l.price+'</span></div></div>';
+      }
+      html += '</div>';
+    }
+    return html;
+  }
+
+  // ================================================================
+  // MAIN UPDATE
+  // ================================================================
   function update() {
-    var activePlatform = effectivePlatform();
-    var platformAvailability = availablePlatforms();
-    var activeWorkloadProfile = workloadProfile();
-    var isMacPlatform = activePlatform === 'mac';
-
-    // Platform visibility
-    var platformArea = document.getElementById('platArea');
-    var forcedPlatformArea = document.getElementById('platForced');
-    if (platformAvailability === 'win') { platformArea.classList.add('hidden'); forcedPlatformArea.classList.remove('hidden'); }
-    else { platformArea.classList.remove('hidden'); forcedPlatformArea.classList.add('hidden'); }
-
-    // Panel visibility based on machine type
-    var isSplit = State.machineType === 'desktop_laptop';
-    var showDesktop = State.machineType === 'desktop' || isSplit;
-    var showLaptop = State.machineType === 'laptop' || isSplit;
-    document.getElementById('panel-desktop').classList.toggle('active', showDesktop);
-    document.getElementById('panel-mobile').classList.toggle('active', showLaptop);
-    document.getElementById('panel-monitors').classList.toggle('active', isSplit);
-    document.getElementById('panelsWrapper').classList.toggle('panels-split', isSplit);
-    document.querySelector('.picker').classList.toggle('split-mode', isSplit);
-
-    // Desktop spec + desk zone
-    var desktopBudgetTier = State.machineType === 'desktop_laptop' ? downgradedBudget(State.budget) : State.budget;
-    var machineIllusHTML;
-    if (isMacPlatform) {
-      var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
-      machineIllusHTML = '<span>[ isometric Mac Studio ]</span>';
-      document.getElementById('d-price').textContent = selectedMacDesktopSpec.price + ' + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
-      document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
-      document.getElementById('d-paths').innerHTML = '<div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div>';
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
-      document.getElementById('d-prebuilts').innerHTML = '';
-    } else {
-      var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
-      var towerPriceBounds = parsePriceRange(selectedWindowsDesktopSpec.priceRange);
-      machineIllusHTML = '<span>[ isometric tower ]</span>';
-      document.getElementById('d-price').textContent = selectedWindowsDesktopSpec.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
-      document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
-      document.getElementById('d-paths').innerHTML =
-        '<div class="purchase-path"><div class="purchase-path-label">Build it yourself</div><p>Case, motherboard, cooler, PSU, and RAM recommendations are on the components page. Takes about 8 hours start to finish.</p><a href="/components" class="card-link">Component recommendations</a><a href="https://pcpartpicker.com" target="_blank" rel="noopener" class="card-link">PCPartPicker</a></div>' +
-        '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Better components, burn-in testing, real support. Premium is typically $700--$1,500. Expect ' + formatPrice(Math.round(towerPriceBounds.low * 1.25 / 100) * 100) + '--' + formatPrice(Math.round(towerPriceBounds.high * 1.35 / 100) * 100) + ' for the tower.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[activeWorkloadProfile].priority + '</p>';
-      document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
-    }
-
-    // Desktop desk zone / shared monitors panel
-    if (isSplit) {
-      document.getElementById('shared-desk').innerHTML = buildDeskZoneHTML('');
-      document.getElementById('shared-shelf-area').innerHTML = buildShelfHTML();
-      document.getElementById('shared-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
-      bindDeskZoneEvents('shared-desk', 'shared-shelf-area');
-    } else {
-      document.getElementById('d-desk').innerHTML = buildDeskZoneHTML(machineIllusHTML);
-      document.getElementById('d-shelf-area').innerHTML = buildShelfHTML();
-      document.getElementById('d-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
-      bindDeskZoneEvents('d-desk', 'd-shelf-area');
-    }
-
-    // Laptop
-    var mobileStrategy = State.machineType === 'desktop_laptop' ? 'two' : 'one';
-    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], two: ['travel', 'student'] };
-    var macCategoriesByStrategy = { one: ['mac_p', 'mac_s'], two: ['mac_s'] };
-    var activeCategories = isMacPlatform ? macCategoriesByStrategy[mobileStrategy] : windowsCategoriesByStrategy[mobileStrategy];
-    // Collect all matching laptops across categories
-    var laptopBudgetTier = mobileStrategy === 'two' ? 'cheapest' : State.budget;
-    var allLaptopMatches = [];
-    for (var categoryIndex = 0; categoryIndex < activeCategories.length; categoryIndex++) {
-      var activeCategory = activeCategories[categoryIndex];
-      for (var laptopIndex = 0; laptopIndex < Data.Laptops.length; laptopIndex++) {
-        var laptop = Data.Laptops[laptopIndex];
-        if (laptop.category !== activeCategory || laptop.platform !== activePlatform) continue;
-        if (mobileStrategy !== 'two' && !hasWorkloadProfile(laptop.workloadProfiles, activeWorkloadProfile)) continue;
-        allLaptopMatches.push({ laptop: laptop, category: activeCategory });
-      }
-    }
-
-    // Find primary recommendation
-    var primaryRecIndex = -1;
-    for (var ri = 0; ri < allLaptopMatches.length; ri++) {
-      if (isRecommendedForBudget(allLaptopMatches[ri].laptop, activeWorkloadProfile, laptopBudgetTier)) { primaryRecIndex = ri; break; }
-    }
-
-    // Build categorized full list HTML (used in both paths)
-    var fullListMarkup = '';
-    for (var ci = 0; ci < activeCategories.length; ci++) {
-      var cat = activeCategories[ci];
-      var catItems = [];
-      for (var li = 0; li < allLaptopMatches.length; li++) {
-        if (allLaptopMatches[li].category === cat) catItems.push(allLaptopMatches[li].laptop);
-      }
-      if (catItems.length === 0) continue;
-      fullListMarkup += '<div class="laptop-category"><div class="laptop-category-label">' + Data.LaptopCategoryLabels[cat] + '</div>';
-      for (var mi = 0; mi < catItems.length; mi++) {
-        var ml = catItems[mi];
-        var isRec = isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
-        fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + ml.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span><span class="laptop-price">' + ml.price + '</span></div></div>';
-      }
-      fullListMarkup += '</div>';
-    }
-
-    var mobileMarkup = '';
-    if (!isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. The second machine handles documents and meetings -- budget is the priority.</div>';
-
-    if (primaryRecIndex >= 0) {
-      var recLaptop = allLaptopMatches[primaryRecIndex].laptop;
-      var recCategory = allLaptopMatches[primaryRecIndex].category;
-      mobileMarkup += '<div class="laptop-rec-featured">';
-      mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + Data.LaptopCategoryLabels[recCategory] + '</div>';
-      mobileMarkup += '<div class="laptop-rec-featured-name">' + recLaptop.name + '</div>';
-      mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-price">' + recLaptop.price + '</span><span class="laptop-rec-featured-weight">' + recLaptop.weight + '</span></div>';
-      mobileMarkup += '<div class="laptop-rec-featured-note">' + recLaptop.note + '</div>';
-      mobileMarkup += '</div>';
-      if (allLaptopMatches.length > 1) {
-        mobileMarkup += '<button class="laptop-see-all-btn" type="button">See all options (' + allLaptopMatches.length + ')</button>';
-        mobileMarkup += '<div class="laptop-all-list">' + fullListMarkup + '</div>';
-      }
-    } else {
-      mobileMarkup += fullListMarkup;
-    }
-
-    if (!isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Add a Thunderbolt/USB-C dock (~$200) and your desk monitors.</div>';
-    if (isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Pair with an Apple Studio Display or Asus 5K/6K. Thunderbolt docking is native.</div>';
-    if (isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="laptop-list-note">Desktop handles production. Grab a light Air or base Pro for travel.</div>';
-    document.getElementById('m-content').innerHTML = mobileMarkup;
-
-    // Bind see-all toggle
-    var seeAllBtn = document.getElementById('m-content').querySelector('.laptop-see-all-btn');
-    if (seeAllBtn) {
-      var allList = document.getElementById('m-content').querySelector('.laptop-all-list');
-      var totalCount = allLaptopMatches.length;
-      seeAllBtn.addEventListener('click', function() {
-        var opening = !allList.classList.contains('is-open');
-        allList.classList.toggle('is-open', opening);
-        seeAllBtn.classList.toggle('is-open', opening);
-        seeAllBtn.textContent = opening ? 'Hide options' : 'See all options (' + totalCount + ')';
-      });
-    }
-
-    var mobilePriorityNote;
-    if (isMacPlatform && mobileStrategy === 'two') mobilePriorityNote = 'Your Mac handles production at the desk. The laptop just travels. MacBook Air M4 is under 3 lbs with all-day battery.';
-    else if (isMacPlatform) mobilePriorityNote = 'Every MacBook docks natively over Thunderbolt. The MacBook Pro with M4 Pro or Max is a genuine one-machine solution.';
-    else if (mobileStrategy === 'one') mobilePriorityNote = 'One laptop, one set of files. Dock it at your desk, undock and go. Thermals limit sustained rendering -- burst work is real.';
-    else mobilePriorityNote = 'Light laptop for travel, desktop for production. Two machines means syncing files. No thermal compromise on either end.';
-    document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
-
-    if (!isSplit) {
-      var laptopIllusHTML = isMacPlatform ? '<span>[ isometric MacBook ]</span>' : '<span>[ isometric docked laptop ]</span>';
-      document.getElementById('m-desk').innerHTML = buildDeskZoneHTML(laptopIllusHTML);
-      document.getElementById('m-shelf-area').innerHTML = buildShelfHTML();
-      document.getElementById('m-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
-      bindDeskZoneEvents('m-desk', 'm-shelf-area');
-    }
+    renderBands();
+    renderPlatformControls();
+    renderHeroScene();
+    renderRecommendation();
+    renderDesktopMonitors();
+    renderMobileMonitors();
+    renderDetails();
+    syncAppToggles();
   }
 
-  renderBudgetOptions();
-  syncStaticOptionSelections();
+  function syncAppToggles() {
+    document.querySelectorAll('.app-toggle').forEach(function(el) {
+      el.classList.toggle('active', !!State.apps[el.dataset.app]);
+    });
+  }
 
-  // ---- EVENTS ----
-  document.querySelectorAll('.app-toggle:not(.baseline)').forEach(function(appToggle) {
-    appToggle.addEventListener('click', function() {
-      appToggle.classList.toggle('active');
-      State.apps[appToggle.dataset.app] = appToggle.classList.contains('active');
-      if (availablePlatforms() === 'win') {
-        State.platform = 'win';
-        document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) { platformOption.classList.remove('active'); });
-        document.querySelector('#platArea .option-pill[data-platform="win"]').classList.add('active');
-      }
-      update();
-    });
-  });
-  document.querySelectorAll('.sw-nav-item').forEach(function(navItem) {
-    navItem.addEventListener('click', function() {
-      var targetSection = document.getElementById(navItem.dataset.target);
-      if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-    });
-  });
-  document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) {
-    platformOption.addEventListener('click', function() {
-      document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      platformOption.classList.add('active');
-      State.platform = platformOption.dataset.platform;
-      State.desk = defaultDeskMonitorsForBudget(State.budget);
-      update();
-    });
-  });
-  document.querySelectorAll('#budgetOptions .option-pill').forEach(function(budgetOption) {
-    budgetOption.addEventListener('click', function() {
-      document.querySelectorAll('#budgetOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      budgetOption.classList.add('active');
-      State.budget = budgetOption.dataset.budget;
-      State.desk = defaultDeskMonitorsForBudget(State.budget);
-      update();
-    });
-  });
-  document.querySelectorAll('#scaleOptions .option-pill').forEach(function(scaleOption) {
-    scaleOption.addEventListener('click', function() {
-      document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      scaleOption.classList.add('active');
-      State.scale = scaleOption.dataset.scale;
-      update();
-    });
-  });
-  document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(machineTypeOption) {
-    machineTypeOption.addEventListener('click', function() {
-      document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      machineTypeOption.classList.add('active');
-      State.machineType = machineTypeOption.dataset.machinetype;
-      update();
-    });
-  });
-  document.getElementById('d-details-btn').addEventListener('click', function() {
-    var opening = !document.getElementById('d-details').classList.contains('is-open');
-    document.getElementById('d-details').classList.toggle('is-open', opening);
-    document.getElementById('d-details-btn').classList.toggle('is-open', opening);
-    document.getElementById('d-details-btn').textContent = opening ? 'Hide details' : 'Build / buy details';
+  // ================================================================
+  // EVENTS — use delegation to avoid re-binding
+  // ================================================================
+  // Band clicks (delegated — bands are re-rendered each update)
+  document.querySelector('.control-bands').addEventListener('click', function(e) {
+    var pill = e.target.closest('.band-pill');
+    if (!pill) return;
+    if (pill.dataset.workload) {
+      State.workload = pill.dataset.workload;
+      var defaults = Data.Workloads[State.workload].defaultApps;
+      for (var a in State.apps) State.apps[a] = false;
+      for (var i = 0; i < defaults.length; i++) State.apps[defaults[i]] = true;
+      if (needsWindows()) State.platform = 'win';
+    } else if (pill.dataset.tier) {
+      State.tier = pill.dataset.tier;
+      State.desk = defaultDeskMonitors(Data.Tiers[State.tier].budget);
+    } else if (pill.dataset.form) {
+      State.form = pill.dataset.form;
+    }
+    update();
   });
 
+  // Platform clicks (delegated)
+  document.getElementById('platformRow').addEventListener('click', function(e) {
+    var pill = e.target.closest('.plat-pill');
+    if (!pill) return;
+    State.platform = pill.dataset.platform;
+    State.desk = defaultDeskMonitors(Data.Tiers[State.tier].budget);
+    update();
+  });
+
+  // Software toggles (static DOM, bind once)
+  document.getElementById('swGroups').addEventListener('click', function(e) {
+    var toggle = e.target.closest('.app-toggle');
+    if (!toggle) return;
+    toggle.classList.toggle('active');
+    State.apps[toggle.dataset.app] = toggle.classList.contains('active');
+    if (needsWindows()) State.platform = 'win';
+    update();
+  });
+
+  // ================================================================
+  // INIT
+  // ================================================================
   update();
-
-  // ---- SOFTWARE SCROLL CHEVRONS + NAV INDICATOR ----
-  var swScroll = document.getElementById('swScroll');
-  var swChevLeft = document.getElementById('swChevLeft');
-  var swChevRight = document.getElementById('swChevRight');
-  var swNavIndicator = document.getElementById('swNavIndicator');
-  var swNavEl = document.getElementById('swNav');
-
-  function updateSwControls() {
-    swChevLeft.hidden = swScroll.scrollLeft <= 0;
-    swChevRight.hidden = swScroll.scrollLeft >= swScroll.scrollWidth - swScroll.clientWidth - 1;
-
-    // Active nav items
-    var scrollRect = swScroll.getBoundingClientRect();
-    document.querySelectorAll('.sw-nav-item').forEach(function(navItem) {
-      var group = document.getElementById(navItem.dataset.target);
-      if (!group) return;
-      var gr = group.getBoundingClientRect();
-      navItem.classList.toggle('sw-active', gr.right > scrollRect.left + 1 && gr.left < scrollRect.right - 1);
-    });
-
-    // Navigator indicator: proportional viewport rect across the full nav width
-    var totalWidth = swScroll.scrollWidth;
-    var viewWidth = swScroll.clientWidth;
-    if (totalWidth <= viewWidth) { swNavIndicator.hidden = true; return; }
-    var navWidth = swNavEl.offsetWidth;
-    swNavIndicator.hidden = false;
-    swNavIndicator.style.left = Math.round((swScroll.scrollLeft / totalWidth) * navWidth) + 'px';
-    swNavIndicator.style.width = Math.round((viewWidth / totalWidth) * navWidth) + 'px';
-  }
-
-  swChevLeft.addEventListener('click', function() { swScroll.scrollBy({ left: -260, behavior: 'smooth' }); });
-  swChevRight.addEventListener('click', function() { swScroll.scrollBy({ left: 260, behavior: 'smooth' }); });
-  swScroll.addEventListener('scroll', updateSwControls, { passive: true });
-  window.addEventListener('resize', updateSwControls);
-  updateSwControls();
 })();
 </script>
 </body>
