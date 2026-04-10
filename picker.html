@@ -65,9 +65,9 @@
   /* ---- MONITOR SECTION ---- */
   .monitor-section{margin-bottom:2rem;}
   .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.75rem;}
-  .desk-zone{border:1px dashed var(--gray-300);padding:1rem 1rem 0.75rem;margin-bottom:0.75rem;display:flex;flex-direction:column;align-items:center;gap:0;min-height:100px;position:relative;}
+  .desk-zone{border:1px dashed var(--gray-300);padding:1rem 1rem 0.75rem;margin-bottom:0.75rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;}
   .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
-  .desk-machine{display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0.5rem 0.75rem;min-height:50px;}
+  .hero-image{display:block;width:100%;max-width:460px;height:auto;margin:0 auto 1rem;}
   .desk-zone-label{position:absolute;top:0.4rem;left:0.6rem;font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
   .desk-zone-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:1rem 0;width:100%;}
   .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;}
@@ -196,10 +196,11 @@
   <!-- ===== HERO + CONTROLS ===== -->
   <div class="hero-composition">
     <div class="hero-desk" id="heroDeskArea">
-      <!-- Desk zone (monitors + machine) IS the hero drawing -->
+      <!-- Hero drawing — Make2D-derived asset -->
+      <img src="assets/images/Computer make2d.png" alt="Isometric line drawing of a desktop workstation — monitor, tower, keyboard" class="hero-image" id="heroImage">
+      <!-- Desk zone — monitors the user has selected -->
       <div class="desk-zone" id="deskZone">
         <span class="desk-zone-label">Your desk</span>
-        <img src="assets/images/Computer make2d.png" alt="A desktop computer with a monitor, keyboard, and mouse arranged on a desk in a clean, minimal workspace. The environment appears organized and professional, with a neutral and focused tone. No visible text in the image." class="desk-machine" id="deskMachine">
       </div>
       <div id="shelfArea"></div>
       <div class="mobile-mon-controls" id="mobileMonControls"></div>
@@ -339,18 +340,6 @@
     var profile = effectiveProfile(), budget = effectiveBudget(), scale = effectiveScale();
     if (isMac()) return { type: 'mac', spec: Data.MacSpecs[profile][scale][budget], priority: Data.MacSpecs[profile].priority };
     return { type: 'win', spec: Data.WindowsSpecs[profile][scale][budget], priority: Data.WindowsSpecs[profile].priority };
-  }
-
-  // ================================================================
-  // MACHINE ILLUSTRATION (placeholder text in desk zone)
-  // Replace with Make2D-derived SVG assets later.
-  // ================================================================
-  function machineIllustrationHTML() {
-    var form = State.form, mac = isMac();
-    if (form === 'laptop') return mac ? '[ MacBook ]' : '[ docked laptop ]';
-    if (form === 'sff') return mac ? '[ Mac Mini ]' : '[ SFF desktop ]';
-    if (form === 'desktop_laptop') return mac ? '[ Mac Studio + MacBook ]' : '[ tower + laptop ]';
-    return mac ? '[ Mac Studio ]' : '[ tower ]';
   }
 
   // ================================================================
@@ -500,8 +489,6 @@
       }
     }
     dz += '</div>';
-    // Machine illustration placeholder — replace with Make2D SVG assets later
-    dz += '<div class="desk-machine">'+machineIllustrationHTML()+'</div>';
     document.getElementById('deskZone').innerHTML = dz;
     // Shelf
     var sh = '';
