@@ -18,25 +18,35 @@
   .page-title p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:44em;}
 
   /* ---- HERO COMPOSITION ---- */
-  .hero-composition{display:grid;grid-template-columns:1fr 210px;gap:2rem;margin-bottom:2rem;align-items:start;}
+  .hero-composition{display:grid;grid-template-columns:1fr 240px;gap:2rem;margin-bottom:2rem;align-items:start;}
   .hero-scene{border:1px solid var(--gray-200);background:var(--white);position:relative;overflow:hidden;}
   .hero-svg{width:100%;height:auto;display:block;}
 
-  /* ---- CONTROL BANDS ---- */
-  .control-bands{display:flex;flex-direction:column;gap:1.5rem;}
+  /* ---- CONTROL BANDS (sidebar) ---- */
+  .control-bands{display:flex;flex-direction:column;gap:1.25rem;}
   .band-label{font-size:0.6rem;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.4rem;}
   .band-options{display:flex;flex-direction:column;gap:0.25rem;}
+  .band-options-row{flex-direction:row;gap:0.3rem;}
   .band-pill{display:block;width:100%;text-align:left;padding:0.45rem 0.7rem;border:1px solid var(--gray-300);cursor:pointer;font-size:0.75rem;font-weight:400;font-family:var(--font-body);background:var(--white);transition:all 0.15s ease;color:var(--black);line-height:1.4;}
   .band-pill:hover{border-color:var(--gray-700);}
   .band-pill.active{border:2px solid var(--selected-bg);padding:calc(0.45rem - 1px) calc(0.7rem - 1px);background:var(--selected-bg);color:var(--white);}
   .band-pill .pill-sub{font-size:0.62rem;font-weight:300;opacity:0.6;display:block;margin-top:0.05rem;}
-
-  .platform-row{display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;}
-  .platform-row .band-label{margin-bottom:0;}
-  .plat-pill{padding:0.2rem 0.5rem;font-size:0.62rem;font-weight:400;cursor:pointer;border:1px solid var(--gray-300);background:var(--white);font-family:var(--font-body);transition:all 0.15s;}
-  .plat-pill:hover{border-color:var(--gray-700);}
-  .plat-pill.active{border:2px solid var(--black);padding:calc(0.2rem - 1px) calc(0.5rem - 1px);background:var(--black);color:var(--white);}
+  .band-options-row .band-pill{width:auto;flex:1;text-align:center;}
   .plat-forced{font-size:0.58rem;font-weight:300;color:var(--gray-400);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.3rem;}
+
+  /* ---- SOFTWARE BAND (disclosure groups in sidebar) ---- */
+  .band-sw{border-bottom:1px solid var(--gray-200);padding-bottom:1rem;}
+  .sw-band-group{border:none;margin-bottom:0.35rem;}
+  .sw-band-group summary{list-style:none;cursor:pointer;font-size:0.6rem;font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-400);padding:0.3rem 0;display:flex;justify-content:space-between;align-items:center;transition:color 0.15s;}
+  .sw-band-group summary:hover{color:var(--black);}
+  .sw-band-group summary::-webkit-details-marker{display:none;}
+  .sw-band-group summary::after{content:'+';font-size:0.85rem;font-weight:300;line-height:1;}
+  .sw-band-group[open] summary::after{content:'\2212';}
+  .sw-band-group[open] summary{color:var(--gray-700);margin-bottom:0.25rem;}
+  .sw-band-apps{display:flex;flex-wrap:wrap;gap:0.25rem;padding-bottom:0.35rem;}
+  .sw-band-apps .app-toggle{font-size:0.65rem;padding:0.3rem 0.55rem;}
+  .sw-band-apps .app-toggle.active{padding:calc(0.3rem - 1px) calc(0.55rem - 1px);}
+  .sw-band-apps .app-toggle.win-only::after{font-size:0.35rem;top:0px;right:2px;}
 
   /* ---- RECOMMENDATION ---- */
   .recommendation{margin-bottom:2rem;padding-top:1.5rem;border-top:2px solid var(--black);}
@@ -148,10 +158,14 @@
   @media(max-width:820px){
     .picker-page{padding:2rem 1.25rem 3rem;}
     .hero-composition{grid-template-columns:1fr;gap:1.5rem;}
-    .control-bands{flex-direction:column;gap:1.25rem;}
-    .band-options{flex-direction:row;flex-wrap:wrap;gap:0.3rem;}
-    .band-pill{width:auto;flex:1;text-align:center;min-width:0;}
+    .control-bands{flex-direction:column;gap:1rem;}
+    /* Budget and Form bands go horizontal on mobile */
+    .band:not(.band-sw) .band-options{flex-direction:row;flex-wrap:wrap;gap:0.3rem;}
+    .band:not(.band-sw) .band-pill{width:auto;flex:1;text-align:center;min-width:0;}
     .band-pill .pill-sub{display:none;}
+    /* Software band stays vertical, slightly tighter */
+    .band-sw{padding-bottom:0.75rem;}
+    .sw-band-apps .app-toggle{font-size:0.68rem;}
     .spec-block{gap:1rem 2rem;}
     .desktop-mon-controls{display:none;}
     .mobile-mon-controls{display:block;}
@@ -169,7 +183,7 @@
   <!-- ===== HEADER ===== -->
   <header class="page-title">
     <h1>What computer should I buy for architecture?</h1>
-    <p>The drawing is the recommendation. Adjust the three bands to change it.</p>
+    <p>The drawing is the recommendation. Change your software, budget, or setup to update it.</p>
   </header>
 
   <!-- ===== HERO + CONTROLS ===== -->
@@ -177,25 +191,63 @@
     <div class="hero-scene" id="heroScene">
       <!-- Hero isometric SVG rendered by JS -->
     </div>
-    <aside class="control-bands">
-      <div class="band">
-        <div class="band-label">Workload</div>
-        <div class="band-options" id="workloadBand"></div>
+    <aside class="control-bands" id="controlBands">
+      <!-- Software -->
+      <div class="band band-sw">
+        <div class="band-label">Software</div>
+        <details class="sw-band-group" open>
+          <summary class="sw-band-summary">Modeling / BIM</summary>
+          <div class="sw-band-apps">
+            <button class="app-toggle win-only active" data-app="revit">Revit</button>
+            <button class="app-toggle" data-app="archicad">ArchiCAD</button>
+            <button class="app-toggle" data-app="vectorworks">Vectorworks</button>
+            <button class="app-toggle" data-app="sketchup">SketchUp</button>
+            <button class="app-toggle" data-app="rhino">Rhino</button>
+          </div>
+        </details>
+        <details class="sw-band-group" open>
+          <summary class="sw-band-summary">Visualization</summary>
+          <div class="sw-band-apps">
+            <button class="app-toggle active" data-app="enscape">Enscape</button>
+            <button class="app-toggle win-only" data-app="lumion">Lumion</button>
+            <button class="app-toggle win-only" data-app="d5">D5 Render</button>
+            <button class="app-toggle" data-app="twinmotion">TwinMotion</button>
+            <button class="app-toggle win-only" data-app="unreal">Unreal Engine</button>
+          </div>
+        </details>
+        <details class="sw-band-group">
+          <summary class="sw-band-summary">Production Rendering</summary>
+          <div class="sw-band-apps">
+            <button class="app-toggle" data-app="vray">V-Ray</button>
+            <button class="app-toggle" data-app="corona">Corona</button>
+          </div>
+        </details>
+        <details class="sw-band-group">
+          <summary class="sw-band-summary">Drafting</summary>
+          <div class="sw-band-apps">
+            <button class="app-toggle win-only" data-app="autocad">AutoCAD</button>
+          </div>
+        </details>
       </div>
+      <!-- Budget -->
       <div class="band">
-        <div class="band-label">Value</div>
+        <div class="band-label">Budget</div>
         <div class="band-options" id="tierBand"></div>
       </div>
+      <!-- Form -->
       <div class="band">
-        <div class="band-label">Form</div>
+        <div class="band-label">Setup</div>
         <div class="band-options" id="formBand"></div>
       </div>
-      <div class="platform-row" id="platformRow">
-        <span class="band-label">Platform</span>
-        <button class="plat-pill active" data-platform="win">Windows</button>
-        <button class="plat-pill" data-platform="mac">Mac</button>
+      <!-- Platform -->
+      <div class="band">
+        <div class="band-label">Platform</div>
+        <div class="band-options band-options-row" id="platformBand">
+          <button class="band-pill active" data-platform="win">Windows</button>
+          <button class="band-pill" data-platform="mac">Mac</button>
+        </div>
+        <div id="platForced" class="plat-forced hidden">Windows — required by selected apps</div>
       </div>
-      <div id="platForced" class="plat-forced hidden">Windows — required by selected apps</div>
     </aside>
   </div>
 
@@ -218,48 +270,6 @@
     </div>
   </section>
 
-  <!-- ===== SOFTWARE REFINEMENT ===== -->
-  <details class="software-section" id="softwareSection">
-    <summary class="section-toggle">Specific software</summary>
-    <div class="software-content">
-      <div class="sw-groups" id="swGroups">
-        <div class="sw-group">
-          <div class="sw-group-label">Modeling / BIM</div>
-          <div class="sw-group-apps">
-            <button class="app-toggle win-only active" data-app="revit">Revit</button>
-            <button class="app-toggle" data-app="archicad">ArchiCAD</button>
-            <button class="app-toggle" data-app="vectorworks">Vectorworks</button>
-            <button class="app-toggle" data-app="sketchup">SketchUp</button>
-            <button class="app-toggle" data-app="rhino">Rhino</button>
-          </div>
-        </div>
-        <div class="sw-group">
-          <div class="sw-group-label">Visualization</div>
-          <div class="sw-group-apps">
-            <button class="app-toggle active" data-app="enscape">Enscape</button>
-            <button class="app-toggle win-only" data-app="lumion">Lumion</button>
-            <button class="app-toggle win-only" data-app="d5">D5 Render</button>
-            <button class="app-toggle" data-app="twinmotion">TwinMotion</button>
-            <button class="app-toggle win-only" data-app="unreal">Unreal Engine</button>
-          </div>
-        </div>
-        <div class="sw-group">
-          <div class="sw-group-label">Production Rendering</div>
-          <div class="sw-group-apps">
-            <button class="app-toggle" data-app="vray">V-Ray</button>
-            <button class="app-toggle" data-app="corona">Corona</button>
-          </div>
-        </div>
-        <div class="sw-group">
-          <div class="sw-group-label">Drafting</div>
-          <div class="sw-group-apps">
-            <button class="app-toggle win-only" data-app="autocad">AutoCAD</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </details>
-
   <!-- ===== DETAILS ===== -->
   <details class="details-section" id="detailsSection">
     <summary class="section-toggle">Build / buy details</summary>
@@ -278,24 +288,42 @@
   // STATE
   // ================================================================
   var State = {
-    workload: Data.EditorialDefaults.workload,
     tier: Data.EditorialDefaults.tier,
     form: Data.EditorialDefaults.form,
     apps: { revit: true, enscape: true },
     desk: Data.PickerOptions.deskMonitorDefaults['value'].slice(),
-    platform: 'win'
+    platform: 'win',
+    scale: 'small'
   };
 
   // ================================================================
   // ENGINE — derive specs from state
+  // Workload profile is derived from active software, not set directly.
   // ================================================================
-  function effectiveProfile() { return Data.Workloads[State.workload].profile; }
+  function workloadProfile() {
+    var hasModeling = 0, hasDrafting = 0, hasViz = 0, hasRender = 0;
+    for (var a in State.apps) {
+      if (!State.apps[a]) continue;
+      var g = Data.Apps[a] && Data.Apps[a].group;
+      if (g === 'modeling') hasModeling = 1;
+      if (g === 'drafting') hasDrafting = 1;
+      if (g === 'viz') hasViz = 1;
+      if (g === 'render') hasRender = 1;
+    }
+    if (hasRender) return 'production';
+    if (hasViz && (hasModeling || hasDrafting)) return 'modeling_viz';
+    if (hasViz) return 'viz';
+    if (hasModeling) return 'modeling';
+    if (hasDrafting) return 'drafting';
+    return 'review';
+  }
+  function effectiveProfile() { return workloadProfile(); }
   function effectiveBudget() {
     var base = Data.Tiers[State.tier].budget;
     if (State.form === 'desktop_laptop') return base === 'best' ? 'value' : 'cheapest';
     return base;
   }
-  function effectiveScale() { return Data.Tiers[State.tier].scale; }
+  function effectiveScale() { return State.scale; }
   function needsWindows() {
     for (var a in State.apps) { if (State.apps[a] && Data.Apps[a] && Data.Apps[a].platform === 'win') return true; }
     return false;
@@ -484,11 +512,7 @@
   // VIEW — render all sections
   // ================================================================
   function renderBands() {
-    var wHTML = '', tHTML = '', fHTML = '';
-    for (var wk in Data.Workloads) {
-      var w = Data.Workloads[wk];
-      wHTML += '<button class="band-pill'+(State.workload===wk?' active':'')+'" data-workload="'+wk+'">'+w.label+'<span class="pill-sub">'+w.description+'</span></button>';
-    }
+    var tHTML = '', fHTML = '';
     for (var tk in Data.Tiers) {
       var t = Data.Tiers[tk];
       tHTML += '<button class="band-pill'+(State.tier===tk?' active':'')+'" data-tier="'+tk+'">'+t.label+'<span class="pill-sub">'+t.description+'</span></button>';
@@ -497,17 +521,34 @@
       var f = Data.FormFactors[fk];
       fHTML += '<button class="band-pill'+(State.form===fk?' active':'')+'" data-form="'+fk+'">'+f.label+'</button>';
     }
-    document.getElementById('workloadBand').innerHTML = wHTML;
     document.getElementById('tierBand').innerHTML = tHTML;
     document.getElementById('formBand').innerHTML = fHTML;
   }
 
   function renderPlatformControls() {
     var forced = needsWindows();
-    document.getElementById('platformRow').classList.toggle('hidden', forced);
-    document.getElementById('platForced').classList.toggle('hidden', !forced);
-    document.querySelectorAll('.plat-pill').forEach(function(el) {
+    var bandEl = document.getElementById('platformBand');
+    var forcedEl = document.getElementById('platForced');
+    if (forced) {
+      bandEl.classList.add('hidden');
+      forcedEl.classList.remove('hidden');
+    } else {
+      bandEl.classList.remove('hidden');
+      forcedEl.classList.add('hidden');
+    }
+    bandEl.querySelectorAll('.band-pill').forEach(function(el) {
       el.classList.toggle('active', el.dataset.platform === effectivePlatform());
+    });
+  }
+
+  function syncAppToggles() {
+    document.querySelectorAll('.app-toggle').forEach(function(el) {
+      el.classList.toggle('active', !!State.apps[el.dataset.app]);
+    });
+    // Auto-open groups that have active apps
+    document.querySelectorAll('.sw-band-group').forEach(function(group) {
+      var hasActive = group.querySelector('.app-toggle.active');
+      if (hasActive) group.open = true;
     });
   }
 
@@ -522,7 +563,8 @@
       var s = info.spec;
       var formLabel = form === 'sff' ? 'SFF Desktop' : 'Desktop';
       if (form === 'desktop_laptop') formLabel = 'Desktop (in two-machine setup)';
-      html += '<div class="rec-headline">'+formLabel+' \u00b7 '+Data.Workloads[State.workload].label+' \u00b7 '+Data.Tiers[State.tier].label+'</div>';
+      var profileLabels = { review:'Document review', drafting:'2D drafting', modeling:'3D modeling', viz:'Visualization', modeling_viz:'Modeling + viz', production:'Production rendering' };
+      html += '<div class="rec-headline">'+formLabel+' \u00b7 '+(profileLabels[effectiveProfile()]||effectiveProfile())+' \u00b7 '+Data.Tiers[State.tier].label+'</div>';
       if (mac) {
         html += '<div class="rec-price">'+s.price+' + '+fmt(monitorTotal())+' '+monLabel()+'</div>';
         html += '<div class="spec-block"><div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">'+s.chip+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
@@ -747,51 +789,35 @@
     syncAppToggles();
   }
 
-  function syncAppToggles() {
-    document.querySelectorAll('.app-toggle').forEach(function(el) {
-      el.classList.toggle('active', !!State.apps[el.dataset.app]);
-    });
-  }
-
   // ================================================================
   // EVENTS — use delegation to avoid re-binding
   // ================================================================
-  // Band clicks (delegated — bands are re-rendered each update)
-  document.querySelector('.control-bands').addEventListener('click', function(e) {
+  var bands = document.getElementById('controlBands');
+
+  // Band pill clicks (tier + form pills are re-rendered; platform pills are static)
+  bands.addEventListener('click', function(e) {
     var pill = e.target.closest('.band-pill');
-    if (!pill) return;
-    if (pill.dataset.workload) {
-      State.workload = pill.dataset.workload;
-      var defaults = Data.Workloads[State.workload].defaultApps;
-      for (var a in State.apps) State.apps[a] = false;
-      for (var i = 0; i < defaults.length; i++) State.apps[defaults[i]] = true;
-      if (needsWindows()) State.platform = 'win';
-    } else if (pill.dataset.tier) {
-      State.tier = pill.dataset.tier;
-      State.desk = defaultDeskMonitors(Data.Tiers[State.tier].budget);
-    } else if (pill.dataset.form) {
-      State.form = pill.dataset.form;
+    if (pill) {
+      if (pill.dataset.tier) {
+        State.tier = pill.dataset.tier;
+        State.desk = defaultDeskMonitors(Data.Tiers[State.tier].budget);
+      } else if (pill.dataset.form) {
+        State.form = pill.dataset.form;
+      } else if (pill.dataset.platform) {
+        State.platform = pill.dataset.platform;
+        State.desk = defaultDeskMonitors(Data.Tiers[State.tier].budget);
+      }
+      update();
+      return;
     }
-    update();
-  });
-
-  // Platform clicks (delegated)
-  document.getElementById('platformRow').addEventListener('click', function(e) {
-    var pill = e.target.closest('.plat-pill');
-    if (!pill) return;
-    State.platform = pill.dataset.platform;
-    State.desk = defaultDeskMonitors(Data.Tiers[State.tier].budget);
-    update();
-  });
-
-  // Software toggles (static DOM, bind once)
-  document.getElementById('swGroups').addEventListener('click', function(e) {
+    // Software toggle clicks
     var toggle = e.target.closest('.app-toggle');
-    if (!toggle) return;
-    toggle.classList.toggle('active');
-    State.apps[toggle.dataset.app] = toggle.classList.contains('active');
-    if (needsWindows()) State.platform = 'win';
-    update();
+    if (toggle) {
+      toggle.classList.toggle('active');
+      State.apps[toggle.dataset.app] = toggle.classList.contains('active');
+      if (needsWindows()) State.platform = 'win';
+      update();
+    }
   });
 
   // ================================================================
