@@ -31,6 +31,7 @@
   .band-pill.active{border:2px solid var(--selected-bg);padding:calc(0.45rem - 1px) calc(0.7rem - 1px);background:var(--selected-bg);color:var(--white);}
   .band-pill .pill-sub{font-size:0.62rem;font-weight:300;opacity:0.6;display:block;margin-top:0.05rem;}
   .band-options-row .band-pill{width:auto;flex:1;text-align:center;}
+  .band-pill.disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
   .plat-forced{font-size:0.58rem;font-weight:300;color:var(--gray-400);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.3rem;}
 
   /* ---- SOFTWARE BAND (summary button + expandable panel) ---- */
@@ -380,15 +381,14 @@
     var forced = needsWindows();
     var bandEl = document.getElementById('platformBand');
     var forcedEl = document.getElementById('platForced');
-    if (forced) {
-      bandEl.classList.add('hidden');
-      forcedEl.classList.remove('hidden');
-    } else {
-      bandEl.classList.remove('hidden');
-      forcedEl.classList.add('hidden');
-    }
+    // Always show both pills; disable Mac when Windows is forced
+    bandEl.classList.remove('hidden');
+    forcedEl.classList.toggle('hidden', !forced);
     bandEl.querySelectorAll('.band-pill').forEach(function(el) {
+      var isMacPill = el.dataset.platform === 'mac';
       el.classList.toggle('active', el.dataset.platform === effectivePlatform());
+      el.classList.toggle('disabled', isMacPill && forced);
+      el.disabled = isMacPill && forced;
     });
   }
 
@@ -498,7 +498,7 @@
     document.getElementById('deskZone').innerHTML = dz;
     // Shelf
     var sh = '';
-    if (State.desk.length > 0) sh += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
+    sh += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
     sh += '<div class="mon-shelf-label" style="margin-top:0.75rem;">Available'+(State.desk.length >= 4 ? ' \u2014 desk full' : '')+'</div><div class="mon-shelf">';
     for (var j = 0; j < Data.Monitors.length; j++) {
       var m = Data.Monitors[j];
@@ -524,7 +524,7 @@
       html += '<div class="mobile-mon-row"><div class="mobile-mon-info">'+monitorSVG(m,0.5)+'<span class="mobile-mon-name">'+m.name+'</span><span class="mobile-mon-price">'+fmt(m.price)+'</span></div>';
       html += '<div class="mobile-mon-qty"><button class="mobile-mon-btn" data-action="remove" data-mid="'+m.id+'">&minus;</button><span class="mobile-mon-count">'+count+'</span><button class="mobile-mon-btn" data-action="add" data-mid="'+m.id+'">+</button></div></div>';
     }
-    if (State.desk.length > 0) html += '<div class="mon-total" style="margin-top:0.5rem;"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
+    html += '<div class="mon-total" style="margin-top:0.5rem;"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
     document.getElementById('mobileMonControls').innerHTML = html;
     bindMobileMonitorEvents();
   }
