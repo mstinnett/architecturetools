@@ -19,8 +19,7 @@
 
   /* ---- HERO COMPOSITION ---- */
   .hero-composition{display:grid;grid-template-columns:1fr 240px;gap:2rem;margin-bottom:2rem;align-items:start;}
-  .hero-scene{border:1px solid var(--gray-200);background:var(--white);position:relative;overflow:hidden;}
-  .hero-svg{width:100%;height:auto;display:block;}
+  .hero-desk{min-height:120px;}
 
   /* ---- CONTROL BANDS (sidebar) ---- */
   .control-bands{display:flex;flex-direction:column;gap:1.25rem;}
@@ -34,19 +33,21 @@
   .band-options-row .band-pill{width:auto;flex:1;text-align:center;}
   .plat-forced{font-size:0.58rem;font-weight:300;color:var(--gray-400);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.3rem;}
 
-  /* ---- SOFTWARE BAND (disclosure groups in sidebar) ---- */
+  /* ---- SOFTWARE BAND (summary button + expandable panel) ---- */
   .band-sw{border-bottom:1px solid var(--gray-200);padding-bottom:1rem;}
-  .sw-band-group{border:none;margin-bottom:0.35rem;}
-  .sw-band-group summary{list-style:none;cursor:pointer;font-size:0.6rem;font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-400);padding:0.3rem 0;display:flex;justify-content:space-between;align-items:center;transition:color 0.15s;}
-  .sw-band-group summary:hover{color:var(--black);}
-  .sw-band-group summary::-webkit-details-marker{display:none;}
-  .sw-band-group summary::after{content:'+';font-size:0.85rem;font-weight:300;line-height:1;}
-  .sw-band-group[open] summary::after{content:'\2212';}
-  .sw-band-group[open] summary{color:var(--gray-700);margin-bottom:0.25rem;}
-  .sw-band-apps{display:flex;flex-wrap:wrap;gap:0.25rem;padding-bottom:0.35rem;}
-  .sw-band-apps .app-toggle{font-size:0.65rem;padding:0.3rem 0.55rem;}
-  .sw-band-apps .app-toggle.active{padding:calc(0.3rem - 1px) calc(0.55rem - 1px);}
-  .sw-band-apps .app-toggle.win-only::after{font-size:0.35rem;top:0px;right:2px;}
+  .sw-summary{display:flex;width:100%;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;border:1px solid var(--gray-300);background:var(--white);cursor:pointer;font-family:var(--font-body);font-size:0.72rem;font-weight:400;color:var(--black);transition:border-color 0.15s;text-align:left;line-height:1.4;}
+  .sw-summary:hover{border-color:var(--gray-700);}
+  .sw-summary.is-open{border-color:var(--gray-700);border-bottom-color:transparent;}
+  .sw-summary-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sw-summary-arrow{font-size:0.6rem;color:var(--gray-400);flex-shrink:0;margin-left:0.5rem;transition:transform 0.15s;}
+  .sw-summary.is-open .sw-summary-arrow{transform:rotate(180deg);}
+  .sw-panel{border:1px solid var(--gray-700);border-top:none;padding:0.5rem 0.6rem 0.6rem;background:var(--white);}
+  .sw-panel-group{margin-bottom:0.5rem;}
+  .sw-panel-group:last-child{margin-bottom:0;}
+  .sw-panel-group-label{font-size:0.5rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.25rem;margin-top:0.15rem;}
+  .sw-panel .app-toggle{display:block;width:100%;text-align:left;font-size:0.68rem;padding:0.35rem 0.6rem;margin-bottom:0.2rem;border-color:var(--gray-200);}
+  .sw-panel .app-toggle.active{padding:calc(0.35rem - 1px) calc(0.6rem - 1px);}
+  .sw-panel .app-toggle.win-only::after{font-size:0.35rem;top:2px;right:4px;}
 
   /* ---- RECOMMENDATION ---- */
   .recommendation{margin-bottom:2rem;padding-top:1.5rem;border-top:2px solid var(--black);}
@@ -64,7 +65,9 @@
   /* ---- MONITOR SECTION ---- */
   .monitor-section{margin-bottom:2rem;}
   .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.75rem;}
-  .desk-zone{border:1px dashed var(--gray-300);padding:0.75rem;margin-bottom:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:flex-end;justify-content:center;min-height:80px;position:relative;}
+  .desk-zone{border:1px dashed var(--gray-300);padding:1rem 1rem 0.75rem;margin-bottom:0.75rem;display:flex;flex-direction:column;align-items:center;gap:0;min-height:100px;position:relative;}
+  .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
+  .desk-machine{display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0.5rem 0.75rem;min-height:50px;}
   .desk-zone-label{position:absolute;top:0.4rem;left:0.6rem;font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
   .desk-zone-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:1rem 0;width:100%;}
   .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;}
@@ -147,6 +150,10 @@
   .laptop-rec-featured-weight{font-size:0.65rem;font-weight:300;color:var(--gray-400);}
   .laptop-rec-featured-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;line-height:1.5;}
   .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.5;}
+  .list-overflow{display:none;}
+  .laptop-category.is-expanded .list-overflow{display:flex;}
+  .show-more-btn{width:100%;border:none;border-top:1px solid var(--gray-100);background:none;cursor:pointer;font-size:0.72rem;font-family:var(--font-body);font-weight:400;color:var(--gray-500);padding:0.6rem 0;text-align:left;transition:color 0.15s;}
+  .show-more-btn:hover{color:var(--black);}
 
   /* ---- FOOTER ---- */
   .picker-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
@@ -163,9 +170,9 @@
     .band:not(.band-sw) .band-options{flex-direction:row;flex-wrap:wrap;gap:0.3rem;}
     .band:not(.band-sw) .band-pill{width:auto;flex:1;text-align:center;min-width:0;}
     .band-pill .pill-sub{display:none;}
-    /* Software band stays vertical, slightly tighter */
-    .band-sw{padding-bottom:0.75rem;}
-    .sw-band-apps .app-toggle{font-size:0.68rem;}
+    /* Desk zone monitors: hide desktop click-to-add, show mobile +/- */
+    .desk-zone .mon-on-desk{pointer-events:none;}
+    .mon-remove-mark{display:none !important;}
     .spec-block{gap:1rem 2rem;}
     .desktop-mon-controls{display:none;}
     .mobile-mon-controls{display:block;}
@@ -188,53 +195,56 @@
 
   <!-- ===== HERO + CONTROLS ===== -->
   <div class="hero-composition">
-    <div class="hero-scene" id="heroScene">
-      <!-- Hero isometric SVG rendered by JS -->
+    <div class="hero-desk" id="heroDeskArea">
+      <!-- Desk zone (monitors + machine) IS the hero drawing -->
+      <div class="desk-zone" id="deskZone">
+        <span class="desk-zone-label">Your desk</span>
+      </div>
+      <div id="shelfArea"></div>
+      <div class="mobile-mon-controls" id="mobileMonControls"></div>
     </div>
     <aside class="control-bands" id="controlBands">
-      <!-- Software -->
+      <!-- Software (summary + expandable) -->
       <div class="band band-sw">
         <div class="band-label">Software</div>
-        <details class="sw-band-group" open>
-          <summary class="sw-band-summary">Modeling / BIM</summary>
-          <div class="sw-band-apps">
+        <button class="sw-summary" id="swSummaryBtn" type="button">
+          <span class="sw-summary-text" id="swSummaryText">Revit, Enscape</span>
+          <span class="sw-summary-arrow">&#9662;</span>
+        </button>
+        <div class="sw-panel hidden" id="swPanel">
+          <div class="sw-panel-group">
+            <div class="sw-panel-group-label">Modeling / BIM</div>
             <button class="app-toggle win-only active" data-app="revit">Revit</button>
             <button class="app-toggle" data-app="archicad">ArchiCAD</button>
             <button class="app-toggle" data-app="vectorworks">Vectorworks</button>
             <button class="app-toggle" data-app="sketchup">SketchUp</button>
             <button class="app-toggle" data-app="rhino">Rhino</button>
           </div>
-        </details>
-        <details class="sw-band-group" open>
-          <summary class="sw-band-summary">Visualization</summary>
-          <div class="sw-band-apps">
+          <div class="sw-panel-group">
+            <div class="sw-panel-group-label">Visualization</div>
             <button class="app-toggle active" data-app="enscape">Enscape</button>
             <button class="app-toggle win-only" data-app="lumion">Lumion</button>
             <button class="app-toggle win-only" data-app="d5">D5 Render</button>
             <button class="app-toggle" data-app="twinmotion">TwinMotion</button>
             <button class="app-toggle win-only" data-app="unreal">Unreal Engine</button>
           </div>
-        </details>
-        <details class="sw-band-group">
-          <summary class="sw-band-summary">Production Rendering</summary>
-          <div class="sw-band-apps">
+          <div class="sw-panel-group">
+            <div class="sw-panel-group-label">Production Rendering</div>
             <button class="app-toggle" data-app="vray">V-Ray</button>
             <button class="app-toggle" data-app="corona">Corona</button>
           </div>
-        </details>
-        <details class="sw-band-group">
-          <summary class="sw-band-summary">Drafting</summary>
-          <div class="sw-band-apps">
+          <div class="sw-panel-group">
+            <div class="sw-panel-group-label">Drafting</div>
             <button class="app-toggle win-only" data-app="autocad">AutoCAD</button>
           </div>
-        </details>
+        </div>
       </div>
       <!-- Budget -->
       <div class="band">
         <div class="band-label">Budget</div>
         <div class="band-options" id="tierBand"></div>
       </div>
-      <!-- Form -->
+      <!-- Setup -->
       <div class="band">
         <div class="band-label">Setup</div>
         <div class="band-options" id="formBand"></div>
@@ -254,20 +264,6 @@
   <!-- ===== RECOMMENDATION ===== -->
   <section class="recommendation" id="recommendation">
     <!-- Rendered by JS -->
-  </section>
-
-  <!-- ===== MONITORS ===== -->
-  <section class="monitor-section" id="monitorSection">
-    <div class="section-label">Monitors</div>
-    <div class="desktop-mon-controls" id="desktopMonControls">
-      <div class="desk-zone" id="deskZone">
-        <span class="desk-zone-label">Your desk</span>
-      </div>
-      <div id="shelfArea"></div>
-    </div>
-    <div class="mobile-mon-controls" id="mobileMonControls">
-      <!-- Rendered by JS: add/remove buttons per monitor type -->
-    </div>
   </section>
 
   <!-- ===== DETAILS ===== -->
@@ -345,156 +341,15 @@
   }
 
   // ================================================================
-  // SCENE — hero isometric SVG
-  // Replace these functions with Make2D-derived SVG assets later.
-  // Each returns an SVG <g> string. The coordinate system:
-  //   iso(x, y, z): x=right, y=back, z=up
-  //   Desk surface at z=15, floor at z=0
+  // MACHINE ILLUSTRATION (placeholder text in desk zone)
+  // Replace with Make2D-derived SVG assets later.
   // ================================================================
-  var SC = { cx: 270, cy: 262, s: 7 };
-  function _sx(x,y) { return SC.cx + (x - y) * 0.866 * SC.s; }
-  function _sy(x,y,z) { return SC.cy + (x + y) * 0.5 * SC.s - (z||0) * SC.s; }
-  function _sp(x,y,z) { return _sx(x,y).toFixed(1)+','+_sy(x,y,z).toFixed(1); }
-  function _face(pts,sw) { return '<polygon points="'+pts.map(function(p){return _sp(p[0],p[1],p[2]);}).join(' ')+'" stroke-width="'+(sw||1)+'"/>'; }
-  function _isoBox(x,y,z,w,d,h,sw) {
-    return _face([[x,y,z],[x+w,y,z],[x+w,y,z+h],[x,y,z+h]],sw) +
-           _face([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+h],[x+w,y,z+h]],sw) +
-           _face([[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]],sw);
-  }
-
-  /* PLACEHOLDER SCENE ASSETS — swap with Make2D SVG imports later */
-  function _sceneDesk() {
-    var g = '<g class="scene-desk">';
-    g += _face([[-12,-6,15],[12,-6,15],[12,6,15],[-12,6,15]], 1.5);
-    g += _face([[-12,-6,15],[12,-6,15],[12,-6,14],[-12,-6,14]], 0.75);
-    g += _face([[12,-6,15],[12,6,15],[12,6,14],[12,-6,14]], 0.75);
-    // Desk legs (4 corners)
-    var legs = [[-11,-5],[-11,5],[11,-5],[11,5]];
-    for (var i = 0; i < legs.length; i++) {
-      g += '<line x1="'+_sx(legs[i][0],legs[i][1]).toFixed(1)+'" y1="'+_sy(legs[i][0],legs[i][1],14).toFixed(1)+'" x2="'+_sx(legs[i][0],legs[i][1]).toFixed(1)+'" y2="'+_sy(legs[i][0],legs[i][1],0).toFixed(1)+'" stroke-width="0.5"/>';
-    }
-    g += '</g>';
-    return g;
-  }
-
-  function _sceneTower(mac) {
-    var g = '<g class="scene-tower">';
-    if (mac) {
-      // Mac Studio — squat box
-      g += _isoBox(14, -1, 12, 5, 5, 2, 1);
-      // Apple logo hint
-      var cx = _sx(16.5, 1.5); var cy = _sy(16.5, 1.5, 13.5);
-      g += '<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="1.5" stroke-width="0.5"/>';
-    } else {
-      // PC tower
-      g += _isoBox(14, -2, 0, 4, 8, 14, 1);
-      // Power button
-      var px = _sx(16, -2), py = _sy(16, -2, 13);
-      g += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="1.8" stroke-width="0.5"/>';
-    }
-    g += '</g>';
-    return g;
-  }
-
-  function _sceneSFF(mac) {
-    var g = '<g class="scene-sff">';
-    if (mac) {
-      g += _isoBox(5, 1, 15, 4, 4, 1.2, 1);
-    } else {
-      g += _isoBox(5, 0, 15, 5, 5, 2, 1);
-    }
-    g += '</g>';
-    return g;
-  }
-
-  function _sceneLaptop() {
-    var g = '<g class="scene-laptop">';
-    // Base
-    g += _face([[-5,-4,15.2],[4,-4,15.2],[4,1,15.2],[-5,1,15.2]], 1);
-    g += _face([[-5,-4,15.2],[4,-4,15.2],[4,-4,15],[-5,-4,15]], 0.5);
-    // Screen panel (angled back from hinge at y=1)
-    g += _face([[-5,1,15.2],[4,1,15.2],[4,2,21],[-5,2,21]], 1.5);
-    // Keyboard dots
-    for (var r = 0; r < 3; r++) {
-      for (var c = 0; c < 5; c++) {
-        var kx = -3.5 + c * 1.6, ky = -3 + r * 1.2;
-        g += '<circle cx="'+_sx(kx,ky).toFixed(1)+'" cy="'+_sy(kx,ky,15.3).toFixed(1)+'" r="0.6" stroke-width="0.3"/>';
-      }
-    }
-    g += '</g>';
-    return g;
-  }
-
-  function _sceneClosedLaptop() {
-    var g = '<g class="scene-closed-laptop">';
-    g += _isoBox(-16, -2, 15, 7, 5, 0.8, 0.75);
-    g += '</g>';
-    return g;
-  }
-
-  function _sceneKeyboard() {
-    var g = '<g class="scene-keyboard">';
-    g += _face([[-4,-5,15.1],[3,-5,15.1],[3,-3,15.1],[-4,-3,15.1]], 0.75);
-    for (var r = 0; r < 2; r++) for (var c = 0; c < 4; c++) {
-      var kx = -3 + c * 1.5, ky = -4.5 + r * 1.2;
-      g += '<circle cx="'+_sx(kx,ky).toFixed(1)+'" cy="'+_sy(kx,ky,15.15).toFixed(1)+'" r="0.4" stroke-width="0.25"/>';
-    }
-    g += '</g>';
-    return g;
-  }
-
-  function _sceneMouse() {
-    var g = '<g class="scene-mouse">';
-    var mx = 5, my = -4.5;
-    g += '<ellipse cx="'+_sx(mx,my).toFixed(1)+'" cy="'+_sy(mx,my,15.2).toFixed(1)+'" rx="'+( 0.866*SC.s*0.8).toFixed(1)+'" ry="'+(0.5*SC.s*0.8 + 2).toFixed(1)+'" stroke-width="0.75"/>';
-    g += '</g>';
-    return g;
-  }
-
-  function _sceneMonitors(deskMons) {
-    if (!deskMons || deskMons.length === 0) return '';
-    var g = '<g class="scene-monitors">';
-    var n = deskMons.length;
-    var spacing = Math.min(10, 22 / n);
-    var startX = -spacing * (n - 1) / 2;
-    for (var i = 0; i < n; i++) {
-      var mon = findMonitor(deskMons[i]);
-      if (!mon) continue;
-      var mx = startX + i * spacing;
-      var my = 3;
-      var sw = mon.width / 8;
-      var sh = mon.height / 8;
-      var standH = 1.5;
-      // Screen panel (faces toward viewer, in XZ plane at y=my)
-      g += '<g class="scene-mon">';
-      g += _face([[mx-sw/2,my,15+standH],[mx+sw/2,my,15+standH],[mx+sw/2,my,15+standH+sh],[mx-sw/2,my,15+standH+sh]], 1.5);
-      // Stand
-      var bx = _sx(mx,my), by = _sy(mx,my,15);
-      var sy2 = _sy(mx,my,15+standH);
-      g += '<line x1="'+bx.toFixed(1)+'" y1="'+by.toFixed(1)+'" x2="'+bx.toFixed(1)+'" y2="'+sy2.toFixed(1)+'" stroke-width="0.75"/>';
-      // Base
-      g += '<line x1="'+_sx(mx-1.5,my).toFixed(1)+'" y1="'+_sy(mx-1.5,my,15).toFixed(1)+'" x2="'+_sx(mx+1.5,my).toFixed(1)+'" y2="'+_sy(mx+1.5,my,15).toFixed(1)+'" stroke-width="0.75"/>';
-      g += '</g>';
-    }
-    g += '</g>';
-    return g;
-  }
-
-  function renderHeroScene() {
-    var form = State.form;
-    var mac = isMac();
-    var svg = '<svg viewBox="0 0 560 380" class="hero-svg" xmlns="http://www.w3.org/2000/svg">';
-    svg += '<g fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round">';
-    // Draw back-to-front for proper overlap
-    svg += _sceneMonitors(State.desk);
-    svg += _sceneDesk();
-    if (form === 'desktop' || form === 'desktop_laptop') svg += _sceneTower(mac);
-    if (form === 'sff') svg += _sceneSFF(mac);
-    if (form === 'laptop') svg += _sceneLaptop();
-    else { svg += _sceneKeyboard(); svg += _sceneMouse(); }
-    if (form === 'desktop_laptop') svg += _sceneClosedLaptop();
-    svg += '</g></svg>';
-    document.getElementById('heroScene').innerHTML = svg;
+  function machineIllustrationHTML() {
+    var form = State.form, mac = isMac();
+    if (form === 'laptop') return mac ? '[ MacBook ]' : '[ docked laptop ]';
+    if (form === 'sff') return mac ? '[ Mac Mini ]' : '[ SFF desktop ]';
+    if (form === 'desktop_laptop') return mac ? '[ Mac Studio + MacBook ]' : '[ tower + laptop ]';
+    return mac ? '[ Mac Studio ]' : '[ tower ]';
   }
 
   // ================================================================
@@ -545,11 +400,12 @@
     document.querySelectorAll('.app-toggle').forEach(function(el) {
       el.classList.toggle('active', !!State.apps[el.dataset.app]);
     });
-    // Auto-open groups that have active apps
-    document.querySelectorAll('.sw-band-group').forEach(function(group) {
-      var hasActive = group.querySelector('.app-toggle.active');
-      if (hasActive) group.open = true;
+    // Update software summary text
+    var names = [];
+    document.querySelectorAll('#swPanel .app-toggle.active').forEach(function(el) {
+      names.push(el.textContent.trim());
     });
+    document.getElementById('swSummaryText').textContent = names.length ? names.join(', ') : 'None selected';
   }
 
   function renderRecommendation() {
@@ -630,8 +486,9 @@
   function renderDesktopMonitors() {
     var platform = effectivePlatform();
     var recIds = recMonitorIds(Data.Tiers[State.tier].budget);
-    // Desk zone
+    // Desk zone — monitors row, then machine illustration
     var dz = '<span class="desk-zone-label">Your desk</span>';
+    dz += '<div class="desk-monitors">';
     if (State.desk.length === 0) {
       dz += '<div class="desk-zone-hint">Click a monitor below to add</div>';
     } else {
@@ -641,6 +498,9 @@
         dz += '<div class="mon-on-desk" data-idx="'+i+'" title="Click to remove"><span class="mon-on-desk-visual">'+monitorSVG(mon,1.2)+'<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">'+mon.name+'</span></div>';
       }
     }
+    dz += '</div>';
+    // Machine illustration placeholder — replace with Make2D SVG assets later
+    dz += '<div class="desk-machine">'+machineIllustrationHTML()+'</div>';
     document.getElementById('deskZone').innerHTML = dz;
     // Shelf
     var sh = '';
@@ -722,6 +582,9 @@
     document.getElementById('detailsContent').innerHTML = html;
   }
 
+  var _listId = 0;
+  var LIST_BREAK = 3; // show this many, then "show more"
+
   function buildPrebuiltHTML(profile, winSpec) {
     var types = ['mini','office','workstation','gaming'];
     if (State.form === 'sff') types = ['mini'];
@@ -740,7 +603,12 @@
       for (var ii = 0; ii < items.length; ii++) {
         var item = items[ii];
         var isRec = !!(item.recommendedFor && item.recommendedFor[profile] && item.recommendedFor[profile][effectiveBudget()]);
-        html += '<div class="laptop-row'+(isRec?' is-rec':'')+'"><div class="laptop-name">'+item.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+item.note+'</div></div><div class="laptop-meta"><span class="laptop-price">'+item.price+'</span></div></div>';
+        var overflow = ii >= LIST_BREAK;
+        html += '<div class="laptop-row'+(isRec?' is-rec':'')+(overflow?' list-overflow':'')+'"><div class="laptop-name">'+item.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+item.note+'</div></div><div class="laptop-meta"><span class="laptop-price">'+item.price+'</span></div></div>';
+      }
+      if (items.length > LIST_BREAK) {
+        var moreId = 'more-'+(++_listId);
+        html += '<button class="show-more-btn" data-target="'+moreId+'" type="button">Show '+(items.length - LIST_BREAK)+' more</button>';
       }
       html += '</div>';
     }
@@ -768,7 +636,11 @@
       for (var ii = 0; ii < items.length; ii++) {
         var l = items[ii];
         var isRec = !!(l.recommendedFor && l.recommendedFor[profile] && l.recommendedFor[profile][laptopBudget]);
-        html += '<div class="laptop-row'+(isRec?' is-rec':'')+'"><div class="laptop-name">'+l.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+l.note+'</div></div><div class="laptop-meta"><span class="laptop-weight">'+l.weight+'</span><span class="laptop-price">'+l.price+'</span></div></div>';
+        var overflow = ii >= LIST_BREAK;
+        html += '<div class="laptop-row'+(isRec?' is-rec':'')+(overflow?' list-overflow':'')+'"><div class="laptop-name">'+l.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+l.note+'</div></div><div class="laptop-meta"><span class="laptop-weight">'+l.weight+'</span><span class="laptop-price">'+l.price+'</span></div></div>';
+      }
+      if (items.length > LIST_BREAK) {
+        html += '<button class="show-more-btn" type="button">Show '+(items.length - LIST_BREAK)+' more</button>';
       }
       html += '</div>';
     }
@@ -781,7 +653,6 @@
   function update() {
     renderBands();
     renderPlatformControls();
-    renderHeroScene();
     renderRecommendation();
     renderDesktopMonitors();
     renderMobileMonitors();
@@ -793,6 +664,26 @@
   // EVENTS — use delegation to avoid re-binding
   // ================================================================
   var bands = document.getElementById('controlBands');
+
+  // Show-more buttons in details lists (delegated)
+  document.getElementById('detailsContent').addEventListener('click', function(e) {
+    var btn = e.target.closest('.show-more-btn');
+    if (!btn) return;
+    var cat = btn.closest('.laptop-category');
+    if (cat) {
+      cat.classList.add('is-expanded');
+      btn.remove();
+    }
+  });
+
+  // Software summary toggle
+  document.getElementById('swSummaryBtn').addEventListener('click', function() {
+    var panel = document.getElementById('swPanel');
+    var btn = document.getElementById('swSummaryBtn');
+    var isOpen = !panel.classList.contains('hidden');
+    panel.classList.toggle('hidden', isOpen);
+    btn.classList.toggle('is-open', !isOpen);
+  });
 
   // Band pill clicks (tier + form pills are re-rendered; platform pills are static)
   bands.addEventListener('click', function(e) {
