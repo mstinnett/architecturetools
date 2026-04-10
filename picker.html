@@ -34,15 +34,17 @@
   .band-pill.disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
   .plat-forced{font-size:0.58rem;font-weight:300;color:var(--gray-400);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.3rem;}
 
-  /* ---- SOFTWARE BAND (summary button + expandable panel) ---- */
+  /* ---- SOFTWARE BAND (list + disclosure + panel) ---- */
   .band-sw{border-bottom:1px solid var(--gray-200);padding-bottom:1rem;}
-  .sw-summary{display:flex;width:100%;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;border:1px solid var(--gray-300);background:var(--white);cursor:pointer;font-family:var(--font-body);font-size:0.72rem;font-weight:400;color:var(--black);transition:border-color 0.15s;text-align:left;line-height:1.4;}
-  .sw-summary:hover{border-color:var(--gray-700);}
-  .sw-summary.is-open{border-color:var(--gray-700);border-bottom-color:transparent;}
-  .sw-summary-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .sw-summary-arrow{font-size:0.6rem;color:var(--gray-400);flex-shrink:0;margin-left:0.5rem;transition:transform 0.15s;}
-  .sw-summary.is-open .sw-summary-arrow{transform:rotate(180deg);}
-  .sw-panel{border:1px solid var(--gray-700);border-top:none;padding:0.5rem 0.6rem 0.6rem;background:var(--white);}
+  .sw-selected-list{font-size:0.75rem;font-weight:400;line-height:1.7;min-height:1.4em;color:var(--black);}
+  .sw-selected-list .sw-sel-item{display:block;}
+  .sw-selected-list .sw-sel-empty{color:var(--gray-400);font-style:italic;font-weight:300;}
+  .sw-disclosure{display:flex;width:100%;align-items:center;justify-content:center;padding:0.3rem 0;margin-top:0.25rem;border:none;border-top:1px solid var(--gray-200);background:none;cursor:pointer;transition:border-color 0.15s;}
+  .sw-disclosure:hover{border-top-color:var(--gray-700);}
+  .sw-disclosure-arrow{font-size:0.55rem;color:var(--gray-400);transition:transform 0.2s,color 0.15s;line-height:1;}
+  .sw-disclosure:hover .sw-disclosure-arrow{color:var(--black);}
+  .sw-disclosure.is-open .sw-disclosure-arrow{transform:rotate(180deg);}
+  .sw-panel{border:1px solid var(--gray-200);border-top:none;padding:0.5rem 0.6rem 0.6rem;background:var(--white);}
   .sw-panel-group{margin-bottom:0.5rem;}
   .sw-panel-group:last-child{margin-bottom:0;}
   .sw-panel-group-label{font-size:0.5rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.25rem;margin-top:0.15rem;}
@@ -209,12 +211,14 @@
       <div class="mobile-mon-controls" id="mobileMonControls"></div>
     </div>
     <aside class="control-bands" id="controlBands">
-      <!-- Software (summary + expandable) -->
+      <!-- Software (list + disclosure) -->
       <div class="band band-sw">
         <div class="band-label">Software</div>
-        <button class="sw-summary" id="swSummaryBtn" type="button">
-          <span class="sw-summary-text" id="swSummaryText">Revit, Enscape</span>
-          <span class="sw-summary-arrow">&#9662;</span>
+        <div class="sw-selected-list" id="swSelectedList">
+          <!-- Rendered by JS: one line per active app -->
+        </div>
+        <button class="sw-disclosure" id="swDisclosureBtn" type="button">
+          <span class="sw-disclosure-arrow">&#9662;</span>
         </button>
         <div class="sw-panel hidden" id="swPanel">
           <div class="sw-panel-group">
@@ -396,12 +400,17 @@
     document.querySelectorAll('.app-toggle').forEach(function(el) {
       el.classList.toggle('active', !!State.apps[el.dataset.app]);
     });
-    // Update software summary text
+    // Render selected software list
     var names = [];
     document.querySelectorAll('#swPanel .app-toggle.active').forEach(function(el) {
       names.push(el.textContent.trim());
     });
-    document.getElementById('swSummaryText').textContent = names.length ? names.join(', ') : 'Baseline — Office / Bluebeam / PM';
+    var listEl = document.getElementById('swSelectedList');
+    if (names.length) {
+      listEl.innerHTML = names.map(function(n) { return '<span class="sw-sel-item">' + n + '</span>'; }).join('');
+    } else {
+      listEl.innerHTML = '<span class="sw-sel-empty">Baseline — Office / Bluebeam / PM</span>';
+    }
   }
 
   function renderRecommendation() {
@@ -671,9 +680,9 @@
   });
 
   // Software summary toggle
-  document.getElementById('swSummaryBtn').addEventListener('click', function() {
+  document.getElementById('swDisclosureBtn').addEventListener('click', function() {
     var panel = document.getElementById('swPanel');
-    var btn = document.getElementById('swSummaryBtn');
+    var btn = document.getElementById('swDisclosureBtn');
     var isOpen = !panel.classList.contains('hidden');
     panel.classList.toggle('hidden', isOpen);
     btn.classList.toggle('is-open', !isOpen);
