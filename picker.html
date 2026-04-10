@@ -48,6 +48,8 @@
   .sw-panel .app-toggle{display:block;width:100%;text-align:left;font-size:0.68rem;padding:0.35rem 0.6rem;margin-bottom:0.2rem;border-color:var(--gray-200);}
   .sw-panel .app-toggle.active{padding:calc(0.35rem - 1px) calc(0.6rem - 1px);}
   .sw-panel .app-toggle.win-only::after{font-size:0.35rem;top:2px;right:4px;}
+  .app-toggle.baseline{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500);cursor:default;font-style:italic;}
+  .app-toggle.baseline:hover{border-color:var(--gray-200);}
 
   /* ---- RECOMMENDATION ---- */
   .recommendation{margin-bottom:2rem;padding-top:1.5rem;border-top:2px solid var(--black);}
@@ -239,6 +241,10 @@
             <div class="sw-panel-group-label">Drafting</div>
             <button class="app-toggle win-only" data-app="autocad">AutoCAD</button>
           </div>
+          <div class="sw-panel-group">
+            <div class="sw-panel-group-label">Baseline</div>
+            <span class="app-toggle baseline">Office / Bluebeam / PM</span>
+          </div>
         </div>
       </div>
       <!-- Budget -->
@@ -395,7 +401,7 @@
     document.querySelectorAll('#swPanel .app-toggle.active').forEach(function(el) {
       names.push(el.textContent.trim());
     });
-    document.getElementById('swSummaryText').textContent = names.length ? names.join(', ') : 'None selected';
+    document.getElementById('swSummaryText').textContent = names.length ? names.join(', ') : 'Baseline — Office / Bluebeam / PM';
   }
 
   function renderRecommendation() {
