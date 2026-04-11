@@ -25,10 +25,12 @@
   .spec-item{min-width:120px;}
   .spec-item-label{font-size:0.6rem;font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.2rem;}
   .spec-item-value{font-size:0.88rem;font-weight:400;}
-  .spec-item-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;margin-top:0.1rem;max-width:20em;}
+  .spec-item-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;margin-top:0.1rem;max-width:22em;}
   .priority-box{padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);}
   .priority-box-label{font-size:0.6rem;font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
   .priority-box p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
+  .monitor-note{margin-top:1rem;padding:0.85rem 1.1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
+  .monitor-note strong{font-weight:500;color:var(--black);}
   .laptop-rec-featured{padding:1.25rem 0;margin-top:1rem;border-top:1px solid var(--gray-200);}
   .laptop-rec-featured-label{font-size:0.55rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.5rem;}
   .laptop-rec-featured-name{font-size:1rem;font-weight:500;margin-bottom:0.35rem;}
@@ -73,43 +75,6 @@
   .band-pill.disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
   .plat-forced{font-size:0.58rem;font-weight:300;color:var(--gray-400);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.3rem;}
 
-  /* ---- MONITORS ---- */
-  .monitor-section{margin-bottom:2rem;border-top:1px solid var(--gray-200);padding-top:1.5rem;}
-  .section-label{font-size:0.65rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.75rem;}
-  .desk-zone{border:1px dashed var(--gray-300);padding:1rem 1rem 0.75rem;margin-bottom:0.75rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;}
-  .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
-  .desk-zone-label{position:absolute;top:0.4rem;left:0.6rem;font-size:0.55rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
-  .desk-zone-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:1rem 0;width:100%;}
-  .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;}
-  .mon-on-desk-visual{position:relative;display:block;}
-  .mon-on-desk-name{font-size:0.58rem;font-weight:300;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);transition:color 0.15s;}
-  .mon-remove-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:300;line-height:1;color:var(--black);background:rgba(245,245,244,0.8);opacity:0;transition:opacity 0.15s;pointer-events:none;}
-  .mon-on-desk:hover .mon-remove-mark{opacity:1;}
-  .mon-on-desk:hover .mon-on-desk-name{color:var(--black);}
-  .mon-total{display:flex;justify-content:space-between;align-items:baseline;padding-top:0.5rem;border-top:1px solid var(--gray-200);margin-top:0.5rem;}
-  .mon-total-label{font-size:0.6rem;font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);}
-  .mon-total-price{font-size:0.82rem;font-weight:300;}
-  .mon-shelf-label{font-size:0.55rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.4rem;}
-  .mon-shelf{display:flex;flex-wrap:wrap;gap:0.4rem;}
-  .shelf-full .mon-avail{opacity:0.35;pointer-events:none;}
-  .mon-avail{display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.4rem;border:1px solid var(--gray-300);cursor:pointer;user-select:none;transition:all 0.15s;background:var(--white);position:relative;}
-  .mon-avail:hover{border-color:var(--gray-700);}
-  .mon-avail.recommended{border:2px solid var(--black);padding:calc(0.4rem - 1px);}
-  .mon-avail-name{font-size:0.6rem;font-weight:400;white-space:nowrap;}
-  .mon-avail-price{font-size:0.55rem;font-weight:300;color:var(--gray-500);}
-  .mon-avail .mbadge{display:none;position:absolute;top:2px;right:2px;font-size:0.4rem;background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
-  .mon-avail.recommended .mbadge{display:block;}
-  .mon-avail svg,.mon-on-desk svg{display:block;}
-  .mobile-mon-controls{display:none;}
-  .mobile-mon-row{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--gray-100);}
-  .mobile-mon-info{display:flex;align-items:center;gap:0.5rem;}
-  .mobile-mon-name{font-size:0.78rem;font-weight:400;}
-  .mobile-mon-price{font-size:0.68rem;color:var(--gray-500);font-weight:300;}
-  .mobile-mon-qty{display:flex;align-items:center;gap:0.4rem;}
-  .mobile-mon-btn{width:28px;height:28px;border:1px solid var(--gray-300);background:var(--white);cursor:pointer;font-size:1rem;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;transition:border-color 0.15s;}
-  .mobile-mon-btn:hover{border-color:var(--black);}
-  .mobile-mon-count{font-size:0.78rem;font-weight:400;min-width:1.5em;text-align:center;}
-
   /* ---- DETAILS ---- */
   .section-toggle{font-size:0.82rem;font-weight:400;cursor:pointer;padding:0.85rem 0;list-style:none;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--gray-200);color:var(--gray-700);transition:color 0.15s;}
   .section-toggle:hover{color:var(--black);}
@@ -149,10 +114,7 @@
     .picker-page{padding:2rem 1.25rem 3rem;}
     .control-grid{grid-template-columns:1fr 1fr;gap:1rem;}
     .band-pill .pill-sub{display:none;}
-    .desk-zone .mon-on-desk{pointer-events:none;}
-    .mon-remove-mark{display:none !important;}
     .spec-block{gap:1rem 2rem;}
-    .mobile-mon-controls{display:block;}
   }
   @media(max-width:480px){
     .picker-page{padding:1.5rem 1rem 2.5rem;}
@@ -170,6 +132,10 @@
   </header>
 
   <!-- ===== THE ANSWER ===== -->
+  <!-- Hero image swaps based on form factor + platform.
+       Image naming convention: {form}_{platform}.png
+       e.g. desktop_win.png, laptop_mac.png, sff_win.png, desktop_laptop_win.png
+       Falls back to default if specific image not found. -->
   <section class="hero-answer">
     <img src="assets/images/Computer make2d.png" alt="Isometric line drawing of a desktop workstation" class="hero-image" id="heroImage">
     <div id="recommendation"></div>
@@ -177,7 +143,6 @@
 
   <!-- ===== CONTROLS ===== -->
   <div class="controls-area" id="controlsArea">
-    <!-- Software bar -->
     <div class="sw-bar">
       <div class="band-label">Software</div>
       <div class="sw-selected-list" id="swSelectedList"></div>
@@ -214,7 +179,6 @@
         <span class="app-toggle baseline">Office / Bluebeam / PM</span>
       </div>
     </div>
-    <!-- 4-column grid: Budget, Scale, Setup, Platform -->
     <div class="control-grid">
       <div class="band">
         <div class="band-label">Budget</div>
@@ -242,14 +206,6 @@
     </div>
   </div>
 
-  <!-- ===== MONITORS ===== -->
-  <section class="monitor-section">
-    <div class="section-label">Monitors</div>
-    <div class="desk-zone" id="deskZone"><span class="desk-zone-label">Your desk</span></div>
-    <div id="shelfArea"></div>
-    <div class="mobile-mon-controls" id="mobileMonControls"></div>
-  </section>
-
   <!-- ===== DETAILS ===== -->
   <details class="details-section" id="detailsSection">
     <summary class="section-toggle">Build / buy details</summary>
@@ -266,7 +222,6 @@
     tier: Data.EditorialDefaults.tier,
     form: Data.EditorialDefaults.form,
     apps: { revit: true, enscape: true },
-    desk: Data.PickerOptions.deskMonitorDefaults['value'].slice(),
     platform: 'win',
     scale: 'small'
   };
@@ -283,21 +238,49 @@
   function needsWindows(){for(var a in State.apps){if(State.apps[a]&&Data.Apps[a]&&Data.Apps[a].platform==='win')return true;}return false;}
   function effectivePlatform(){return needsWindows()?'win':State.platform;}
   function isMac(){return effectivePlatform()==='mac';}
-  function findMonitor(id){for(var i=0;i<Data.Monitors.length;i++)if(Data.Monitors[i].id===id)return Data.Monitors[i];return null;}
-  function monitorTotal(){var t=0;for(var i=0;i<State.desk.length;i++){var m=findMonitor(State.desk[i]);if(m)t+=m.price;}return t;}
   function fmt(n){return'$'+n.toLocaleString('en-US');}
-  function monLabel(){return State.desk.length===1?'monitor':'monitors';}
-  function defaultDeskMonitors(b){return(Data.PickerOptions.deskMonitorDefaults[b]||Data.PickerOptions.deskMonitorDefaults['value']).slice();}
-  function recMonitorIds(b){var d=defaultDeskMonitors(b),u=[];for(var i=0;i<d.length;i++)if(u.indexOf(d[i])<0)u.push(d[i]);return u;}
   function parsePriceRange(r){var p=r.split('--');return{lo:parseInt(p[0].replace(/[^0-9]/g,''),10),hi:parseInt(p[1].replace(/[^0-9]/g,''),10)};}
+
   function getDesktopSpec(){
     var p=effectiveProfile(),b=effectiveBudget(),s=effectiveScale();
     if(isMac())return{type:'mac',spec:Data.MacSpecs[p][s][b],priority:Data.MacSpecs[p].priority};
     return{type:'win',spec:Data.WindowsSpecs[p][s][b],priority:Data.WindowsSpecs[p].priority};
   }
 
-  // ---- MONITOR SVG ----
-  function monitorSVG(mon,sc){var sw=Math.round(mon.width*sc),sh=Math.round(mon.height*sc),bw=Math.round(14*sc),stH=Math.round(4*sc),tw=Math.max(sw,bw),th=sh+stH+2,cx=tw/2,sx=((tw-sw)/2)+0.5,by=sh+stH-0.5;return'<svg width="'+tw+'" height="'+th+'" viewBox="0 0 '+tw+' '+th+'" fill="none"><rect x="'+sx.toFixed(1)+'" y="0.5" width="'+Math.max(sw-1,1)+'" height="'+Math.max(sh-1,1)+'" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="'+cx.toFixed(1)+'" y1="'+(sh-0.5).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/><line x1="'+(cx-bw/2).toFixed(1)+'" y1="'+by.toFixed(1)+'" x2="'+(cx+bw/2).toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/></svg>';}
+  // Monitor recommendation is text-based, derived from budget tier.
+  // The Make2D hero image shows the default monitor arrangement.
+  function monitorRec(){
+    var b=Data.Tiers[State.tier].budget;
+    var defaults=Data.PickerOptions.deskMonitorDefaults[b]||Data.PickerOptions.deskMonitorDefaults['value'];
+    var counts={};
+    for(var i=0;i<defaults.length;i++){var id=defaults[i];counts[id]=(counts[id]||0)+1;}
+    var parts=[],total=0;
+    for(var id in counts){
+      for(var j=0;j<Data.Monitors.length;j++){
+        if(Data.Monitors[j].id===id){var m=Data.Monitors[j];parts.push(counts[id]+'\u00d7 '+m.name);total+=m.price*counts[id];break;}
+      }
+    }
+    return{text:parts.join(' + '),price:total};
+  }
+
+  // ---- HERO IMAGE SWAP ----
+  // Naming convention: assets/images/{form}_{platform}.png
+  // Falls back to default image if specific variant not found.
+  var heroImageEl=document.getElementById('heroImage');
+  var defaultHeroSrc='assets/images/Computer make2d.png';
+  var heroImageCache={};
+
+  function updateHeroImage(){
+    var key=State.form+'_'+(isMac()?'mac':'win');
+    var src='assets/images/'+key+'.png';
+    if(heroImageCache[key]===false){heroImageEl.src=defaultHeroSrc;return;}
+    if(heroImageCache[key]===true){heroImageEl.src=src;return;}
+    // Probe if image exists
+    var img=new Image();
+    img.onload=function(){heroImageCache[key]=true;heroImageEl.src=src;};
+    img.onerror=function(){heroImageCache[key]=false;heroImageEl.src=defaultHeroSrc;};
+    img.src=src;
+  }
 
   // ---- VIEW ----
   var profileLabels={review:'Document review',drafting:'2D drafting',modeling:'3D modeling',viz:'Visualization',modeling_viz:'Modeling + viz',production:'Production rendering'};
@@ -308,7 +291,6 @@
     for(var fk in Data.FormFactors){var f=Data.FormFactors[fk];fHTML+='<button class="band-pill'+(State.form===fk?' active':'')+'" data-form="'+fk+'">'+f.label+'</button>';}
     document.getElementById('tierBand').innerHTML=tHTML;
     document.getElementById('formBand').innerHTML=fHTML;
-    // Scale
     document.querySelectorAll('#scaleBand .band-pill').forEach(function(el){el.classList.toggle('active',el.dataset.scale===State.scale);});
   }
 
@@ -336,26 +318,36 @@
     var form=State.form,mac=isMac();
     var showDesktop=form==='desktop'||form==='sff'||form==='desktop_laptop';
     var showLaptop=form==='laptop'||form==='desktop_laptop';
+    var mon=monitorRec();
     var html='';
+
     if(showDesktop){
       var info=getDesktopSpec(),s=info.spec;
       var formLabel=form==='sff'?'SFF Desktop':'Desktop';
       if(form==='desktop_laptop')formLabel='Desktop (two-machine)';
       html+='<div class="rec-headline">'+formLabel+' \u00b7 '+(profileLabels[effectiveProfile()]||effectiveProfile())+' \u00b7 '+Data.Tiers[State.tier].label+'</div>';
       if(mac){
-        html+='<div class="rec-price">'+s.price+' + '+fmt(monitorTotal())+' '+monLabel()+'</div>';
-        html+='<div class="spec-block"><div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">'+s.chip+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
+        html+='<div class="rec-price">'+s.price+' + '+fmt(mon.price)+' monitors</div>';
+        html+='<div class="spec-block">';
+        html+='<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">'+s.chip+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
         html+='<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">'+s.memory+'</div><div class="spec-item-note">Unified \u2014 RAM and GPU memory</div></div>';
-        html+='<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div></div>';
+        html+='<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div>';
+        html+='<div class="spec-item"><div class="spec-item-label">Monitors</div><div class="spec-item-value">'+mon.text+'</div><div class="spec-item-note">'+fmt(mon.price)+'</div></div>';
+        html+='</div>';
       }else{
-        html+='<div class="rec-price">'+s.priceRange+' tower + '+fmt(monitorTotal())+' '+monLabel()+'</div>';
-        html+='<div class="spec-block"><div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">'+s.cpu+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
+        html+='<div class="rec-price">'+s.priceRange+' tower + '+fmt(mon.price)+' monitors</div>';
+        html+='<div class="spec-block">';
+        html+='<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">'+s.cpu+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
         html+='<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">'+s.gpu+'</div><div class="spec-item-note">'+s.gpuNote+'</div></div>';
         html+='<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">'+s.ram+'</div>'+(s.ramNote?'<div class="spec-item-note">'+s.ramNote+'</div>':'')+'</div>';
-        html+='<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div></div>';
+        html+='<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div>';
+        html+='<div class="spec-item"><div class="spec-item-label">Monitors</div><div class="spec-item-value">'+mon.text+'</div><div class="spec-item-note">'+fmt(mon.price)+'</div></div>';
+        html+='</div>';
       }
       html+='<div class="priority-box"><div class="priority-box-label">Where the money matters</div><p>'+info.priority+'</p></div>';
+      html+='<div class="monitor-note"><strong>Alternatives:</strong> 34\u2033 ultrawide ($1,000) replaces one 27\u2033. Apple Studio Display ($1,600) for Thunderbolt docking. Add a 27\u2033 4K ($500) as a third screen.</div>';
     }
+
     if(showLaptop)html+=renderLaptopRec();
     document.getElementById('recommendation').innerHTML=html;
   }
@@ -373,33 +365,8 @@
     return html;
   }
 
-  // ---- MONITORS ----
-  function renderDesktopMonitors(){
-    var platform=effectivePlatform(),recIds=recMonitorIds(Data.Tiers[State.tier].budget);
-    var dz='<span class="desk-zone-label">Your desk</span><div class="desk-monitors">';
-    if(State.desk.length===0){dz+='<div class="desk-zone-hint">Click a monitor below to add</div>';}
-    else{for(var i=0;i<State.desk.length;i++){var mon=findMonitor(State.desk[i]);if(!mon)continue;dz+='<div class="mon-on-desk" data-idx="'+i+'" title="Click to remove"><span class="mon-on-desk-visual">'+monitorSVG(mon,1.2)+'<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">'+mon.name+'</span></div>';}}
-    dz+='</div>';
-    document.getElementById('deskZone').innerHTML=dz;
-    var sh='<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
-    sh+='<div class="mon-shelf-label" style="margin-top:0.75rem;">Available'+(State.desk.length>=4?' \u2014 desk full':'')+'</div><div class="mon-shelf">';
-    for(var j=0;j<Data.Monitors.length;j++){var m=Data.Monitors[j];if(m.platform!=='both'&&m.platform!==platform)continue;var isRec=recIds.indexOf(m.id)>=0;sh+='<div class="mon-avail'+(isRec?' recommended':'')+'" data-mid="'+m.id+'" title="Click to add">'+monitorSVG(m,0.7)+'<span class="mbadge">rec</span><div class="mon-avail-name">'+m.name+'</div><div class="mon-avail-price">'+fmt(m.price)+'</div></div>';}
-    sh+='</div>';
-    var shelfEl=document.getElementById('shelfArea');shelfEl.innerHTML=sh;shelfEl.classList.toggle('shelf-full',State.desk.length>=4);
-    document.querySelectorAll('#deskZone .mon-on-desk').forEach(function(el){el.addEventListener('click',function(){State.desk.splice(parseInt(el.dataset.idx,10),1);update();});});
-    document.querySelectorAll('#shelfArea .mon-avail').forEach(function(el){el.addEventListener('click',function(){if(State.desk.length<4){State.desk.push(el.dataset.mid);update();}});});
-  }
-
-  function renderMobileMonitors(){
-    var platform=effectivePlatform(),html='';
-    for(var i=0;i<Data.Monitors.length;i++){var m=Data.Monitors[i];if(m.platform!=='both'&&m.platform!==platform)continue;var count=0;for(var d=0;d<State.desk.length;d++)if(State.desk[d]===m.id)count++;html+='<div class="mobile-mon-row"><div class="mobile-mon-info">'+monitorSVG(m,0.5)+'<span class="mobile-mon-name">'+m.name+'</span><span class="mobile-mon-price">'+fmt(m.price)+'</span></div><div class="mobile-mon-qty"><button class="mobile-mon-btn" data-action="remove" data-mid="'+m.id+'">&minus;</button><span class="mobile-mon-count">'+count+'</span><button class="mobile-mon-btn" data-action="add" data-mid="'+m.id+'">+</button></div></div>';}
-    html+='<div class="mon-total" style="margin-top:0.5rem;"><span class="mon-total-label">Monitors</span><span class="mon-total-price">'+fmt(monitorTotal())+'</span></div>';
-    document.getElementById('mobileMonControls').innerHTML=html;
-    document.querySelectorAll('#mobileMonControls .mobile-mon-btn').forEach(function(el){el.addEventListener('click',function(){var mid=el.dataset.mid;if(el.dataset.action==='add'){if(State.desk.length<4)State.desk.push(mid);}else{var idx=State.desk.indexOf(mid);if(idx>=0)State.desk.splice(idx,1);}update();});});
-  }
-
   // ---- DETAILS ----
-  var _listId=0,LIST_BREAK=3;
+  var LIST_BREAK=3;
 
   function renderDetails(){
     var form=State.form,mac=isMac(),profile=effectiveProfile();
@@ -417,7 +384,7 @@
   function buildLaptopListHTML(){var mac=isMac(),profile=effectiveProfile(),two=State.form==='desktop_laptop';var cats=mac?(two?['mac_s']:['mac_p','mac_s']):(two?['travel','student']:['one','desk','travel','student']);var lb=two?'cheapest':Data.Tiers[State.tier].budget;var html='<div class="section-label" style="margin-top:1.5rem">Laptop Options</div>';for(var ci=0;ci<cats.length;ci++){var cat=cats[ci],items=[];for(var li=0;li<Data.Laptops.length;li++){var lap=Data.Laptops[li];if(lap.category!==cat||lap.platform!==effectivePlatform())continue;if(!two){var found=false;for(var wp=0;wp<lap.workloadProfiles.length;wp++)if(lap.workloadProfiles[wp]===profile)found=true;if(!found)continue;}items.push(lap);}if(items.length===0)continue;html+='<div class="laptop-category"><div class="laptop-category-label">'+Data.LaptopCategoryLabels[cat]+'</div>';for(var ii=0;ii<items.length;ii++){var l=items[ii],isRec=!!(l.recommendedFor&&l.recommendedFor[profile]&&l.recommendedFor[profile][lb]),ov=ii>=LIST_BREAK;html+='<div class="laptop-row'+(isRec?' is-rec':'')+(ov?' list-overflow':'')+'"><div class="laptop-name">'+l.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+l.note+'</div></div><div class="laptop-meta"><span class="laptop-weight">'+l.weight+'</span><span class="laptop-price">'+l.price+'</span></div></div>';}if(items.length>LIST_BREAK)html+='<button class="show-more-btn" type="button">Show '+(items.length-LIST_BREAK)+' more</button>';html+='</div>';}return html;}
 
   // ---- UPDATE ----
-  function update(){renderBands();renderPlatformControls();renderRecommendation();renderDesktopMonitors();renderMobileMonitors();renderDetails();syncAppToggles();}
+  function update(){renderBands();renderPlatformControls();updateHeroImage();renderRecommendation();renderDetails();syncAppToggles();}
 
   // ---- EVENTS ----
   var ctrlArea=document.getElementById('controlsArea');
@@ -436,9 +403,9 @@
   ctrlArea.addEventListener('click',function(e){
     var pill=e.target.closest('.band-pill');
     if(pill){
-      if(pill.dataset.tier){State.tier=pill.dataset.tier;State.desk=defaultDeskMonitors(Data.Tiers[State.tier].budget);}
+      if(pill.dataset.tier){State.tier=pill.dataset.tier;}
       else if(pill.dataset.form){State.form=pill.dataset.form;}
-      else if(pill.dataset.platform){State.platform=pill.dataset.platform;State.desk=defaultDeskMonitors(Data.Tiers[State.tier].budget);}
+      else if(pill.dataset.platform){State.platform=pill.dataset.platform;}
       else if(pill.dataset.scale){State.scale=pill.dataset.scale;}
       update();return;
     }
