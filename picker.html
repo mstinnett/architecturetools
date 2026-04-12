@@ -18,7 +18,7 @@
 
   /* ---- HERO ANSWER ---- */
   .hero-answer{margin-bottom:2rem;}
-  .hero-image{display:block;width:100%;max-width:460px;height:auto;margin:0 auto 1.5rem;}
+  .hero-image{display:block;width:100%;max-width:720px;height:auto;margin:0 auto 1rem;}
   .rec-headline{font-size:0.65rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.5rem;}
   .rec-price{font-size:1.05rem;font-weight:500;margin-bottom:1.25rem;}
   .spec-block{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:1.25rem;}
@@ -29,8 +29,6 @@
   .priority-box{padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);}
   .priority-box-label{font-size:0.6rem;font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
   .priority-box p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
-  .monitor-note{margin-top:1rem;padding:0.85rem 1.1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
-  .monitor-note strong{font-weight:500;color:var(--black);}
   .laptop-rec-featured{padding:1.25rem 0;margin-top:1rem;border-top:1px solid var(--gray-200);}
   .laptop-rec-featured-label{font-size:0.55rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.5rem;}
   .laptop-rec-featured-name{font-size:1rem;font-weight:500;margin-bottom:0.35rem;}
@@ -40,21 +38,52 @@
   .laptop-rec-featured-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;line-height:1.5;}
   .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.5;}
 
+  /* ---- MONITOR CHOOSER ---- */
+  .monitor-chooser{margin-bottom:2rem;padding-top:1rem;border-top:1px solid var(--gray-200);}
+  .mon-section-label{font-size:0.6rem;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
+  .desk-zone{border:1px dashed var(--gray-300);padding:0.75rem;margin-bottom:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:flex-end;justify-content:center;min-height:70px;position:relative;}
+  .desk-zone-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:0.75rem 0;width:100%;}
+  .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;}
+  .mon-on-desk-visual{position:relative;display:block;}
+  .mon-on-desk-name{font-size:0.55rem;font-weight:300;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);transition:color 0.15s;}
+  .mon-remove-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:300;line-height:1;color:var(--black);background:rgba(245,245,244,0.8);opacity:0;transition:opacity 0.15s;pointer-events:none;}
+  .mon-on-desk:hover .mon-remove-mark{opacity:1;}
+  .mon-on-desk:hover .mon-on-desk-name{color:var(--black);}
+  .mon-shelf-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:0.5rem;}
+  .mon-shelf-label{font-size:0.55rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);flex-shrink:0;}
+  .mon-total-price{font-size:0.72rem;font-weight:400;color:var(--black);}
+  .mon-shelf{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;}
+  .shelf-full .mon-avail{opacity:0.35;pointer-events:none;}
+  .mon-avail{display:flex;flex-direction:column;align-items:center;gap:0.15rem;padding:0.35rem 0.4rem;border:1px solid var(--gray-300);cursor:pointer;user-select:none;transition:all 0.15s;background:var(--white);position:relative;}
+  .mon-avail:hover{border-color:var(--gray-700);}
+  .mon-avail.recommended{border:2px solid var(--black);padding:calc(0.35rem - 1px) calc(0.4rem - 1px);}
+  .mon-avail-name{font-size:0.58rem;font-weight:400;white-space:nowrap;}
+  .mon-avail-price{font-size:0.52rem;font-weight:300;color:var(--gray-500);}
+  .mon-avail .mbadge{display:none;position:absolute;top:2px;right:2px;font-size:0.38rem;background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
+  .mon-avail.recommended .mbadge{display:block;}
+  .mon-avail svg,.mon-on-desk svg{display:block;}
+
   /* ---- CONTROLS ---- */
   .controls-area{border-top:2px solid var(--black);padding-top:1.5rem;margin-bottom:2rem;}
-  .sw-bar{display:flex;align-items:baseline;gap:0.75rem;margin-bottom:1rem;}
-  .sw-bar .band-label{margin-bottom:0;flex-shrink:0;}
-  .sw-selected-list{font-size:0.75rem;font-weight:400;color:var(--black);flex:1;min-width:0;}
-  .sw-sel-item{display:inline;}
-  .sw-sel-item+.sw-sel-item::before{content:', ';}
-  .sw-sel-empty{color:var(--gray-400);font-style:italic;font-weight:300;}
-  .sw-disclosure{flex-shrink:0;border:none;background:none;cursor:pointer;padding:0.2rem 0.4rem;}
-  .sw-disclosure-arrow{font-size:0.6rem;color:var(--gray-400);transition:transform 0.2s,color 0.15s;line-height:1;}
-  .sw-disclosure:hover .sw-disclosure-arrow{color:var(--black);}
-  .sw-disclosure.is-open .sw-disclosure-arrow{transform:rotate(180deg);}
-  .sw-panel{border:1px solid var(--gray-200);padding:0.75rem 1rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:1.25rem;}
-  .sw-panel-group{display:flex;flex-direction:column;gap:0.25rem;}
-  .sw-panel-group-label{font-size:0.5rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.1rem;}
+
+  /* V1 software strip: horizontal scroll with minimap nav */
+  .sw-section{margin-bottom:1.5rem;}
+  .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;}
+  .sw-nav-item{font-size:0.6rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;}
+  .sw-nav-item:hover{color:var(--black);}
+  .sw-nav-item.sw-active{color:var(--black);}
+  .sw-nav-indicator{position:absolute;border:1px solid var(--black);background:rgba(0,0,0,0.04);top:-2px;bottom:-1px;pointer-events:none;}
+  .sw-scroll-wrap{display:flex;align-items:stretch;gap:0.5rem;}
+  .sw-scroll{flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:0.5rem;scrollbar-width:none;}
+  .sw-scroll::-webkit-scrollbar{display:none;}
+  .sw-chevron{flex-shrink:0;width:2.25rem;border:1px solid var(--gray-300);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--gray-500);transition:border-color 0.15s,color 0.15s;padding:0;line-height:1;font-family:var(--font-body);}
+  .sw-chevron:hover{border-color:var(--black);color:var(--black);}
+  .sw-chevron[hidden]{display:none;}
+  .sw-strip{display:flex;gap:2rem;min-width:max-content;padding:0.25rem 0;}
+  .sw-group{display:flex;flex-direction:column;gap:0.3rem;}
+  .sw-group-label{font-size:0.55rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;white-space:nowrap;}
+  .sw-group-apps{display:flex;gap:0.3rem;flex-wrap:nowrap;}
+
   .app-toggle{padding:0.35rem 0.7rem;border:1px solid var(--gray-300);cursor:pointer;user-select:none;font-size:0.72rem;font-weight:400;transition:all 0.15s ease;background:var(--white);position:relative;white-space:nowrap;font-family:var(--font-body);}
   .app-toggle:hover{border-color:var(--gray-700);}
   .app-toggle.active{border:2px solid var(--selected-bg);padding:calc(0.35rem - 1px) calc(0.7rem - 1px);background:var(--selected-bg);color:var(--white);}
@@ -62,8 +91,6 @@
   .app-toggle.active.win-only::after{color:rgba(255,255,255,0.4);}
   .app-toggle.baseline{border-color:var(--gray-200);background:var(--gray-50);color:var(--gray-500);cursor:default;font-style:italic;}
   .app-toggle.baseline:hover{border-color:var(--gray-200);}
-  .sw-panel .app-toggle{font-size:0.68rem;padding:0.3rem 0.6rem;}
-  .sw-panel .app-toggle.active{padding:calc(0.3rem - 1px) calc(0.6rem - 1px);}
 
   .control-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
   .band-label{font-size:0.6rem;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.4rem;}
@@ -116,10 +143,10 @@
     .band-pill .pill-sub{display:none;}
     .spec-block{gap:1rem 2rem;}
   }
-  @media(max-width:480px){
+  @media(max-width:580px){
     .picker-page{padding:1.5rem 1rem 2.5rem;}
     .control-grid{grid-template-columns:1fr;}
-    .sw-bar{flex-wrap:wrap;}
+    .sw-nav{display:none;}
   }
 </style>
 </head>
@@ -132,53 +159,86 @@
   </header>
 
   <!-- ===== THE ANSWER ===== -->
-  <!-- Hero image swaps based on form factor + platform.
-       Image naming convention: {form}_{platform}.png
-       e.g. desktop_win.png, laptop_mac.png, sff_win.png, desktop_laptop_win.png
-       Falls back to default if specific image not found. -->
+  <!-- Hero image swap system. Image naming convention:
+       assets/images/{form}_{platform}_{monitorKey}.png   (e.g. desktop_win_m5k27-m5k27.png)
+       Falls back to: {form}_{platform}.png              (e.g. desktop_win.png)
+       Falls back to: Computer make2d.png                (the default)
+       Monitor key is State.desk sorted and joined with '-'.  -->
   <section class="hero-answer">
     <img src="assets/images/Computer make2d.png" alt="Isometric line drawing of a desktop workstation" class="hero-image" id="heroImage">
     <div id="recommendation"></div>
   </section>
 
+  <!-- ===== MONITOR CHOOSER ===== -->
+  <section class="monitor-chooser">
+    <div class="mon-section-label">Monitors on your desk</div>
+    <div class="desk-zone" id="deskZone"></div>
+    <div class="mon-shelf-row"><span class="mon-shelf-label">Available</span><span class="mon-total-price" id="monTotalPrice">$0</span></div>
+    <div class="mon-shelf" id="shelfArea"></div>
+  </section>
+
   <!-- ===== CONTROLS ===== -->
   <div class="controls-area" id="controlsArea">
-    <div class="sw-bar">
-      <div class="band-label">Software</div>
-      <div class="sw-selected-list" id="swSelectedList"></div>
-      <button class="sw-disclosure" id="swDisclosureBtn" type="button"><span class="sw-disclosure-arrow">&#9662;</span></button>
+
+    <!-- V1 Software strip: horizontal scroll with minimap nav -->
+    <div class="sw-section">
+      <div class="sw-nav" id="swNav">
+        <span class="sw-nav-indicator" id="swNavIndicator" hidden></span>
+        <span class="sw-nav-item" data-target="grp-modeling">Modeling / BIM</span>
+        <span class="sw-nav-item" data-target="grp-drafting">Drafting</span>
+        <span class="sw-nav-item" data-target="grp-viz">Visualization</span>
+        <span class="sw-nav-item" data-target="grp-render">Production Rendering</span>
+        <span class="sw-nav-item" data-target="grp-baseline">Baseline</span>
+      </div>
+      <div class="sw-scroll-wrap">
+        <button class="sw-chevron" id="swChevLeft" hidden type="button">&#8249;</button>
+        <div class="sw-scroll" id="swScroll">
+          <div class="sw-strip">
+            <div class="sw-group" id="grp-modeling">
+              <div class="sw-group-label">Modeling / BIM</div>
+              <div class="sw-group-apps">
+                <button class="app-toggle win-only active" data-app="revit">Revit</button>
+                <button class="app-toggle" data-app="archicad">ArchiCAD</button>
+                <button class="app-toggle" data-app="vectorworks">Vectorworks</button>
+                <button class="app-toggle" data-app="sketchup">SketchUp</button>
+                <button class="app-toggle" data-app="rhino">Rhino</button>
+              </div>
+            </div>
+            <div class="sw-group" id="grp-drafting">
+              <div class="sw-group-label">Drafting</div>
+              <div class="sw-group-apps">
+                <button class="app-toggle win-only" data-app="autocad">AutoCAD</button>
+              </div>
+            </div>
+            <div class="sw-group" id="grp-viz">
+              <div class="sw-group-label">Visualization</div>
+              <div class="sw-group-apps">
+                <button class="app-toggle active" data-app="enscape">Enscape</button>
+                <button class="app-toggle win-only" data-app="lumion">Lumion</button>
+                <button class="app-toggle win-only" data-app="d5">D5 Render</button>
+                <button class="app-toggle" data-app="twinmotion">TwinMotion</button>
+                <button class="app-toggle win-only" data-app="unreal">Unreal Engine</button>
+              </div>
+            </div>
+            <div class="sw-group" id="grp-render">
+              <div class="sw-group-label">Production Rendering</div>
+              <div class="sw-group-apps">
+                <button class="app-toggle" data-app="vray">V-Ray</button>
+                <button class="app-toggle" data-app="corona">Corona</button>
+              </div>
+            </div>
+            <div class="sw-group" id="grp-baseline">
+              <div class="sw-group-label">Baseline</div>
+              <div class="sw-group-apps">
+                <span class="app-toggle baseline">Office / Bluebeam / PM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="sw-chevron" id="swChevRight" type="button">&#8250;</button>
+      </div>
     </div>
-    <div class="sw-panel hidden" id="swPanel">
-      <div class="sw-panel-group">
-        <div class="sw-panel-group-label">Modeling / BIM</div>
-        <button class="app-toggle win-only active" data-app="revit">Revit</button>
-        <button class="app-toggle" data-app="archicad">ArchiCAD</button>
-        <button class="app-toggle" data-app="vectorworks">Vectorworks</button>
-        <button class="app-toggle" data-app="sketchup">SketchUp</button>
-        <button class="app-toggle" data-app="rhino">Rhino</button>
-      </div>
-      <div class="sw-panel-group">
-        <div class="sw-panel-group-label">Visualization</div>
-        <button class="app-toggle active" data-app="enscape">Enscape</button>
-        <button class="app-toggle win-only" data-app="lumion">Lumion</button>
-        <button class="app-toggle win-only" data-app="d5">D5 Render</button>
-        <button class="app-toggle" data-app="twinmotion">TwinMotion</button>
-        <button class="app-toggle win-only" data-app="unreal">Unreal Engine</button>
-      </div>
-      <div class="sw-panel-group">
-        <div class="sw-panel-group-label">Production Rendering</div>
-        <button class="app-toggle" data-app="vray">V-Ray</button>
-        <button class="app-toggle" data-app="corona">Corona</button>
-      </div>
-      <div class="sw-panel-group">
-        <div class="sw-panel-group-label">Drafting</div>
-        <button class="app-toggle win-only" data-app="autocad">AutoCAD</button>
-      </div>
-      <div class="sw-panel-group">
-        <div class="sw-panel-group-label">Baseline</div>
-        <span class="app-toggle baseline">Office / Bluebeam / PM</span>
-      </div>
-    </div>
+
     <div class="control-grid">
       <div class="band">
         <div class="band-label">Budget</div>
@@ -222,6 +282,7 @@
     tier: Data.EditorialDefaults.tier,
     form: Data.EditorialDefaults.form,
     apps: { revit: true, enscape: true },
+    desk: Data.PickerOptions.deskMonitorDefaults['value'].slice(),
     platform: 'win',
     scale: 'small'
   };
@@ -241,46 +302,60 @@
   function fmt(n){return'$'+n.toLocaleString('en-US');}
   function parsePriceRange(r){var p=r.split('--');return{lo:parseInt(p[0].replace(/[^0-9]/g,''),10),hi:parseInt(p[1].replace(/[^0-9]/g,''),10)};}
 
+  function findMonitor(id){for(var i=0;i<Data.Monitors.length;i++)if(Data.Monitors[i].id===id)return Data.Monitors[i];return null;}
+  function monitorTotal(){var t=0;for(var i=0;i<State.desk.length;i++){var m=findMonitor(State.desk[i]);if(m)t+=m.price;}return t;}
+  function defaultDeskMonitors(b){return(Data.PickerOptions.deskMonitorDefaults[b]||Data.PickerOptions.deskMonitorDefaults['value']).slice();}
+  function recMonitorIds(b){var d=defaultDeskMonitors(b),u=[];for(var i=0;i<d.length;i++)if(u.indexOf(d[i])<0)u.push(d[i]);return u;}
+
   function getDesktopSpec(){
     var p=effectiveProfile(),b=effectiveBudget(),s=effectiveScale();
     if(isMac())return{type:'mac',spec:Data.MacSpecs[p][s][b],priority:Data.MacSpecs[p].priority};
     return{type:'win',spec:Data.WindowsSpecs[p][s][b],priority:Data.WindowsSpecs[p].priority};
   }
 
-  // Monitor recommendation is text-based, derived from budget tier.
-  // The Make2D hero image shows the default monitor arrangement.
-  function monitorRec(){
-    var b=Data.Tiers[State.tier].budget;
-    var defaults=Data.PickerOptions.deskMonitorDefaults[b]||Data.PickerOptions.deskMonitorDefaults['value'];
-    var counts={};
-    for(var i=0;i<defaults.length;i++){var id=defaults[i];counts[id]=(counts[id]||0)+1;}
-    var parts=[],total=0;
-    for(var id in counts){
-      for(var j=0;j<Data.Monitors.length;j++){
-        if(Data.Monitors[j].id===id){var m=Data.Monitors[j];parts.push(counts[id]+'\u00d7 '+m.name);total+=m.price*counts[id];break;}
-      }
-    }
-    return{text:parts.join(' + '),price:total};
+  // Monitor text summary for the spec block
+  function monitorSummary(){
+    var counts={},order=[];
+    for(var i=0;i<State.desk.length;i++){var id=State.desk[i];if(counts[id]===undefined){counts[id]=0;order.push(id);}counts[id]++;}
+    var parts=[];
+    for(var j=0;j<order.length;j++){var m=findMonitor(order[j]);if(!m)continue;parts.push(counts[order[j]]+'\u00d7 '+m.name);}
+    return parts.join(' + ')||'No monitors';
   }
 
+  // ---- MONITOR SVG ----
+  function monitorSVG(mon,sc){var sw=Math.round(mon.width*sc),sh=Math.round(mon.height*sc),bw=Math.round(14*sc),stH=Math.round(4*sc),tw=Math.max(sw,bw),th=sh+stH+2,cx=tw/2,sx=((tw-sw)/2)+0.5,by=sh+stH-0.5;return'<svg width="'+tw+'" height="'+th+'" viewBox="0 0 '+tw+' '+th+'" fill="none"><rect x="'+sx.toFixed(1)+'" y="0.5" width="'+Math.max(sw-1,1)+'" height="'+Math.max(sh-1,1)+'" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="'+cx.toFixed(1)+'" y1="'+(sh-0.5).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/><line x1="'+(cx-bw/2).toFixed(1)+'" y1="'+by.toFixed(1)+'" x2="'+(cx+bw/2).toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/></svg>';}
+
   // ---- HERO IMAGE SWAP ----
-  // Naming convention: assets/images/{form}_{platform}.png
-  // Falls back to default image if specific variant not found.
+  // Naming convention (most specific first):
+  //   assets/images/{form}_{platform}_{monitorKey}.png  (e.g. desktop_win_m5k27-m5k27.png)
+  //   assets/images/{form}_{platform}.png               (e.g. desktop_win.png)
+  //   assets/images/Computer make2d.png                 (the default)
+  // monitorKey = sorted State.desk joined with '-'
   var heroImageEl=document.getElementById('heroImage');
   var defaultHeroSrc='assets/images/Computer make2d.png';
   var heroImageCache={};
 
-  function updateHeroImage(){
-    var key=State.form+'_'+(isMac()?'mac':'win');
-    var src='assets/images/'+key+'.png';
-    if(heroImageCache[key]===false){heroImageEl.src=defaultHeroSrc;return;}
+  function heroCandidates(){
+    var platform=isMac()?'mac':'win';
+    var monKey=State.desk.slice().sort().join('-');
+    var list=[];
+    if(State.desk.length>0)list.push(State.form+'_'+platform+'_'+monKey);
+    list.push(State.form+'_'+platform);
+    return list;
+  }
+
+  function tryHeroImage(candidates,idx){
+    if(idx>=candidates.length){heroImageEl.src=defaultHeroSrc;return;}
+    var key=candidates[idx],src='assets/images/'+key+'.png';
     if(heroImageCache[key]===true){heroImageEl.src=src;return;}
-    // Probe if image exists
+    if(heroImageCache[key]===false){tryHeroImage(candidates,idx+1);return;}
     var img=new Image();
     img.onload=function(){heroImageCache[key]=true;heroImageEl.src=src;};
-    img.onerror=function(){heroImageCache[key]=false;heroImageEl.src=defaultHeroSrc;};
+    img.onerror=function(){heroImageCache[key]=false;tryHeroImage(candidates,idx+1);};
     img.src=src;
   }
+
+  function updateHeroImage(){tryHeroImage(heroCandidates(),0);}
 
   // ---- VIEW ----
   var profileLabels={review:'Document review',drafting:'2D drafting',modeling:'3D modeling',viz:'Visualization',modeling_viz:'Modeling + viz',production:'Production rendering'};
@@ -318,7 +393,7 @@
     var form=State.form,mac=isMac();
     var showDesktop=form==='desktop'||form==='sff'||form==='desktop_laptop';
     var showLaptop=form==='laptop'||form==='desktop_laptop';
-    var mon=monitorRec();
+    var monText=monitorSummary(),monPrice=monitorTotal();
     var html='';
 
     if(showDesktop){
@@ -327,29 +402,42 @@
       if(form==='desktop_laptop')formLabel='Desktop (two-machine)';
       html+='<div class="rec-headline">'+formLabel+' \u00b7 '+(profileLabels[effectiveProfile()]||effectiveProfile())+' \u00b7 '+Data.Tiers[State.tier].label+'</div>';
       if(mac){
-        html+='<div class="rec-price">'+s.price+' + '+fmt(mon.price)+' monitors</div>';
+        html+='<div class="rec-price">'+s.price+' + '+fmt(monPrice)+' monitors</div>';
         html+='<div class="spec-block">';
         html+='<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">'+s.chip+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
         html+='<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">'+s.memory+'</div><div class="spec-item-note">Unified \u2014 RAM and GPU memory</div></div>';
         html+='<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div>';
-        html+='<div class="spec-item"><div class="spec-item-label">Monitors</div><div class="spec-item-value">'+mon.text+'</div><div class="spec-item-note">'+fmt(mon.price)+'</div></div>';
+        html+='<div class="spec-item"><div class="spec-item-label">Monitors</div><div class="spec-item-value">'+monText+'</div><div class="spec-item-note">'+fmt(monPrice)+'</div></div>';
         html+='</div>';
       }else{
-        html+='<div class="rec-price">'+s.priceRange+' tower + '+fmt(mon.price)+' monitors</div>';
+        html+='<div class="rec-price">'+s.priceRange+' tower + '+fmt(monPrice)+' monitors</div>';
         html+='<div class="spec-block">';
         html+='<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">'+s.cpu+'</div><div class="spec-item-note">'+s.cpuNote+'</div></div>';
         html+='<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">'+s.gpu+'</div><div class="spec-item-note">'+s.gpuNote+'</div></div>';
         html+='<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">'+s.ram+'</div>'+(s.ramNote?'<div class="spec-item-note">'+s.ramNote+'</div>':'')+'</div>';
         html+='<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">'+s.storage+'</div></div>';
-        html+='<div class="spec-item"><div class="spec-item-label">Monitors</div><div class="spec-item-value">'+mon.text+'</div><div class="spec-item-note">'+fmt(mon.price)+'</div></div>';
+        html+='<div class="spec-item"><div class="spec-item-label">Monitors</div><div class="spec-item-value">'+monText+'</div><div class="spec-item-note">'+fmt(monPrice)+'</div></div>';
         html+='</div>';
       }
       html+='<div class="priority-box"><div class="priority-box-label">Where the money matters</div><p>'+info.priority+'</p></div>';
-      html+='<div class="monitor-note"><strong>Alternatives:</strong> 34\u2033 ultrawide ($1,000) replaces one 27\u2033. Apple Studio Display ($1,600) for Thunderbolt docking. Add a 27\u2033 4K ($500) as a third screen.</div>';
     }
 
     if(showLaptop)html+=renderLaptopRec();
     document.getElementById('recommendation').innerHTML=html;
+  }
+
+  function renderMonitors(){
+    var platform=effectivePlatform(),recIds=recMonitorIds(Data.Tiers[State.tier].budget);
+    var dz='';
+    if(State.desk.length===0){dz+='<div class="desk-zone-hint">Pick monitors below to add to your desk</div>';}
+    else{for(var i=0;i<State.desk.length;i++){var mon=findMonitor(State.desk[i]);if(!mon)continue;dz+='<div class="mon-on-desk" data-idx="'+i+'" title="Click to remove"><span class="mon-on-desk-visual">'+monitorSVG(mon,1.2)+'<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">'+mon.name+'</span></div>';}}
+    document.getElementById('deskZone').innerHTML=dz;
+    var sh='';
+    for(var j=0;j<Data.Monitors.length;j++){var m=Data.Monitors[j];if(m.platform!=='both'&&m.platform!==platform)continue;var isRec=recIds.indexOf(m.id)>=0;sh+='<div class="mon-avail'+(isRec?' recommended':'')+'" data-mid="'+m.id+'" title="Click to add">'+monitorSVG(m,0.7)+'<span class="mbadge">rec</span><div class="mon-avail-name">'+m.name+'</div><div class="mon-avail-price">'+fmt(m.price)+'</div></div>';}
+    var shelfEl=document.getElementById('shelfArea');
+    shelfEl.innerHTML=sh;
+    shelfEl.classList.toggle('shelf-full',State.desk.length>=4);
+    document.getElementById('monTotalPrice').textContent=fmt(monitorTotal());
   }
 
   function renderLaptopRec(){
@@ -384,15 +472,19 @@
   function buildLaptopListHTML(){var mac=isMac(),profile=effectiveProfile(),two=State.form==='desktop_laptop';var cats=mac?(two?['mac_s']:['mac_p','mac_s']):(two?['travel','student']:['one','desk','travel','student']);var lb=two?'cheapest':Data.Tiers[State.tier].budget;var html='<div class="section-label" style="margin-top:1.5rem">Laptop Options</div>';for(var ci=0;ci<cats.length;ci++){var cat=cats[ci],items=[];for(var li=0;li<Data.Laptops.length;li++){var lap=Data.Laptops[li];if(lap.category!==cat||lap.platform!==effectivePlatform())continue;if(!two){var found=false;for(var wp=0;wp<lap.workloadProfiles.length;wp++)if(lap.workloadProfiles[wp]===profile)found=true;if(!found)continue;}items.push(lap);}if(items.length===0)continue;html+='<div class="laptop-category"><div class="laptop-category-label">'+Data.LaptopCategoryLabels[cat]+'</div>';for(var ii=0;ii<items.length;ii++){var l=items[ii],isRec=!!(l.recommendedFor&&l.recommendedFor[profile]&&l.recommendedFor[profile][lb]),ov=ii>=LIST_BREAK;html+='<div class="laptop-row'+(isRec?' is-rec':'')+(ov?' list-overflow':'')+'"><div class="laptop-name">'+l.name+'<span class="laptop-rec-badge">rec</span><div class="laptop-note">'+l.note+'</div></div><div class="laptop-meta"><span class="laptop-weight">'+l.weight+'</span><span class="laptop-price">'+l.price+'</span></div></div>';}if(items.length>LIST_BREAK)html+='<button class="show-more-btn" type="button">Show '+(items.length-LIST_BREAK)+' more</button>';html+='</div>';}return html;}
 
   // ---- UPDATE ----
-  function update(){renderBands();renderPlatformControls();updateHeroImage();renderRecommendation();renderDetails();syncAppToggles();}
+  function update(){renderBands();renderPlatformControls();updateHeroImage();renderRecommendation();renderMonitors();renderDetails();syncAppToggles();updateSwControls();}
 
   // ---- EVENTS ----
   var ctrlArea=document.getElementById('controlsArea');
 
-  document.getElementById('swDisclosureBtn').addEventListener('click',function(){
-    var panel=document.getElementById('swPanel'),btn=document.getElementById('swDisclosureBtn');
-    var isOpen=!panel.classList.contains('hidden');
-    panel.classList.toggle('hidden',isOpen);btn.classList.toggle('is-open',!isOpen);
+  // Monitor chooser (delegated, desk zone + shelf)
+  document.getElementById('deskZone').addEventListener('click',function(e){
+    var el=e.target.closest('.mon-on-desk');if(!el)return;
+    State.desk.splice(parseInt(el.dataset.idx,10),1);update();
+  });
+  document.getElementById('shelfArea').addEventListener('click',function(e){
+    var el=e.target.closest('.mon-avail');if(!el)return;
+    if(State.desk.length<4){State.desk.push(el.dataset.mid);update();}
   });
 
   document.getElementById('detailsContent').addEventListener('click',function(e){
@@ -403,9 +495,9 @@
   ctrlArea.addEventListener('click',function(e){
     var pill=e.target.closest('.band-pill');
     if(pill){
-      if(pill.dataset.tier){State.tier=pill.dataset.tier;}
+      if(pill.dataset.tier){State.tier=pill.dataset.tier;State.desk=defaultDeskMonitors(Data.Tiers[State.tier].budget);}
       else if(pill.dataset.form){State.form=pill.dataset.form;}
-      else if(pill.dataset.platform){State.platform=pill.dataset.platform;}
+      else if(pill.dataset.platform){State.platform=pill.dataset.platform;State.desk=defaultDeskMonitors(Data.Tiers[State.tier].budget);}
       else if(pill.dataset.scale){State.scale=pill.dataset.scale;}
       update();return;
     }
@@ -414,6 +506,41 @@
       toggle.classList.toggle('active');State.apps[toggle.dataset.app]=toggle.classList.contains('active');
       if(needsWindows())State.platform='win';update();
     }
+  });
+
+  // ---- V1 SOFTWARE STRIP: scroll + chevrons + minimap nav ----
+  var swScroll=document.getElementById('swScroll');
+  var swChevLeft=document.getElementById('swChevLeft');
+  var swChevRight=document.getElementById('swChevRight');
+  var swNavIndicator=document.getElementById('swNavIndicator');
+  var swNavEl=document.getElementById('swNav');
+
+  function updateSwControls(){
+    swChevLeft.hidden=swScroll.scrollLeft<=0;
+    swChevRight.hidden=swScroll.scrollLeft>=swScroll.scrollWidth-swScroll.clientWidth-1;
+    var scrollRect=swScroll.getBoundingClientRect();
+    document.querySelectorAll('.sw-nav-item').forEach(function(ni){
+      var g=document.getElementById(ni.dataset.target);if(!g)return;
+      var gr=g.getBoundingClientRect();
+      ni.classList.toggle('sw-active',gr.right>scrollRect.left+1&&gr.left<scrollRect.right-1);
+    });
+    var tw=swScroll.scrollWidth,vw=swScroll.clientWidth;
+    if(tw<=vw){swNavIndicator.hidden=true;return;}
+    var nw=swNavEl.offsetWidth;
+    swNavIndicator.hidden=false;
+    swNavIndicator.style.left=Math.round((swScroll.scrollLeft/tw)*nw)+'px';
+    swNavIndicator.style.width=Math.round((vw/tw)*nw)+'px';
+  }
+
+  swChevLeft.addEventListener('click',function(){swScroll.scrollBy({left:-260,behavior:'smooth'});});
+  swChevRight.addEventListener('click',function(){swScroll.scrollBy({left:260,behavior:'smooth'});});
+  swScroll.addEventListener('scroll',updateSwControls,{passive:true});
+  window.addEventListener('resize',updateSwControls);
+  document.querySelectorAll('.sw-nav-item').forEach(function(ni){
+    ni.addEventListener('click',function(){
+      var t=document.getElementById(ni.dataset.target);
+      if(t)t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});
+    });
   });
 
   update();
