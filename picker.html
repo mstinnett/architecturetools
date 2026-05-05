@@ -539,6 +539,27 @@
   swScroll.addEventListener('scroll',updateSwControls,{passive:true});
   window.addEventListener('resize',updateSwControls);
   window.addEventListener('load',function(){updateSwControls();});
+
+  // Drag the nav indicator to scroll the strip
+  var navDragState=null;
+  function inIndicator(x){if(swNavIndicator.hidden)return false;var r=swNavIndicator.getBoundingClientRect();return x>=r.left&&x<=r.right;}
+  swNavEl.addEventListener('mousedown',function(e){
+    if(e.target.closest('.sw-nav-item'))return;
+    if(!inIndicator(e.clientX))return;
+    e.preventDefault();
+    navDragState={startX:e.clientX,startScrollLeft:swScroll.scrollLeft,ratio:swScroll.scrollWidth/swNavEl.offsetWidth};
+    document.body.style.cursor='grabbing';document.body.style.userSelect='none';
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!navDragState)return;
+    e.preventDefault();
+    swScroll.scrollLeft=navDragState.startScrollLeft+(e.clientX-navDragState.startX)*navDragState.ratio;
+  });
+  document.addEventListener('mouseup',function(){
+    if(!navDragState)return;
+    navDragState=null;
+    document.body.style.cursor='';document.body.style.userSelect='';
+  });
   document.querySelectorAll('.sw-nav-item').forEach(function(ni){
     ni.addEventListener('click',function(){
       var t=document.getElementById(ni.dataset.target);
