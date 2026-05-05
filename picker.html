@@ -538,6 +538,7 @@
   swChevRight.addEventListener('click',function(){swScroll.scrollBy({left:260,behavior:'smooth'});});
   swScroll.addEventListener('scroll',updateSwControls,{passive:true});
   window.addEventListener('resize',updateSwControls);
+  window.addEventListener('load',function(){updateSwControls();});
   document.querySelectorAll('.sw-nav-item').forEach(function(ni){
     ni.addEventListener('click',function(){
       var t=document.getElementById(ni.dataset.target);
