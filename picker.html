@@ -159,13 +159,8 @@
   </header>
 
   <!-- ===== THE ANSWER ===== -->
-  <!-- Hero image swap system. Image naming convention:
-       assets/images/{form}_{platform}_{monitorKey}.png   (e.g. desktop_win_m5k27-m5k27.png)
-       Falls back to: {form}_{platform}.png              (e.g. desktop_win.png)
-       Falls back to: Computer make2d.png                (the default)
-       Monitor key is State.desk sorted and joined with '-'.  -->
   <section class="hero-answer">
-    <img src="assets/images/Computer make2d.png" alt="Isometric line drawing of a desktop workstation" class="hero-image" id="heroImage">
+    <img src="assets/desk-images/tower-xl-2x27.png" alt="Isometric line drawing of the recommended setup" class="hero-image" id="heroImage">
     <div id="recommendation"></div>
   </section>
 
@@ -325,37 +320,44 @@
   // ---- MONITOR SVG ----
   function monitorSVG(mon,sc){var sw=Math.round(mon.width*sc),sh=Math.round(mon.height*sc),bw=Math.round(14*sc),stH=Math.round(4*sc),tw=Math.max(sw,bw),th=sh+stH+2,cx=tw/2,sx=((tw-sw)/2)+0.5,by=sh+stH-0.5;return'<svg width="'+tw+'" height="'+th+'" viewBox="0 0 '+tw+' '+th+'" fill="none"><rect x="'+sx.toFixed(1)+'" y="0.5" width="'+Math.max(sw-1,1)+'" height="'+Math.max(sh-1,1)+'" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="'+cx.toFixed(1)+'" y1="'+(sh-0.5).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/><line x1="'+(cx-bw/2).toFixed(1)+'" y1="'+by.toFixed(1)+'" x2="'+(cx+bw/2).toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#555" stroke-width="0.75"/></svg>';}
 
-  // ---- HERO IMAGE SWAP ----
-  // Naming convention (most specific first):
-  //   assets/images/{form}_{platform}_{monitorKey}.png  (e.g. desktop_win_m5k27-m5k27.png)
-  //   assets/images/{form}_{platform}.png               (e.g. desktop_win.png)
-  //   assets/images/Computer make2d.png                 (the default)
-  // monitorKey = sorted State.desk joined with '-'
+  // ---- HERO IMAGE ----
+  // Images live in assets/desk-images/ with naming: {machine}-{monitorDesc}.png
+  // Machine: tower-xl (desktop, sff, desktop_laptop) or laptop-closed (laptop)
+  // Monitor desc: {count}x{size} where size is 27 or 32
+  //   27" class: m5k27, m4k27, m1k24, masd
+  //   32" class: m6k32, muw34
+  // Available images:
+  //   tower-xl-2x27, tower-xl-1x27, tower-xl-1x32
+  //   laptop-closed-2x27, laptop-closed-1x32
   var heroImageEl=document.getElementById('heroImage');
-  var defaultHeroSrc='assets/images/Computer make2d.png';
+  var defaultHeroSrc='assets/desk-images/tower-xl-2x27.png';
   var heroImageCache={};
 
-  function heroCandidates(){
-    var platform=isMac()?'mac':'win';
-    var monKey=State.desk.slice().sort().join('-');
-    var list=[];
-    if(State.desk.length>0)list.push(State.form+'_'+platform+'_'+monKey);
-    list.push(State.form+'_'+platform);
-    return list;
+  function heroImageKey(){
+    var machine=(State.form==='laptop')?'laptop-closed':'tower-xl';
+    var big=0,small=0;
+    for(var i=0;i<State.desk.length;i++){
+      var id=State.desk[i];
+      if(id==='m6k32'||id==='muw34')big++;else small++;
+    }
+    var desc;
+    if(big>0&&small===0)desc=big+'x32';
+    else if(big===0&&small>0)desc=small+'x27';
+    else if(big>0&&small>0)desc=(big+small)+'x27';
+    else desc='1x27';
+    return machine+'-'+desc;
   }
 
-  function tryHeroImage(candidates,idx){
-    if(idx>=candidates.length){heroImageEl.src=defaultHeroSrc;return;}
-    var key=candidates[idx],src='assets/images/'+key+'.png';
+  function updateHeroImage(){
+    var key=heroImageKey();
+    var src='assets/desk-images/'+key+'.png';
     if(heroImageCache[key]===true){heroImageEl.src=src;return;}
-    if(heroImageCache[key]===false){tryHeroImage(candidates,idx+1);return;}
+    if(heroImageCache[key]===false){heroImageEl.src=defaultHeroSrc;return;}
     var img=new Image();
     img.onload=function(){heroImageCache[key]=true;heroImageEl.src=src;};
-    img.onerror=function(){heroImageCache[key]=false;tryHeroImage(candidates,idx+1);};
+    img.onerror=function(){heroImageCache[key]=false;heroImageEl.src=defaultHeroSrc;};
     img.src=src;
   }
-
-  function updateHeroImage(){tryHeroImage(heroCandidates(),0);}
 
   // ---- VIEW ----
   var profileLabels={review:'Document review',drafting:'2D drafting',modeling:'3D modeling',viz:'Visualization',modeling_viz:'Modeling + viz',production:'Production rendering'};
