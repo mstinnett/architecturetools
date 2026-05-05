@@ -561,6 +561,8 @@
     document.body.style.cursor='';document.body.style.userSelect='';
   });
   window.addEventListener('resize',updateSwControls);
+  window.addEventListener('load',updateSwControls);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(updateSwControls);
   document.querySelectorAll('.sw-nav-item').forEach(function(ni){
     ni.addEventListener('click',function(){
       var t=document.getElementById(ni.dataset.target);
