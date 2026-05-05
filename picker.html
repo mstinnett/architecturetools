@@ -72,7 +72,9 @@
   .sw-nav-item{font-size:0.6rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;}
   .sw-nav-item:hover{color:var(--black);}
   .sw-nav-item.sw-active{color:var(--black);}
-  .sw-nav-indicator{position:absolute;border:1px solid var(--black);background:rgba(0,0,0,0.04);top:-2px;bottom:-1px;pointer-events:none;}
+  .sw-nav-indicator{position:absolute;border:1px solid var(--black);background:rgba(0,0,0,0.04);top:-2px;bottom:-1px;pointer-events:auto;cursor:grab;z-index:1;transition:background-color 0.15s;}
+  .sw-nav-indicator:hover{background:rgba(0,0,0,0.08);}
+  .sw-nav-indicator.is-dragging{cursor:grabbing;background:rgba(0,0,0,0.12);}
   .sw-scroll-wrap{display:flex;align-items:stretch;gap:0.5rem;}
   .sw-scroll{flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:0.5rem;scrollbar-width:none;}
   .sw-scroll::-webkit-scrollbar{display:none;}
@@ -537,6 +539,36 @@
   swChevLeft.addEventListener('click',function(){swScroll.scrollBy({left:-260,behavior:'smooth'});});
   swChevRight.addEventListener('click',function(){swScroll.scrollBy({left:260,behavior:'smooth'});});
   swScroll.addEventListener('scroll',updateSwControls,{passive:true});
+
+  // Drag the nav indicator to scroll
+  var navDragState=null;
+  function getEventX(e){return e.touches?e.touches[0].clientX:e.clientX;}
+  function startNavDrag(e){
+    if(swScroll.scrollWidth<=swScroll.clientWidth)return;
+    e.preventDefault();
+    navDragState={startX:getEventX(e),startScrollLeft:swScroll.scrollLeft,ratio:swScroll.scrollWidth/swNavEl.offsetWidth};
+    swNavIndicator.classList.add('is-dragging');
+    document.body.style.userSelect='none';
+  }
+  function moveNavDrag(e){
+    if(!navDragState)return;
+    if(e.cancelable)e.preventDefault();
+    var dx=getEventX(e)-navDragState.startX;
+    swScroll.scrollLeft=navDragState.startScrollLeft+dx*navDragState.ratio;
+  }
+  function endNavDrag(){
+    if(!navDragState)return;
+    navDragState=null;
+    swNavIndicator.classList.remove('is-dragging');
+    document.body.style.userSelect='';
+  }
+  swNavIndicator.addEventListener('mousedown',startNavDrag);
+  swNavIndicator.addEventListener('touchstart',startNavDrag,{passive:false});
+  document.addEventListener('mousemove',moveNavDrag);
+  document.addEventListener('mouseup',endNavDrag);
+  document.addEventListener('touchmove',moveNavDrag,{passive:false});
+  document.addEventListener('touchend',endNavDrag);
+  document.addEventListener('touchcancel',endNavDrag);
   window.addEventListener('resize',updateSwControls);
   document.querySelectorAll('.sw-nav-item').forEach(function(ni){
     ni.addEventListener('click',function(){
