@@ -23,9 +23,9 @@ import math
 import os
 
 import Rhino
-import System
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
+import System
 
 SCRIPT_VERSION = "2026-05-06.1"
 
@@ -34,8 +34,10 @@ SCRIPT_VERSION = "2026-05-06.1"
 # CONFIGURATION - Edit these paths
 # =============================================================================
 
-COMPONENT_DIR = r"~/make2d/objects/"  # Update this
-OUTPUT_DIR = r"~/make2d/output/"      # Update this
+COMPONENT_DIR = (
+    r"C:\Users\mstin\Dropbox\Architecture Tools\make2d\objects"  # Update this
+)
+OUTPUT_DIR = r"C:\Users\mstin\Dropbox\Architecture Tools\make2d\output"  # Update this
 
 # View setup for Make2D-style hidden line generation
 WORK_VIEW = "Perspective"
@@ -149,6 +151,7 @@ MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM = 60.0
 # =============================================================================
 # DESK CONFIGURATIONS
 # =============================================================================
+
 
 def mon(filename, x_offset=0):
     return (filename, x_offset)
@@ -309,7 +312,9 @@ def cleanup_existing_temp_artifacts():
         if layer is None or layer.IsDeleted:
             continue
         layer_name = get_layer_full_path(layer)
-        if layer_name == TEMP_LAYER_ROOT or layer_name.startswith(TEMP_LAYER_ROOT + "::"):
+        if layer_name == TEMP_LAYER_ROOT or layer_name.startswith(
+            TEMP_LAYER_ROOT + "::"
+        ):
             layer_names.append(layer_name)
 
     layer_names.sort(key=layer_depth, reverse=True)
@@ -359,7 +364,7 @@ def vector3d_between(start_point, end_point):
     return Rhino.Geometry.Vector3d(
         end_point.X - start_point.X,
         end_point.Y - start_point.Y,
-        end_point.Z - start_point.Z
+        end_point.Z - start_point.Z,
     )
 
 
@@ -530,7 +535,11 @@ def get_mac_mini_anchor_position(config):
         return None
 
     anchor_x, anchor_y = anchor_position
-    x_value = anchor_x + MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM + get_dual_display_spacing_mm(config)
+    x_value = (
+        anchor_x
+        + MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM
+        + get_dual_display_spacing_mm(config)
+    )
     y_value = anchor_y + MAC_MINI_DESK_Y_OFFSET_MM
     return x_value, y_value
 
@@ -560,7 +569,7 @@ def get_input_device_positions(config):
         (
             MOUSE_FILENAME,
             keyboard_x + MOUSE_CENTER_X_FROM_KEYBOARD_CENTER_MM,
-            keyboard_y + MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM
+            keyboard_y + MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM,
         ),
     ]
 
@@ -586,7 +595,9 @@ def get_component_base_position(config, filename, x_value, y_value):
         return x_value, y_value
 
     anchor_x, anchor_y = anchor_position
-    x_value = anchor_x + TOWER_RIGHTMOST_DISPLAY_GAP_MM + get_dual_display_spacing_mm(config)
+    x_value = (
+        anchor_x + TOWER_RIGHTMOST_DISPLAY_GAP_MM + get_dual_display_spacing_mm(config)
+    )
     y_value = TOWER_DESK_Y_MM
     return x_value, y_value
 
@@ -630,9 +641,7 @@ def load_3dm_component(filepath, dx=0, dy=0, dz=0, rotation_deg=0):
         rotation_radians = math.radians(rotation_deg)
         transforms.append(
             Rhino.Geometry.Transform.Rotation(
-                rotation_radians,
-                Rhino.Geometry.Vector3d.ZAxis,
-                point3d(0.0, 0.0, 0.0)
+                rotation_radians, Rhino.Geometry.Vector3d.ZAxis, point3d(0.0, 0.0, 0.0)
             )
         )
     transforms.append(Rhino.Geometry.Transform.Translation(dx, dy, dz))
@@ -698,7 +707,11 @@ def compose_configuration(config):
     for monitor_file, monitor_x in config["monitors"]:
         monitor_path = os.path.join(COMPONENT_DIR, monitor_file)
         monitor_rotation = get_component_rotation_deg(monitor_file)
-        all_ids.extend(load_component_into_doc(monitor_path, monitor_x, MONITOR_Y_MM, 0, monitor_rotation))
+        all_ids.extend(
+            load_component_into_doc(
+                monitor_path, monitor_x, MONITOR_Y_MM, 0, monitor_rotation
+            )
+        )
 
     for input_file, input_x, input_y in get_input_device_positions(config):
         input_path = os.path.join(COMPONENT_DIR, input_file)
@@ -709,9 +722,13 @@ def compose_configuration(config):
 
     for extra_file, extra_x, extra_y in config.get("extras", []):
         extra_path = os.path.join(COMPONENT_DIR, extra_file)
-        extra_x, extra_y = get_component_base_position(config, extra_file, extra_x, extra_y)
+        extra_x, extra_y = get_component_base_position(
+            config, extra_file, extra_x, extra_y
+        )
         extra_rotation = get_component_rotation_deg(extra_file)
-        all_ids.extend(load_component_into_doc(extra_path, extra_x, extra_y, 0, extra_rotation))
+        all_ids.extend(
+            load_component_into_doc(extra_path, extra_x, extra_y, 0, extra_rotation)
+        )
 
     return all_ids
 
@@ -768,10 +785,7 @@ def curve_to_points(curve):
 
     sampling_tolerance = get_curve_sampling_tolerance()
     polyline_curve = curve.ToPolyline(
-        sampling_tolerance,
-        sampling_tolerance,
-        get_angle_tolerance_radians(),
-        1000.0
+        sampling_tolerance, sampling_tolerance, get_angle_tolerance_radians(), 1000.0
     )
     if polyline_curve:
         polyline = polyline_curve.ToPolyline()
@@ -820,7 +834,7 @@ def write_svg(curve_entries, filepath):
             format_number(width_mm),
             format_number(height_mm),
             format_number(width_mm),
-            format_number(height_mm)
+            format_number(height_mm),
         ),
         '<g fill="none" stroke="#000000" stroke-width="{}" stroke-linecap="round" stroke-linejoin="round">'.format(
             format_number(SVG_STROKE_WIDTH_MM)
@@ -835,10 +849,14 @@ def write_svg(curve_entries, filepath):
             continue
 
         page_points = curve_points_to_page(points, bbox)
-        svg_points = " ".join("{},{}".format(format_number(x), format_number(y)) for x, y in page_points)
+        svg_points = " ".join(
+            "{},{}".format(format_number(x), format_number(y)) for x, y in page_points
+        )
 
         if entry["style"] == "hidden":
-            hidden_lines.append('<polyline points="{}" stroke-dasharray="3 2" />'.format(svg_points))
+            hidden_lines.append(
+                '<polyline points="{}" stroke-dasharray="3 2" />'.format(svg_points)
+            )
         else:
             visible_lines.append('<polyline points="{}" />'.format(svg_points))
 
@@ -884,12 +902,10 @@ def write_pdf(curve_entries, filepath):
 
         for start_point, end_point in zip(page_points_mm[:-1], page_points_mm[1:]):
             from_point = System.Drawing.PointF(
-                float(mm_to_points(start_point[0])),
-                float(mm_to_points(start_point[1]))
+                float(mm_to_points(start_point[0])), float(mm_to_points(start_point[1]))
             )
             to_point = System.Drawing.PointF(
-                float(mm_to_points(end_point[0])),
-                float(mm_to_points(end_point[1]))
+                float(mm_to_points(end_point[0])), float(mm_to_points(end_point[1]))
             )
             line_drawn = False
             page_candidates = [draw_page_number, draw_page_number + 1]
@@ -901,14 +917,20 @@ def write_pdf(curve_entries, filepath):
                     continue
                 seen_candidates.add(candidate)
                 try:
-                    pdf.DrawLine(candidate, from_point, to_point, color, float(stroke_width))
+                    pdf.DrawLine(
+                        candidate, from_point, to_point, color, float(stroke_width)
+                    )
                     line_drawn = True
                     break
                 except Exception as exc:
                     last_error = exc
 
             if not line_drawn:
-                print("  PDF draw error on page {}: {}".format(draw_page_number, last_error))
+                print(
+                    "  PDF draw error on page {}: {}".format(
+                        draw_page_number, last_error
+                    )
+                )
                 return False
 
     try:
@@ -928,7 +950,7 @@ def write_pdf(curve_entries, filepath):
             filepath,
             System.IO.FileMode.Create,
             System.IO.FileAccess.Write,
-            getattr(System.IO.FileShare, "None")
+            getattr(System.IO.FileShare, "None"),
         )
         try:
             write_result = pdf.Write(file_stream)
@@ -981,7 +1003,9 @@ def write_png(curve_entries, filepath):
         visible_color = System.Drawing.Color.FromArgb(v_r, v_g, v_b)
         hidden_color = System.Drawing.Color.FromArgb(h_r, h_g, h_b)
 
-        visible_pen = System.Drawing.Pen(visible_color, float(PNG_VISIBLE_STROKE_WIDTH_PX))
+        visible_pen = System.Drawing.Pen(
+            visible_color, float(PNG_VISIBLE_STROKE_WIDTH_PX)
+        )
         visible_pen.StartCap = System.Drawing.Drawing2D.LineCap.Round
         visible_pen.EndCap = System.Drawing.Drawing2D.LineCap.Round
         visible_pen.LineJoin = System.Drawing.Drawing2D.LineJoin.Round
@@ -1035,9 +1059,7 @@ def write_debug_curves(curve_entries, config_name):
         return []
 
     translation = Rhino.Geometry.Transform.Translation(
-        -bbox.Min.X + EXPORT_MARGIN_MM,
-        -bbox.Min.Y + EXPORT_MARGIN_MM,
-        0.0
+        -bbox.Min.X + EXPORT_MARGIN_MM, -bbox.Min.Y + EXPORT_MARGIN_MM, 0.0
     )
 
     object_ids = []
@@ -1055,7 +1077,9 @@ def write_debug_curves(curve_entries, config_name):
     return object_ids
 
 
-def collect_hidden_line_output(source_ids, view_name, config_name, projection_name="iso"):
+def collect_hidden_line_output(
+    source_ids, view_name, config_name, projection_name="iso"
+):
     if not source_ids:
         return [], {}
 
@@ -1065,7 +1089,11 @@ def collect_hidden_line_output(source_ids, view_name, config_name, projection_na
         viewport = build_hidden_line_viewport(view_name, source_ids)
 
     if viewport is None:
-        print("WARNING: Could not build hidden line viewport for '{}'.".format(config_name))
+        print(
+            "WARNING: Could not build hidden line viewport for '{}'.".format(
+                config_name
+            )
+        )
         return [], {}
 
     params = Rhino.Geometry.HiddenLineDrawingParameters()
@@ -1109,7 +1137,9 @@ def collect_hidden_line_output(source_ids, view_name, config_name, projection_na
         elif segment.SegmentVisibility == visibility_enum.Duplicate:
             stats["duplicate"] += 1
             style = "visible"
-        elif INCLUDE_HIDDEN_LINES and segment.SegmentVisibility == visibility_enum.Hidden:
+        elif (
+            INCLUDE_HIDDEN_LINES and segment.SegmentVisibility == visibility_enum.Hidden
+        ):
             stats["hidden"] += 1
             style = "hidden"
         else:
@@ -1122,10 +1152,12 @@ def collect_hidden_line_output(source_ids, view_name, config_name, projection_na
         if curve is None or not curve.IsValid:
             continue
 
-        curve_entries.append({
-            "curve": curve,
-            "style": style,
-        })
+        curve_entries.append(
+            {
+                "curve": curve,
+                "style": style,
+            }
+        )
 
     return curve_entries, stats
 
@@ -1170,7 +1202,7 @@ def print_segment_stats(prefix, stats):
             stats.get("visible", 0),
             stats.get("duplicate", 0),
             stats.get("hidden", 0),
-            stats.get("other", 0)
+            stats.get("other", 0),
         )
     )
 
@@ -1229,7 +1261,9 @@ def main():
                     print("  Skipped: no source objects were created")
                     continue
 
-                curve_entries, stats = collect_hidden_line_output(source_ids, view_name, config["name"])
+                curve_entries, stats = collect_hidden_line_output(
+                    source_ids, view_name, config["name"]
+                )
                 print_segment_stats("", stats)
 
                 if not curve_entries:
@@ -1244,15 +1278,14 @@ def main():
                 if EXPORT_TOP_VIEW:
                     top_config_name = config["name"] + TOP_VIEW_SUFFIX
                     top_curve_entries, top_stats = collect_hidden_line_output(
-                        source_ids,
-                        view_name,
-                        top_config_name,
-                        "top"
+                        source_ids, view_name, top_config_name, "top"
                     )
                     print_segment_stats("Top ", top_stats)
 
                     if top_curve_entries:
-                        debug_ids.extend(write_debug_curves(top_curve_entries, top_config_name))
+                        debug_ids.extend(
+                            write_debug_curves(top_curve_entries, top_config_name)
+                        )
                         export_output(top_curve_entries, top_config_name)
                     else:
                         print("  Skipped: top hidden line output was empty")
