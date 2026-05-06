@@ -123,10 +123,11 @@ MONITOR_Y_MM = DESK_DEPTH * 0.3
 # away from the displays in dual-monitor setups.
 DUAL_DISPLAY_MACHINE_SPACING_MM = 60.0
 
-# The tower lives on the +X side of the displays so it renders to the
-# right of the monitors in the iso camera view (camera at +X +Y +Z).
+# The tower lives on the -X side of the displays so it renders on the
+# camera-right of the composition (the iso camera sits at +X +Y, which
+# inverts world-X relative to the screen).
 TOWER_ANCHOR_FILENAME = "fractal_tower.3dm"
-TOWER_RIGHTMOST_DISPLAY_GAP_MM = 380.0
+TOWER_LEFTMOST_DISPLAY_GAP_MM = 380.0
 TOWER_DESK_Y_MM = 40.0
 
 MAC_MINI_ANCHOR_FILENAME = "mac_mini.3dm"
@@ -166,7 +167,7 @@ def compute_dual_offsets(mon1_file, mon2_file):
     return x1, x2
 
 
-TOWER_POS = (500, 50)
+TOWER_POS = (-500, 50)
 LAPTOP_CENTER_POS = (0, -50)
 MAC_MINI_POS = (350, 200)
 
@@ -201,7 +202,7 @@ MACHINES = {
         "pos": (-250, -50),
         "label": "X1Tower",
         "extras": [
-            ("fractal_tower.3dm", 500, 50),
+            ("fractal_tower.3dm", -500, 50),
         ],
     },
 }
@@ -590,13 +591,13 @@ def get_component_base_position(config, filename, x_value, y_value):
     if filename != TOWER_ANCHOR_FILENAME:
         return x_value, y_value
 
-    anchor_position = get_rightmost_monitor_edge_position(config)
-    if not anchor_position:
+    cluster_info = get_monitor_cluster_info(config)
+    if not cluster_info:
         return x_value, y_value
 
-    anchor_x, anchor_y = anchor_position
+    leftmost_x = cluster_info["left_x"]
     x_value = (
-        anchor_x + TOWER_RIGHTMOST_DISPLAY_GAP_MM + get_dual_display_spacing_mm(config)
+        leftmost_x - TOWER_LEFTMOST_DISPLAY_GAP_MM - get_dual_display_spacing_mm(config)
     )
     y_value = TOWER_DESK_Y_MM
     return x_value, y_value
