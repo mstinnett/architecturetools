@@ -90,6 +90,24 @@ DRAW_DESK = False
 
 
 # =============================================================================
+# TEST MODE - Iterate quickly on one layout
+# =============================================================================
+
+# When non-empty, only configurations whose "name" contains any of these
+# substrings are processed. Set to [] (or comment out the entries) to run
+# every configuration. Substring matching, so ["NorthXL"] matches all
+# NorthXL_* combos and ["NorthXL_2x27"] matches just one.
+TEST_CONFIG_NAMES = []  # e.g. ["NorthXL_2x27"]
+
+# When non-empty, only these component filenames are physically loaded
+# into the doc. Positions are still computed from the full configuration,
+# so e.g. the tower lands exactly where it would with the monitors
+# loaded -- you just don't have to render them. Set to [] to load
+# everything.
+TEST_ISOLATE_COMPONENTS = []  # e.g. ["fractal_tower.3dm"]
+
+
+# =============================================================================
 # MONITOR SPACING
 # =============================================================================
 
@@ -609,7 +627,28 @@ def rotate_objects(object_ids, rotation_deg, center_point):
     rs.RotateObjects(object_ids, center_point, rotation_deg, None, False)
 
 
+def is_test_config_match(config_name):
+    if not TEST_CONFIG_NAMES:
+        return True
+    return any(pattern in config_name for pattern in TEST_CONFIG_NAMES)
+
+
+def should_load_component(filename):
+    if not TEST_ISOLATE_COMPONENTS:
+        return True
+    return filename in TEST_ISOLATE_COMPONENTS
+
+
+def filter_configurations(configs):
+    if not TEST_CONFIG_NAMES:
+        return list(configs)
+    return [config for config in configs if is_test_config_match(config["name"])]
+
+
 def load_component_into_doc(filepath, dx=0, dy=0, dz=0, rotation_deg=0):
+    if not should_load_component(os.path.basename(filepath)):
+        return []
+
     if not os.path.exists(filepath):
         print("WARNING: Missing file: {}".format(filepath))
         return []
@@ -1235,7 +1274,8 @@ def main():
     ensure_layer(SOURCE_LAYER_NAME)
 
     view_name = get_work_view_name()
-    total = len(CONFIGURATIONS)
+    configs_to_run = filter_configurations(CONFIGURATIONS)
+    total = len(configs_to_run)
     completed = 0
 
     print("=" * 60)
@@ -1245,11 +1285,27 @@ def main():
     print("Output dir: {}".format(OUTPUT_DIR))
     print("Using view: {}".format(view_name))
     print("{} configurations to process".format(total))
+    if TEST_CONFIG_NAMES:
+        print(
+            "TEST_CONFIG_NAMES filter active: {} ({} of {} configs matched)".format(
+                ", ".join(TEST_CONFIG_NAMES), total, len(CONFIGURATIONS)
+            )
+        )
+        if total == 0:
+            print("WARNING: filter matched 0 configs. Available names:")
+            for config in CONFIGURATIONS:
+                print("  {}".format(config["name"]))
+    if TEST_ISOLATE_COMPONENTS:
+        print(
+            "TEST_ISOLATE_COMPONENTS filter active: {}".format(
+                ", ".join(TEST_ISOLATE_COMPONENTS)
+            )
+        )
     print("=" * 60)
 
     rs.EnableRedraw(False)
     try:
-        for index, config in enumerate(CONFIGURATIONS):
+        for index, config in enumerate(configs_to_run):
             print("")
             print("[{}/{}] {}".format(index + 1, total, config["name"]))
 
