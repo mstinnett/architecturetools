@@ -158,6 +158,11 @@ LAPTOP_ANCHOR_FILENAMES = (
 )
 LAPTOP_DESK_X_MM = -500.0
 LAPTOP_DESK_Y_MM = 395.0
+# Used when the laptop shares the desk with another machine (config has
+# "extras"), so the laptop can be tuned independently of the single-
+# laptop configs.
+LAPTOP_MULTI_DESK_X_MM = -300.0
+LAPTOP_MULTI_DESK_Y_MM = 395.0
 
 KEYBOARD_FILENAME = "keyboard.3dm"
 MOUSE_FILENAME = "mouse.3dm"
@@ -568,10 +573,17 @@ def get_laptop_anchor_position(config):
     if not cluster_info:
         return None
 
-    x_value = LAPTOP_DESK_X_MM
+    if config.get("extras"):
+        base_x = LAPTOP_MULTI_DESK_X_MM
+        base_y = LAPTOP_MULTI_DESK_Y_MM
+    else:
+        base_x = LAPTOP_DESK_X_MM
+        base_y = LAPTOP_DESK_Y_MM
+
+    x_value = base_x
     x_value += get_left_display_expansion_mm(config)
     x_value -= get_dual_display_spacing_mm(config)
-    return x_value, LAPTOP_DESK_Y_MM
+    return x_value, base_y
 
 
 def get_input_device_positions(config):
