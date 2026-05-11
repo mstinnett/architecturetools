@@ -27,7 +27,7 @@ import rhinoscriptsyntax as rs
 import scriptcontext as sc
 import System
 
-SCRIPT_VERSION = "2026-05-06.1"
+SCRIPT_VERSION = "2026-05-11.01"
 
 
 # =============================================================================
@@ -145,12 +145,12 @@ DUAL_DISPLAY_MACHINE_SPACING_MM = 60.0
 # camera-right of the composition (the iso camera sits at +X +Y, which
 # inverts world-X relative to the screen).
 TOWER_ANCHOR_FILENAME = "fractal_tower.3dm"
-TOWER_LEFTMOST_DISPLAY_GAP_MM = 380.0
-TOWER_DESK_Y_MM = -80.0
+TOWER_LEFTMOST_DISPLAY_GAP_MM = 200.0
+TOWER_DESK_Y_MM = 350.0
 
 MAC_MINI_ANCHOR_FILENAME = "macmini.3dm"
-MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM = 260.0
-MAC_MINI_DESK_Y_OFFSET_MM = -250.0
+MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM = 200.0
+MAC_MINI_DESK_Y_OFFSET_MM = -50.0
 
 LAPTOP_ANCHOR_FILENAMES = (
     "laptop_closed.3dm",
