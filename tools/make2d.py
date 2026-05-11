@@ -97,7 +97,7 @@ DRAW_DESK = False
 # substrings are processed. Set to [] (or comment out the entries) to run
 # every configuration. Substring matching, so ["NorthXL"] matches all
 # NorthXL_* combos and ["NorthXL_2x27"] matches just one.
-TEST_CONFIG_NAMES = []  # e.g. ["NorthXL_2x27"]
+TEST_CONFIG_NAMES = ["Laptop"]  # e.g. ["NorthXL_2x27"]
 
 # When non-empty, only these component filenames are physically loaded
 # into the doc. Positions are still computed from the full configuration,
