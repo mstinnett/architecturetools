@@ -156,12 +156,16 @@ LAPTOP_ANCHOR_FILENAMES = (
     "laptop_closed.3dm",
     "macbook_air_open.3dm",
 )
-LAPTOP_DESK_X_MM = -500.0
+# Laptop is anchored to the leftmost monitor edge (like the tower). The
+# gap value is how far to the LEFT of that edge the laptop center sits,
+# so the spacing stays consistent across single/dual and 27/32/UW combos.
+LAPTOP_LEFTMOST_DISPLAY_GAP_MM = 200.0
 LAPTOP_DESK_Y_MM = 395.0
 # Used when the laptop shares the desk with another machine (config has
-# "extras"), so the laptop can be tuned independently of the single-
-# laptop configs.
-LAPTOP_MULTI_DESK_X_MM = -300.0
+# "extras"). Lets the laptop be tuned independently of the single-laptop
+# configs -- e.g. in x1_tower the tower already takes the leftmost slot,
+# so the laptop probably wants a much larger gap to clear it.
+LAPTOP_MULTI_LEFTMOST_DISPLAY_GAP_MM = 500.0
 LAPTOP_MULTI_DESK_Y_MM = 395.0
 
 KEYBOARD_FILENAME = "keyboard.3dm"
@@ -536,16 +540,6 @@ def get_dual_display_spacing_mm(config):
     return 0.0
 
 
-def get_left_display_expansion_mm(config):
-    cluster_info = get_monitor_cluster_info(config)
-    monitors = config.get("monitors") or []
-    if not cluster_info or len(monitors) < 2:
-        return 0.0
-
-    first_monitor_width = get_monitor_width_mm(monitors[0][0])
-    return cluster_info["left_x"] + (first_monitor_width / 2.0)
-
-
 def get_rightmost_monitor_edge_position(config):
     cluster_info = get_monitor_cluster_info(config)
     if not cluster_info:
@@ -574,15 +568,14 @@ def get_laptop_anchor_position(config):
         return None
 
     if config.get("extras"):
-        base_x = LAPTOP_MULTI_DESK_X_MM
+        gap = LAPTOP_MULTI_LEFTMOST_DISPLAY_GAP_MM
         base_y = LAPTOP_MULTI_DESK_Y_MM
     else:
-        base_x = LAPTOP_DESK_X_MM
+        gap = LAPTOP_LEFTMOST_DISPLAY_GAP_MM
         base_y = LAPTOP_DESK_Y_MM
 
-    x_value = base_x
-    x_value += get_left_display_expansion_mm(config)
-    x_value -= get_dual_display_spacing_mm(config)
+    leftmost_x = cluster_info["left_x"]
+    x_value = leftmost_x - gap - get_dual_display_spacing_mm(config)
     return x_value, base_y
 
 
