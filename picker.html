@@ -537,27 +537,32 @@
     return null;
   }
   function monitorComboName(deskIds) {
-    if (!deskIds || deskIds.length === 0 || deskIds.length > 2) return null;
-    var sizes = [];
-    for (var i = 0; i < deskIds.length; i++) {
-      var size = classifyMonitorSize(findMonitor(deskIds[i]));
-      if (!size) return null;
-      sizes.push(size);
+    if (!deskIds || deskIds.length === 0) return null;
+    if (deskIds.length === 1) {
+      var only = classifyMonitorSize(findMonitor(deskIds[0])) || '27';
+      return '1x' + only;
     }
-    if (sizes.length === 1) return '1x' + sizes[0];
-    if (sizes[0] === sizes[1]) return '2x' + sizes[0];
+    // 2+ monitors: classify the first two; anything beyond is collapsed to the dual layout.
+    var sizes = [];
+    for (var i = 0; i < 2; i++) {
+      sizes.push(classifyMonitorSize(findMonitor(deskIds[i])) || '27');
+    }
+    if (sizes[0] === sizes[1]) {
+      if (sizes[0] === 'UW') return '1xUW';  // no 2xUW export -- fall back to single UW
+      return '2x' + sizes[0];
+    }
     var sorted = sizes.slice().sort();
     if (sorted[0] === '27' && sorted[1] === '32') return '1x27_1x32';
-    return null;
+    return '2x27';  // generic dual fallback for unsupported mixes
   }
   function deskImageFilename(role, deskIds, platform) {
+    var combo = monitorComboName(deskIds);
+    if (!combo) return null;  // 0 monitors -- placeholder text stays
     var label;
     if (role === 'desktop') label = platform === 'mac' ? 'MacMini' : 'NorthXL';
     else if (role === 'laptop') label = platform === 'mac' ? 'MBP' : 'Laptop';
-    else if (role === 'combo') { if (platform === 'mac') return null; label = 'X1Tower'; }
+    else if (role === 'combo') label = platform === 'mac' ? 'MacMini' : 'X1Tower';
     else return null;
-    var combo = monitorComboName(deskIds);
-    if (!combo) return null;
     return label + '_' + combo;
   }
   function deskImageHTML(filename) {
