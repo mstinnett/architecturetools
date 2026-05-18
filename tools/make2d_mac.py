@@ -103,7 +103,7 @@ DRAW_DESK = False
 # substrings are processed. Set to [] (or comment out the entries) to run
 # every configuration. Substring matching, so ["NorthXL"] matches all
 # NorthXL_* combos and ["NorthXL_2x27"] matches just one.
-TEST_CONFIG_NAMES = ["X1"]  # e.g. ["NorthXL_2x27"]
+TEST_CONFIG_NAMES = ["X1Tower"]  # e.g. ["NorthXL_2x27"]
 
 # When non-empty, only these component filenames are physically loaded
 # into the doc. Positions are still computed from the full configuration,
@@ -129,13 +129,16 @@ MONITOR_WIDTHS = {
 SCREEN_YAW_DEG = 90.0
 TOWER_YAW_DEG = 90.0
 INPUT_YAW_DEG = 90.0
+# Laptops are rotated an extra 60 deg CCW from the monitor yaw so they
+# read as turned-in to the user (mac-mini-side angle).
+LAPTOP_YAW_DEG = SCREEN_YAW_DEG + 60.0
 COMPONENT_ROTATIONS_DEG = {
     "fractal_tower.3dm": TOWER_YAW_DEG,
     "monitor_27in.3dm": SCREEN_YAW_DEG,
     "monitor_32in.3dm": SCREEN_YAW_DEG,
     "monitor_34in_ultrawide.3dm": SCREEN_YAW_DEG,
-    "laptop_closed.3dm": SCREEN_YAW_DEG,
-    "macbook_air_open.3dm": SCREEN_YAW_DEG,
+    "laptop_closed.3dm": LAPTOP_YAW_DEG,
+    "macbook_air_open.3dm": LAPTOP_YAW_DEG,
     "keyboard.3dm": INPUT_YAW_DEG,
     "mouse.3dm": INPUT_YAW_DEG,
 }
