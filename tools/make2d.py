@@ -166,10 +166,11 @@ LAPTOP_ANCHOR_FILENAMES = (
 # leftmost monitor edge (so it lands on the camera-right of the displays).
 LAPTOP_LEFTMOST_DISPLAY_GAP_MM = 200.0
 LAPTOP_DESK_Y_MM = 395.0
-# Used when the laptop shares the desk with another machine (config has
-# "extras"). Lets the laptop be tuned independently of the single-laptop
-# configs.
-LAPTOP_MULTI_LEFTMOST_DISPLAY_GAP_MM = 0
+# Multi-machine configs (extras present, e.g. x1_tower). The tower
+# already sits past the leftmost monitor edge, so the laptop goes on
+# the opposite side -- anchored to the rightmost monitor edge with
+# this gap (same shape as get_mac_mini_anchor_position).
+LAPTOP_MULTI_RIGHTMOST_DISPLAY_GAP_MM = 200.0
 LAPTOP_MULTI_DESK_Y_MM = 395.0
 
 KEYBOARD_FILENAME = "keyboard.3dm"
@@ -572,15 +573,21 @@ def get_laptop_anchor_position(config):
         return None
 
     if config.get("extras"):
-        gap = LAPTOP_MULTI_LEFTMOST_DISPLAY_GAP_MM
-        base_y = LAPTOP_MULTI_DESK_Y_MM
-    else:
-        gap = LAPTOP_LEFTMOST_DISPLAY_GAP_MM
-        base_y = LAPTOP_DESK_Y_MM
+        rightmost_x = cluster_info["right_x"]
+        x_value = (
+            rightmost_x
+            + LAPTOP_MULTI_RIGHTMOST_DISPLAY_GAP_MM
+            + get_dual_display_spacing_mm(config)
+        )
+        return x_value, LAPTOP_MULTI_DESK_Y_MM
 
     leftmost_x = cluster_info["left_x"]
-    x_value = leftmost_x - gap - get_dual_display_spacing_mm(config)
-    return x_value, base_y
+    x_value = (
+        leftmost_x
+        - LAPTOP_LEFTMOST_DISPLAY_GAP_MM
+        - get_dual_display_spacing_mm(config)
+    )
+    return x_value, LAPTOP_DESK_Y_MM
 
 
 def get_input_device_positions(config):
