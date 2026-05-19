@@ -96,6 +96,12 @@
   .panels-split #panel-desktop{padding-right:2rem;border-right:2px solid var(--black);}
   .panels-split #panel-mobile{padding-left:2rem;}
   .panels-split #panel-monitors{grid-column:1/-1;padding-top:1.5rem;margin-top:1.5rem;border-top:1px solid var(--gray-200);}
+  /* When panel-monitors is the full-width row (mobile/tablet split mode),
+     lay it out as two columns: desk-zone on the left, shelf on the right.
+     The single-wide stacked layout is too wide per row of shelf cards and
+     too tall vertically. */
+  .panels-split #panel-monitors.active{display:grid;grid-template-columns:1fr 1fr;column-gap:2rem;align-items:start;}
+  .panels-split #panel-monitors .panel-label{grid-column:1/-1;}
   .panels-split .result-columns{flex-direction:column;align-items:stretch;}
   .panels-split .result-side{width:100%;}
   .panels-split .panel-label{display:block;}
@@ -105,6 +111,9 @@
     .panels-split{grid-template-columns:1fr 1fr 260px;}
     .panels-split #panel-mobile{padding-right:2rem;}
     .panels-split #panel-monitors{grid-column:3;grid-row:1;padding-top:1.5rem;margin-top:0;border-top:none;border-left:2px solid var(--black);padding-left:2rem;}
+    /* Desktop split mode: panel-monitors is a 260px sidebar -- not enough
+       room for 2 internal columns, so revert to the stacked layout. */
+    .panels-split #panel-monitors.active{display:block;}
   }
 
   /* Two-column */
@@ -588,18 +597,25 @@
     return markup;
   }
 
+  // update() rebuilds large chunks of innerHTML, which can make the browser
+  // lose its scroll anchor and jump the page. Save and restore explicitly.
+  function updatePreservingScroll() {
+    var y = window.scrollY;
+    update();
+    window.scrollTo(0, y);
+  }
   function bindDeskZoneEvents(deskId, shelfId) {
     var deskZone = document.getElementById(deskId);
     var shelfArea = document.getElementById(shelfId);
     shelfArea.querySelectorAll('.mon-avail').forEach(function(el) {
       el.addEventListener('click', function() {
-        if (State.desk.length < 4) { State.desk.push(el.dataset.mid); update(); }
+        if (State.desk.length < 4) { State.desk.push(el.dataset.mid); updatePreservingScroll(); }
       });
     });
     deskZone.querySelectorAll('.mon-on-desk').forEach(function(el) {
       el.addEventListener('click', function() {
         State.desk.splice(parseInt(el.dataset.idx, 10), 1);
-        update();
+        updatePreservingScroll();
       });
     });
   }
@@ -899,37 +915,36 @@
   swScroll.addEventListener('scroll', updateSwControls, { passive: true });
   window.addEventListener('resize', updateSwControls);
 
-  // The sw-nav doubles as a scrollbar: drag the indicator (or click an empty
-  // spot on the bar) to scrub the underlying horizontal scroller. Clicks on
-  // a nav-item still jump to that section.
+  // The sw-nav doubles as a scrollbar. Grab the bar (or indicator) and drag
+  // -- the underlying horizontal scroller follows your mouse proportionally.
+  // No snap-to-click: pressing down doesn't move anything; motion is what
+  // drives the scroll, in the same direction as the mouse. Nav-item labels
+  // keep their jump-to-section click behaviour.
   var swScrubbing = false;
-  function scrubToClientX(clientX) {
-    var rect = swNavEl.getBoundingClientRect();
-    if (rect.width <= 0) return;
-    var indicatorWidth = swNavIndicator.offsetWidth || 0;
-    var usableWidth = Math.max(rect.width - indicatorWidth, 1);
-    var rawX = clientX - rect.left - (indicatorWidth / 2);
-    var proportion = Math.max(0, Math.min(1, rawX / usableWidth));
-    var maxScroll = swScroll.scrollWidth - swScroll.clientWidth;
-    if (maxScroll <= 0) return;
-    swScroll.scrollLeft = proportion * maxScroll;
-  }
+  var swScrubStartClientX = 0;
+  var swScrubStartScrollLeft = 0;
+  var swScrubScrollPerPixel = 1;
   swNavEl.addEventListener('pointerdown', function(e) {
     if (e.button !== undefined && e.button !== 0) return;
-    var onNavItem = e.target.closest('.sw-nav-item');
-    var onIndicator = e.target === swNavIndicator;
-    // Clicks on a nav-item label keep their jump-to-section behaviour.
-    // Bar background or indicator -> start scrubbing.
-    if (onNavItem && !onIndicator) return;
+    if (e.target.closest('.sw-nav-item')) return;  // let the nav-item click jump
+    var maxScroll = swScroll.scrollWidth - swScroll.clientWidth;
+    if (maxScroll <= 0) return;
+    var navWidth = swNavEl.offsetWidth;
+    var indicatorWidth = swNavIndicator.offsetWidth || 0;
+    var trackWidth = Math.max(navWidth - indicatorWidth, 1);
     swScrubbing = true;
+    swScrubStartClientX = e.clientX;
+    swScrubStartScrollLeft = swScroll.scrollLeft;
+    swScrubScrollPerPixel = maxScroll / trackWidth;
     swNavEl.classList.add('is-scrubbing');
     try { swNavEl.setPointerCapture(e.pointerId); } catch (err) {}
-    scrubToClientX(e.clientX);
     e.preventDefault();
   });
   swNavEl.addEventListener('pointermove', function(e) {
     if (!swScrubbing) return;
-    scrubToClientX(e.clientX);
+    var dx = e.clientX - swScrubStartClientX;
+    var maxScroll = swScroll.scrollWidth - swScroll.clientWidth;
+    swScroll.scrollLeft = Math.max(0, Math.min(maxScroll, swScrubStartScrollLeft + dx * swScrubScrollPerPixel));
   });
   function endScrub(e) {
     if (!swScrubbing) return;
