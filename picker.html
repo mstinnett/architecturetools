@@ -24,12 +24,6 @@
   .control-group{display:flex;flex-direction:column;align-items:flex-start;}
 
   /* Machine type strip (below divider) — full-width tabs */
-  .machine-type-strip{margin-bottom:1.5rem;}
-  .machine-type-strip .option-row{display:flex;gap:0;width:100%;}
-  .machine-type-strip .option-pill{flex:1;text-align:center;font-size:0.95rem;padding:0.75rem 1rem;border-color:var(--gray-200);display:flex;align-items:center;justify-content:center;}
-  .machine-type-strip .option-pill+.option-pill{border-left:none;}
-  .machine-type-strip .option-pill:hover{border-color:var(--gray-500);}
-  .machine-type-strip .option-pill.active{border:2px solid var(--selected-bg);padding:calc(0.75rem - 1px) calc(1rem - 1px);}
 
   /* Merged desk zone — monitors row on top, machine underneath */
   .desk-zone{border:1px dashed var(--gray-700);padding:1rem 1rem 0.75rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;}
@@ -206,7 +200,6 @@
     .result-side{width:100%;}
     .controls-row{gap:1.5rem 2rem;}
     .spec-block{gap:1rem 2rem;}
-    .machine-type-strip .option-pill{font-size:0.8rem;padding:0.65rem 0.6rem;}
     .panels-split{grid-template-columns:1fr;}
     .panels-split #panel-desktop{padding-right:0;border-right:none;border-bottom:2px solid var(--black);padding-bottom:1.5rem;margin-bottom:1.5rem;}
     .panels-split #panel-mobile{padding-left:0;}
@@ -222,8 +215,59 @@
 <div class="picker">
   <div class="picker-header">
     <h1>What computer should I buy for architecture?</h1>
-    <p>Toggle the software you use — recommendation updates live.</p>
+    <p>Live recommendation. Tweak the inputs below.</p>
   </div>
+
+  <!-- Answer first: hero illustration, then the recommendation panels. -->
+  <div class="desk-hero" id="deskHero"></div>
+
+  <div id="panelsWrapper">
+  <!-- Desktop -->
+  <div class="results-panel active" id="panel-desktop">
+    <div class="panel-label">Desktop</div>
+    <div class="result-columns">
+      <div class="result-main">
+        <div class="price-summary" id="d-price"></div>
+        <div class="spec-block" id="d-spec"></div>
+        <div id="d-priority" class="priority-box"></div>
+        <button class="laptop-see-all-btn" id="d-details-btn" type="button">Build / buy details</button>
+        <div class="laptop-all-list" id="d-details">
+          <div class="purchase-paths" id="d-paths"></div>
+          <div class="desktop-prebuilts" id="d-prebuilts"></div>
+        </div>
+      </div>
+      <div class="result-side">
+        <div class="desk-zone" id="d-desk"></div>
+        <div id="d-shelf-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Laptop -->
+  <div class="results-panel" id="panel-mobile">
+    <div class="panel-label">Laptop</div>
+    <div class="result-columns">
+      <div class="result-main">
+        <div id="m-content"></div>
+        <div id="m-priority" class="priority-box"></div>
+      </div>
+      <div class="result-side">
+        <div class="desk-zone" id="m-desk"></div>
+        <div id="m-shelf-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitors (shared panel in Desktop+Laptop mode) -->
+  <div class="results-panel" id="panel-monitors">
+    <div class="panel-label">Monitors</div>
+    <div class="desk-zone" id="shared-desk"></div>
+    <div id="shared-shelf-area"></div>
+  </div>
+  </div>
+
+  <!-- Heavy rule separates the answer above from the tweakable inputs below. -->
+  <hr class="divider">
 
   <div class="input-section">
     <div class="sw-nav" id="swNav">
@@ -295,6 +339,14 @@
         </div>
       </div>
       <div class="control-group">
+        <div class="section-label">Setup</div>
+        <div class="option-row" id="machineTypeOptions">
+          <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
+          <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
+          <div class="option-pill" data-machinetype="desktop_laptop"><div>Desktop + Laptop</div></div>
+        </div>
+      </div>
+      <div class="control-group">
         <div class="section-label">Platform</div>
         <div class="option-row" id="platArea">
           <div class="option-pill active" data-platform="win"><div>Windows</div></div>
@@ -305,63 +357,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <hr class="divider">
-
-  <div class="machine-type-strip">
-    <div class="option-row" id="machineTypeOptions">
-      <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
-      <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
-      <div class="option-pill" data-machinetype="desktop_laptop"><div>Desktop + Laptop</div></div>
-    </div>
-  </div>
-
-  <div class="desk-hero" id="deskHero"></div>
-
-  <div id="panelsWrapper">
-  <!-- Desktop -->
-  <div class="results-panel active" id="panel-desktop">
-    <div class="panel-label">Desktop</div>
-    <div class="result-columns">
-      <div class="result-main">
-        <div class="price-summary" id="d-price"></div>
-        <div class="spec-block" id="d-spec"></div>
-        <div id="d-priority" class="priority-box"></div>
-        <button class="laptop-see-all-btn" id="d-details-btn" type="button">Build / buy details</button>
-        <div class="laptop-all-list" id="d-details">
-          <div class="purchase-paths" id="d-paths"></div>
-          <div class="desktop-prebuilts" id="d-prebuilts"></div>
-        </div>
-      </div>
-      <div class="result-side">
-        <div class="desk-zone" id="d-desk"></div>
-        <div id="d-shelf-area"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Laptop -->
-  <div class="results-panel" id="panel-mobile">
-    <div class="panel-label">Laptop</div>
-    <div class="result-columns">
-      <div class="result-main">
-        <div id="m-content"></div>
-        <div id="m-priority" class="priority-box"></div>
-      </div>
-      <div class="result-side">
-        <div class="desk-zone" id="m-desk"></div>
-        <div id="m-shelf-area"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Monitors (shared panel in Desktop+Laptop mode) -->
-  <div class="results-panel" id="panel-monitors">
-    <div class="panel-label">Monitors</div>
-    <div class="desk-zone" id="shared-desk"></div>
-    <div id="shared-shelf-area"></div>
-  </div>
   </div>
 
   <div class="picker-footer">Updated March 2026. No affiliate commissions. Prices are approximate US retail.</div>
