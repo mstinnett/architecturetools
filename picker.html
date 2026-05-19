@@ -41,11 +41,13 @@
   .shelf-full .mon-avail{opacity:0.35;pointer-events:none;cursor:default;}
 
   /* Software nav + scroll */
-  .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;}
-  .sw-nav-item{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;}
+  .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
+  .sw-nav-item{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;position:relative;z-index:1;}
   .sw-nav-item:hover{color:var(--black);}
   .sw-nav-item.sw-active{color:var(--black);}
-  .sw-nav-indicator{position:absolute;border:1px solid var(--black);background:rgba(0,0,0,0.04);top:-2px;bottom:-1px;pointer-events:none;}
+  .sw-nav-indicator{position:absolute;border:1px solid var(--black);background:rgba(0,0,0,0.04);top:-2px;bottom:-1px;pointer-events:none;cursor:grab;}
+  .sw-nav.is-scrubbing{cursor:grabbing;}
+  .sw-nav.is-scrubbing .sw-nav-indicator{cursor:grabbing;}
   .sw-scroll-wrap{display:flex;align-items:stretch;gap:0.5rem;}
   .sw-scroll{flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:0.5rem;scrollbar-width:none;}
   .sw-scroll::-webkit-scrollbar{display:none;}
@@ -827,7 +829,6 @@
       document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
       platformOption.classList.add('active');
       State.platform = platformOption.dataset.platform;
-      State.desk = defaultDeskMonitorsForBudget(State.budget);
       update();
     });
   });
@@ -836,7 +837,6 @@
       document.querySelectorAll('#budgetOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
       budgetOption.classList.add('active');
       State.budget = budgetOption.dataset.budget;
-      State.desk = defaultDeskMonitorsForBudget(State.budget);
       update();
     });
   });
@@ -899,6 +899,47 @@
   swChevRight.addEventListener('click', function() { swScroll.scrollBy({ left: 260, behavior: 'smooth' }); });
   swScroll.addEventListener('scroll', updateSwControls, { passive: true });
   window.addEventListener('resize', updateSwControls);
+
+  // The sw-nav doubles as a scrollbar: drag the indicator (or click an empty
+  // spot on the bar) to scrub the underlying horizontal scroller. Clicks on
+  // a nav-item still jump to that section.
+  var swScrubbing = false;
+  function scrubToClientX(clientX) {
+    var rect = swNavEl.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    var indicatorWidth = swNavIndicator.offsetWidth || 0;
+    var usableWidth = Math.max(rect.width - indicatorWidth, 1);
+    var rawX = clientX - rect.left - (indicatorWidth / 2);
+    var proportion = Math.max(0, Math.min(1, rawX / usableWidth));
+    var maxScroll = swScroll.scrollWidth - swScroll.clientWidth;
+    if (maxScroll <= 0) return;
+    swScroll.scrollLeft = proportion * maxScroll;
+  }
+  swNavEl.addEventListener('pointerdown', function(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    var onNavItem = e.target.closest('.sw-nav-item');
+    var onIndicator = e.target === swNavIndicator;
+    // Clicks on a nav-item label keep their jump-to-section behaviour.
+    // Bar background or indicator -> start scrubbing.
+    if (onNavItem && !onIndicator) return;
+    swScrubbing = true;
+    swNavEl.classList.add('is-scrubbing');
+    try { swNavEl.setPointerCapture(e.pointerId); } catch (err) {}
+    scrubToClientX(e.clientX);
+    e.preventDefault();
+  });
+  swNavEl.addEventListener('pointermove', function(e) {
+    if (!swScrubbing) return;
+    scrubToClientX(e.clientX);
+  });
+  function endScrub(e) {
+    if (!swScrubbing) return;
+    swScrubbing = false;
+    swNavEl.classList.remove('is-scrubbing');
+    try { swNavEl.releasePointerCapture(e.pointerId); } catch (err) {}
+  }
+  swNavEl.addEventListener('pointerup', endScrub);
+  swNavEl.addEventListener('pointercancel', endScrub);
   updateSwControls();
 })();
 </script>
