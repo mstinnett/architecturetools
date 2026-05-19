@@ -10,18 +10,19 @@
   :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#f9f9f8;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
   html{font-size:15px;}
   body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;}
-  .picker{max-width:1060px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);}
+  .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);}
   .picker-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
   .picker-header h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.2rem;}
   .picker-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:44em;}
   .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.75rem;}
   .input-section{margin-bottom:2.5rem;}
 
-  /* Controls cluster */
+  /* Controls cluster -- 4-column grid (Budget / Scale / Setup / Platform) */
   .controls-cluster{margin-bottom:2.5rem;}
-  .controls-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-bottom:1.5rem;}
-  .controls-row:last-child{margin-bottom:0;}
-  .control-group{display:flex;flex-direction:column;align-items:flex-start;}
+  .controls-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2rem;align-items:start;margin-bottom:0;}
+  .control-group{display:flex;flex-direction:column;align-items:flex-start;min-width:0;}
+  .control-group .option-row{flex-direction:column;align-items:stretch;width:100%;}
+  .control-group .option-pill{flex:0 0 auto;}
 
   /* Machine type strip (below divider) — full-width tabs */
 
@@ -192,13 +193,18 @@
   .strategy-row{margin-bottom:1.5rem;}
   .picker-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-700);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
 
+  @media(max-width:980px){
+    .controls-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem 2rem;}
+  }
+  @media(max-width:540px){
+    .controls-row{grid-template-columns:1fr;}
+  }
   @media(max-width:820px){
     .picker{padding:2rem 1.25rem 3rem;}
     .picker-header{margin-bottom:2rem;padding-bottom:1.5rem;}
     .divider{margin:2rem 0;}
     .result-columns{flex-direction:column;align-items:stretch;}
     .result-side{width:100%;}
-    .controls-row{gap:1.5rem 2rem;}
     .spec-block{gap:1rem 2rem;}
     .panels-split{grid-template-columns:1fr;}
     .panels-split #panel-desktop{padding-right:0;border-right:none;border-bottom:2px solid var(--black);padding-bottom:1.5rem;margin-bottom:1.5rem;}
@@ -329,8 +335,6 @@
         <div class="section-label">Budget</div>
         <div class="option-row" id="budgetOptions"></div>
       </div>
-    </div>
-    <div class="controls-row">
       <div class="control-group">
         <div class="section-label">Project Scale</div>
         <div class="option-row" id="scaleOptions">
