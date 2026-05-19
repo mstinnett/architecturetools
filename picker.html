@@ -33,8 +33,8 @@
 
   /* Merged desk zone — monitors row on top, machine underneath */
   .desk-zone{border:1px dashed var(--gray-700);padding:1rem 1rem 0.75rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;}
-  .desk-image{display:block;width:100%;max-width:100%;max-height:220px;object-fit:contain;margin:0 auto;}
-  .desk-machine.has-image{padding:0.25rem 0 0;min-height:0;width:100%;color:inherit;font-size:inherit;font-weight:inherit;}
+  .desk-hero{max-width:720px;margin:0 auto 1.5rem;}
+  .desk-hero img{width:100%;height:auto;display:block;}
   .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
   .desk-machine{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0.5rem 0.75rem;min-height:60px;}
   .desk-zone .mon-desk-hint{padding:0.75rem 0;}
@@ -317,6 +317,8 @@
     </div>
   </div>
 
+  <div class="desk-hero" id="deskHero"></div>
+
   <div id="panelsWrapper">
   <!-- Desktop -->
   <div class="results-panel active" id="panel-desktop">
@@ -507,7 +509,7 @@
     return '<svg width="' + totalWidth + '" height="' + totalHeight + '" viewBox="0 0 ' + totalWidth + ' ' + totalHeight + '" fill="none" aria-hidden="true"><rect x="' + screenX.toFixed(1) + '" y="0.5" width="' + Math.max(screenWidth - 1, 1) + '" height="' + Math.max(screenHeight - 1, 1) + '" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="' + centerX.toFixed(1) + '" y1="' + (screenHeight - 0.5).toFixed(1) + '" x2="' + centerX.toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/><line x1="' + (centerX - (baseWidth / 2)).toFixed(1) + '" y1="' + baseY.toFixed(1) + '" x2="' + (centerX + (baseWidth / 2)).toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/></svg>';
   }
 
-  function buildDeskZoneHTML(machineHTML) {
+  function buildDeskZoneHTML() {
     var markup = '<span class="mon-desk-label">Your desk</span>';
     markup += '<div class="desk-monitors">';
     if (State.desk.length === 0) {
@@ -520,10 +522,6 @@
       }
     }
     markup += '</div>';
-    if (machineHTML) {
-      var machineClass = 'desk-machine' + (machineHTML.indexOf('<img') >= 0 ? ' has-image' : '');
-      markup += '<div class="' + machineClass + '">' + machineHTML + '</div>';
-    }
     return markup;
   }
 
@@ -539,7 +537,9 @@
     return null;
   }
   function monitorComboName(deskIds) {
-    if (!deskIds || deskIds.length === 0) return null;
+    // Always returns a valid combo so the hero can always show something.
+    // Empty desk falls back to the dual 27" layout (most common default).
+    if (!deskIds || deskIds.length === 0) return '2x27';
     if (deskIds.length === 1) {
       var only = classifyMonitorSize(findMonitor(deskIds[0])) || '27';
       return '1x' + only;
@@ -558,18 +558,17 @@
     return '2x27';  // generic dual fallback for unsupported mixes
   }
   function deskImageFilename(role, deskIds, platform) {
-    var combo = monitorComboName(deskIds);
-    if (!combo) return null;  // 0 monitors -- placeholder text stays
     var label;
     if (role === 'desktop') label = platform === 'mac' ? 'MacMini' : 'NorthXL';
     else if (role === 'laptop') label = platform === 'mac' ? 'MBP' : 'Laptop';
     else if (role === 'combo') label = platform === 'mac' ? 'MacMini' : 'X1Tower';
     else return null;
-    return label + '_' + combo;
+    return label + '_' + monitorComboName(deskIds);
   }
-  function deskImageHTML(filename) {
+  function deskHeroHTML(role, deskIds, platform) {
+    var filename = deskImageFilename(role, deskIds, platform);
     if (!filename) return '';
-    return '<img class="desk-image" src="assets/desk-images/' + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout" loading="lazy" onerror="this.style.display=\'none\'">';
+    return '<img src="assets/desk-images/' + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout" loading="eager" onerror="this.onerror=null;this.src=\'assets/desk-images/NorthXL_2x27.png\';">';
   }
 
   function buildShelfHTML() {
@@ -668,12 +667,14 @@
     document.getElementById('panelsWrapper').classList.toggle('panels-split', isSplit);
     document.querySelector('.picker').classList.toggle('split-mode', isSplit);
 
+    // Hero desk illustration -- one big image that swaps with state.
+    var heroRole = isSplit ? 'combo' : (State.machineType === 'laptop' ? 'laptop' : 'desktop');
+    document.getElementById('deskHero').innerHTML = deskHeroHTML(heroRole, State.desk, activePlatform);
+
     // Desktop spec + desk zone
     var desktopBudgetTier = State.machineType === 'desktop_laptop' ? downgradedBudget(State.budget) : State.budget;
-    var machineIllusHTML;
     if (isMacPlatform) {
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
-      machineIllusHTML = deskImageHTML(deskImageFilename('desktop', State.desk, activePlatform)) || '<span>[ isometric Mac Studio ]</span>';
       document.getElementById('d-price').textContent = selectedMacDesktopSpec.price + ' + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
       document.getElementById('d-paths').innerHTML = '<div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div>';
@@ -682,7 +683,6 @@
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
       var towerPriceBounds = parsePriceRange(selectedWindowsDesktopSpec.priceRange);
-      machineIllusHTML = deskImageHTML(deskImageFilename('desktop', State.desk, activePlatform)) || '<span>[ isometric tower ]</span>';
       document.getElementById('d-price').textContent = selectedWindowsDesktopSpec.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
       document.getElementById('d-paths').innerHTML =
@@ -694,13 +694,12 @@
 
     // Desktop desk zone / shared monitors panel
     if (isSplit) {
-      var comboImageHTML = deskImageHTML(deskImageFilename('combo', State.desk, activePlatform));
-      document.getElementById('shared-desk').innerHTML = buildDeskZoneHTML(comboImageHTML);
+      document.getElementById('shared-desk').innerHTML = buildDeskZoneHTML('');
       document.getElementById('shared-shelf-area').innerHTML = buildShelfHTML();
       document.getElementById('shared-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
       bindDeskZoneEvents('shared-desk', 'shared-shelf-area');
     } else {
-      document.getElementById('d-desk').innerHTML = buildDeskZoneHTML(machineIllusHTML);
+      document.getElementById('d-desk').innerHTML = buildDeskZoneHTML('');
       document.getElementById('d-shelf-area').innerHTML = buildShelfHTML();
       document.getElementById('d-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
       bindDeskZoneEvents('d-desk', 'd-shelf-area');
@@ -794,8 +793,7 @@
     document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
     if (!isSplit) {
-      var laptopIllusHTML = deskImageHTML(deskImageFilename('laptop', State.desk, activePlatform)) || (isMacPlatform ? '<span>[ isometric MacBook ]</span>' : '<span>[ isometric docked laptop ]</span>');
-      document.getElementById('m-desk').innerHTML = buildDeskZoneHTML(laptopIllusHTML);
+      document.getElementById('m-desk').innerHTML = buildDeskZoneHTML('');
       document.getElementById('m-shelf-area').innerHTML = buildShelfHTML();
       document.getElementById('m-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
       bindDeskZoneEvents('m-desk', 'm-shelf-area');
