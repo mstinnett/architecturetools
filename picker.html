@@ -377,10 +377,65 @@
   <div class="picker-footer">Updated March 2026. No affiliate commissions. Prices are approximate US retail.</div>
 </div>
 
-<script src="assets/data/hardware-data.js"></script>
 <script>
 (function(){
-  // All data comes from Data.* (assets/data/hardware-data.js). This file is pure logic.
+  // Data is loaded from JSON files in assets/data/ (managed by Pages CMS).
+  // The picker waits for all of them before booting -- runApp() runs once
+  // Data is populated.
+  var Data = {};
+
+  function unflattenSpecs(raw) {
+    var out = {};
+    raw.specs.forEach(function(s) {
+      if (!out[s.workload]) out[s.workload] = {};
+      if (!out[s.workload][s.scale]) out[s.workload][s.scale] = {};
+      var copy = {};
+      Object.keys(s).forEach(function(k) {
+        if (k !== 'workload' && k !== 'scale' && k !== 'budget') copy[k] = s[k];
+      });
+      out[s.workload][s.scale][s.budget] = copy;
+    });
+    Object.keys(raw.priorities || {}).forEach(function(workload) {
+      if (!out[workload]) out[workload] = {};
+      out[workload].priority = raw.priorities[workload];
+    });
+    return out;
+  }
+
+  function loadAllData() {
+    function get(url) { return fetch(url).then(function(r) { return r.json(); }); }
+    return Promise.all([
+      get('assets/data/apps.json'),
+      get('assets/data/picker-options.json'),
+      get('assets/data/windows-specs.json'),
+      get('assets/data/mac-specs.json'),
+      get('assets/data/prebuilts.json'),
+      get('assets/data/monitors.json'),
+      get('assets/data/laptops.json')
+    ]).then(function(results) {
+      var apps = results[0], options = results[1], ws = results[2], ms = results[3];
+      var pb = results[4], mon = results[5], lap = results[6];
+      Data.Apps = {};
+      apps.items.forEach(function(a) { Data.Apps[a.id] = { group: a.group, platform: a.platform }; });
+      Data.PickerOptions = options;
+      Data.WindowsSpecs = unflattenSpecs(ws);
+      Data.MacSpecs = unflattenSpecs(ms);
+      Data.Prebuilts = pb.items;
+      Data.PrebuiltTypeLabels = pb.typeLabels;
+      Data.PrebuiltTypeNotes = pb.typeNotes;
+      Data.Monitors = mon.items;
+      Data.Laptops = lap.items;
+      Data.LaptopCategoryLabels = lap.categoryLabels;
+    });
+  }
+
+  loadAllData().then(runApp).catch(function(err) {
+    console.error('Picker data load failed', err);
+    document.body.insertAdjacentHTML('afterbegin', '<div style="padding:1rem;background:#fee;color:#900;border:1px solid #900;margin:1rem;font:14px sans-serif;">Failed to load picker data. Check the browser console.</div>');
+  });
+
+  function runApp() {
+  // All data comes from Data.* (loaded above). This block is pure logic.
 
   var defaultPickerState = Data.PickerOptions.defaultState;
   var workloadProfileLabels = {
@@ -477,7 +532,8 @@
     return false;
   }
   function isRecommendedForBudget(item, activeProfile, budgetId) {
-    return !!(item.recommendedFor && item.recommendedFor[activeProfile] && item.recommendedFor[activeProfile][budgetId]);
+    if (!item.recommendedFor) return false;
+    return item.recommendedFor.some(function(r) { return r.workload === activeProfile && r.budget === budgetId; });
   }
   function budgetOptionLabel(budgetId) {
     for (var budgetOptionIndex = 0; budgetOptionIndex < Data.PickerOptions.budgetOptions.length; budgetOptionIndex++) {
@@ -955,6 +1011,7 @@
   swNavEl.addEventListener('pointerup', endScrub);
   swNavEl.addEventListener('pointercancel', endScrub);
   updateSwControls();
+  }  // end runApp
 })();
 </script>
 </body>

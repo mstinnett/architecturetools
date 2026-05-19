@@ -1,0 +1,238 @@
+# Pages CMS schema for architecture.tools
+# https://pagescms.org
+#
+# Each entry below maps a JSON file in assets/data/ to an editable form in
+# the CMS. The picker fetches these files at runtime, so changes go live
+# as soon as a commit lands on the deploy branch.
+
+media:
+  - name: desk-images
+    label: "Desk images"
+    input: assets/desk-images
+    output: assets/desk-images
+
+content:
+
+  # ---- Apps ----
+  - name: apps
+    label: "Apps"
+    description: "Architecture software shown in the picker. Group drives the workload profile."
+    path: assets/data/apps.json
+    type: file
+    format: json
+    fields:
+      - name: items
+        label: "Applications"
+        type: object
+        list: true
+        fields:
+          - { name: id,       label: "ID (lowercase, no spaces)", type: string, required: true, pattern: "^[a-z0-9_]+$" }
+          - { name: group,    label: "Group", type: select, required: true, options: { values: [modeling, drafting, viz, render] } }
+          - { name: platform, label: "Platform", type: select, required: true, options: { values: [win, mac, both] } }
+
+  # ---- Picker options ----
+  - name: picker-options
+    label: "Picker options"
+    description: "Defaults shown on first load, budget tier list, and default desk monitors per tier."
+    path: assets/data/picker-options.json
+    type: file
+    format: json
+    fields:
+      - name: defaultState
+        label: "Default state"
+        type: object
+        fields:
+          - { name: platform,       label: "Default platform", type: select, options: { values: [win, mac] } }
+          - { name: scale,          label: "Default project scale", type: select, options: { values: [small, large] } }
+          - { name: budget,         label: "Default budget", type: select, options: { values: [cheapest, value, best] } }
+          - { name: mobileStrategy, label: "Default laptop strategy", type: select, options: { values: [one, two] } }
+      - name: budgetOptions
+        label: "Budget tiers"
+        type: object
+        list: true
+        fields:
+          - { name: id,     label: "ID", type: string, required: true }
+          - { name: label,  label: "Display label", type: string, required: true }
+          - { name: detail, label: "Sub-label", type: string }
+      - name: deskMonitorDefaults
+        label: "Default monitors per budget tier"
+        description: "Two monitor IDs (from monitors.json) to show on the desk by default."
+        type: object
+        fields:
+          - { name: cheapest, label: "Cheapest defaults",       type: string, list: true }
+          - { name: value,    label: "Best Value defaults",     type: string, list: true }
+          - { name: best,     label: "Best Available defaults", type: string, list: true }
+
+  # ---- Windows specs ----
+  - name: windows-specs
+    label: "Windows desktop specs"
+    description: "Build-your-own recommendations for Windows. One row per (workload, scale, budget) combo."
+    path: assets/data/windows-specs.json
+    type: file
+    format: json
+    fields:
+      - name: priorities
+        label: "Priority notes (per workload)"
+        description: "Short editorial note shown alongside the spec block."
+        type: object
+        fields:
+          - { name: review,       label: "Review",       type: text }
+          - { name: drafting,     label: "Drafting",     type: text }
+          - { name: modeling,     label: "Modeling",     type: text }
+          - { name: viz,          label: "Viz",          type: text }
+          - { name: modeling_viz, label: "Modeling+viz", type: text }
+          - { name: production,   label: "Production",   type: text }
+      - name: specs
+        label: "Specs"
+        type: object
+        list: true
+        fields:
+          - { name: workload,   label: "Workload", type: select, required: true, options: { values: [review, drafting, modeling, viz, modeling_viz, production] } }
+          - { name: scale,      label: "Scale",    type: select, required: true, options: { values: [small, large] } }
+          - { name: budget,     label: "Budget",   type: select, required: true, options: { values: [cheapest, value, best] } }
+          - { name: cpu,        label: "CPU (e.g. Intel Core Ultra 7 265K or AMD Ryzen 9 9950X)", type: string }
+          - { name: cpuNote,    label: "CPU note", type: text }
+          - { name: gpu,        label: "GPU",      type: string }
+          - { name: gpuNote,    label: "GPU note", type: text }
+          - { name: ram,        label: "RAM",      type: string }
+          - { name: ramNote,    label: "RAM note", type: text }
+          - { name: storage,    label: "Storage",  type: string }
+          - { name: priceRange, label: "Price range (e.g. $900--$1,100)", type: string }
+
+  # ---- Mac specs ----
+  - name: mac-specs
+    label: "Mac desktop specs"
+    description: "Apple desktop recommendations. One row per (workload, scale, budget) combo."
+    path: assets/data/mac-specs.json
+    type: file
+    format: json
+    fields:
+      - name: priorities
+        label: "Priority notes (per workload)"
+        type: object
+        fields:
+          - { name: review,       label: "Review",       type: text }
+          - { name: drafting,     label: "Drafting",     type: text }
+          - { name: modeling,     label: "Modeling",     type: text }
+          - { name: viz,          label: "Viz",          type: text }
+          - { name: modeling_viz, label: "Modeling+viz", type: text }
+          - { name: production,   label: "Production",   type: text }
+      - name: specs
+        label: "Specs"
+        type: object
+        list: true
+        fields:
+          - { name: workload, label: "Workload", type: select, required: true, options: { values: [review, drafting, modeling, viz, modeling_viz, production] } }
+          - { name: scale,    label: "Scale",    type: select, required: true, options: { values: [small, large] } }
+          - { name: budget,   label: "Budget",   type: select, required: true, options: { values: [cheapest, value, best] } }
+          - { name: chip,     label: "Chip (e.g. Mac Studio -- M4 Max)", type: string }
+          - { name: cpuNote,  label: "Chip note", type: text }
+          - { name: memory,   label: "Memory",   type: string }
+          - { name: storage,  label: "Storage",  type: string }
+          - { name: price,    label: "Price range", type: string }
+
+  # ---- Monitors ----
+  - name: monitors
+    label: "Monitors"
+    description: "Available displays. Width/height are inches and drive the desk diagram."
+    path: assets/data/monitors.json
+    type: file
+    format: json
+    fields:
+      - name: items
+        label: "Monitors"
+        type: object
+        list: true
+        fields:
+          - { name: id,       label: "ID (e.g. m5k27)", type: string, required: true, pattern: "^[a-z0-9_]+$" }
+          - { name: name,     label: "Name", type: string, required: true }
+          - { name: price,    label: "Price (USD)", type: number }
+          - { name: platform, label: "Platform", type: select, options: { values: [win, mac, both] } }
+          - { name: width,    label: "Width (inches)", type: number }
+          - { name: height,   label: "Height (inches)", type: number }
+
+  # ---- Prebuilts ----
+  - name: prebuilts
+    label: "Prebuilt desktops"
+    path: assets/data/prebuilts.json
+    type: file
+    format: json
+    fields:
+      - name: typeLabels
+        label: "Type labels"
+        type: object
+        fields:
+          - { name: mini,        label: "Mini",        type: string }
+          - { name: office,      label: "Office",      type: string }
+          - { name: workstation, label: "Workstation", type: string }
+          - { name: gaming,      label: "Gaming",      type: string }
+      - name: typeNotes
+        label: "Type notes"
+        type: object
+        fields:
+          - { name: mini,        label: "Mini note",        type: text }
+          - { name: office,      label: "Office note",      type: text }
+          - { name: workstation, label: "Workstation note", type: text }
+          - { name: gaming,      label: "Gaming note",      type: text }
+      - name: items
+        label: "Prebuilt machines"
+        type: object
+        list: true
+        fields:
+          - { name: type,  label: "Type",  type: select, options: { values: [mini, office, workstation, gaming] } }
+          - { name: name,  label: "Name",  type: string, required: true }
+          - { name: price, label: "Price (e.g. $600--$900)", type: string }
+          - { name: note,  label: "Note",  type: text }
+          - name: workloadProfiles
+            label: "Fits these workloads"
+            type: select
+            list: true
+            options: { values: [review, drafting, modeling, viz, modeling_viz, production] }
+          - name: recommendedFor
+            label: "Recommended for (workload + budget pairs)"
+            type: object
+            list: true
+            fields:
+              - { name: workload, label: "Workload", type: select, options: { values: [review, drafting, modeling, viz, modeling_viz, production] } }
+              - { name: budget,   label: "Budget",   type: select, options: { values: [cheapest, value, best] } }
+
+  # ---- Laptops ----
+  - name: laptops
+    label: "Laptops"
+    path: assets/data/laptops.json
+    type: file
+    format: json
+    fields:
+      - name: categoryLabels
+        label: "Category labels"
+        type: object
+        fields:
+          - { name: one,     label: "One-machine",        type: string }
+          - { name: desk,    label: "Desk-bound",         type: string }
+          - { name: travel,  label: "Travel",             type: string }
+          - { name: student, label: "Student (Windows)",  type: string }
+          - { name: mac_p,   label: "MacBook (primary)",  type: string }
+          - { name: mac_s,   label: "MacBook (student)",  type: string }
+      - name: items
+        label: "Laptops"
+        type: object
+        list: true
+        fields:
+          - { name: category, label: "Category", type: select, options: { values: [one, desk, travel, student, mac_p, mac_s] } }
+          - { name: platform, label: "Platform", type: select, options: { values: [win, mac] } }
+          - { name: name,     label: "Name",     type: string, required: true }
+          - { name: price,    label: "Price",    type: string }
+          - { name: weight,   label: "Weight",   type: string }
+          - { name: note,     label: "Note",     type: text }
+          - name: workloadProfiles
+            label: "Fits these workloads"
+            type: select
+            list: true
+            options: { values: [review, drafting, modeling, viz, modeling_viz, production] }
+          - name: recommendedFor
+            label: "Recommended for (workload + budget pairs)"
+            type: object
+            list: true
+            fields:
+              - { name: workload, label: "Workload", type: select, options: { values: [review, drafting, modeling, viz, modeling_viz, production] } }
+              - { name: budget,   label: "Budget",   type: select, options: { values: [cheapest, value, best] } }

@@ -1,0 +1,69 @@
+{
+  "items": [
+    {
+      "id": "revit",
+      "group": "modeling",
+      "platform": "win"
+    },
+    {
+      "id": "archicad",
+      "group": "modeling",
+      "platform": "both"
+    },
+    {
+      "id": "vectorworks",
+      "group": "modeling",
+      "platform": "both"
+    },
+    {
+      "id": "sketchup",
+      "group": "modeling",
+      "platform": "both"
+    },
+    {
+      "id": "rhino",
+      "group": "modeling",
+      "platform": "both"
+    },
+    {
+      "id": "autocad",
+      "group": "drafting",
+      "platform": "win"
+    },
+    {
+      "id": "enscape",
+      "group": "viz",
+      "platform": "both"
+    },
+    {
+      "id": "lumion",
+      "group": "viz",
+      "platform": "win"
+    },
+    {
+      "id": "d5",
+      "group": "viz",
+      "platform": "win"
+    },
+    {
+      "id": "twinmotion",
+      "group": "viz",
+      "platform": "both"
+    },
+    {
+      "id": "unreal",
+      "group": "viz",
+      "platform": "win"
+    },
+    {
+      "id": "vray",
+      "group": "render",
+      "platform": "both"
+    },
+    {
+      "id": "corona",
+      "group": "render",
+      "platform": "both"
+    }
+  ]
+}
