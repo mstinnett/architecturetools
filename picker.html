@@ -20,7 +20,11 @@
   /* Controls cluster -- 4-column grid (Budget / Scale / Setup / Platform) */
   .controls-cluster{margin-bottom:2.5rem;}
   .controls-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2rem;align-items:start;margin-bottom:0;}
-  .control-group{display:flex;flex-direction:column;align-items:flex-start;min-width:0;}
+  .control-group{display:flex;flex-direction:column;align-items:stretch;min-width:0;}
+  /* Pills stack vertically inside each column so every button is exactly
+     one column wide -- gives all four columns identical button widths. */
+  .control-group .option-row{flex-direction:column;align-items:stretch;gap:0.4rem;}
+  .control-group .option-pill{width:100%;text-align:left;}
 
   /* Machine type strip (below divider) — full-width tabs */
 
@@ -140,7 +144,7 @@
   .mon-on-desk:hover .mon-on-desk-name{color:var(--black);}
 
   .mon-shelf-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.4rem;}
-  .mon-shelf{display:flex;flex-wrap:wrap;gap:0.4rem;}
+  .mon-shelf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.4rem;}
   .mon-avail{display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;transition:all 0.15s;background:var(--white);position:relative;}
   .mon-avail:hover{border-color:var(--gray-500);}
   .mon-avail.recommended{border:2px solid var(--black);padding:calc(0.4rem - 1px);}
