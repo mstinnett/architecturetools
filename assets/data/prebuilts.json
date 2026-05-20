@@ -9,7 +9,7 @@
     "mini": "Silent, tiny, no discrete GPU. Drives 2-4 monitors on integrated graphics. Perfect for document review, drafting, and light modeling.",
     "office": "Standard office tower. Some accept a low-power GPU (RTX 4060 class, 115W). Good for drafting and modeling. Cannot fit a high-end GPU.",
     "workstation": "ISV-certified, vPro, ECC optional. Real support. RTX Pro (not GeForce) GPUs -- fine for modeling, underpowered for serious viz.",
-    "gaming": "When you need a real GPU, buy a gaming desktop. 850W PSU, triple-slot GPU clearance, proper cooling. Outperforms a $4,000 workstation for Enscape/Lumion/V-Ray at half the price."
+    "gaming": "When you need a real GPU, buy a gaming desktop. 850W PSU, triple-slot GPU clearance, proper cooling. Outperforms an ISV-certified workstation for Enscape/Lumion/V-Ray, often by a wide margin."
   },
   "items": [
     {
@@ -91,7 +91,7 @@
       "type": "office",
       "name": "Lenovo ThinkCentre Neo 50t",
       "price": "$800--$1,200",
-      "note": "i5/i7, 32 GB, has PCIe x16 slot. Add an RTX 4060 ($300) for viewport acceleration.",
+      "note": "i5/i7, 32 GB, has PCIe x16 slot. Add an RTX 4060 for viewport acceleration.",
       "workloadProfiles": [
         "review",
         "drafting",
