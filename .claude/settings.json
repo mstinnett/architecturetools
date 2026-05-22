@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(bash .claude/gate/run.sh)",
+      "Bash(node .claude/gate/check-links.mjs)",
+      "Bash(codex:*)"
+    ]
+  }
+}

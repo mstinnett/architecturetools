@@ -1,0 +1,4 @@
+# Autonomous work system — local-only artifacts (not part of the site)
+.claude/gate/node_modules/
+scratch/*
+!scratch/.gitkeep

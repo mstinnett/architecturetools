@@ -1,0 +1,13 @@
+{
+  "name": "architecturetools-gate",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Rung 0 verification gate for the autonomous work system. A dependency carve-out: these tools are NOT part of the published site and never ship with it.",
+  "scripts": {
+    "gate": "bash run.sh"
+  },
+  "devDependencies": {
+    "htmlhint": "^1.1.4",
+    "stylelint": "^16.10.0"
+  }
+}
