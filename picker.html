@@ -138,7 +138,6 @@
   .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);}
   .priority-box-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
   .priority-box p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
-  .price-summary{font-family:var(--font-body);font-size:1rem;font-weight:500;margin-bottom:1.5rem;}
   .desktop-prebuilts{margin-top:1.5rem;}
 
   /* Monitor sidebar: desk on top, shelf below */
@@ -158,14 +157,9 @@
   .mon-avail:hover{border-color:var(--gray-500);}
   .mon-avail.recommended{border:2px solid var(--black);padding:calc(0.4rem - 1px);}
   .mon-avail-name{font-size:0.6rem;font-weight:400;white-space:nowrap;}
-  .mon-avail-price{font-size:0.55rem;font-family:var(--font-body);font-weight:300;color:var(--gray-500);}
   .mon-avail .mbadge{display:none;position:absolute;top:2px;right:2px;font-size:0.4rem;font-family:var(--font-body);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
   .mon-avail.recommended .mbadge{display:block;}
   .mon-avail svg,.mon-on-desk svg{display:block;}
-
-  .mon-total{display:flex;justify-content:space-between;align-items:baseline;padding-top:0.5rem;border-top:1px solid var(--gray-700);margin-top:0.5rem;}
-  .mon-total-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);}
-  .mon-total-price{font-family:var(--font-body);font-size:0.82rem;font-weight:300;}
 
   /* Laptop list */
   .laptop-category{margin-bottom:1.5rem;}
@@ -181,7 +175,6 @@
   .laptop-equivalence-label{display:block;margin-bottom:0.15rem;font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
   .laptop-meta{display:flex;gap:1rem;flex-shrink:0;align-items:baseline;}
   .laptop-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);white-space:nowrap;}
-  .laptop-price{font-size:0.72rem;font-family:var(--font-body);font-weight:300;color:var(--gray-700);white-space:nowrap;}
   .laptop-list-note{margin-top:0.75rem;font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;font-style:italic;}
   .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.5;}
 
@@ -190,7 +183,6 @@
   .laptop-rec-featured-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.5rem;}
   .laptop-rec-featured-name{font-size:1rem;font-weight:500;margin-bottom:0.35rem;}
   .laptop-rec-featured-meta{display:flex;gap:1rem;align-items:baseline;margin-bottom:0.35rem;}
-  .laptop-rec-featured-price{font-size:0.82rem;font-family:var(--font-body);font-weight:400;}
   .laptop-rec-featured-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);}
   .laptop-rec-featured-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;line-height:1.5;}
   .laptop-see-all-btn{width:100%;border:1px solid var(--gray-300);background:none;cursor:pointer;font-size:0.85rem;font-family:var(--font-body);font-weight:400;color:var(--gray-700);padding:1rem 1.25rem;text-align:left;display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;transition:border-color 0.15s,color 0.15s;}
@@ -244,7 +236,6 @@
     <div class="panel-label">Desktop</div>
     <div class="result-columns">
       <div class="result-main">
-        <div class="price-summary" id="d-price"></div>
         <div class="spec-block" id="d-spec"></div>
         <div id="d-priority" class="priority-box"></div>
         <button class="laptop-see-all-btn" id="d-details-btn" type="button">Build / buy details</button>
@@ -374,7 +365,7 @@
     </div>
   </div>
 
-  <div class="picker-footer">Updated March 2026. No affiliate commissions. Prices are approximate US retail.</div>
+  <div class="picker-footer">Updated March 2026. Independent recommendations &mdash; no affiliate commissions.</div>
 </div>
 
 <script src="assets/data/hardware-data.js"></script>
@@ -459,17 +450,6 @@
     return 'review';
   }
   function findMonitor(monitorId) { for (var monitorIndex = 0; monitorIndex < Data.Monitors.length; monitorIndex++) if (Data.Monitors[monitorIndex].id === monitorId) return Data.Monitors[monitorIndex]; return null; }
-  function monitorTotal() { var total = 0; for (var deskIndex = 0; deskIndex < State.desk.length; deskIndex++) { var monitor = findMonitor(State.desk[deskIndex]); if (monitor) total += monitor.price; } return total; }
-  function monitorPrice() { return monitorTotal(); }
-  function formatPrice(amount) { return '$' + amount.toLocaleString('en-US'); }
-  function monitorLabel() { return State.desk.length === 1 ? 'monitor' : 'monitors'; }
-  function parsePriceRange(priceRange) {
-    var priceBounds = priceRange.split('--');
-    return {
-      low: parseInt(priceBounds[0].replace(/[^0-9]/g, ''), 10),
-      high: parseInt(priceBounds[1].replace(/[^0-9]/g, ''), 10)
-    };
-  }
   function hasWorkloadProfile(workloadProfiles, targetProfile) {
     for (var profileIndex = 0; profileIndex < workloadProfiles.length; profileIndex++) {
       if (workloadProfiles[profileIndex] === targetProfile) return true;
@@ -585,13 +565,12 @@
     var platform = effectivePlatform();
     var recommendedMonitorIds = recommendedMonitorIdsForBudget(State.budget);
     var markup = '';
-    if (State.desk.length > 0) markup += '<div class="mon-total"><span class="mon-total-label">Monitors</span><span class="mon-total-price">' + formatPrice(monitorTotal()) + '</span></div>';
     markup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available' + (State.desk.length >= 4 ? ' — desk full' : '') + '</div><div class="mon-shelf">';
     for (var i = 0; i < Data.Monitors.length; i++) {
       var mon = Data.Monitors[i];
       if (mon.platform !== 'both' && mon.platform !== platform) continue;
       var isRec = recommendedMonitorIds.indexOf(mon.id) >= 0;
-      markup += '<div class="mon-avail' + (isRec ? ' recommended' : '') + '" data-mid="' + mon.id + '" title="Tap to add">' + monitorSVG(mon, 0.7) + '<span class="mbadge">rec</span><div class="mon-avail-name">' + mon.name + '</div><div class="mon-avail-price">' + formatPrice(mon.price) + '</div></div>';
+      markup += '<div class="mon-avail' + (isRec ? ' recommended' : '') + '" data-mid="' + mon.id + '" title="Tap to add">' + monitorSVG(mon, 0.7) + '<span class="mbadge">rec</span><div class="mon-avail-name">' + mon.name + '</div></div>';
     }
     markup += '</div>';
     return markup;
@@ -653,7 +632,6 @@
         var isRecommended = isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
         prebuiltMarkup += '<div class="laptop-row' + (isRecommended ? ' is-rec' : '') + '">';
         prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
-        prebuiltMarkup += '<div class="laptop-meta"><span class="laptop-price">' + matchedPrebuilt.price + '</span></div>';
         prebuiltMarkup += '</div>';
       }
       prebuiltMarkup += '</div>';
@@ -692,19 +670,16 @@
     var desktopBudgetTier = State.machineType === 'desktop_laptop' ? downgradedBudget(State.budget) : State.budget;
     if (isMacPlatform) {
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
-      document.getElementById('d-price').textContent = selectedMacDesktopSpec.price + ' + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
       document.getElementById('d-paths').innerHTML = '<div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div>';
       document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
       document.getElementById('d-prebuilts').innerHTML = '';
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
-      var towerPriceBounds = parsePriceRange(selectedWindowsDesktopSpec.priceRange);
-      document.getElementById('d-price').textContent = selectedWindowsDesktopSpec.priceRange + ' tower + ' + formatPrice(monitorPrice()) + ' ' + monitorLabel();
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
       document.getElementById('d-paths').innerHTML =
-        '<div class="purchase-path"><div class="purchase-path-label">Build it yourself</div><p>Case, motherboard, cooler, PSU, and RAM recommendations are on the components page. Takes about 8 hours start to finish.</p><a href="/components" class="card-link">Component recommendations</a><a href="https://pcpartpicker.com" target="_blank" rel="noopener" class="card-link">PCPartPicker</a></div>' +
-        '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Better components, burn-in testing, real support. Premium is typically $700--$1,500. Expect ' + formatPrice(Math.round(towerPriceBounds.low * 1.25 / 100) * 100) + '--' + formatPrice(Math.round(towerPriceBounds.high * 1.35 / 100) * 100) + ' for the tower.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
+        '<div class="purchase-path"><div class="purchase-path-label">Build it yourself</div><p>Source the parts yourself, using this CPU and GPU class as the target. Roughly an afternoon to assemble.</p><a href="https://pcpartpicker.com" target="_blank" rel="noopener" class="card-link">PCPartPicker</a></div>' +
+        '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Better components, burn-in testing, and real support than a big-box prebuilt.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
       document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[activeWorkloadProfile].priority + '</p>';
       document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
     }
@@ -759,7 +734,7 @@
       for (var mi = 0; mi < catItems.length; mi++) {
         var ml = catItems[mi];
         var isRec = isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
-        fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + ml.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span><span class="laptop-price">' + ml.price + '</span></div></div>';
+        fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + ml.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span></div></div>';
       }
       fullListMarkup += '</div>';
     }
@@ -773,7 +748,7 @@
       mobileMarkup += '<div class="laptop-rec-featured">';
       mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + Data.LaptopCategoryLabels[recCategory] + '</div>';
       mobileMarkup += '<div class="laptop-rec-featured-name">' + recLaptop.name + '</div>';
-      mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-price">' + recLaptop.price + '</span><span class="laptop-rec-featured-weight">' + recLaptop.weight + '</span></div>';
+      mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-weight">' + recLaptop.weight + '</span></div>';
       mobileMarkup += '<div class="laptop-rec-featured-note">' + recLaptop.note + '</div>';
       mobileMarkup += '</div>';
       if (allLaptopMatches.length > 1) {
@@ -784,7 +759,7 @@
       mobileMarkup += fullListMarkup;
     }
 
-    if (!isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Add a Thunderbolt/USB-C dock (~$200) and your desk monitors.</div>';
+    if (!isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Add a Thunderbolt/USB-C dock and your desk monitors.</div>';
     if (isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Pair with an Apple Studio Display or Asus 5K/6K. Thunderbolt docking is native.</div>';
     if (isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="laptop-list-note">Desktop handles production. Grab a light Air or base Pro for travel.</div>';
     document.getElementById('m-content').innerHTML = mobileMarkup;
