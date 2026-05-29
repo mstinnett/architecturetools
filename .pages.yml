@@ -1,0 +1,22 @@
+# Pages CMS configuration — https://pagescms.org
+#
+# Edit the hardware recommendation data through the Pages CMS web UI. The picker
+# at the site root (index.html) fetches this same JSON at runtime, so anything
+# committed here goes live with no build step.
+#
+# The file is edited as JSON (syntax-highlighted code) — the same `format: code`
+# pattern Pages CMS uses for its own JSON config. This keeps the whole nested
+# structure editable and avoids any chance of the CMS dropping unlisted fields.
+
+content:
+  - name: hardware
+    label: Hardware data
+    description: >-
+      CPU/GPU class and model recommendations, monitors, laptops, and prebuilt
+      picks that power the picker. Top-level keys include WindowsSpecs, MacSpecs,
+      Prebuilts, Monitors, Laptops, Apps, PickerOptions, and the label maps.
+    type: file
+    path: assets/data/hardware-data.json
+    format: code
+    options:
+      language: json

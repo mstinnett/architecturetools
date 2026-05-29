@@ -54,8 +54,8 @@ They are part of the site structure, but they do not need premature renaming or 
 
 ```text
 /
-├── index.html                      # AT-0 master cover sheet (to be added / refined)
-├── picker.html                     # Flagship live hardware recommendation page
+├── index.html                      # The picker — site home page and launch entry point
+├── picker.html                     # Redirect to / (kept so old links resolve)
 ├── components.html                 # Flagship live component recommendation page
 ├── site-screen.html                # Flagship live site feasibility page
 ├── a/
@@ -68,7 +68,7 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── css/
 │   │   └── global.css              # Shared design tokens and component styles
 │   └── data/
-│       └── hardware-data.js        # All hardware recommendation data
+│       └── hardware-data.json      # Hardware recommendation data (edited via Pages CMS)
 ├── calculators/
 │   ├── index.html                  # Calculator index / C-0 candidate
 │   ├── dimension-converter.html
@@ -113,9 +113,13 @@ The site should still feel like a drawing set: diagrams first, notes second, opi
 But interactive tools are explicitly allowed. They are not exceptions to the framework; they are part of the product.
 
 ### Low friction over systems
-Do not introduce a framework migration, CMS, or heavy templating layer.
+Do not introduce a framework migration, build step, or heavy templating layer.
 
 The goal is low-friction publishing in plain HTML/CSS/JS. Reuse small patterns, not infrastructure.
+
+Pages CMS is the one deliberate exception: a Git-based editor (no build, no
+backend) wired only to `assets/data/hardware-data.json` via `.pages.yml`. The
+site stays fully static — the CMS just commits JSON edits that the picker fetches.
 
 ### A few reusable page habits, not a template engine
 A page can be assembled from simple recurring parts:
@@ -154,8 +158,9 @@ Contains:
 
 **Status:** created but not yet applied everywhere. Continue migrating pages toward shared styles rather than inventing a larger system.
 
-### assets/data/hardware-data.js
-External data file loaded by `picker.html`. All hardware recommendation data lives here.
+### assets/data/hardware-data.json
+Hardware recommendation data, fetched by the picker (`index.html`) at runtime and
+editable in Pages CMS (`.pages.yml`). All hardware recommendation data lives here.
 
 This is the main source of truth for:
 - app group/platform data

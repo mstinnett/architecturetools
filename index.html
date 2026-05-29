@@ -375,10 +375,13 @@
   <div class="picker-footer">Updated March 2026. Independent recommendations &mdash; no affiliate commissions.</div>
 </div>
 
-<script src="assets/data/hardware-data.js"></script>
 <script>
+// Hardware data lives in assets/data/hardware-data.json — the single source of
+// truth, editable in Pages CMS (see .pages.yml). We fetch it, expose it as the
+// global Data, then run the picker. No build step: a CMS edit goes live directly.
+function runPicker(){
 (function(){
-  // All data comes from Data.* (assets/data/hardware-data.js). This file is pure logic.
+  // All data comes from Data.* (fetched from hardware-data.json). This file is pure logic.
 
   var defaultPickerState = Data.PickerOptions.defaultState;
   var workloadProfileLabels = {
@@ -938,6 +941,16 @@
   swNavEl.addEventListener('pointercancel', endScrub);
   updateSwControls();
 })();
+}
+
+fetch('assets/data/hardware-data.json', { cache: 'no-cache' })
+  .then(function(response){ if (!response.ok) throw new Error('hardware-data.json HTTP ' + response.status); return response.json(); })
+  .then(function(loadedData){ window.Data = loadedData; runPicker(); })
+  .catch(function(error){
+    var note = document.querySelector('.picker-header p');
+    if (note) note.textContent = 'Recommendation data failed to load — please refresh the page.';
+    if (window.console && console.error) console.error('Could not load hardware-data.json:', error);
+  });
 </script>
 </body>
 </html>

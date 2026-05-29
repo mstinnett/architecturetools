@@ -10,7 +10,7 @@ silently appended elsewhere.
 
 ## Open
 
-- [ ] **Add / refine `index.html` as AT-0.** Source: PROJECT.md priority 1. The master cover sheet — site title, one-line thesis, a compact visual index of the sets, links to the flagship live pages, an update date.
+- [ ] **Richer AT-0 master cover (deferred behind picker-only launch).** `index.html` currently *is* the picker (the launch home page). The fuller AT-0 cover — site thesis, a compact index of the sets, links to flagship pages — is future work, to land only when more of the site is linked.
 - [ ] **Add / refine a calculator index as C-0.** Source: PROJECT.md priority 2. `calculators/index.html` as the calculators set cover: framing note, grouped links, a cover-sheet feel.
 - [ ] **Bring more pages onto `assets/css/global.css`.** Source: PROJECT.md priority 3. Most calculator pages, plus `picker.html` and `site-screen.html`, do not yet import the shared stylesheet.
 - [ ] **Add thin A-series pages gradually (A-0, then A-1 … A-4).** Source: PROJECT.md priority 5 / SITE_FRAMEWORK build order. A-1 Workstation Types, A-2 Monitors, A-3 Mobile First Setups, A-4 AI in Architecture.
