@@ -943,9 +943,51 @@ function runPicker(){
 })();
 }
 
+// hardware-data.json keeps each CPU/GPU/Mac chip (its name and standard note) in
+// the CPUs/GPUs/Chips catalogs, and has the spec cells reference them by key, so
+// a model name or a shared note (VRAM, the 5090 street-price caveat) is written
+// once. hydrateSpecs() resolves those references into the flat { cpu, cpuNote,
+// gpu, gpuNote, ... } shape the rest of the picker already expects.
+//
+// A cell's cpuNote/gpuNote: absent -> use the component's catalog note; plain
+// text -> replace it for that cell; "+ text" -> add a line to the catalog note.
+function resolveNote(catalogNote, cellNote) {
+  catalogNote = catalogNote || '';
+  if (cellNote === undefined || cellNote === null) return catalogNote;
+  if (cellNote.indexOf('+ ') === 0) {
+    var extra = cellNote.slice(2);
+    return catalogNote ? (catalogNote + ' -- ' + extra) : extra;
+  }
+  return cellNote;
+}
+function hydrateSpecs(data) {
+  function look(catalog, key) { return (catalog && catalog[key]) ? catalog[key] : { name: key, note: '' }; }
+  function eachCell(specs, apply) {
+    for (var profile in specs) {
+      var byProfile = specs[profile];
+      ['small', 'large'].forEach(function(scale) {
+        if (!byProfile[scale]) return;
+        ['cheapest', 'value', 'best'].forEach(function(tier) {
+          if (byProfile[scale][tier]) apply(byProfile[scale][tier]);
+        });
+      });
+    }
+  }
+  if (data.WindowsSpecs) eachCell(data.WindowsSpecs, function(cell) {
+    var cpu = look(data.CPUs, cell.cpu), gpu = look(data.GPUs, cell.gpu);
+    cell.cpuNote = resolveNote(cpu.note, cell.cpuNote); cell.cpu = cpu.name;
+    cell.gpuNote = resolveNote(gpu.note, cell.gpuNote); cell.gpu = gpu.name;
+  });
+  if (data.MacSpecs) eachCell(data.MacSpecs, function(cell) {
+    var chip = look(data.Chips, cell.chip);
+    cell.cpuNote = resolveNote(chip.note, cell.cpuNote); cell.chip = chip.name;
+  });
+  return data;
+}
+
 fetch('assets/data/hardware-data.json', { cache: 'no-cache' })
   .then(function(response){ if (!response.ok) throw new Error('hardware-data.json HTTP ' + response.status); return response.json(); })
-  .then(function(loadedData){ window.Data = loadedData; runPicker(); })
+  .then(function(loadedData){ window.Data = hydrateSpecs(loadedData); runPicker(); })
   .catch(function(error){
     var note = document.querySelector('.picker-header p');
     if (note) note.textContent = 'Recommendation data failed to load — please refresh the page.';

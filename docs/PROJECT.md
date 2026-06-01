@@ -159,8 +159,9 @@ Contains:
 **Status:** created but not yet applied everywhere. Continue migrating pages toward shared styles rather than inventing a larger system.
 
 ### assets/data/hardware-data.json
-Hardware recommendation data, fetched by the picker (`index.html`) at runtime and
-editable in Pages CMS (`.pages.yml`). All hardware recommendation data lives here.
+Hardware recommendation data, fetched by the picker (`index.html`) at runtime.
+Designed to be hand-edited in any text editor; Pages CMS (`.pages.yml`) is an
+optional web-UI alternative. All hardware recommendation data lives here.
 
 This is the main source of truth for:
 - app group/platform data
@@ -171,6 +172,27 @@ This is the main source of truth for:
 - recommendation labels and notes
 
 Keep recommendation data centralized here.
+
+**Catalogs and references (no duplication).** The long, repeated, drift-prone
+strings — CPU/GPU/Mac-chip model names and their standard notes — are defined
+once in the `CPUs`, `GPUs`, and `Chips` catalogs. Each spec cell references a
+component by short key (`"gpu": "rtx5090"`) instead of restating the model and
+its VRAM/price note. Edit a name or a shared note in one place and every spec
+that uses it updates.
+
+A spec cell's `cpuNote`/`gpuNote` is resolved against the component's catalog
+note:
+- **omit it** → use the catalog note as-is (e.g. five review builds inherit the
+  RTX 4060's "Viewport display only" from one definition);
+- **plain text** → replace the note for that cell only;
+- **`"+ text"`** → append a per-cell line on top of the catalog note (e.g. the
+  RTX 5090's single street-price caveat plus each build's own flavor).
+
+`hydrateSpecs()` in `index.html` resolves these references at load into the flat
+`{ cpu, cpuNote, gpu, gpuNote, ... }` shape the render code expects, so the
+catalogs cost nothing at runtime and there is still no build step. The
+self-documenting `_legend` field at the top of the JSON restates these rules for
+whoever edits the file next.
 
 ---
 
