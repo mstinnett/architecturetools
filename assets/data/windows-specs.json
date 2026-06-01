@@ -1,11 +1,11 @@
 {
   "priorities": {
     "review": "Your work is document-primary. The monitor is the most important purchase.",
-    "drafting": "2D drafting is single-thread CPU bound but not demanding. Display quality matters more than compute.",
-    "modeling": "BIM modeling is single-thread CPU bound. Clock speed governs how Revit, Rhino, and SketchUp feel, and AMD's 3D V-Cache gives it a measurable edge in Revit. The GPU is nearly invisible.",
-    "viz": "Interactive viz is GPU bound. Enscape, Lumion, D5, and TwinMotion scale directly with GPU power and VRAM. The RTX 5070 Ti hits the practical sweet spot for most architecture viz.",
-    "modeling_viz": "You need both: fast single-core for modeling and a capable GPU for viz. The RTX 5070 Ti is the honest sweet spot -- enough GPU for real-time viz without overspending on cores you will not use.",
-    "production": "V-Ray and Corona are multi-thread CPU bound, with GPU hybrid modes. Core count drives render times -- AMD Ryzen 9 leads, and Threadripper PRO pulls further ahead for dedicated render boxes."
+    "drafting": "2D drafting responds most to single-core CPU performance but most options will be good. If you have heavy XREF, block, and nested file usage, RAM and storage speed can play into the equation. In general, the quality of the monitor matters more than the computer to get great output. ",
+    "modeling": "BIM modeling is single-thread CPU bound. Clock speed for comparable processor generations governs how Revit, Rhino, and SketchUp feel, and AMD's x3d chips give responsiveness t a measurable edge in Revit. The GPU doesn't affect viewport performance much. ",
+    "viz": "Interactive rendering is driven almost entirely by the GPU chocie. Enscape, Lumion, D5, and TwinMotion scale directly with GPU power and VRAM. The RTX 5070 Ti hits the practical sweet spot for most architecture viz but the sky is the limit and more GPU power means faster rendering and more complex scenes are supported. ",
+    "modeling_viz": "You need both a CPU with fast single-core performance for modeling and a capable GPU for visualization. ",
+    "production": "V-Ray CPU and Corona are multi-thread CPU bound, with GPU hybrid modes available. Core count drives render times - AMD Ryzen 9 leads, and Threadripper PRO pulls further ahead if you're only rendering on that computer. GPU rendering continues to advance and it may be worth investigating switching away from CPU rendering. "
   },
   "specs": [
     {
@@ -13,11 +13,11 @@
       "scale": "small",
       "budget": "cheapest",
       "cpu": "Intel Core Ultra 5 245K or AMD Ryzen 5 9600X",
-      "cpuNote": "Minimum spend that still feels fast for office work",
-      "gpu": "NVIDIA RTX 4060",
-      "gpuNote": "Only here to drive displays cleanly",
+      "cpuNote": "Minimum spend that still feels fast for office work.",
+      "gpu": "Integrated",
+      "gpuNote": "A dedicated GPU is needed if you occasionally open a file but otherwise a CPU with an integrated GPU can work fine. Choose one of the higher end integrated GPU models like the suggested 245k or 9600x, with the 245k edging out the 9600x. ",
       "ram": "16 GB DDR5",
-      "ramNote": "",
+      "ramNote": "8GB is truly too little.",
       "storage": "1 TB NVMe",
       "priceRange": "$900--$1,100"
     },
@@ -27,10 +27,9 @@
       "budget": "value",
       "cpu": "Intel Core Ultra 5 245K or AMD Ryzen 5 9600X",
       "cpuNote": "More than enough for documents",
-      "gpu": "NVIDIA RTX 4060",
-      "gpuNote": "Viewport display only",
+      "gpu": "Integrated",
+      "gpuNote": "A dedicated GPU is needed if you occasionally open a file but otherwise a CPU with an integrated GPU can work fine. Choose one of the higher end integrated GPU models like the suggested 245k or 9600x, with the 245k edging out the 9600x. ",
       "ram": "32 GB DDR5",
-      "ramNote": "",
       "storage": "1 TB NVMe",
       "priceRange": "$1,100--$1,400"
     },
@@ -39,11 +38,11 @@
       "scale": "small",
       "budget": "best",
       "cpu": "Intel Core Ultra 7 265K or AMD Ryzen 7 9700X",
-      "cpuNote": "Headroom for the future",
+      "cpuNote": "Marginally faster than the value pick and will last a little longer as well.",
       "gpu": "NVIDIA RTX 4060",
-      "gpuNote": "Viewport display only",
+      "gpuNote": "A 4060 will edge out integrated GPUs a bit so if you're after the best that's an upgrade you could get. ",
       "ram": "64 GB DDR5",
-      "ramNote": "",
+      "ramNote": "Headroom for more documents and more multitasking as well as longevity. ",
       "storage": "2 TB NVMe",
       "priceRange": "$1,500--$1,800"
     },
@@ -53,10 +52,10 @@
       "budget": "cheapest",
       "cpu": "Intel Core Ultra 5 245K or AMD Ryzen 5 9600X",
       "cpuNote": "Enough for large document sets if budget is tight",
-      "gpu": "NVIDIA RTX 4060",
-      "gpuNote": "Viewport display only",
+      "gpu": "Integrated",
+      "gpuNote": "A dedicated GPU is needed if you occasionally open a file but otherwise a CPU with an integrated GPU can work fine. Choose one of the higher end integrated GPU models like the suggested 245k or 9600x, with the 245k edging out the 9600x. ",
       "ram": "32 GB DDR5",
-      "ramNote": "Lets drawings, PDFs, and browser tabs coexist",
+      "ramNote": "Lets drawings, PDFs, and browser tabs coexist when you're reviewing larger document sets. ",
       "storage": "1 TB NVMe",
       "priceRange": "$1,100--$1,400"
     },
@@ -67,7 +66,7 @@
       "cpu": "Intel Core Ultra 7 265K or AMD Ryzen 7 9700X",
       "cpuNote": "Headroom for larger document sets",
       "gpu": "NVIDIA RTX 4060",
-      "gpuNote": "Viewport display only",
+      "gpuNote": "A 4060 will edge out integrated GPUs a bit so it is maybe worth it at this level for large sets. Integrated graphics can be argued to be enough even at this level. ",
       "ram": "64 GB DDR5",
       "ramNote": "Larger reference sets open simultaneously",
       "storage": "2 TB NVMe",
@@ -78,11 +77,10 @@
       "scale": "large",
       "budget": "best",
       "cpu": "Intel Core Ultra 7 265K or AMD Ryzen 7 9700X",
-      "cpuNote": "Same chip -- documents are not demanding",
+      "cpuNote": "Headroom for larger document sets",
       "gpu": "NVIDIA RTX 4060",
-      "gpuNote": "Viewport display only",
+      "gpuNote": "A 4060 will edge out integrated GPUs a bit so if you're after the best that's an upgrade you could get. ",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$1,500--$1,800"
     },
@@ -95,7 +93,6 @@
       "gpu": "NVIDIA RTX 4060",
       "gpuNote": "AutoCAD viewport is not demanding",
       "ram": "32 GB DDR5",
-      "ramNote": "",
       "storage": "1 TB NVMe",
       "priceRange": "$1,100--$1,400"
     },
@@ -108,7 +105,6 @@
       "gpu": "NVIDIA RTX 4060",
       "gpuNote": "AutoCAD viewport is not demanding",
       "ram": "32 GB DDR5",
-      "ramNote": "",
       "storage": "1 TB NVMe",
       "priceRange": "$1,300--$1,600"
     },
@@ -121,7 +117,6 @@
       "gpu": "NVIDIA RTX 5070",
       "gpuNote": "Comfortable headroom",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,200--$2,600"
     },
@@ -160,7 +155,6 @@
       "gpu": "NVIDIA RTX 5070",
       "gpuNote": "Comfortable headroom",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,400--$2,800"
     },
@@ -173,7 +167,6 @@
       "gpu": "NVIDIA RTX 4060",
       "gpuNote": "Enough for modeling, light for viz",
       "ram": "32 GB DDR5",
-      "ramNote": "",
       "storage": "1 TB NVMe",
       "priceRange": "$1,600--$1,900"
     },
@@ -186,7 +179,6 @@
       "gpu": "NVIDIA RTX 5070",
       "gpuNote": "Transparent for modeling, ready for occasional Enscape",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$1,900--$2,300"
     },
@@ -199,7 +191,6 @@
       "gpu": "NVIDIA RTX 5070 Ti",
       "gpuNote": "Ready for viz if your role expands -- 16 GB VRAM",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,600--$3,100"
     },
@@ -251,7 +242,6 @@
       "gpu": "NVIDIA RTX 5070",
       "gpuNote": "12 GB VRAM is the cheapest point that still makes sense",
       "ram": "32 GB DDR5",
-      "ramNote": "",
       "storage": "1 TB NVMe",
       "priceRange": "$1,900--$2,300"
     },
@@ -264,7 +254,6 @@
       "gpu": "NVIDIA RTX 5070 Ti",
       "gpuNote": "16 GB VRAM -- the viz sweet spot at current prices",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,400--$2,900"
     },
@@ -277,7 +266,6 @@
       "gpu": "NVIDIA RTX 5090",
       "gpuNote": "32 GB VRAM -- maximum viz, with headroom for VR and large arch-viz scenes",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$4,500--$5,500"
     },
@@ -329,7 +317,6 @@
       "gpu": "NVIDIA RTX 5070",
       "gpuNote": "Enough GPU to cross into real-time viz without overspending",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,100--$2,500"
     },
@@ -342,7 +329,6 @@
       "gpu": "NVIDIA RTX 5070 Ti",
       "gpuNote": "16 GB VRAM -- handles both workflows",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,300--$2,800"
     },
@@ -355,7 +341,6 @@
       "gpu": "NVIDIA RTX 5080",
       "gpuNote": "16 GB VRAM -- serious viz without the 5090 markup",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$3,000--$3,600"
     },
@@ -394,7 +379,6 @@
       "gpu": "NVIDIA RTX 5090",
       "gpuNote": "32 GB VRAM -- no compromises",
       "ram": "128 GB DDR5",
-      "ramNote": "",
       "storage": "4 TB NVMe",
       "priceRange": "$5,000--$6,000"
     },
@@ -407,7 +391,6 @@
       "gpu": "NVIDIA RTX 5070",
       "gpuNote": "Enough for GPU hybrid rendering without overspending",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,300--$2,800"
     },
@@ -420,7 +403,6 @@
       "gpu": "NVIDIA RTX 5070 Ti",
       "gpuNote": "GPU hybrid rendering plus viz -- 16 GB VRAM",
       "ram": "64 GB DDR5",
-      "ramNote": "",
       "storage": "2 TB NVMe",
       "priceRange": "$2,600--$3,100"
     },
@@ -433,7 +415,6 @@
       "gpu": "NVIDIA RTX 5090",
       "gpuNote": "32 GB VRAM -- GPU hybrid rendering at maximum",
       "ram": "128 GB DDR5",
-      "ramNote": "",
       "storage": "4 TB NVMe",
       "priceRange": "$5,000--$6,000"
     },
@@ -472,7 +453,6 @@
       "gpu": "NVIDIA RTX 5090",
       "gpuNote": "32 GB VRAM -- no scene too large",
       "ram": "128 GB DDR5",
-      "ramNote": "",
       "storage": "4 TB NVMe",
       "priceRange": "$5,200--$6,200"
     }
