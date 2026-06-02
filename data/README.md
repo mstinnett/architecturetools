@@ -10,11 +10,16 @@ Edit the files here instead.
 
 | File | What it holds |
 |------|----------------|
-| `catalog.csv` | Every CPU / GPU / Mac chip — its `key`, `name`, and standard `note` — defined **once**. |
+| `cpus.csv` | Each CPU rec — a `key`, an `intel` option, an `amd` option, and a `note` — defined **once**. Either vendor column may be blank. |
+| `gpus.csv` | Each GPU rec — `key`, `name`, standard `note` — defined **once**. |
+| `chips.csv` | Each Mac chip — `key`, `name` — defined **once**. |
 | `specs-win.csv` | Windows spec matrix: one row per `profile / scale / tier` cell. |
 | `specs-mac.csv` | Mac spec matrix: one row per cell. |
 | `priorities.csv` | The per-profile "where the money matters" note. |
 | `extras.json` | Everything that isn't a table (apps, prebuilts, monitors, laptops, labels). |
+
+A Windows cell's `cpu` column references a `cpus.csv` key; the picker shows it as
+"*intel* or *amd*". Its `gpu` column references a `gpus.csv` key.
 
 ## Editing in Numbers
 
@@ -29,9 +34,9 @@ notes that contain commas) — that's expected and the build handles it.
 
 ## How a spec cell works
 
-A cell names a CPU/GPU/chip by its **catalog key** (e.g. `rtx5090`), not the full
-model name. Change a name or a shared note once in `catalog.csv` and every spec
-that references it updates.
+A cell names a CPU/GPU/chip by its **catalog key** (e.g. `rtx5090`, `x3d`), not the
+full model name. Change a name or a shared note once in `cpus.csv` / `gpus.csv` /
+`chips.csv` and every spec that references it updates.
 
 The `cpuNote` / `gpuNote` columns control the note shown for that cell:
 

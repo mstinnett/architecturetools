@@ -2,7 +2,9 @@
 // Build assets/data/hardware-data.json from the hand-edited tables in data/.
 //
 //   Sources (edit these — they open as a grid in Numbers / any spreadsheet):
-//     data/catalog.csv     CPUs / GPUs / Chips — each model name + note, once
+//     data/cpus.csv        CPU recs — each an Intel + AMD option, defined once
+//     data/gpus.csv        GPU recs — name + standard note, defined once
+//     data/chips.csv       Mac chips — name, defined once
 //     data/specs-win.csv   Windows spec matrix, one row per cell
 //     data/specs-mac.csv   Mac spec matrix, one row per cell
 //     data/priorities.csv  the per-profile "where the money matters" note
@@ -64,18 +66,26 @@ function readTable(rel) {
   return out;
 }
 
-// ---- catalogs ----
+// ---- catalogs (each in its own sheet) ----
 const CPUs = {}, GPUs = {}, Chips = {};
-const catalogFor = { cpu: CPUs, gpu: GPUs, chip: Chips };
-for (const r of readTable('data/catalog.csv')) {
-  const target = catalogFor[r.kind];
-  if (!target) { fail(`catalog.csv line ${r.__line}: unknown kind "${r.kind}"`); continue; }
-  if (!r.key) { fail(`catalog.csv line ${r.__line}: missing key`); continue; }
-  if (target[r.key]) fail(`catalog.csv line ${r.__line}: duplicate ${r.kind} key "${r.key}"`);
-  target[r.key] = r.kind === 'gpu' ? { name: r.name, note: r.note || '' } : { name: r.name };
+for (const r of readTable('data/cpus.csv')) {
+  if (!r.key) { fail(`cpus.csv line ${r.__line}: missing key`); continue; }
+  if (CPUs[r.key]) fail(`cpus.csv line ${r.__line}: duplicate cpu key "${r.key}"`);
+  if (!r.intel && !r.amd) fail(`cpus.csv line ${r.__line}: "${r.key}" has neither an intel nor an amd option`);
+  CPUs[r.key] = { intel: r.intel || '', amd: r.amd || '', note: r.note || '' };
+}
+for (const r of readTable('data/gpus.csv')) {
+  if (!r.key) { fail(`gpus.csv line ${r.__line}: missing key`); continue; }
+  if (GPUs[r.key]) fail(`gpus.csv line ${r.__line}: duplicate gpu key "${r.key}"`);
+  GPUs[r.key] = { name: r.name, note: r.note || '' };
+}
+for (const r of readTable('data/chips.csv')) {
+  if (!r.key) { fail(`chips.csv line ${r.__line}: missing key`); continue; }
+  if (Chips[r.key]) fail(`chips.csv line ${r.__line}: duplicate chip key "${r.key}"`);
+  Chips[r.key] = { name: r.name };
 }
 
-const checkRef = (cat, key, where, label) => { if (!cat[key]) fail(`${where}: unknown ${label} "${key}" (not in catalog.csv)`); };
+const checkRef = (cat, key, where, label, file) => { if (!cat[key]) fail(`${where}: unknown ${label} "${key}" (not in ${file})`); };
 
 // ---- spec matrices ----
 function buildSpecs(rel, makeCell) {
@@ -98,8 +108,8 @@ function buildSpecs(rel, makeCell) {
 }
 
 const winByProfile = buildSpecs('data/specs-win.csv', (r, where) => {
-  checkRef(CPUs, r.cpu, where, 'cpu');
-  checkRef(GPUs, r.gpu, where, 'gpu');
+  checkRef(CPUs, r.cpu, where, 'cpu', 'cpus.csv');
+  checkRef(GPUs, r.gpu, where, 'gpu', 'gpus.csv');
   const cell = { cpu: r.cpu, cpuNote: r.cpuNote, gpu: r.gpu };
   if (r.gpuNote) cell.gpuNote = r.gpuNote; // blank = inherit the GPU's catalog note
   cell.ram = r.ram; cell.ramNote = r.ramNote; cell.storage = r.storage; cell.priceRange = r.price;
@@ -107,7 +117,7 @@ const winByProfile = buildSpecs('data/specs-win.csv', (r, where) => {
 });
 
 const macByProfile = buildSpecs('data/specs-mac.csv', (r, where) => {
-  checkRef(Chips, r.chip, where, 'chip');
+  checkRef(Chips, r.chip, where, 'chip', 'chips.csv');
   return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, storage: r.storage, price: r.price };
 });
 

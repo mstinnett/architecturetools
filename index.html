@@ -963,6 +963,10 @@ function resolveNote(catalogNote, cellNote) {
 }
 function hydrateSpecs(data) {
   function look(catalog, key) { return (catalog && catalog[key]) ? catalog[key] : { name: key, note: '' }; }
+  function cpuLabel(rec, key) {
+    if (rec && (rec.intel || rec.amd)) return [rec.intel, rec.amd].filter(Boolean).join(' or ');
+    return (rec && rec.name) || key;
+  }
   function eachCell(specs, apply) {
     for (var profile in specs) {
       var byProfile = specs[profile];
@@ -975,8 +979,8 @@ function hydrateSpecs(data) {
     }
   }
   if (data.WindowsSpecs) eachCell(data.WindowsSpecs, function(cell) {
-    var cpu = look(data.CPUs, cell.cpu), gpu = look(data.GPUs, cell.gpu);
-    cell.cpuNote = resolveNote(cpu.note, cell.cpuNote); cell.cpu = cpu.name;
+    var cpu = (data.CPUs && data.CPUs[cell.cpu]) || {}, gpu = look(data.GPUs, cell.gpu);
+    cell.cpuNote = resolveNote(cpu.note, cell.cpuNote); cell.cpu = cpuLabel(cpu, cell.cpu);
     cell.gpuNote = resolveNote(gpu.note, cell.gpuNote); cell.gpu = gpu.name;
   });
   if (data.MacSpecs) eachCell(data.MacSpecs, function(cell) {

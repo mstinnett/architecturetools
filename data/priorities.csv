@@ -1,10 +1,10 @@
 platform,profile,priority
 win,review,Your work is document-primary. The monitor is the most important purchase.
-win,drafting,2D drafting is single-thread CPU bound but not demanding. Display quality matters more than compute.
-win,modeling,"BIM modeling is single-thread CPU bound. Clock speed governs how Revit, Rhino, and SketchUp feel. The GPU is nearly invisible."
-win,viz,"Interactive viz is GPU bound. Enscape, Lumion, D5, TwinMotion scale directly with GPU power and VRAM. GPU prices are inflated in early 2026 due to a GDDR7 memory shortage -- the 5070 Ti is the best value right now."
-win,modeling_viz,"You need both: fast single-core for modeling and a capable GPU for viz. The 5070 Ti at ~$1,000 is the honest sweet spot in early 2026."
-win,production,V-Ray and Corona are multi-thread CPU bound with GPU hybrid modes. The Ryzen 9 9950X leads. Note: the 5090 is severely marked up in early 2026. The 5080 is the better value for GPU hybrid rendering right now.
+win,drafting,"2D drafting responds most to single-core CPU performance but most options will be good. If you have heavy XREF, block, and nested file usage, RAM and storage speed can play into the equation. In general, the quality of the monitor matters more than the computer to get great output."
+win,modeling,"BIM modeling is single-thread CPU bound. Clock speed for comparable processor generations governs how Revit, Rhino, and SketchUp feel, and AMD's X3D chips give a measurable responsiveness edge in Revit. The GPU doesn't affect viewport performance much."
+win,viz,"Interactive rendering is driven almost entirely by the GPU choice. Enscape, Lumion, D5, and TwinMotion scale directly with GPU power and VRAM. The RTX 5070 Ti hits the practical sweet spot for most architecture viz but the sky is the limit and more GPU power means faster rendering and more complex scenes are supported."
+win,modeling_viz,You need both a CPU with fast single-core performance for modeling and a capable GPU for visualization.
+win,production,"V-Ray CPU and Corona are multi-thread CPU bound, with GPU hybrid modes available. Core count drives render times - AMD Ryzen 9 leads, and Threadripper PRO pulls further ahead if you're only rendering on that computer. GPU rendering continues to advance and it may be worth investigating switching away from CPU rendering."
 mac,review,Document-primary. The display matters more than the Mac.
 mac,drafting,2D drafting on Mac is well-served by the M4 Pro.
 mac,modeling,"ArchiCAD, Vectorworks, SketchUp, Rhino v8 all run on Mac. Performance scales with GPU cores and unified memory."

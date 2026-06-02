@@ -1,0 +1,7 @@
+key,name,note
+integrated,Integrated,"A dedicated GPU is needed if you occasionally open a file but otherwise a CPU with an integrated GPU can work fine. Choose one of the higher end integrated GPU models like the suggested 245k or 9600x, with the 245k edging out the 9600x."
+rtx4060,NVIDIA RTX 4060,
+rtx5070,NVIDIA RTX 5070,
+rtx5070ti,NVIDIA RTX 5070 Ti,16 GB VRAM
+rtx5080,NVIDIA RTX 5080,16 GB VRAM
+rtx5090,NVIDIA RTX 5090,32 GB VRAM
