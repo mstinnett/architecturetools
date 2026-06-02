@@ -5,3 +5,8 @@ rtx5070,NVIDIA RTX 5070,
 rtx5070ti,NVIDIA RTX 5070 Ti,16 GB VRAM
 rtx5080,NVIDIA RTX 5080,16 GB VRAM
 rtx5090,NVIDIA RTX 5090,32 GB VRAM
+rtxpro2000,NVIDIA RTX PRO 2000 Blackwell,"16 GB VRAM. Pro card: certified drivers, ECC."
+rtxpro4000,NVIDIA RTX PRO 4000 Blackwell,"24 GB VRAM. Pro card: certified drivers, ECC. Single-slot."
+rtxpro4500,NVIDIA RTX PRO 4500 Blackwell,"32 GB VRAM. Pro card: certified drivers, ECC."
+rtxpro5000,NVIDIA RTX PRO 5000 Blackwell,"48 GB VRAM. Pro card: certified drivers, ECC."
+rtxpro6000,NVIDIA RTX PRO 6000 Blackwell,"96 GB VRAM. Pro flagship: certified drivers, ECC."

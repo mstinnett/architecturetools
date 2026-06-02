@@ -17,7 +17,12 @@
     "rtx5070": { "name": "NVIDIA RTX 5070", "note": "" },
     "rtx5070ti": { "name": "NVIDIA RTX 5070 Ti", "note": "16 GB VRAM" },
     "rtx5080": { "name": "NVIDIA RTX 5080", "note": "16 GB VRAM" },
-    "rtx5090": { "name": "NVIDIA RTX 5090", "note": "32 GB VRAM" }
+    "rtx5090": { "name": "NVIDIA RTX 5090", "note": "32 GB VRAM" },
+    "rtxpro2000": { "name": "NVIDIA RTX PRO 2000 Blackwell", "note": "16 GB VRAM. Pro card: certified drivers, ECC." },
+    "rtxpro4000": { "name": "NVIDIA RTX PRO 4000 Blackwell", "note": "24 GB VRAM. Pro card: certified drivers, ECC. Single-slot." },
+    "rtxpro4500": { "name": "NVIDIA RTX PRO 4500 Blackwell", "note": "32 GB VRAM. Pro card: certified drivers, ECC." },
+    "rtxpro5000": { "name": "NVIDIA RTX PRO 5000 Blackwell", "note": "48 GB VRAM. Pro card: certified drivers, ECC." },
+    "rtxpro6000": { "name": "NVIDIA RTX PRO 6000 Blackwell", "note": "96 GB VRAM. Pro flagship: certified drivers, ECC." }
   },
   "Chips": {
     "macmini_m4": { "name": "Mac Mini -- M4" },
