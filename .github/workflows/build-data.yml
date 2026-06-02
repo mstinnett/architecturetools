@@ -1,0 +1,42 @@
+name: Build hardware data
+
+# When the TSV sources (or the compiler) change on any branch, regenerate
+# assets/data/hardware-data.json and commit it back. This is what lets you edit
+# the data in a spreadsheet on a phone, commit the TSV, and have the live picker
+# update without running a build yourself.
+on:
+  push:
+    paths:
+      - 'data/**'
+      - 'tools/build-data.mjs'
+      - '.github/workflows/build-data.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Fails (red check) with a clear message if a TSV has a bad reference,
+      # a missing cell, or a duplicate -- so typos are caught before they ship.
+      - name: Compile data/ -> hardware-data.json
+        run: node tools/build-data.mjs
+
+      - name: Commit regenerated data if it changed
+        run: |
+          if git diff --quiet -- assets/data/hardware-data.json; then
+            echo "hardware-data.json already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/data/hardware-data.json
+          git commit -m "build: regenerate hardware-data.json from data/ sources [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}

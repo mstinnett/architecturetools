@@ -1,0 +1,13 @@
+platform	profile	priority
+win	review	Your work is document-primary. The monitor is the most important purchase.
+win	drafting	2D drafting is single-thread CPU bound but not demanding. Display quality matters more than compute.
+win	modeling	BIM modeling is single-thread CPU bound. Clock speed governs how Revit, Rhino, and SketchUp feel. The GPU is nearly invisible.
+win	viz	Interactive viz is GPU bound. Enscape, Lumion, D5, TwinMotion scale directly with GPU power and VRAM. GPU prices are inflated in early 2026 due to a GDDR7 memory shortage -- the 5070 Ti is the best value right now.
+win	modeling_viz	You need both: fast single-core for modeling and a capable GPU for viz. The 5070 Ti at ~$1,000 is the honest sweet spot in early 2026.
+win	production	V-Ray and Corona are multi-thread CPU bound with GPU hybrid modes. The Ryzen 9 9950X leads. Note: the 5090 is severely marked up in early 2026. The 5080 is the better value for GPU hybrid rendering right now.
+mac	review	Document-primary. The display matters more than the Mac.
+mac	drafting	2D drafting on Mac is well-served by the M4 Pro.
+mac	modeling	ArchiCAD, Vectorworks, SketchUp, Rhino v8 all run on Mac. Performance scales with GPU cores and unified memory.
+mac	viz	Enscape works on Mac. TwinMotion runs via Rosetta. Lumion and D5 are Windows-only.
+mac	modeling_viz	Unified memory serves as both RAM and VRAM.
+mac	production	V-Ray supports Metal GPU since V-Ray 7. A mid-range Windows PC with an RTX 4070 still outrenders a maxed Mac Studio. Mac wins on ecosystem, display, and silence.

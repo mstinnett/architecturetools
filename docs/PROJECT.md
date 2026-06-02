@@ -68,7 +68,15 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── css/
 │   │   └── global.css              # Shared design tokens and component styles
 │   └── data/
-│       └── hardware-data.json      # Hardware recommendation data (edited via Pages CMS)
+│       └── hardware-data.json      # GENERATED from data/*.tsv — do not hand-edit
+├── data/                           # Hardware data source (edit these; see data/README.md)
+│   ├── catalog.tsv                 # CPUs / GPUs / Chips — name + note, defined once
+│   ├── specs-win.tsv               # Windows spec matrix (one row per cell)
+│   ├── specs-mac.tsv               # Mac spec matrix (one row per cell)
+│   ├── priorities.tsv              # Per-profile "where the money matters" note
+│   └── extras.json                 # Non-tabular data (apps, prebuilts, monitors…)
+├── tools/
+│   └── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
 ├── calculators/
 │   ├── index.html                  # Calculator index / C-0 candidate
 │   ├── dimension-converter.html
@@ -113,13 +121,19 @@ The site should still feel like a drawing set: diagrams first, notes second, opi
 But interactive tools are explicitly allowed. They are not exceptions to the framework; they are part of the product.
 
 ### Low friction over systems
-Do not introduce a framework migration, build step, or heavy templating layer.
+Do not introduce a framework migration, site build step, or heavy templating
+layer. The site itself stays plain HTML/CSS/JS, served static, no bundler.
 
-The goal is low-friction publishing in plain HTML/CSS/JS. Reuse small patterns, not infrastructure.
+The goal is low-friction publishing. Reuse small patterns, not infrastructure.
 
-Pages CMS is the one deliberate exception: a Git-based editor (no build, no
-backend) wired only to `assets/data/hardware-data.json` via `.pages.yml`. The
-site stays fully static — the CMS just commits JSON edits that the picker fetches.
+The one deliberate exception is **data**: the picker's hardware data is authored
+as tab-separated tables under `data/` and compiled to
+`assets/data/hardware-data.json` by a tiny, dependency-free Node script
+(`tools/build-data.mjs`). This is a data compile, not a site build — the pages
+are still static and load the JSON directly. It exists because the data is a
+regular 72-row matrix that is far nicer to edit in a spreadsheet than as hand-
+written JSON. A GitHub Action runs the compile on push, so editing stays
+edit → commit → live (see `data/README.md`).
 
 ### A few reusable page habits, not a template engine
 A page can be assembled from simple recurring parts:
@@ -158,41 +172,36 @@ Contains:
 
 **Status:** created but not yet applied everywhere. Continue migrating pages toward shared styles rather than inventing a larger system.
 
-### assets/data/hardware-data.json
-Hardware recommendation data, fetched by the picker (`index.html`) at runtime.
-Designed to be hand-edited in any text editor; Pages CMS (`.pages.yml`) is an
-optional web-UI alternative. All hardware recommendation data lives here.
+### Hardware data — `data/` (source) → `assets/data/hardware-data.json` (generated)
+The picker fetches `assets/data/hardware-data.json` at runtime, but that file is
+**generated — do not hand-edit it.** The source of truth is the tab-separated
+tables under `data/`, compiled by `tools/build-data.mjs`. Full workflow is in
+`data/README.md`; the short version:
 
-This is the main source of truth for:
-- app group/platform data
-- Windows and Mac spec tables
-- prebuilts
-- monitors
-- laptops
-- recommendation labels and notes
+- `data/catalog.tsv` — every CPU / GPU / Mac chip (key, name, standard note),
+  defined **once**.
+- `data/specs-win.tsv`, `data/specs-mac.tsv` — the spec matrices, one row per
+  `profile / scale / tier` cell, naming components by their catalog key.
+- `data/priorities.tsv` — the per-profile "where the money matters" note.
+- `data/extras.json` — everything not tabular (apps, prebuilts, monitors,
+  laptops, label maps).
 
-Keep recommendation data centralized here.
+The `.tsv` files open as a clean grid in any spreadsheet app (desktop or mobile),
+which is the point: a 72-row matrix is far nicer to edit there than as JSON.
 
-**Catalogs and references (no duplication).** The long, repeated, drift-prone
-strings — CPU/GPU/Mac-chip model names and their standard notes — are defined
-once in the `CPUs`, `GPUs`, and `Chips` catalogs. Each spec cell references a
-component by short key (`"gpu": "rtx5090"`) instead of restating the model and
-its VRAM/price note. Edit a name or a shared note in one place and every spec
-that uses it updates.
+**No duplication.** A spec cell names a component by catalog key (`rtx5090`), not
+the full model string. Its `cpuNote`/`gpuNote` cell is **blank** to inherit the
+catalog note, **plain text** to replace it, or **`+ text`** to add a line on top
+of it. So the RTX 5090's `$2,900+` caveat lives once in `catalog.tsv` and each
+build adds its own flavor. `hydrateSpecs()` in `index.html` resolves these
+references at load into the flat `{ cpu, cpuNote, gpu, gpuNote, ... }` shape the
+render code expects.
 
-A spec cell's `cpuNote`/`gpuNote` is resolved against the component's catalog
-note:
-- **omit it** → use the catalog note as-is (e.g. five review builds inherit the
-  RTX 4060's "Viewport display only" from one definition);
-- **plain text** → replace the note for that cell only;
-- **`"+ text"`** → append a per-cell line on top of the catalog note (e.g. the
-  RTX 5090's single street-price caveat plus each build's own flavor).
-
-`hydrateSpecs()` in `index.html` resolves these references at load into the flat
-`{ cpu, cpuNote, gpu, gpuNote, ... }` shape the render code expects, so the
-catalogs cost nothing at runtime and there is still no build step. The
-self-documenting `_legend` field at the top of the JSON restates these rules for
-whoever edits the file next.
+**Build & publish.** `node tools/build-data.mjs` rebuilds the JSON locally (no
+dependencies). A GitHub Action (`.github/workflows/build-data.yml`) runs the same
+compile on push, so editing a TSV and committing — even from a phone — updates
+the live picker with no local build. The compile fails loudly on an unknown
+catalog key, a missing cell, or a duplicate, so typos never ship.
 
 ---
 

@@ -1,0 +1,37 @@
+profile	scale	tier	cpu	cpuNote	gpu	gpuNote	ram	ramNote	storage	price
+review	small	cheapest	ultra5_245k	Minimum spend that still feels fast for office work	rtx4060	Only here to drive displays cleanly	16 GB DDR5		1 TB NVMe	$900--$1,100
+review	small	value	ultra5_245k	More than enough for documents	rtx4060		32 GB DDR5		1 TB NVMe	$1,100--$1,400
+review	small	best	ultra7_265k	Headroom for the future	rtx4060		64 GB DDR5		2 TB NVMe	$1,500--$1,800
+review	large	cheapest	ultra5_245k	Enough for large document sets if budget is tight	rtx4060		32 GB DDR5	Lets drawings, PDFs, and browser tabs coexist	1 TB NVMe	$1,100--$1,400
+review	large	value	ultra7_265k	Headroom for larger document sets	rtx4060		64 GB DDR5	Larger reference sets open simultaneously	2 TB NVMe	$1,500--$1,800
+review	large	best	ultra7_265k	Same chip -- documents are not demanding	rtx4060		64 GB DDR5		2 TB NVMe	$1,500--$1,800
+drafting	small	cheapest	ultra5_245k	Cheapest CPU I would still buy for CAD	rtx4060	AutoCAD viewport is not demanding	32 GB DDR5		1 TB NVMe	$1,100--$1,400
+drafting	small	value	ultra7_265k	Best value for single-thread CAD	rtx4060	AutoCAD viewport is not demanding	32 GB DDR5		1 TB NVMe	$1,300--$1,600
+drafting	small	best	ultra9_285k	Top single-thread	rtx5070	Comfortable headroom	64 GB DDR5		2 TB NVMe	$2,200--$2,600
+drafting	large	cheapest	ultra7_265k	Acceptable for larger xrefs if budget is tight	rtx4060	Still enough for complex 2D work	32 GB DDR5	Manageable if you avoid keeping everything open	1 TB NVMe	$1,400--$1,700
+drafting	large	value	ultra7_265k	Best value for single-thread CAD	rtx4060	AutoCAD viewport is not demanding	64 GB DDR5	Large drawing sets with xrefs	2 TB NVMe	$1,600--$1,900
+drafting	large	best	ultra9_285k	Faster regen on complex drawings	rtx5070	Comfortable headroom	64 GB DDR5		2 TB NVMe	$2,400--$2,800
+modeling	small	cheapest	ultra7_265k	The floor for a modeling desktop that still feels good	rtx4060	Enough for modeling, light for viz	32 GB DDR5		1 TB NVMe	$1,600--$1,900
+modeling	small	value	ultra7_265k	Best value for Revit -- 90-95% of the 285K	rtx5070	Transparent for modeling, ready for occasional Enscape	64 GB DDR5		2 TB NVMe	$1,900--$2,300
+modeling	small	best	ultra9_285k	Top single-thread -- view regen, family loading	rtx5070ti	Ready for viz if your role expands -- 16 GB VRAM	64 GB DDR5		2 TB NVMe	$2,600--$3,100
+modeling	large	cheapest	ultra7_265k	Tight-budget choice for large linked models	rtx5070	Enough for modeling, still not a viz-first build	64 GB DDR5	The minimum I would buy for large-model work	2 TB NVMe	$2,100--$2,500
+modeling	large	value	ultra9_285k	Large models with linked consultants need top single-thread	rtx5070	Transparent for modeling	128 GB DDR5	Multiple linked models open simultaneously	2 TB NVMe	$2,600--$3,100
+modeling	large	best	ultra9_285k	Top single-thread for complex view regeneration	rtx5070ti	Headroom for Enscape walkthroughs of large models	128 GB DDR5	500MB+ models with full consultant links	4 TB NVMe	$3,100--$3,700
+viz	small	cheapest	ryzen7_9800x3d	Strong scene handling without jumping to halo pricing	rtx5070	12 GB VRAM is the cheapest point that still makes sense	32 GB DDR5		1 TB NVMe	$1,900--$2,300
+viz	small	value	ryzen7_9800x3d	Strong single-thread, excellent multi-thread for scene loading	rtx5070ti	+ the viz sweet spot at current prices	64 GB DDR5		2 TB NVMe	$2,400--$2,900
+viz	small	best	ryzen9_9950x	16-core -- scene loading and CPU-side rendering	rtx5090	+ maximum viz	64 GB DDR5		2 TB NVMe	$4,500--$5,500
+viz	large	cheapest	ryzen9_9950x	The cheapest CPU I would trust for large viz scenes	rtx5070ti	16 GB VRAM is the practical minimum at this scale	64 GB DDR5	You will need to manage scene size carefully	2 TB NVMe	$2,700--$3,200
+viz	large	value	ryzen9_9950x	16-core -- large scenes benefit from multi-thread	rtx5080	+ large scenes with heavy geometry	128 GB DDR5	Viz software loads the full scene into RAM	2 TB NVMe	$3,200--$3,800
+viz	large	best	ryzen9_9950x	Maximum multi-thread for complex scene handling	rtx5090	+ large scenes need VRAM headroom	128 GB DDR5	Running out of VRAM crashes the software	4 TB NVMe	$5,000--$6,000
+modeling_viz	small	cheapest	ultra7_265k	Cheapest balanced CPU for mixed modeling and viz	rtx5070	Enough GPU to cross into real-time viz without overspending	64 GB DDR5		2 TB NVMe	$2,100--$2,500
+modeling_viz	small	value	ultra7_265k	Best single-thread for Revit, strong enough for viz	rtx5070ti	+ handles both workflows	64 GB DDR5		2 TB NVMe	$2,300--$2,800
+modeling_viz	small	best	ryzen9_9950x	16-core -- strong single-thread plus serious multi-thread	rtx5080	+ serious viz without the 5090 markup	64 GB DDR5		2 TB NVMe	$3,000--$3,600
+modeling_viz	large	cheapest	ultra9_285k	Budget-conscious choice for large mixed workloads	rtx5070	Will do the job, but this is where I stop cutting	64 GB DDR5	Enough for big models if you are disciplined	2 TB NVMe	$2,500--$3,000
+modeling_viz	large	value	ultra9_285k	Large linked models need top single-thread	rtx5070ti	+ large model viz	128 GB DDR5	Modeling plus viz open simultaneously eats memory	2 TB NVMe	$2,800--$3,400
+modeling_viz	large	best	ryzen9_9950x	Best all-around for large models plus heavy viz	rtx5090	+ no compromises	128 GB DDR5		4 TB NVMe	$5,000--$6,000
+production	small	cheapest	ryzen9_9900x	12 cores is the floor for a render box that still makes sense	rtx5070	Enough for GPU hybrid rendering without overspending	64 GB DDR5		2 TB NVMe	$2,300--$2,800
+production	small	value	ryzen9_9950x	16-core -- best for CPU rendering plus strong single-thread	rtx5070ti	GPU hybrid rendering plus viz -- 16 GB VRAM	64 GB DDR5		2 TB NVMe	$2,600--$3,100
+production	small	best	ryzen9_9950x	16-core -- still the right chip at top budget	rtx5090	+ GPU hybrid at maximum	128 GB DDR5		4 TB NVMe	$5,000--$6,000
+production	large	cheapest	ryzen9_9950x	The cheapest CPU I would trust for large production scenes	rtx5070ti	Still enough VRAM for serious hybrid rendering work	64 GB DDR5	You will need to manage scene size more carefully	2 TB NVMe	$2,900--$3,400
+production	large	value	ryzen9_9950x	16-core -- large scenes render longer, cores matter more	rtx5080	+ large scene GPU rendering	128 GB DDR5	V-Ray loads the full scene into RAM before rendering	4 TB NVMe	$3,400--$4,000
+production	large	best	ryzen9_9950x	Maximum cores for production rendering	rtx5090	+ no scene too large	128 GB DDR5		4 TB NVMe	$5,200--$6,200

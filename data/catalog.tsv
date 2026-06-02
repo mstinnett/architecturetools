@@ -1,0 +1,16 @@
+kind	key	name	note
+cpu	ultra5_245k	Intel Core Ultra 5 245K	
+cpu	ultra7_265k	Intel Core Ultra 7 265K	
+cpu	ultra9_285k	Intel Core Ultra 9 285K	
+cpu	ryzen7_9800x3d	AMD Ryzen 7 9800X3D	
+cpu	ryzen9_9900x	AMD Ryzen 9 9900X	
+cpu	ryzen9_9950x	AMD Ryzen 9 9950X	
+gpu	rtx4060	NVIDIA RTX 4060	Viewport display only
+gpu	rtx5070	NVIDIA RTX 5070	
+gpu	rtx5070ti	NVIDIA RTX 5070 Ti	16 GB VRAM
+gpu	rtx5080	NVIDIA RTX 5080	16 GB VRAM
+gpu	rtx5090	NVIDIA RTX 5090	32 GB VRAM, $2,900+ street price (early 2026)
+chip	macmini_m4	Mac Mini -- M4	
+chip	macmini_m4pro	Mac Mini -- M4 Pro	
+chip	macstudio_m4max	Mac Studio -- M4 Max	
+chip	macstudio_m4ultra	Mac Studio -- M4 Ultra	

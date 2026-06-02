@@ -1,0 +1,37 @@
+profile	scale	tier	chip	cpuNote	memory	storage	price
+review	small	cheapest	macmini_m4	Quiet, small, and enough for documents	16 GB unified	512 GB SSD	$800--$1,000
+review	small	value	macmini_m4pro	More than enough for documents	24 GB unified	512 GB SSD	$1,400--$1,600
+review	small	best	macmini_m4pro	Same chip -- no need to go higher	48 GB unified	1 TB SSD	$1,800--$2,000
+review	large	cheapest	macmini_m4	24 GB is the floor once file sizes grow	24 GB unified	512 GB SSD	$1,000--$1,200
+review	large	value	macmini_m4pro	Same chip -- documents are not demanding at any scale	48 GB unified	1 TB SSD	$1,800--$2,000
+review	large	best	macmini_m4pro	Same chip -- display matters more	48 GB unified	1 TB SSD	$1,800--$2,000
+drafting	small	cheapest	macmini_m4pro	The cheapest Mac desktop I would still buy for CAD	24 GB unified	512 GB SSD	$1,400--$1,600
+drafting	small	value	macmini_m4pro	Strong single-thread for 2D CAD	24 GB unified	1 TB SSD	$1,600--$1,800
+drafting	small	best	macstudio_m4max	Headroom for larger drawings	36 GB unified	1 TB SSD	$2,000--$2,400
+drafting	large	cheapest	macmini_m4pro	Still workable for big drawing sets if budget is tight	24 GB unified	1 TB SSD	$1,600--$1,800
+drafting	large	value	macstudio_m4max	Large drawing sets with many xrefs	36 GB unified	1 TB SSD	$2,000--$2,400
+drafting	large	best	macstudio_m4max	Headroom for complex drawings and multitasking	64 GB unified	2 TB SSD	$2,800--$3,200
+modeling	small	cheapest	macmini_m4pro	Acceptable for ArchiCAD, Rhino, and SketchUp if models stay moderate	48 GB unified	1 TB SSD	$1,800--$2,100
+modeling	small	value	macstudio_m4max	Strong GPU cores for ArchiCAD/Rhino/SketchUp	36 GB unified	1 TB SSD	$2,000--$2,400
+modeling	small	best	macstudio_m4max	More memory for larger models	64 GB unified	2 TB SSD	$2,800--$3,200
+modeling	large	cheapest	macstudio_m4max	The minimum Mac desktop I would buy for large models	48 GB unified	1 TB SSD	$2,400--$2,800
+modeling	large	value	macstudio_m4max	Large models need memory and GPU bandwidth	64 GB unified	2 TB SSD	$2,800--$3,200
+modeling	large	best	macstudio_m4ultra	Large complex models benefit from Ultra GPU cores	128 GB unified	2 TB SSD	$4,000--$5,000
+viz	small	cheapest	macstudio_m4max	Cheapest Mac desktop I would still call a viz machine	48 GB unified	1 TB SSD	$2,300--$2,700
+viz	small	value	macstudio_m4max	Enough for Enscape/TwinMotion at SFR scale	64 GB unified	1 TB SSD	$2,500--$3,000
+viz	small	best	macstudio_m4ultra	Maximum GPU cores and bandwidth	128 GB unified	2 TB SSD	$4,000--$5,000
+viz	large	cheapest	macstudio_m4ultra	Large scenes really do need the Ultra tier on Mac	96 GB unified	2 TB SSD	$3,600--$4,300
+viz	large	value	macstudio_m4ultra	Large scenes need maximum GPU cores	128 GB unified	2 TB SSD	$4,000--$5,000
+viz	large	best	macstudio_m4ultra	Maximum config for large scene visualization	192 GB unified	4 TB SSD	$5,500--$7,000
+modeling_viz	small	cheapest	macstudio_m4max	Cheapest balanced Mac for modeling plus viz	48 GB unified	1 TB SSD	$2,500--$2,900
+modeling_viz	small	value	macstudio_m4max	Balanced for modeling and viz	64 GB unified	2 TB SSD	$2,800--$3,200
+modeling_viz	small	best	macstudio_m4ultra	Maximum headroom for both workflows	128 GB unified	2 TB SSD	$4,000--$5,000
+modeling_viz	large	cheapest	macstudio_m4max	Budget-conscious choice for large mixed workloads	64 GB unified	2 TB SSD	$2,800--$3,200
+modeling_viz	large	value	macstudio_m4ultra	Large models plus viz need Ultra GPU cores	128 GB unified	2 TB SSD	$4,000--$5,000
+modeling_viz	large	best	macstudio_m4ultra	Maximum config for large-scale modeling and viz	192 GB unified	4 TB SSD	$5,500--$7,000
+production	small	cheapest	macstudio_m4max	Entry point if you insist on Mac for rendering	64 GB unified	2 TB SSD	$3,200--$3,800
+production	small	value	macstudio_m4ultra	Maximum cores for V-Ray CPU plus Metal GPU	128 GB unified	2 TB SSD	$4,000--$5,000
+production	small	best	macstudio_m4ultra	Maximum config	192 GB unified	4 TB SSD	$5,500--$7,000
+production	large	cheapest	macstudio_m4ultra	The cheapest Mac desktop I would trust for large renders	128 GB unified	2 TB SSD	$4,000--$5,000
+production	large	value	macstudio_m4ultra	Large scenes need max memory for rendering	192 GB unified	4 TB SSD	$5,500--$7,000
+production	large	best	macstudio_m4ultra	Maximum everything -- still slower than a mid-range Windows PC with an RTX 4070 for V-Ray	192 GB unified	4 TB SSD	$5,500--$7,000

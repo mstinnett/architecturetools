@@ -1,5 +1,5 @@
 {
-  "_legend": "HARDWARE DATA -- hand-editable. CPUs/GPUs/Chips below are catalogs: each component (its name and standard note) is defined ONCE, then referenced by its short key from the spec cells (e.g. \"gpu\": \"rtx5090\"). For a cell's cpuNote/gpuNote: omit it to use the component's standard note; write plain text to replace that note for this cell; or prefix with \"+ \" to add a line on top of the standard note. Edit a model name or its VRAM/price note in one place and every spec that uses it updates. The picker resolves these references at load time (see hydrateSpecs in index.html).",
+  "_comment": "GENERATED -- do not edit by hand. Source: data/*.tsv (+ data/extras.json). Rebuild: node tools/build-data.mjs (CI rebuilds on push). See data/README.md.",
   "CPUs": {
     "ultra5_245k": { "name": "Intel Core Ultra 5 245K" },
     "ultra7_265k": { "name": "Intel Core Ultra 7 265K" },
