@@ -51,7 +51,8 @@ function parseDelimited(text) {
 }
 
 function readTable(rel) {
-  const rows = parseDelimited(readFileSync(join(ROOT, rel), 'utf8'));
+  // strip a leading BOM — some spreadsheet CSV exports (Excel "CSV UTF-8") add one
+  const rows = parseDelimited(readFileSync(join(ROOT, rel), 'utf8').replace(/^\uFEFF/, ''));
   const header = (rows.shift() || []).map((h) => h.trim());
   const out = [];
   rows.forEach((cells, i) => {
