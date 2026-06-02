@@ -812,5 +812,67 @@
     "student": "Student",
     "mac_p": "MacBook",
     "mac_s": "Student"
-  }
+  },
+  "MonitorConfigs": [
+    {
+      "tier": "cheapest",
+      "name": "Single 24\"",
+      "monitors": [
+        "m1k24"
+      ],
+      "rec": true
+    },
+    {
+      "tier": "value",
+      "name": "Dual 27\" 5K",
+      "monitors": [
+        "m5k27",
+        "m5k27"
+      ],
+      "rec": true
+    },
+    {
+      "tier": "value",
+      "name": "34\" Ultrawide",
+      "monitors": [
+        "muw34"
+      ],
+      "rec": false
+    },
+    {
+      "tier": "overkill",
+      "name": "Dual 32\" 6K",
+      "monitors": [
+        "m6k32",
+        "m6k32"
+      ],
+      "rec": true
+    },
+    {
+      "tier": "overkill",
+      "name": "Single 32\" 6K",
+      "monitors": [
+        "m6k32"
+      ],
+      "rec": false
+    },
+    {
+      "tier": "overkill",
+      "name": "27\" + 32\"",
+      "monitors": [
+        "m5k27",
+        "m6k32"
+      ],
+      "rec": false
+    },
+    {
+      "tier": "overkill",
+      "name": "Dual Studio Display",
+      "monitors": [
+        "masd",
+        "masd"
+      ],
+      "rec": false
+    }
+  ]
 }

@@ -35,14 +35,9 @@
 
   /* Machine type strip (below divider) — full-width tabs */
 
-  /* Merged desk zone — monitors row on top, machine underneath */
-  .desk-zone{border:1px dashed var(--gray-700);padding:1rem 1rem 0.75rem;margin-bottom:1rem;display:flex;flex-direction:column;align-items:center;gap:0;position:relative;}
+  /* make2d desk illustration hero */
   .desk-hero{max-width:720px;margin:0 auto 1.5rem;}
   .desk-hero img{width:100%;height:auto;display:block;}
-  .desk-monitors{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;align-items:flex-end;min-height:40px;width:100%;}
-  .desk-machine{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-weight:300;padding:0.5rem 0.75rem;min-height:60px;}
-  .desk-zone .mon-desk-hint{padding:0.75rem 0;}
-  .shelf-full .mon-avail{opacity:0.35;pointer-events:none;cursor:default;}
 
   /* Software nav + scroll */
   .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
@@ -144,26 +139,19 @@
   .priority-box p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
   .desktop-prebuilts{margin-top:1.5rem;}
 
-  /* Monitor sidebar: desk on top, shelf below */
-  .mon-desk{min-height:100px;border:1px dashed var(--gray-700);padding:0.75rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:flex-end;justify-content:center;position:relative;}
-  .mon-desk-label{position:absolute;top:0.4rem;left:0.6rem;font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
-  .mon-desk-hint{font-size:0.68rem;color:var(--gray-400);font-weight:300;text-align:center;padding:1.5rem 0;width:100%;}
-  .mon-on-desk{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;position:relative;padding:0.2rem 0.25rem;border-radius:2px;}
-  .mon-on-desk-visual{position:relative;display:block;color:inherit;}
-  .mon-on-desk-name{font-size:0.58rem;font-family:var(--font-body);font-weight:300;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);transition:color 0.15s ease;}
-  .mon-remove-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:300;line-height:1;color:var(--black);background:rgba(245,245,244,0.8);opacity:0;transition:opacity 0.15s ease;pointer-events:none;}
-  .mon-on-desk:hover .mon-remove-mark{opacity:1;}
-  .mon-on-desk:hover .mon-on-desk-name{color:var(--black);}
-
-  .mon-shelf-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.4rem;}
-  .mon-shelf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.4rem;}
-  .mon-avail{display:flex;flex-direction:column;align-items:center;gap:0.2rem;padding:0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;transition:all 0.15s;background:var(--white);position:relative;}
-  .mon-avail:hover{border-color:var(--gray-500);}
-  .mon-avail.recommended{border:2px solid var(--black);padding:calc(0.4rem - 1px);}
-  .mon-avail-name{font-size:0.6rem;font-weight:400;white-space:nowrap;}
-  .mon-avail .mbadge{display:none;position:absolute;top:2px;right:2px;font-size:0.4rem;font-family:var(--font-body);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
-  .mon-avail.recommended .mbadge{display:block;}
-  .mon-avail svg,.mon-on-desk svg{display:block;}
+  /* Monitor configs: curated tiered list of cards */
+  .mon-config-visual svg{display:block;}
+  .mon-configs-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.6rem;}
+  .mon-configs{display:flex;flex-direction:column;gap:0.9rem;}
+  .mon-tier-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.4rem;}
+  .mon-tier-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.4rem;}
+  .mon-config{display:flex;flex-direction:column;align-items:center;gap:0.35rem;padding:0.55rem 0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;background:var(--white);position:relative;transition:border-color 0.15s,background 0.15s;}
+  .mon-config:hover{border-color:var(--gray-500);}
+  .mon-config.selected{border:2px solid var(--black);padding:calc(0.55rem - 1px) calc(0.4rem - 1px);background:var(--gray-50);}
+  .mon-config-visual{display:flex;gap:0.25rem;align-items:flex-end;min-height:38px;}
+  .mon-config-name{font-size:0.62rem;font-weight:400;text-align:center;white-space:nowrap;}
+  .mon-config .mbadge{display:none;position:absolute;top:3px;right:3px;font-size:0.4rem;font-family:var(--font-body);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
+  .mon-config.recommended .mbadge{display:block;}
 
   /* Laptop list */
   .laptop-category{margin-bottom:1.5rem;}
@@ -245,7 +233,6 @@
         <div class="desktop-prebuilts" id="d-prebuilts"></div>
       </div>
       <div class="result-side">
-        <div class="desk-zone" id="d-desk"></div>
         <div id="d-shelf-area"></div>
       </div>
     </div>
@@ -260,7 +247,6 @@
         <div id="m-priority" class="priority-box"></div>
       </div>
       <div class="result-side">
-        <div class="desk-zone" id="m-desk"></div>
         <div id="m-shelf-area"></div>
       </div>
     </div>
@@ -269,7 +255,6 @@
   <!-- Monitors (shared panel in Desktop+Laptop mode) -->
   <div class="results-panel" id="panel-monitors">
     <div class="panel-label">Monitors</div>
-    <div class="desk-zone" id="shared-desk"></div>
     <div id="shared-shelf-area"></div>
   </div>
   </div>
@@ -386,23 +371,41 @@ function runPicker(){
     production: 'production rendering'
   };
 
-  function defaultDeskMonitorsForBudget(budgetId) {
-    var defaultMonitorIds = Data.PickerOptions.deskMonitorDefaults[budgetId] || Data.PickerOptions.deskMonitorDefaults[defaultPickerState.budget];
-    return defaultMonitorIds.slice();
-  }
-  function recommendedMonitorIdsForBudget(budgetId) {
-    var defaultMonitorIds = defaultDeskMonitorsForBudget(budgetId);
-    var uniqueMonitorIds = [];
-    for (var monitorIndex = 0; monitorIndex < defaultMonitorIds.length; monitorIndex++) {
-      if (uniqueMonitorIds.indexOf(defaultMonitorIds[monitorIndex]) < 0) uniqueMonitorIds.push(defaultMonitorIds[monitorIndex]);
+  // Monitor configs: curated setups grouped by tier, shown as a list of cards
+  // (diagrams + Rec badge). Picking one sets State.desk, which drives the hero.
+  function configAvailable(config, platform) {
+    for (var i = 0; i < config.monitors.length; i++) {
+      var m = findMonitor(config.monitors[i]);
+      if (!m) return false;
+      if (m.platform !== 'both' && m.platform !== platform) return false;
     }
-    return uniqueMonitorIds;
+    return true;
+  }
+  function defaultConfigIndexForBudget(budgetId, platform) {
+    var tier = budgetId === 'cheapest' ? 'cheapest' : budgetId === 'best' ? 'overkill' : 'value';
+    var recOfTier = -1, anyOfTier = -1, anyAvailable = -1;
+    for (var i = 0; i < Data.MonitorConfigs.length; i++) {
+      var c = Data.MonitorConfigs[i];
+      if (!configAvailable(c, platform)) continue;
+      if (anyAvailable < 0) anyAvailable = i;
+      if (c.tier === tier) { if (anyOfTier < 0) anyOfTier = i; if (c.rec && recOfTier < 0) recOfTier = i; }
+    }
+    return recOfTier >= 0 ? recOfTier : anyOfTier >= 0 ? anyOfTier : anyAvailable;
+  }
+  function ensureSelectedConfig(platform) {
+    var c = Data.MonitorConfigs[State.monitorConfig];
+    if (!c || !configAvailable(c, platform)) {
+      State.monitorConfig = defaultConfigIndexForBudget(State.budget, platform);
+      c = Data.MonitorConfigs[State.monitorConfig];
+    }
+    State.desk = c ? c.monitors.slice() : [];
   }
 
   var State = {
     apps: {},
     platform: defaultPickerState.platform,
-    desk: defaultDeskMonitorsForBudget(defaultPickerState.budget),
+    desk: [],
+    monitorConfig: -1,
     budget: defaultPickerState.budget,
     scale: defaultPickerState.scale,
     machineType: 'desktop'
@@ -502,20 +505,23 @@ function runPicker(){
     return '<svg width="' + totalWidth + '" height="' + totalHeight + '" viewBox="0 0 ' + totalWidth + ' ' + totalHeight + '" fill="none" aria-hidden="true"><rect x="' + screenX.toFixed(1) + '" y="0.5" width="' + Math.max(screenWidth - 1, 1) + '" height="' + Math.max(screenHeight - 1, 1) + '" stroke="#111" stroke-width="2" fill="none" rx="1"/><line x1="' + centerX.toFixed(1) + '" y1="' + (screenHeight - 0.5).toFixed(1) + '" x2="' + centerX.toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/><line x1="' + (centerX - (baseWidth / 2)).toFixed(1) + '" y1="' + baseY.toFixed(1) + '" x2="' + (centerX + (baseWidth / 2)).toFixed(1) + '" y2="' + baseY.toFixed(1) + '" stroke="#555" stroke-width="0.75"/></svg>';
   }
 
-  function buildDeskZoneHTML() {
-    var markup = '<span class="mon-desk-label">Your desk</span>';
-    markup += '<div class="desk-monitors">';
-    if (State.desk.length === 0) {
-      markup += '<div class="mon-desk-hint">Tap to add</div>';
-    } else {
-      for (var i = 0; i < State.desk.length; i++) {
-        var mon = findMonitor(State.desk[i]);
-        if (!mon) continue;
-        markup += '<div class="mon-on-desk" data-idx="' + i + '" title="Tap to remove"><span class="mon-on-desk-visual">' + monitorSVG(mon, 1.2) + '<span class="mon-remove-mark">&times;</span></span><span class="mon-on-desk-name">' + mon.name + '</span></div>';
+  function buildMonitorConfigsHTML(platform) {
+    var tiers = [['cheapest', 'Cheapest'], ['value', 'Value'], ['overkill', 'Overkill']];
+    var markup = '<div class="mon-configs-label">Monitors &mdash; tap to preview on your desk</div><div class="mon-configs">';
+    for (var t = 0; t < tiers.length; t++) {
+      var row = '';
+      for (var i = 0; i < Data.MonitorConfigs.length; i++) {
+        var c = Data.MonitorConfigs[i];
+        if (c.tier !== tiers[t][0] || !configAvailable(c, platform)) continue;
+        var visual = '';
+        for (var j = 0; j < c.monitors.length; j++) { var mon = findMonitor(c.monitors[j]); if (mon) visual += monitorSVG(mon, 0.62); }
+        row += '<div class="mon-config' + (i === State.monitorConfig ? ' selected' : '') + (c.rec ? ' recommended' : '') +
+          '" data-config="' + i + '"><div class="mon-config-visual">' + visual +
+          '</div><span class="mbadge">rec</span><div class="mon-config-name">' + c.name + '</div></div>';
       }
+      if (row) markup += '<div class="mon-tier"><div class="mon-tier-label">' + tiers[t][1] + '</div><div class="mon-tier-row">' + row + '</div></div>';
     }
-    markup += '</div>';
-    return markup;
+    return markup + '</div>';
   }
 
   // Make2D-rendered desk illustrations. Files live under
@@ -564,19 +570,17 @@ function runPicker(){
     return '<img src="assets/desk-images/' + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout" loading="eager" onerror="this.onerror=null;this.src=\'assets/desk-images/NorthXL_2x27.png\';">';
   }
 
-  function buildShelfHTML() {
-    var platform = effectivePlatform();
-    var recommendedMonitorIds = recommendedMonitorIdsForBudget(State.budget);
-    var markup = '';
-    markup += '<div class="mon-shelf-label" style="margin-top:1rem;">Available' + (State.desk.length >= 4 ? ' — desk full' : '') + '</div><div class="mon-shelf">';
-    for (var i = 0; i < Data.Monitors.length; i++) {
-      var mon = Data.Monitors[i];
-      if (mon.platform !== 'both' && mon.platform !== platform) continue;
-      var isRec = recommendedMonitorIds.indexOf(mon.id) >= 0;
-      markup += '<div class="mon-avail' + (isRec ? ' recommended' : '') + '" data-mid="' + mon.id + '" title="Tap to add">' + monitorSVG(mon, 0.7) + '<span class="mbadge">rec</span><div class="mon-avail-name">' + mon.name + '</div></div>';
-    }
-    markup += '</div>';
-    return markup;
+  function bindMonitorConfigEvents(containerId) {
+    var area = document.getElementById(containerId);
+    if (!area) return;
+    area.querySelectorAll('.mon-config').forEach(function(el) {
+      el.addEventListener('click', function() {
+        State.monitorConfig = parseInt(el.dataset.config, 10);
+        var c = Data.MonitorConfigs[State.monitorConfig];
+        if (c) State.desk = c.monitors.slice();
+        updatePreservingScroll();
+      });
+    });
   }
 
   // update() rebuilds large chunks of innerHTML, which can make the browser
@@ -586,22 +590,6 @@ function runPicker(){
     update();
     window.scrollTo(0, y);
   }
-  function bindDeskZoneEvents(deskId, shelfId) {
-    var deskZone = document.getElementById(deskId);
-    var shelfArea = document.getElementById(shelfId);
-    shelfArea.querySelectorAll('.mon-avail').forEach(function(el) {
-      el.addEventListener('click', function() {
-        if (State.desk.length < 4) { State.desk.push(el.dataset.mid); updatePreservingScroll(); }
-      });
-    });
-    deskZone.querySelectorAll('.mon-on-desk').forEach(function(el) {
-      el.addEventListener('click', function() {
-        State.desk.splice(parseInt(el.dataset.idx, 10), 1);
-        updatePreservingScroll();
-      });
-    });
-  }
-
   function windowsSpecHTML(spec) {
     return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">' + spec.cpu + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
       '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">' + spec.gpu + '</div><div class="spec-item-note">' + spec.gpuNote + '</div></div>' +
@@ -648,6 +636,7 @@ function runPicker(){
     var platformAvailability = availablePlatforms();
     var activeWorkloadProfile = workloadProfile();
     var isMacPlatform = activePlatform === 'mac';
+    ensureSelectedConfig(activePlatform);
 
     // Platform visibility
     var platformArea = document.getElementById('platArea');
@@ -683,17 +672,14 @@ function runPicker(){
       document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
     }
 
-    // Desktop desk zone / shared monitors panel
+    // Monitor configs (curated list with diagrams + Rec badge; drives the hero)
+    var monitorsHTML = buildMonitorConfigsHTML(activePlatform);
     if (isSplit) {
-      document.getElementById('shared-desk').innerHTML = buildDeskZoneHTML('');
-      document.getElementById('shared-shelf-area').innerHTML = buildShelfHTML();
-      document.getElementById('shared-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
-      bindDeskZoneEvents('shared-desk', 'shared-shelf-area');
+      document.getElementById('shared-shelf-area').innerHTML = monitorsHTML;
+      bindMonitorConfigEvents('shared-shelf-area');
     } else {
-      document.getElementById('d-desk').innerHTML = buildDeskZoneHTML('');
-      document.getElementById('d-shelf-area').innerHTML = buildShelfHTML();
-      document.getElementById('d-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
-      bindDeskZoneEvents('d-desk', 'd-shelf-area');
+      document.getElementById('d-shelf-area').innerHTML = monitorsHTML;
+      bindMonitorConfigEvents('d-shelf-area');
     }
 
     // Laptop
@@ -784,10 +770,8 @@ function runPicker(){
     document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
     if (!isSplit) {
-      document.getElementById('m-desk').innerHTML = buildDeskZoneHTML('');
-      document.getElementById('m-shelf-area').innerHTML = buildShelfHTML();
-      document.getElementById('m-shelf-area').classList.toggle('shelf-full', State.desk.length >= 4);
-      bindDeskZoneEvents('m-desk', 'm-shelf-area');
+      document.getElementById('m-shelf-area').innerHTML = buildMonitorConfigsHTML(activePlatform);
+      bindMonitorConfigEvents('m-shelf-area');
     }
   }
 

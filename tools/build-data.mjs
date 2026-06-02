@@ -162,6 +162,7 @@ const data = {
   PrebuiltTypeLabels: extras.PrebuiltTypeLabels,
   PrebuiltTypeNotes: extras.PrebuiltTypeNotes,
   Monitors: extras.Monitors,
+  MonitorConfigs: extras.MonitorConfigs,
   Laptops: extras.Laptops,
   LaptopCategoryLabels: extras.LaptopCategoryLabels,
 };
