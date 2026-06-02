@@ -1,0 +1,6 @@
+# The data tables are round-tripped through spreadsheet apps (Numbers, Excel),
+# which often export CRLF. Normalize to LF on commit so a re-export doesn't show
+# up as a whole-file diff. The build parser accepts either, so this is cosmetic.
+data/*.csv text eol=lf
+assets/data/hardware-data.json text eol=lf
+*.mjs text eol=lf
