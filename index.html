@@ -138,9 +138,6 @@
   .card-link{display:inline-block;font-size:0.75rem;font-weight:400;color:var(--black);border-bottom:1px solid var(--black);text-decoration:none;padding-bottom:1px;transition:opacity 0.15s;margin-right:1.5rem;}
   .card-link:hover{opacity:0.6;}
   .purchase-paths{margin-bottom:1rem;}
-  .purchase-path{margin-bottom:1rem;}
-  .purchase-path-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
-  .purchase-path p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;margin-bottom:0.5rem;}
 
   .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);}
   .priority-box-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
@@ -245,11 +242,7 @@
       <div class="result-main">
         <div class="spec-block" id="d-spec"></div>
         <div id="d-priority" class="priority-box"></div>
-        <button class="laptop-see-all-btn" id="d-details-btn" type="button">Build / buy details</button>
-        <div class="laptop-all-list" id="d-details">
-          <div class="purchase-paths" id="d-paths"></div>
-          <div class="desktop-prebuilts" id="d-prebuilts"></div>
-        </div>
+        <div class="desktop-prebuilts" id="d-prebuilts"></div>
       </div>
       <div class="result-side">
         <div class="desk-zone" id="d-desk"></div>
@@ -490,9 +483,9 @@ function runPicker(){
     if (!windowsDesktopSpec) return '';
     var equivalenceNote = 'Similar fit for ' + workloadProfileLabels[workloadProfileId] + ', not an exact parts match.';
     if (prebuilt.type === 'mini' && (workloadProfileId === 'review' || workloadProfileId === 'drafting')) {
-      equivalenceNote += ' The DIY tower uses its GPU mostly for display output here; this mini PC gets into the same recommendation tier with integrated graphics instead.';
+      equivalenceNote += ' The tower spec uses its GPU mostly for display output here; this mini PC reaches the same tier on integrated graphics instead.';
     }
-    equivalenceNote += ' Current ' + budgetOptionLabel(State.budget) + ' DIY target: ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
+    equivalenceNote += ' Current ' + budgetOptionLabel(State.budget) + ' target spec: ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
     return '<div class="laptop-equivalence-note"><span class="laptop-equivalence-label">Comparable target</span>' + equivalenceNote + '</div>';
   }
 
@@ -681,15 +674,11 @@ function runPicker(){
     if (isMacPlatform) {
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
-      document.getElementById('d-paths').innerHTML = '<div class="purchase-path"><a href="https://www.apple.com/shop/buy-mac" target="_blank" rel="noopener" class="card-link">Configure at apple.com</a></div>';
       document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
       document.getElementById('d-prebuilts').innerHTML = '';
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
-      document.getElementById('d-paths').innerHTML =
-        '<div class="purchase-path"><div class="purchase-path-label">Build it yourself</div><p>Source the parts yourself, using this CPU and GPU class as the target. Roughly an afternoon to assemble.</p><a href="https://pcpartpicker.com" target="_blank" rel="noopener" class="card-link">PCPartPicker</a></div>' +
-        '<div class="purchase-path"><div class="purchase-path-label">Buy prebuilt (custom spec)</div><p>Take this spec to Puget Systems or BOXX. Better components, burn-in testing, and real support than a big-box prebuilt.</p><a href="https://www.pugetsystems.com/solutions/aec-702/" target="_blank" rel="noopener" class="card-link">Puget Systems</a><a href="https://www.boxx.com/solutions/architecture-engineering-construction" target="_blank" rel="noopener" class="card-link">BOXX</a></div>';
       document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[activeWorkloadProfile].priority + '</p>';
       document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
     }
@@ -856,13 +845,6 @@ function runPicker(){
       update();
     });
   });
-  document.getElementById('d-details-btn').addEventListener('click', function() {
-    var opening = !document.getElementById('d-details').classList.contains('is-open');
-    document.getElementById('d-details').classList.toggle('is-open', opening);
-    document.getElementById('d-details-btn').classList.toggle('is-open', opening);
-    document.getElementById('d-details-btn').textContent = opening ? 'Hide details' : 'Build / buy details';
-  });
-
   update();
 
   // ---- SOFTWARE SCROLL CHEVRONS + NAV INDICATOR ----
