@@ -165,6 +165,7 @@ const data = {
   MonitorConfigs: extras.MonitorConfigs,
   Laptops: extras.Laptops,
   LaptopCategoryLabels: extras.LaptopCategoryLabels,
+  Glossary: extras.Glossary,
 };
 
 // Compact JSON: scalar-only objects/arrays on one line, else block-indented.

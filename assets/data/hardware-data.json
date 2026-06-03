@@ -679,5 +679,34 @@
       }
     }
   ],
-  "LaptopCategoryLabels": { "one": "One-Machine Solution", "desk": "Desk-Bound Powerhouses", "travel": "Document / Travel", "student": "Student", "mac_p": "MacBook", "mac_s": "Student" }
+  "LaptopCategoryLabels": { "one": "One-Machine Solution", "desk": "Desk-Bound Powerhouses", "travel": "Document / Travel", "student": "Student", "mac_p": "MacBook", "mac_s": "Student" },
+  "Glossary": {
+    "VRAM": { "def": "A dedicated GPU's own memory. It holds the scene while you work, so it sets how large a scene fits." },
+    "unified memory": { "def": "On Apple Silicon, one pool of memory shared by the processor and the graphics. It counts as both RAM and VRAM." },
+    "single-core": { "def": "How fast one CPU core runs. Modeling and drafting depend on this, since they work one operation at a time." },
+    "CPU core": { "def": "One of the independent processing units in a CPU. Final rendering uses all of them at once; modeling depends on the speed of just one." },
+    "GPU core": { "def": "The graphics units on an Apple Silicon chip. More of them speed up real-time visualization." },
+    "integrated graphics": {
+      "def": "The graphics built into the CPU. Fine for documents and 2D drafting, unreliable for 3D viewports.",
+      "aka": [ "integrated GPU" ]
+    },
+    "dedicated GPU": { "def": "A separate graphics card, not the one built into the CPU. Modeling and visualization both need one." },
+    "3D V-Cache": {
+      "def": "Extra fast memory AMD stacks onto the processor. It speeds up Revit and other modeling work.",
+      "aka": [ "V-Cache" ]
+    },
+    "X3D": { "def": "AMD's chips that carry 3D V-Cache. The fastest processors for Revit." },
+    "Rosetta": { "def": "Apple's built-in translator that runs Intel Mac apps on Apple Silicon, at a small speed cost." },
+    "Metal": { "def": "Apple's graphics framework, its counterpart to DirectX. Mac renderers like V-Ray work through it." },
+    "regeneration": {
+      "def": "Revit or CAD recomputing the model after a change. A faster CPU core shortens the wait.",
+      "aka": [ "regenerating" ]
+    },
+    "hybrid rendering": {
+      "def": "Final rendering that uses the GPU and the CPU together, which finishes faster than the CPU alone.",
+      "aka": [ "hybrid GPU rendering" ]
+    },
+    "Threadripper": { "def": "AMD's very-high-core-count processors, built for a dedicated render machine." },
+    "xref": { "def": "A drawing referenced inside another in AutoCAD, so shared sheets and details update everywhere at once." }
+  }
 }

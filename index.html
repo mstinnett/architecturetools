@@ -212,6 +212,13 @@
     .picker{padding:1.5rem 1rem 2.5rem;}
     .sw-nav{display:none;}
   }
+
+  /* Glossary terms: dotted underline in the copy, popover with the definition. */
+  .gloss{border-bottom:1px dotted var(--gray-400);cursor:help;}
+  .gloss:hover,.gloss:focus-visible{color:var(--black);border-bottom-color:var(--gray-700);outline:none;}
+  .gloss-pop{position:fixed;z-index:200;max-width:19rem;background:var(--black);color:var(--white);font-family:var(--font-body);font-weight:300;font-size:0.78rem;line-height:1.5;padding:0.6rem 0.75rem;box-shadow:0 6px 20px rgba(0,0,0,0.22);pointer-events:none;opacity:0;transform:translateY(2px);transition:opacity 0.12s,transform 0.12s;}
+  .gloss-pop.is-open{opacity:1;transform:translateY(0);}
+  .gloss-pop-term{display:block;font-weight:500;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.25rem;color:var(--gray-400);}
 </style>
 </head>
 <body>
@@ -632,6 +639,114 @@ function runPicker(){
     return prebuiltMarkup;
   }
 
+  // ---- GLOSSARY (popover definitions for borderline-technical terms) ----
+  // Data.Glossary maps a canonical term -> { def, aka? }. We auto-link the first
+  // occurrence of each term per note (not per page -- a reader sees one cell, so
+  // each note must define its own terms), then show the definition on hover/tap.
+  var GlossForms = [];   // [{ term, surface, re }], sorted longest surface first
+  var GlossDefs = {};    // term -> definition string
+  function buildGlossForms() {
+    GlossForms = []; GlossDefs = {};
+    var glossary = (window.Data && Data.Glossary) || {};
+    Object.keys(glossary).forEach(function(term) {
+      var entry = glossary[term] || {};
+      GlossDefs[term] = entry.def || '';
+      var surfaces = [term].concat(entry.aka || []);
+      surfaces.forEach(function(surface) {
+        var esc = surface.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Match the surface form at word edges, allowing an optional plural -s.
+        // The leading group keeps the boundary char; trailing lookahead blocks
+        // partial hits (so "X3D" never lights up inside "9950X3D").
+        GlossForms.push({ term: term, surface: surface,
+          re: new RegExp('(^|[^A-Za-z0-9])(' + esc + ')(s)?(?![A-Za-z0-9])', 'i') });
+      });
+    });
+    GlossForms.sort(function(a, b) { return b.surface.length - a.surface.length; });
+  }
+  function wrapFirstGloss(container, form) {
+    var walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(node) {
+        if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        for (var p = node.parentNode; p && p !== container; p = p.parentNode) {
+          if (p.classList && p.classList.contains('gloss')) return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var node;
+    while ((node = walker.nextNode())) {
+      var m = form.re.exec(node.nodeValue);
+      if (!m) continue;
+      var matchStart = m.index + m[1].length;
+      var matchText = m[2] + (m[3] || '');
+      var after = node.splitText(matchStart);
+      after.nodeValue = after.nodeValue.slice(matchText.length);
+      var span = document.createElement('span');
+      span.className = 'gloss';
+      span.setAttribute('tabindex', '0');
+      span.setAttribute('role', 'button');
+      span.setAttribute('data-term', form.term);
+      span.setAttribute('aria-label', form.term + ': ' + GlossDefs[form.term]);
+      span.textContent = matchText;
+      after.parentNode.insertBefore(span, after);
+      return true;
+    }
+    return false;
+  }
+  function glossifyContainer(container) {
+    if (!container || !GlossForms.length) return;
+    var used = {};
+    for (var i = 0; i < GlossForms.length; i++) {
+      var form = GlossForms[i];
+      if (used[form.term]) continue;
+      if (wrapFirstGloss(container, form)) used[form.term] = true;
+    }
+  }
+  var glossPop = null, glossPopTarget = null;
+  function showGlossPop(target) {
+    var term = target.getAttribute('data-term');
+    var def = GlossDefs[term];
+    if (!def) return;
+    if (!glossPop) {
+      glossPop = document.createElement('div');
+      glossPop.className = 'gloss-pop';
+      glossPop.setAttribute('role', 'tooltip');
+      document.body.appendChild(glossPop);
+    }
+    glossPop.innerHTML = '<span class="gloss-pop-term"></span><span class="gloss-pop-def"></span>';
+    glossPop.querySelector('.gloss-pop-term').textContent = term;
+    glossPop.querySelector('.gloss-pop-def').textContent = def;
+    glossPop.classList.add('is-open');
+    glossPopTarget = target;
+    var r = target.getBoundingClientRect();
+    var pr = glossPop.getBoundingClientRect();
+    var top = r.bottom + 8;
+    if (top + pr.height > window.innerHeight - 8) top = r.top - pr.height - 8;
+    var left = r.left;
+    if (left + pr.width > window.innerWidth - 8) left = window.innerWidth - 8 - pr.width;
+    glossPop.style.top = Math.max(8, top) + 'px';
+    glossPop.style.left = Math.max(8, left) + 'px';
+  }
+  function hideGlossPop() { if (glossPop) glossPop.classList.remove('is-open'); glossPopTarget = null; }
+  function glossTargetFrom(e) {
+    var t = e.target;
+    return (t && t.closest) ? t.closest('.gloss') : null;
+  }
+  document.addEventListener('mouseover', function(e) { var g = glossTargetFrom(e); if (g) showGlossPop(g); });
+  document.addEventListener('mouseout', function(e) { if (glossTargetFrom(e)) hideGlossPop(); });
+  document.addEventListener('focusin', function(e) { var g = glossTargetFrom(e); if (g) showGlossPop(g); });
+  document.addEventListener('focusout', function(e) { if (glossTargetFrom(e)) hideGlossPop(); });
+  document.addEventListener('click', function(e) {
+    var g = glossTargetFrom(e);
+    if (!g) { hideGlossPop(); return; }
+    e.stopPropagation();
+    if (glossPop && glossPop.classList.contains('is-open') && glossPopTarget === g) hideGlossPop();
+    else showGlossPop(g);
+  });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') hideGlossPop(); });
+  window.addEventListener('scroll', hideGlossPop, true);
+  buildGlossForms();
+
   // ---- MAIN UPDATE ----
   function update() {
     var activePlatform = effectivePlatform();
@@ -775,6 +890,13 @@ function runPicker(){
       document.getElementById('m-shelf-area').innerHTML = buildMonitorConfigsHTML(activePlatform);
       bindMonitorConfigEvents('m-shelf-area');
     }
+
+    // Auto-link glossary terms in the freshly rendered copy. innerHTML is rebuilt
+    // each update, so this re-runs cleanly over plain text every time.
+    hideGlossPop();
+    ['d-priority', 'd-spec', 'd-prebuilts', 'm-content', 'm-priority'].forEach(function(id) {
+      glossifyContainer(document.getElementById(id));
+    });
   }
 
   renderBudgetOptions();
