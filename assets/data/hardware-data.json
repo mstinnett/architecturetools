@@ -7,6 +7,8 @@
     "x3d": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 7 9800X3D", "note": "" },
     "x3d_top": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 7 9800X3D", "note": "" },
     "mixed": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 9 9950X", "note": "" },
+    "mixed_x3d": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 9 9950X3D", "note": "" },
+    "top_x3d": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 9 9950X3D2", "note": "" },
     "render12": { "intel": "", "amd": "AMD Ryzen 9 9900X", "note": "" },
     "render16": { "intel": "", "amd": "AMD Ryzen 9 9950X", "note": "" },
     "render_max": { "intel": "", "amd": "AMD Ryzen 9 9950X or AMD Threadripper PRO", "note": "" }
@@ -114,13 +116,13 @@
     "modeling_viz": {
       "small": {
         "cheapest": { "cpu": "x3d", "cpuNote": "The X3D favors the modeling side — single-core speed for Revit and Rhino.", "gpu": "rtx5070", "gpuNote": "A 5070 is enough to start real-time visualization without overspending.", "ram": "64 GB DDR5", "ramNote": "64 GB to run a model and a scene together.", "storage": "2 TB NVMe", "priceRange": "$2,100--$2,500" },
-        "value": { "cpu": "mixed", "cpuNote": "Cores for visualization, still quick for Revit.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM handles both modeling and real visualization.", "ram": "64 GB DDR5", "ramNote": "64 GB for a model plus a visualization scene.", "storage": "2 TB NVMe", "priceRange": "$2,300--$2,800" },
-        "best": { "cpu": "top", "cpuNote": "16 cores for visualization, with the single-core speed modeling wants.", "gpu": "rtx5080", "gpuNote": "16 GB of VRAM — serious visualization without the 5090's price.", "ram": "64 GB DDR5", "ramNote": "64 GB for model and scene together.", "storage": "2 TB NVMe", "priceRange": "$3,000--$3,600" }
+        "value": { "cpu": "mixed_x3d", "cpuNote": "AMD's 9950X3D — 16 cores for visualization, X3D cache for modeling.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM handles both modeling and real visualization.", "ram": "64 GB DDR5", "ramNote": "64 GB for a model plus a visualization scene.", "storage": "2 TB NVMe", "priceRange": "$2,300--$2,800" },
+        "best": { "cpu": "top_x3d", "cpuNote": "AMD's 9950X3D2 — dual V-Cache and 16 cores for both at once.", "gpu": "rtx5080", "gpuNote": "16 GB of VRAM — serious visualization without the 5090's price.", "ram": "64 GB DDR5", "ramNote": "64 GB for model and scene together.", "storage": "2 TB NVMe", "priceRange": "$3,000--$3,600" }
       },
       "large": {
-        "cheapest": { "cpu": "top", "cpuNote": "The cores a large mixed workload needs.", "gpu": "rtx5070", "gpuNote": "A 5070 will do, but this is where I stop cutting the GPU.", "ram": "64 GB DDR5", "ramNote": "64 GB if you keep big models and scenes in check.", "storage": "2 TB NVMe", "priceRange": "$2,500--$3,000" },
-        "value": { "cpu": "top", "cpuNote": "Top cores for large models and visualization at once.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM for visualizing large models.", "ram": "128 GB DDR5", "ramNote": "128 GB — a large model and a scene open together use a lot.", "storage": "2 TB NVMe", "priceRange": "$2,800--$3,400" },
-        "best": { "cpu": "top", "cpuNote": "The most cores for the largest models and visualization.", "gpu": "rtx5090", "gpuNote": "32 GB of VRAM — no limits on model or scene size.", "ram": "128 GB DDR5", "ramNote": "128 GB for the largest model-plus-scene work.", "storage": "4 TB NVMe", "priceRange": "$5,000--$6,000" }
+        "cheapest": { "cpu": "mixed_x3d", "cpuNote": "The 9950X3D's 16 cores and X3D cache handle large mixed work.", "gpu": "rtx5070", "gpuNote": "A 5070 will do, but this is where I stop cutting the GPU.", "ram": "64 GB DDR5", "ramNote": "64 GB if you keep big models and scenes in check.", "storage": "2 TB NVMe", "priceRange": "$2,500--$3,000" },
+        "value": { "cpu": "mixed_x3d", "cpuNote": "16 cores for visualization, X3D cache for large models — the 9950X3D.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM for visualizing large models.", "ram": "128 GB DDR5", "ramNote": "128 GB — a large model and a scene open together use a lot.", "storage": "2 TB NVMe", "priceRange": "$2,800--$3,400" },
+        "best": { "cpu": "top_x3d", "cpuNote": "AMD's 9950X3D2 — dual V-Cache and 16 cores for the largest mixed work.", "gpu": "rtx5090", "gpuNote": "32 GB of VRAM — no limits on model or scene size.", "ram": "128 GB DDR5", "ramNote": "128 GB for the largest model-plus-scene work.", "storage": "4 TB NVMe", "priceRange": "$5,000--$6,000" }
       },
       "priority": "These tasks need two things at once — a fast CPU core for modeling and a powerful GPU for visualization. Neither can be cheap, so expect to pay more than for either alone."
     },
