@@ -200,21 +200,21 @@
         "best": { "chip": "macstudio_m4ultra", "cpuNote": "An M4 Ultra leans toward visualization — more GPU cores, weaker single-core.", "memory": "128 GB unified", "storage": "2 TB SSD", "price": "$4,000--$5,000" }
       },
       "large": {
-        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "An M4 Max is the leanest balanced choice for large mixed work.", "memory": "64 GB unified", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
-        "value": { "chip": "macstudio_m4ultra", "cpuNote": "More GPU cores for large-model visualization, at some single-core cost.", "memory": "128 GB unified", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
+        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "An M4 Max is the cheapest balanced choice for large mixed work.", "memory": "64 GB unified", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
+        "value": { "chip": "macstudio_m4ultra", "cpuNote": "The Ultra has more GPU cores for large-model visualization, but at the cost of some modeling speed. The Max is also a good choice.", "memory": "128 GB unified", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
         "best": { "chip": "macstudio_m4ultra", "cpuNote": "The maximum Mac for large modeling and visualization — 192 GB.", "memory": "192 GB unified", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
       "priority": "On a Mac, these two tasks want different chips. A high-memory M4 Max has the best single-core for modeling. An M4 Ultra adds GPU cores for visualization, but with weaker single-core. Pick by which side dominates your work. Unified memory is both RAM and VRAM, so buy enough of it."
     },
     "production": {
       "small": {
-        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "The entry point if you're set on rendering on a Mac.", "memory": "64 GB unified", "storage": "2 TB SSD", "price": "$3,200--$3,800" },
-        "value": { "chip": "macstudio_m4ultra", "cpuNote": "The Ultra's cores for V-Ray, plus Metal GPU rendering.", "memory": "128 GB unified", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "best": { "chip": "macstudio_m4ultra", "cpuNote": "The maximum Mac — 192 GB.", "memory": "192 GB unified", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
+        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "The entry point if you're set on rendering on a Mac — though a PC offers far better value for this work.", "memory": "64 GB unified", "storage": "2 TB SSD", "price": "$3,200--$3,800" },
+        "value": { "chip": "macstudio_m4ultra", "cpuNote": "The Ultra's cores for V-Ray, plus Metal GPU rendering.", "memory": "96 GB unified", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
+        "best": { "chip": "macstudio_m4ultra", "cpuNote": "The top Mac chip — 128 GB is plenty at this scale.", "memory": "128 GB unified", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
       "large": {
-        "cheapest": { "chip": "macstudio_m4ultra", "cpuNote": "The cheapest Mac I'd trust with large renders.", "memory": "128 GB unified", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "value": { "chip": "macstudio_m4ultra", "cpuNote": "Large scenes need the full 192 GB for rendering.", "memory": "192 GB unified", "storage": "4 TB SSD", "price": "$5,500--$7,000" },
+        "cheapest": { "chip": "macstudio_m4ultra", "cpuNote": "The cheapest Mac I'd trust with large renders.", "memory": "96 GB unified", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
+        "value": { "chip": "macstudio_m4ultra", "cpuNote": "Large scenes need 128 GB to hold the render.", "memory": "128 GB unified", "storage": "4 TB SSD", "price": "$5,500--$7,000" },
         "best": { "chip": "macstudio_m4ultra", "cpuNote": "The maximum Mac, and still slower than a mid-range RTX 4070 PC at V-Ray.", "memory": "192 GB unified", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
       "priority": "Final rendering is the Mac's weakest workload. V-Ray runs on Metal, but a mid-range Windows PC with an RTX 4070 still outrenders a maxed Mac Studio. Choose Mac here for the ecosystem, display, and silence — not for render speed."
