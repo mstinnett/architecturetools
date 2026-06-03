@@ -19,7 +19,7 @@
   body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;}
   .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);display:flex;flex-direction:column;}
   /* Page order: hero, then the heading, then the picker controls, then the results, then prebuilts/footer. */
-  .picker>.desk-hero{order:1;} .picker-header{order:2;} .picker>.controls-cluster{order:3;} .picker>.input-section{order:4;} .picker>.divider{order:5;} .picker>#panelsWrapper{order:6;} .picker>.picker-footer{order:7;}
+  .picker>.desk-hero{order:1;} .picker-header{order:2;} .picker>.controls-cluster{order:3;} .picker>.mon-drawer{order:4;} .picker>.input-section{order:5;} .picker>.divider{order:6;} .picker>#panelsWrapper{order:7;} .picker>.picker-footer{order:8;}
   .picker-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
   .picker-header h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.2rem;}
   .picker-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:44em;}
@@ -34,6 +34,17 @@
      one column wide -- gives all four columns identical button widths. */
   .control-group .option-row{flex-direction:column;align-items:stretch;gap:0.4rem;}
   .control-group .option-pill{width:100%;text-align:left;}
+
+  /* Monitors drawer -- one collapsible picker, grouped with the setup inputs. */
+  .mon-drawer{margin-bottom:2.5rem;border:1px solid var(--gray-300);}
+  .mon-drawer-toggle{width:100%;background:none;border:none;cursor:pointer;font-family:var(--font-body);padding:0.8rem 1rem;display:flex;align-items:center;gap:0.85rem;text-align:left;transition:background 0.15s;}
+  .mon-drawer-toggle:hover{background:var(--gray-50);}
+  .mon-drawer-label{font-size:0.6rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500);flex-shrink:0;}
+  .mon-drawer-summary{font-size:0.85rem;font-weight:400;color:var(--black);flex:1;min-width:0;}
+  .mon-drawer-toggle::after{content:'+';font-size:1.2rem;font-weight:300;color:var(--gray-400);line-height:1;flex-shrink:0;}
+  .mon-drawer.is-open .mon-drawer-toggle::after{content:'\2212';}
+  .mon-drawer-body{display:none;padding:0.5rem 1rem 1.1rem;border-top:1px solid var(--gray-200);}
+  .mon-drawer.is-open .mon-drawer-body{display:block;}
 
   /* Machine type strip (below divider) — full-width tabs */
 
@@ -112,7 +123,7 @@
   .panels-split #panel-desktop .result-side{display:none;}
   .panels-split #panel-mobile .result-side{display:none;}
   @media(min-width:1200px){
-    .panels-split{grid-template-columns:1fr 1fr 260px;}
+    .panels-split{grid-template-columns:1fr 1fr;}
     .panels-split #panel-mobile{padding-right:2rem;}
     .panels-split #panel-monitors{grid-column:3;grid-row:1;padding-top:1.5rem;margin-top:0;border-top:none;border-left:2px solid var(--black);padding-left:2rem;}
     /* Desktop split mode: panel-monitors is a 260px sidebar -- not enough
@@ -146,8 +157,8 @@
   .mon-configs-label{font-size:0.55rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.6rem;}
   .mon-configs{display:flex;flex-direction:column;gap:0.9rem;}
   .mon-tier-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.4rem;}
-  .mon-tier-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.4rem;}
-  .mon-config{display:flex;flex-direction:column;align-items:center;gap:0.35rem;padding:0.55rem 0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;background:var(--white);position:relative;transition:border-color 0.15s,background 0.15s;}
+  .mon-tier-row{display:flex;flex-wrap:wrap;gap:0.5rem;}
+  .mon-config{display:flex;flex-direction:column;align-items:center;width:158px;gap:0.35rem;padding:0.55rem 0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;background:var(--white);position:relative;transition:border-color 0.15s,background 0.15s;}
   .mon-config:hover{border-color:var(--gray-500);}
   .mon-config.selected{border:2px solid var(--black);padding:calc(0.55rem - 1px) calc(0.4rem - 1px);background:var(--gray-50);}
   .mon-config-visual{display:flex;gap:0.25rem;align-items:flex-end;min-height:38px;}
@@ -240,9 +251,6 @@
         <div class="spec-block" id="d-spec"></div>
         <div id="d-priority" class="priority-box"></div>
       </div>
-      <div class="result-side">
-        <div id="d-shelf-area"></div>
-      </div>
     </div>
     <div class="desktop-prebuilts" id="d-prebuilts"></div>
   </div>
@@ -255,16 +263,7 @@
         <div id="m-content"></div>
         <div id="m-priority" class="priority-box"></div>
       </div>
-      <div class="result-side">
-        <div id="m-shelf-area"></div>
-      </div>
     </div>
-  </div>
-
-  <!-- Monitors (shared panel in Desktop+Laptop mode) -->
-  <div class="results-panel" id="panel-monitors">
-    <div class="panel-label">Monitors</div>
-    <div id="shared-shelf-area"></div>
   </div>
   </div>
 
@@ -357,6 +356,17 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Monitors: one collapsible drawer, grouped with the setup inputs above.
+       Closed by default (shows the current pick); opening it reveals the tiered
+       configs. Picking one redraws the hero. -->
+  <div class="mon-drawer" id="monDrawer">
+    <button class="mon-drawer-toggle" id="monDrawerToggle" type="button" aria-expanded="false" aria-controls="monDrawerBody">
+      <span class="mon-drawer-label">Monitors</span>
+      <span class="mon-drawer-summary" id="monDrawerSummary"></span>
+    </button>
+    <div class="mon-drawer-body" id="monDrawerBody"></div>
   </div>
 
   <div class="picker-footer">Updated March 2026. Independent recommendations &mdash; no affiliate commissions.</div>
@@ -516,7 +526,7 @@ function runPicker(){
 
   function buildMonitorConfigsHTML(platform) {
     var tiers = [['cheapest', 'Cheapest'], ['value', 'Value'], ['overkill', 'Overkill']];
-    var markup = '<div class="mon-configs-label">Monitors &mdash; tap to preview on your desk</div><div class="mon-configs">';
+    var markup = '<div class="mon-configs-label">Tap a layout to preview it on your desk above</div><div class="mon-configs">';
     for (var t = 0; t < tiers.length; t++) {
       var row = '';
       for (var i = 0; i < Data.MonitorConfigs.length; i++) {
@@ -767,7 +777,6 @@ function runPicker(){
     var showLaptop = State.machineType === 'laptop' || isSplit;
     document.getElementById('panel-desktop').classList.toggle('active', showDesktop);
     document.getElementById('panel-mobile').classList.toggle('active', showLaptop);
-    document.getElementById('panel-monitors').classList.toggle('active', isSplit);
     document.getElementById('panelsWrapper').classList.toggle('panels-split', isSplit);
     document.querySelector('.picker').classList.toggle('split-mode', isSplit);
 
@@ -789,15 +798,11 @@ function runPicker(){
       document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
     }
 
-    // Monitor configs (curated list with diagrams + Rec badge; drives the hero)
-    var monitorsHTML = buildMonitorConfigsHTML(activePlatform);
-    if (isSplit) {
-      document.getElementById('shared-shelf-area').innerHTML = monitorsHTML;
-      bindMonitorConfigEvents('shared-shelf-area');
-    } else {
-      document.getElementById('d-shelf-area').innerHTML = monitorsHTML;
-      bindMonitorConfigEvents('d-shelf-area');
-    }
+    // Monitors drawer (one collapsible picker for every mode; drives the hero).
+    document.getElementById('monDrawerBody').innerHTML = buildMonitorConfigsHTML(activePlatform);
+    bindMonitorConfigEvents('monDrawerBody');
+    var selectedMonitorConfig = Data.MonitorConfigs[State.monitorConfig];
+    document.getElementById('monDrawerSummary').textContent = selectedMonitorConfig ? selectedMonitorConfig.name : 'Choose a layout';
 
     // Laptop
     var mobileStrategy = State.machineType === 'desktop_laptop' ? 'two' : 'one';
@@ -886,11 +891,6 @@ function runPicker(){
     else mobilePriorityNote = 'Light laptop for travel, desktop for production. Two machines means syncing files. No thermal compromise on either end.';
     document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
-    if (!isSplit) {
-      document.getElementById('m-shelf-area').innerHTML = buildMonitorConfigsHTML(activePlatform);
-      bindMonitorConfigEvents('m-shelf-area');
-    }
-
     // Auto-link glossary terms in the freshly rendered copy. innerHTML is rebuilt
     // each update, so this re-runs cleanly over plain text every time.
     hideGlossPop();
@@ -953,6 +953,18 @@ function runPicker(){
       update();
     });
   });
+
+  // Monitors drawer open/close (bound once; update() only refills the body).
+  var monDrawerToggle = document.getElementById('monDrawerToggle');
+  if (monDrawerToggle) {
+    monDrawerToggle.addEventListener('click', function() {
+      var drawer = document.getElementById('monDrawer');
+      var opening = !drawer.classList.contains('is-open');
+      drawer.classList.toggle('is-open', opening);
+      monDrawerToggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    });
+  }
+
   update();
 
   // ---- SOFTWARE SCROLL CHEVRONS + NAV INDICATOR ----
