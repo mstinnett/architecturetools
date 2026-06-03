@@ -28,6 +28,12 @@ for their work. Not to an audience, about architects.
 - **One decision per note.** Don't borrow an adjacent decision to land a line.
 - **No cross-tier references.** A note describes its own cell's part, not another
   tier's.
+- **Don't repeat the title.** The cell shows the chip, GPU, RAM, and price beside
+  the note. Don't restate them ("the M4 Max," "64 GB"). Name a chip only to steer
+  between options ("skip the Ultra").
+- **No comparatives to unseen tiers.** "More cores" than what? The reader sees one
+  cell, not the others. Describe what the part does, or compare only to the
+  workload's needs ("more than documents need").
 - **No process leaks.** Describe what the buyer gets, not how we tiered it.
   Not "stays an X3D," not "RAM tracks model size."
 - **When the frame states the rule, the cell states the stakes,** not the rule
