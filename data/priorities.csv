@@ -2,12 +2,12 @@ platform,profile,priority
 win,review,"You primarily work on documents — drawings, PDFs, email. Almost any current computer handles that, so the monitor matters more than the computer."
 win,drafting,"AutoCAD runs one operation at a time, so a fast CPU core matters more than many — though almost any current chip drafts smoothly. Drawings with many xrefs and nested blocks want more RAM and fast storage. The monitor matters more than the computer."
 win,modeling,"Modeling runs one operation at a time — what counts is how fast each CPU core is, not how many. That's what makes Revit, Rhino, and SketchUp feel responsive. Get a modest dedicated GPU for stable viewports. More powerful ones are only needed for visualization."
-win,viz,"Real-time visualization renders on the GPU — Enscape, Lumion, D5, and Twinmotion draw the scene live as you move. A more powerful card renders faster, and VRAM sets how large a scene you can hold. The CPU only matters for loading."
+win,viz,"Real-time visualization renders using the GPU — Enscape, Lumion, D5, and Twinmotion draw the scene live as you move. A more powerful GPU renders faster, and VRAM sets how large a scene you can hold. The CPU only matters for loading."
 win,modeling_viz,"These tasks need two things at once — a fast CPU core for modeling and a powerful GPU for visualization. Neither can be cheap, so expect to pay more than for either alone."
-win,production,"Final rendering in V-Ray or Corona runs on your CPU cores — it uses every one at once, so the number of cores sets your render times. More cores, faster renders. AMD's Ryzen 9 leads, and Threadripper PRO goes further on a dedicated render box. GPU rendering keeps improving, so it's worth a look if you're still CPU-only."
-mac,review,Document-primary. The display matters more than the Mac.
-mac,drafting,2D drafting on Mac is well-served by the M4 Pro.
-mac,modeling,"ArchiCAD, Vectorworks, SketchUp, Rhino v8 all run on Mac. Performance scales with GPU cores and unified memory."
-mac,viz,Enscape works on Mac. TwinMotion runs via Rosetta. Lumion and D5 are Windows-only.
-mac,modeling_viz,Unified memory serves as both RAM and VRAM.
-mac,production,"V-Ray supports Metal GPU since V-Ray 7. A mid-range Windows PC with an RTX 4070 still outrenders a maxed Mac Studio. Mac wins on ecosystem, display, and silence."
+win,production,"Final rendering in V-Ray or Corona uses every CPU core at once, so the number of cores sets your render times. More cores, faster renders. AMD's Ryzen 9 leads, and Threadripper PRO goes further on a dedicated render box. GPU rendering keeps improving, so it's worth a look if you're still CPU-only."
+mac,review,"You primarily work on documents, and any Mac handles that. The display matters more than the Mac."
+mac,drafting,"Drafting runs one operation at a time, and Apple's CPU cores are fast at it. The display matters more than the Mac."
+mac,modeling,"Revit doesn't run on macOS, but ArchiCAD, Vectorworks, SketchUp, and Rhino do. Like any modeler, they want a fast CPU core. Bigger models want more unified memory and GPU cores."
+mac,viz,"Real-time visualization is limited on Mac — Enscape and Twinmotion run (Twinmotion through Rosetta), while Lumion and D5 are Windows-only. The apps that run scale with GPU cores and unified memory."
+mac,modeling_viz,"These tasks need a fast CPU core for modeling and many GPU cores for visualization. On Apple Silicon, unified memory is both RAM and VRAM, so the model and the scene share one pool — buy enough of it."
+mac,production,"Final rendering is the Mac's weakest workload. V-Ray runs on Metal, but a mid-range Windows PC with an RTX 4070 still outrenders a maxed Mac Studio. Choose Mac here for the ecosystem, display, and silence — not for render speed."
