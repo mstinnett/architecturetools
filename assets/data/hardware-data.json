@@ -432,7 +432,7 @@
       "name": "HP ZBook Ultra G1a",
       "price": "$3,500--$4,500",
       "weight": "3.3 lbs",
-      "note": "AMD Strix Halo, 128 GB unified, OLED. Battery is the weak point.",
+      "note": "Ryzen AI Max+ 395, 128 GB unified, 14-inch OLED. The integrated Radeon stands in for a discrete GPU — strong for modeling, light on visualization. Battery is the weak point.",
       "workloadProfiles": [ "review", "drafting", "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {
         "review": { "best": true },
@@ -445,7 +445,7 @@
       "name": "Lenovo ThinkPad P1 Gen 8",
       "price": "$2,800--$3,400",
       "weight": "3.8 lbs",
-      "note": "Intel Arrow Lake, RTX Pro 2000, tandem OLED — and the best keyboard here.",
+      "note": "Arrow Lake, RTX PRO 2000 (8 GB), up to 64 GB, 3.2K tandem OLED. A true workstation at this weight, with the best keyboard here.",
       "workloadProfiles": [ "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "drafting": { "best": true },
@@ -459,7 +459,7 @@
       "name": "Asus ProArt P16",
       "price": "$2,200--$2,600",
       "weight": "4.2 lbs",
-      "note": "OLED, tuned for creative work. A strong one-machine pick.",
+      "note": "Ryzen AI 9 HX 370, RTX 5070, up to 64 GB, 16-inch 4K OLED. A polished creator laptop. Memory is soldered, so configure it up front.",
       "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "modeling": { "value": true }
@@ -471,7 +471,7 @@
       "name": "Asus ROG Zephyrus G16",
       "price": "$2,000--$2,500",
       "weight": "4.1 lbs",
-      "note": "Good thermals and a strong display, lighter than a workstation.",
+      "note": "Core Ultra 9, up to RTX 5090, 16-inch 2.5K OLED. Lighter than a workstation with an excellent screen, though the Intel model runs warm under load.",
       "workloadProfiles": [ "drafting", "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {
         "viz": { "cheapest": true },
@@ -484,7 +484,7 @@
       "name": "Asus ROG Zephyrus G14",
       "price": "$1,800--$2,200",
       "weight": "3.3 lbs",
-      "note": "Real power in a 14-inch body.",
+      "note": "Ryzen AI 9, up to RTX 5070, 14-inch 3K OLED, with upgradeable memory. The thin 14-inch chassis caps the GPU at 90W, so it trails heavier machines.",
       "workloadProfiles": [ "drafting", "modeling" ],
       "recommendedFor": {
         "modeling": { "cheapest": true }
@@ -496,7 +496,7 @@
       "name": "Razer Blade 16",
       "price": "$2,500--$3,200",
       "weight": "4.6 lbs",
-      "note": "Premium build, OLED option — but support is mixed.",
+      "note": "Ryzen AI 9 HX 370, up to RTX 5090, 16-inch OLED — the thinnest way to carry a 5090. Premium build, but Razer's support is inconsistent.",
       "workloadProfiles": [ "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {}
     },
@@ -506,7 +506,7 @@
       "name": "Lenovo Legion Pro 7i",
       "price": "$2,200--$2,800",
       "weight": "5.5 lbs",
-      "note": "RTX 5070 Ti and OLED, exceptional value. Loud, and a desk machine.",
+      "note": "Core Ultra 9 275HX, up to RTX 5090, 16-inch OLED — gaming-desktop power for the price. Loud, and desk-bound.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "value": true },
@@ -519,7 +519,7 @@
       "name": "Lenovo ThinkPad P16 Gen 3",
       "price": "$3,800--$4,500",
       "weight": "5.8 lbs",
-      "note": "Flagship ThinkPad — RTX Pro 5000, up to 192 GB.",
+      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB), up to 192 GB ECC. A flagship mobile workstation, certified for pro apps.",
       "workloadProfiles": [ "modeling_viz", "production" ],
       "recommendedFor": {
         "modeling_viz": { "best": true }
@@ -531,7 +531,7 @@
       "name": "HP ZBook Fury 16 G1i",
       "price": "$4,000--$4,800",
       "weight": "6.0 lbs",
-      "note": "280W adapter and the best sustained-rendering thermals here.",
+      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB), up to 192 GB. A 280W adapter and three-fan vapor chamber give it the best sustained-rendering thermals here.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "best": true },
@@ -544,7 +544,7 @@
       "name": "Dell Pro Max 16 Plus",
       "price": "$3,500--$4,200",
       "weight": "5.6 lbs",
-      "note": "Intel HX, RTX Pro 5000 — AEC Magazine rates it highly.",
+      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB ECC), 128 GB, 4K OLED. Replaceable GPU and memory make it the serviceable pick — AEC Magazine rates it highly.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {}
     },
@@ -554,7 +554,7 @@
       "name": "Lenovo ThinkPad X1 Carbon Gen 13",
       "price": "$1,500--$1,800",
       "weight": "2.5 lbs",
-      "note": "The standard ultraportable, with all-day battery.",
+      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch. The standard ultraportable — all-day battery, no discrete GPU, for documents and drafting.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "value": true }
@@ -566,7 +566,7 @@
       "name": "Asus TUF Gaming A16",
       "price": "$1,000--$1,400",
       "weight": "4.8 lbs",
-      "note": "RTX 4060, durable, and affordable.",
+      "note": "Ryzen 7, RTX 5060 (8 GB), upgradeable to 64 GB, 16-inch. Durable to MIL-STD and affordable, with long battery life for a gaming laptop.",
       "workloadProfiles": [ "modeling", "viz", "modeling_viz", "drafting", "review" ],
       "recommendedFor": {
         "modeling": { "cheapest": true }
@@ -578,7 +578,7 @@
       "name": "Lenovo LOQ 16",
       "price": "$900--$1,200",
       "weight": "5.2 lbs",
-      "note": "Configurable and upgradeable.",
+      "note": "Intel or Ryzen with an RTX 5050/5060, up to 32 GB across two slots. The budget pick — configurable, and easy to upgrade later.",
       "workloadProfiles": [ "modeling", "drafting", "review" ],
       "recommendedFor": {
         "review": { "cheapest": true },
@@ -591,7 +591,7 @@
       "name": "Acer Predator Helios 16",
       "price": "$1,400--$1,800",
       "weight": "5.5 lbs",
-      "note": "A high-wattage GPU, for studios that need real-time visualization.",
+      "note": "Core Ultra 9 275HX, up to RTX 5090, 16-inch 2.5K OLED. A high-wattage GPU for studios that need real-time visualization without a workstation price.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "cheapest": true },
@@ -604,7 +604,7 @@
       "name": "MacBook Air 15\" M4",
       "price": "$1,300--$1,500",
       "weight": "3.3 lbs",
-      "note": "Fanless, all-day battery — for documents and light drafting.",
+      "note": "M4, fanless, up to 32 GB unified, 15-inch. All-day battery for documents and light drafting, though the fanless design slows it under sustained load.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "value": true }
@@ -616,7 +616,7 @@
       "name": "MacBook Pro 14\" M4 Pro",
       "price": "$2,400--$2,800",
       "weight": "3.5 lbs",
-      "note": "The everyday Mac for ArchiCAD, Rhino, and SketchUp.",
+      "note": "M4 Pro, up to 48 GB unified, 14-inch XDR. The everyday Mac for ArchiCAD, Rhino, and SketchUp.",
       "workloadProfiles": [ "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "drafting": { "value": true, "best": true },
@@ -629,7 +629,7 @@
       "name": "MacBook Pro 16\" M4 Pro",
       "price": "$2,800--$3,200",
       "weight": "4.7 lbs",
-      "note": "More screen and power — the one-machine Mac.",
+      "note": "M4 Pro, up to 48 GB unified, 16-inch XDR. More screen and sustained power than the 14-inch — the one-machine Mac.",
       "workloadProfiles": [ "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {
         "modeling": { "best": true },
@@ -642,7 +642,7 @@
       "name": "MacBook Pro 16\" M4 Max",
       "price": "$3,800--$4,800",
       "weight": "4.7 lbs",
-      "note": "64–128 GB unified — serious Enscape and V-Ray on Metal.",
+      "note": "M4 Max, 64–128 GB unified, 16-inch XDR. Serious GPU cores for Enscape and V-Ray on Metal.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "value": true, "best": true },
@@ -656,7 +656,7 @@
       "name": "MacBook Air 13\" M4",
       "price": "$1,100--$1,300",
       "weight": "2.7 lbs",
-      "note": "The budget Mac. Small screen, so dock it to a monitor.",
+      "note": "M4, fanless, up to 24 GB unified, 13-inch. The budget Mac — small screen, so dock it to a monitor, and it slows under sustained load.",
       "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {
         "review": { "cheapest": true }
@@ -668,7 +668,7 @@
       "name": "MacBook Pro 14\" M4",
       "price": "$1,600--$1,800",
       "weight": "3.4 lbs",
-      "note": "The base Pro — better sustained performance than the Air.",
+      "note": "Base M4 with a fan, 14-inch XDR. Better sustained performance than the Air, for real modeling on the move.",
       "workloadProfiles": [ "modeling", "drafting", "viz" ],
       "recommendedFor": {
         "drafting": { "cheapest": true },
