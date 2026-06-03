@@ -1,10 +1,10 @@
 platform,profile,priority
-win,review,"Your work is document-primary, and almost any current computer handles it. The monitor matters more than the computer."
-win,drafting,"AutoCAD runs one operation at a time, so a fast core matters more than many cores, and almost any current chip drafts smoothly. Drawings with many xrefs and nested blocks want more RAM and fast storage. The monitor matters more than the computer."
-win,modeling,"Modeling runs one operation at a time — what counts is how fast each core is, not how many. That's what makes Revit, Rhino, and SketchUp feel responsive. Get a modest dedicated GPU for stable viewports. More powerful ones are only needed for visualization."
-win,viz,"Visualization runs on the GPU — Enscape, Lumion, D5, and Twinmotion render faster with a more powerful card, and VRAM sets how large a scene you can hold. The CPU only matters for loading scenes."
-win,modeling_viz,"This build pays for two things at once — a fast core for modeling and a powerful GPU for visualization. Neither can be cheap, so it costs more than either alone."
-win,production,"Rendering uses every core at once, so the number of cores sets your render times — more cores, faster renders. AMD's Ryzen 9 leads, and Threadripper PRO goes further on a dedicated render box. GPU rendering keeps improving, so it's worth a look if you're still CPU-only."
+win,review,"You primarily work on documents — drawings, PDFs, email. Almost any current computer handles that, so the monitor matters more than the computer."
+win,drafting,"AutoCAD runs one operation at a time, so a fast CPU core matters more than many — though almost any current chip drafts smoothly. Drawings with many xrefs and nested blocks want more RAM and fast storage. The monitor matters more than the computer."
+win,modeling,"Modeling runs one operation at a time — what counts is how fast each CPU core is, not how many. That's what makes Revit, Rhino, and SketchUp feel responsive. Get a modest dedicated GPU for stable viewports. More powerful ones are only needed for visualization."
+win,viz,"Real-time visualization renders on the GPU — Enscape, Lumion, D5, and Twinmotion draw the scene live as you move. A more powerful card renders faster, and VRAM sets how large a scene you can hold. The CPU only matters for loading."
+win,modeling_viz,"These tasks need two things at once — a fast CPU core for modeling and a powerful GPU for visualization. Neither can be cheap, so expect to pay more than for either alone."
+win,production,"Final rendering in V-Ray or Corona runs on your CPU cores — it uses every one at once, so the number of cores sets your render times. More cores, faster renders. AMD's Ryzen 9 leads, and Threadripper PRO goes further on a dedicated render box. GPU rendering keeps improving, so it's worth a look if you're still CPU-only."
 mac,review,Document-primary. The display matters more than the Mac.
 mac,drafting,2D drafting on Mac is well-served by the M4 Pro.
 mac,modeling,"ArchiCAD, Vectorworks, SketchUp, Rhino v8 all run on Mac. Performance scales with GPU cores and unified memory."
