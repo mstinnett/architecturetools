@@ -14,7 +14,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#f9f9f8;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
+  :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#6b6b6b;--gray-400:#888;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#f9f9f8;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
   html{font-size:15px;}
   body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;}
   .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);}
@@ -126,9 +126,9 @@
   .card-illustration{background:var(--gray-50);border:1px solid var(--gray-700);height:160px;display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-family:var(--font-body);font-weight:300;margin-bottom:1.5rem;}
 
   .spec-block{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:1.5rem;}
-  .spec-item-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.2rem;}
+  .spec-item-label{font-size:0.64rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-700);margin-bottom:0.25rem;}
   .spec-item-value{font-size:0.88rem;font-weight:400;}
-  .spec-item-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;margin-top:0.1rem;max-width:20em;}
+  .spec-item-note{font-size:0.82rem;color:var(--gray-700);font-weight:300;margin-top:0.2rem;max-width:24em;line-height:1.5;}
 
   .card-link{display:inline-block;font-size:0.75rem;font-weight:400;color:var(--black);border-bottom:1px solid var(--black);text-decoration:none;padding-bottom:1px;transition:opacity 0.15s;margin-right:1.5rem;}
   .card-link:hover{opacity:0.6;}
@@ -136,7 +136,7 @@
 
   .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);}
   .priority-box-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.35rem;}
-  .priority-box p{font-size:0.78rem;font-weight:300;color:var(--gray-700);line-height:1.6;}
+  .priority-box p{font-size:0.88rem;font-weight:300;color:var(--gray-800);line-height:1.6;}
   .desktop-prebuilts{margin-top:1.5rem;}
 
   /* Monitor configs: curated tiered list of cards */
@@ -149,7 +149,7 @@
   .mon-config:hover{border-color:var(--gray-500);}
   .mon-config.selected{border:2px solid var(--black);padding:calc(0.55rem - 1px) calc(0.4rem - 1px);background:var(--gray-50);}
   .mon-config-visual{display:flex;gap:0.25rem;align-items:flex-end;min-height:38px;}
-  .mon-config-name{font-size:0.62rem;font-weight:400;text-align:center;white-space:nowrap;}
+  .mon-config-name{font-size:0.72rem;font-weight:400;text-align:center;white-space:nowrap;}
   .mon-config .mbadge{display:none;position:absolute;top:3px;right:3px;font-size:0.4rem;font-family:var(--font-body);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
   .mon-config.recommended .mbadge{display:block;}
 
@@ -162,8 +162,8 @@
   .laptop-name{font-size:0.82rem;font-weight:400;flex:1;min-width:0;}
   .laptop-rec-badge{font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;background:var(--black);color:var(--white);padding:1px 5px;flex-shrink:0;display:none;}
   .laptop-row.is-rec .laptop-rec-badge{display:inline-block;}
-  .laptop-note{font-size:0.68rem;color:var(--gray-500);font-weight:300;margin-top:0.1rem;}
-  .laptop-equivalence-note{margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--gray-700);font-size:0.64rem;color:var(--gray-600);font-weight:300;line-height:1.55;}
+  .laptop-note{font-size:0.8rem;color:var(--gray-700);font-weight:300;margin-top:0.15rem;line-height:1.45;}
+  .laptop-equivalence-note{margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--gray-200);font-size:0.74rem;color:var(--gray-700);font-weight:300;line-height:1.55;}
   .laptop-equivalence-label{display:block;margin-bottom:0.15rem;font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
   .laptop-meta{display:flex;gap:1rem;flex-shrink:0;align-items:baseline;}
   .laptop-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);white-space:nowrap;}
@@ -176,7 +176,7 @@
   .laptop-rec-featured-name{font-size:1rem;font-weight:500;margin-bottom:0.35rem;}
   .laptop-rec-featured-meta{display:flex;gap:1rem;align-items:baseline;margin-bottom:0.35rem;}
   .laptop-rec-featured-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);}
-  .laptop-rec-featured-note{font-size:0.72rem;color:var(--gray-500);font-weight:300;line-height:1.5;}
+  .laptop-rec-featured-note{font-size:0.82rem;color:var(--gray-700);font-weight:300;line-height:1.5;}
   .laptop-see-all-btn{width:100%;border:1px solid var(--gray-300);background:none;cursor:pointer;font-size:0.85rem;font-family:var(--font-body);font-weight:400;color:var(--gray-700);padding:1rem 1.25rem;text-align:left;display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;transition:border-color 0.15s,color 0.15s;}
   .laptop-see-all-btn:hover{border-color:var(--black);color:var(--black);}
   .laptop-see-all-btn::after{content:'+';font-size:1.2rem;font-weight:300;color:var(--gray-400);line-height:1;transition:color 0.15s;}
