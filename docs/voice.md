@@ -30,12 +30,14 @@ for their work. Not to an audience, about architects.
   tier's.
 - **No process leaks.** Describe what the buyer gets, not how we tiered it.
   Not "stays an X3D," not "RAM tracks model size."
-- **When the frame states the rule, the cell states the stakes** — not the rule
+- **When the frame states the rule, the cell states the stakes,** not the rule
   again. (Frame: get a dedicated GPU. Cheapest cell: integrated will be
   unreliable.)
 - **Recommendations take a verb.** "Get a dedicated GPU," not "a dedicated GPU."
-- **Ration semicolons. Don't invert.** "32 GB is enough for a single building,"
-  not "For a single building; …".
+- **Ration semicolons and em-dashes.** Both read as LLM tells in bulk. None in
+  frames. In notes, reach for a period or comma first.
+- **Don't invert.** Lead with the answer ("32 GB is enough for a single
+  building"), not the condition.
 - **Relevance is the reader's decision, not the topic's completeness.** Cut what
   is true but useful to no one who would read this.
 
