@@ -413,20 +413,9 @@
       "weight": "3.3 lbs",
       "note": "Ryzen AI Max+ 395, 128 GB unified, 14-inch OLED. The integrated Radeon stands in for a discrete GPU. Strong for modeling, light on visualization. Battery is the weak point.",
       "workloadProfiles": [
-        "review",
-        "drafting",
-        "modeling",
-        "viz",
-        "modeling_viz"
+        "modeling"
       ],
-      "recommendedFor": {
-        "review": {
-          "best": true
-        },
-        "drafting": {
-          "value": true
-        }
-      }
+      "recommendedFor": {}
     },
     {
       "category": "one",
@@ -611,6 +600,26 @@
       "recommendedFor": {
         "review": {
           "value": true
+        },
+        "drafting": {
+          "value": true
+        }
+      }
+    },
+    {
+      "category": "travel",
+      "platform": "win",
+      "name": "Lenovo ThinkPad X9 14 Aura Edition",
+      "price": "$1,600--$2,300",
+      "weight": "2.7 lbs",
+      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch 2.8K OLED. A premium ultraportable for documents and drafting. A nicer screen and build than the X1 Carbon, with no more power.",
+      "workloadProfiles": [
+        "review",
+        "drafting"
+      ],
+      "recommendedFor": {
+        "review": {
+          "best": true
         }
       }
     },
