@@ -141,7 +141,7 @@
       "type": "mini",
       "name": "Lenovo ThinkCentre Tiny (M90q)",
       "price": "$700--$1,000",
-      "note": "Core Ultra 7, up to 64 GB. The vPro management only matters to IT fleets, so skip it if you're buying your own.",
+      "note": "Core Ultra 7, up to 64 GB. A reliable business mini. vPro adds no value if you're buying for yourself, so don't pay extra for it.",
       "workloadProfiles": [
         "review",
         "drafting"
