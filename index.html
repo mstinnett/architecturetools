@@ -807,7 +807,7 @@ function runPicker(){
 
     // Laptop
     var mobileStrategy = State.machineType === 'desktop_laptop' ? 'two' : 'one';
-    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], two: ['travel', 'student'] };
+    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], two: ['travel'] };
     var macCategoriesByStrategy = { one: ['mac_p', 'mac_s'], two: ['mac_s'] };
     var activeCategories = isMacPlatform ? macCategoriesByStrategy[mobileStrategy] : windowsCategoriesByStrategy[mobileStrategy];
     // Collect all matching laptops across categories
@@ -823,11 +823,20 @@ function runPicker(){
       }
     }
 
-    // Find primary recommendation
+    // Find primary recommendation. In two-machine mode the laptop is the light
+    // travel/document companion (the desktop does the heavy work and takes the
+    // budget), so recommend the first match in the category rather than matching
+    // the desktop's workload at forced-cheapest -- which used to always land on
+    // a student gaming laptop regardless of budget.
     var primaryRecIndex = -1;
-    for (var ri = 0; ri < allLaptopMatches.length; ri++) {
-      if (isRecommendedForBudget(allLaptopMatches[ri].laptop, activeWorkloadProfile, laptopBudgetTier)) { primaryRecIndex = ri; break; }
+    if (mobileStrategy === 'two') {
+      if (allLaptopMatches.length) primaryRecIndex = 0;
+    } else {
+      for (var ri = 0; ri < allLaptopMatches.length; ri++) {
+        if (isRecommendedForBudget(allLaptopMatches[ri].laptop, activeWorkloadProfile, laptopBudgetTier)) { primaryRecIndex = ri; break; }
+      }
     }
+    var primaryLaptop = primaryRecIndex >= 0 ? allLaptopMatches[primaryRecIndex].laptop : null;
 
     // Build categorized full list HTML (used in both paths)
     var fullListMarkup = '';
@@ -841,20 +850,21 @@ function runPicker(){
       fullListMarkup += '<div class="laptop-category"><div class="laptop-category-label">' + Data.LaptopCategoryLabels[cat] + '</div>';
       for (var mi = 0; mi < catItems.length; mi++) {
         var ml = catItems[mi];
-        var isRec = isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
+        var isRec = (mobileStrategy === 'two') ? (ml === primaryLaptop) : isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
         fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + ml.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span></div></div>';
       }
       fullListMarkup += '</div>';
     }
 
     var mobileMarkup = '';
-    if (!isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. The second machine handles documents and meetings -- budget is the priority.</div>';
+    if (!isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. The second machine is for documents, meetings, and travel, so light and portable matters more than power.</div>';
 
     if (primaryRecIndex >= 0) {
       var recLaptop = allLaptopMatches[primaryRecIndex].laptop;
       var recCategory = allLaptopMatches[primaryRecIndex].category;
       mobileMarkup += '<div class="laptop-rec-featured">';
-      mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + Data.LaptopCategoryLabels[recCategory] + '</div>';
+      var recCategoryLabel = (mobileStrategy === 'two') ? 'Travel machine' : Data.LaptopCategoryLabels[recCategory];
+      mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + recCategoryLabel + '</div>';
       mobileMarkup += '<div class="laptop-rec-featured-name">' + recLaptop.name + '</div>';
       mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-weight">' + recLaptop.weight + '</span></div>';
       mobileMarkup += '<div class="laptop-rec-featured-note">' + recLaptop.note + '</div>';
