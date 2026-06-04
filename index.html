@@ -343,7 +343,8 @@
         <div class="option-row" id="machineTypeOptions">
           <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
           <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
-          <div class="option-pill" data-machinetype="desktop_laptop"><div>Desktop + Laptop</div></div>
+          <div class="option-pill" data-machinetype="desktop_travel"><div>Desktop + Travel Laptop</div></div>
+          <div class="option-pill" data-machinetype="desktop_workstation"><div>Desktop + Powerful Laptop</div></div>
         </div>
       </div>
       <div class="control-group">
@@ -494,10 +495,6 @@ function runPicker(){
   }
   function selectedDesktopSpec(specsByWorkload, workloadProfileId, budgetId) {
     return specsByWorkload[workloadProfileId][State.scale][budgetId || State.budget];
-  }
-  function downgradedBudget(budgetId) {
-    if (budgetId === 'best') return 'value';
-    return 'cheapest';
   }
   function windowsDesktopReferenceSummary(windowsSpec) {
     return windowsSpec.cpu + ' / ' + windowsSpec.gpu + ' / ' + windowsSpec.ram;
@@ -773,7 +770,7 @@ function runPicker(){
     else { platformArea.classList.remove('hidden'); forcedPlatformArea.classList.add('hidden'); }
 
     // Panel visibility based on machine type
-    var isSplit = State.machineType === 'desktop_laptop';
+    var isSplit = State.machineType === 'desktop_travel' || State.machineType === 'desktop_workstation';
     var showDesktop = State.machineType === 'desktop' || isSplit;
     var showLaptop = State.machineType === 'laptop' || isSplit;
     document.getElementById('panel-desktop').classList.toggle('active', showDesktop);
@@ -786,7 +783,7 @@ function runPicker(){
     document.getElementById('deskHero').innerHTML = deskHeroHTML(heroRole, State.desk, activePlatform);
 
     // Desktop spec + desk zone
-    var desktopBudgetTier = State.machineType === 'desktop_laptop' ? downgradedBudget(State.budget) : State.budget;
+    var desktopBudgetTier = State.budget;
     if (isMacPlatform) {
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
@@ -806,35 +803,37 @@ function runPicker(){
     document.getElementById('monDrawerSummary').textContent = selectedMonitorConfig ? selectedMonitorConfig.name : 'Choose a layout';
 
     // Laptop
-    var mobileStrategy = State.machineType === 'desktop_laptop' ? 'two' : 'one';
-    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], two: ['travel'] };
-    var macCategoriesByStrategy = { one: ['mac_p', 'mac_s'], two: ['mac_s'] };
+    var mobileStrategy = State.machineType === 'desktop_travel' ? 'travel' : State.machineType === 'desktop_workstation' ? 'workstation' : 'one';
+    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], travel: ['travel'], workstation: ['one', 'desk', 'student'] };
+    var macCategoriesByStrategy = { one: ['mac_p', 'mac_s'], travel: ['mac_s'], workstation: ['mac_p', 'mac_s'] };
     var activeCategories = isMacPlatform ? macCategoriesByStrategy[mobileStrategy] : windowsCategoriesByStrategy[mobileStrategy];
     // Collect all matching laptops across categories
-    var laptopBudgetTier = mobileStrategy === 'two' ? 'cheapest' : State.budget;
+    var laptopBudgetTier = State.budget;
     var allLaptopMatches = [];
     for (var categoryIndex = 0; categoryIndex < activeCategories.length; categoryIndex++) {
       var activeCategory = activeCategories[categoryIndex];
       for (var laptopIndex = 0; laptopIndex < Data.Laptops.length; laptopIndex++) {
         var laptop = Data.Laptops[laptopIndex];
         if (laptop.category !== activeCategory || laptop.platform !== activePlatform) continue;
-        if (mobileStrategy !== 'two' && !hasWorkloadProfile(laptop.workloadProfiles, activeWorkloadProfile)) continue;
+        if (mobileStrategy !== 'travel' && !hasWorkloadProfile(laptop.workloadProfiles, activeWorkloadProfile)) continue;
         allLaptopMatches.push({ laptop: laptop, category: activeCategory });
       }
     }
 
-    // Find primary recommendation. In two-machine mode the laptop is the light
-    // travel/document companion (the desktop does the heavy work and takes the
-    // budget), so recommend the first match in the category rather than matching
-    // the desktop's workload at forced-cheapest -- which used to always land on
-    // a student gaming laptop regardless of budget.
+    // Find primary recommendation. In travel mode the laptop is the light
+    // document/travel companion (the desktop does the heavy work), so recommend
+    // the first match in the category. In workstation and laptop-only modes,
+    // match the workload + budget like a real machine.
     var primaryRecIndex = -1;
-    if (mobileStrategy === 'two') {
+    if (mobileStrategy === 'travel') {
       if (allLaptopMatches.length) primaryRecIndex = 0;
     } else {
       for (var ri = 0; ri < allLaptopMatches.length; ri++) {
         if (isRecommendedForBudget(allLaptopMatches[ri].laptop, activeWorkloadProfile, laptopBudgetTier)) { primaryRecIndex = ri; break; }
       }
+      // Workstation mode always presents a clear pick; if nothing is flagged at
+      // this budget, feature the first (most portable) match.
+      if (primaryRecIndex < 0 && mobileStrategy === 'workstation' && allLaptopMatches.length) primaryRecIndex = 0;
     }
     var primaryLaptop = primaryRecIndex >= 0 ? allLaptopMatches[primaryRecIndex].laptop : null;
 
@@ -850,20 +849,21 @@ function runPicker(){
       fullListMarkup += '<div class="laptop-category"><div class="laptop-category-label">' + Data.LaptopCategoryLabels[cat] + '</div>';
       for (var mi = 0; mi < catItems.length; mi++) {
         var ml = catItems[mi];
-        var isRec = (mobileStrategy === 'two') ? (ml === primaryLaptop) : isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
+        var isRec = (mobileStrategy === 'travel') ? (ml === primaryLaptop) : isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
         fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + ml.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span></div></div>';
       }
       fullListMarkup += '</div>';
     }
 
     var mobileMarkup = '';
-    if (!isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. The second machine is for documents, meetings, and travel, so light and portable matters more than power.</div>';
+    if (!isMacPlatform && mobileStrategy === 'travel') mobileMarkup += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. The second machine is a light laptop for documents, meetings, and travel, so portability matters more than power.</div>';
+    if (!isMacPlatform && mobileStrategy === 'workstation') mobileMarkup += '<div class="two-machine-desk-note">Desktop at your desk: use the Desktop spec. The laptop is a second full machine for running your work on the road, so plan for the cost of two computers.</div>';
 
     if (primaryRecIndex >= 0) {
       var recLaptop = allLaptopMatches[primaryRecIndex].laptop;
       var recCategory = allLaptopMatches[primaryRecIndex].category;
       mobileMarkup += '<div class="laptop-rec-featured">';
-      var recCategoryLabel = (mobileStrategy === 'two') ? 'Travel machine' : Data.LaptopCategoryLabels[recCategory];
+      var recCategoryLabel = (mobileStrategy === 'travel') ? 'Travel machine' : (mobileStrategy === 'workstation') ? 'Powerful laptop' : Data.LaptopCategoryLabels[recCategory];
       mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + recCategoryLabel + '</div>';
       mobileMarkup += '<div class="laptop-rec-featured-name">' + recLaptop.name + '</div>';
       mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-weight">' + recLaptop.weight + '</span></div>';
@@ -879,7 +879,8 @@ function runPicker(){
 
     if (!isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Add a Thunderbolt/USB-C dock and your desk monitors.</div>';
     if (isMacPlatform && mobileStrategy === 'one') mobileMarkup += '<div class="laptop-list-note">Pair with an Apple Studio Display or Asus 5K/6K. Thunderbolt docking is native.</div>';
-    if (isMacPlatform && mobileStrategy === 'two') mobileMarkup += '<div class="laptop-list-note">Desktop handles production. Grab a light Air or base Pro for travel.</div>';
+    if (isMacPlatform && mobileStrategy === 'travel') mobileMarkup += '<div class="laptop-list-note">Desktop handles the heavy work. Grab a light Air or base Pro for travel.</div>';
+    if (isMacPlatform && mobileStrategy === 'workstation') mobileMarkup += '<div class="laptop-list-note">Desktop handles the longest jobs. The laptop is a full MacBook Pro for working anywhere.</div>';
     document.getElementById('m-content').innerHTML = mobileMarkup;
 
     // Bind see-all toggle
@@ -896,10 +897,15 @@ function runPicker(){
     }
 
     var mobilePriorityNote;
-    if (isMacPlatform && mobileStrategy === 'two') mobilePriorityNote = 'Your Mac handles production at the desk. The laptop just travels. MacBook Air M4 is under 3 lbs with all-day battery.';
-    else if (isMacPlatform) mobilePriorityNote = 'Every MacBook docks natively over Thunderbolt. The MacBook Pro with M4 Pro or Max is a genuine one-machine solution.';
-    else if (mobileStrategy === 'one') mobilePriorityNote = 'One laptop, one set of files. Dock it at your desk, undock and go. Thermals limit sustained rendering -- burst work is real.';
-    else mobilePriorityNote = 'Light laptop for travel, desktop for production. Two machines means syncing files. No thermal compromise on either end.';
+    if (mobileStrategy === 'travel') mobilePriorityNote = isMacPlatform
+      ? 'The Mac does the heavy work at the desk; the laptop just travels. A MacBook Air is under 3 lbs with all-day battery.'
+      : 'The desktop does the heavy work; the laptop just travels. Light, long battery, and it docks at your desk over USB-C.';
+    else if (mobileStrategy === 'workstation') mobilePriorityNote = isMacPlatform
+      ? 'A second full machine you can work on anywhere. A MacBook Pro with M4 Pro or Max runs real modeling, with the desktop for the longest jobs.'
+      : 'A second full machine you can work on anywhere. It runs your software away from the desk, though sustained rendering still favors the desktop.';
+    else mobilePriorityNote = isMacPlatform
+      ? 'Every MacBook docks natively over Thunderbolt. The MacBook Pro with M4 Pro or Max is a genuine one-machine solution.'
+      : 'One laptop, one set of files. Dock it at your desk, undock and go. Thermals limit sustained rendering, so heavy jobs run in bursts.';
     document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
     // Auto-link glossary terms in the freshly rendered copy. innerHTML is rebuilt
