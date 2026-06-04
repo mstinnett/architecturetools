@@ -254,7 +254,7 @@
       "type": "mini",
       "name": "Lenovo ThinkCentre Tiny (M90q)",
       "price": "$700--$1,000",
-      "note": "Core Ultra 7, vPro, up to 64 GB. For IT-managed fleets.",
+      "note": "Core Ultra 7, up to 64 GB. The vPro management only matters to IT fleets, so skip it if you're buying your own.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "best": true }
@@ -434,7 +434,7 @@
       "name": "HP ZBook Ultra G1a",
       "price": "$3,500--$4,500",
       "weight": "3.3 lbs",
-      "note": "Ryzen AI Max+ 395, 128 GB unified, 14-inch OLED. The integrated Radeon stands in for a discrete GPU. Strong for modeling, light on visualization. Battery is the weak point.",
+      "note": "Ryzen AI Max+ 395, 128 GB unified, 14-inch OLED. The integrated Radeon stands in for a discrete GPU, strong for modeling. The 128 GB holds large visualization scenes, but the integrated GPU is too slow to render them. Battery is the weak point.",
       "workloadProfiles": [ "modeling" ],
       "recommendedFor": {}
     },
