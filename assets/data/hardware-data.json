@@ -374,7 +374,7 @@
     }
   ],
   "PrebuiltTypeLabels": { "mini": "Mini PC", "office": "Office Tower", "workstation": "Entry Workstation", "gaming": "Gaming Desktop" },
-  "PrebuiltTypeNotes": { "mini": "Silent and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.", "office": "A standard office tower. A few fit a low-power GPU, enough for drafting and modeling, but never a fast one.", "workstation": "Certified and supported for professional software, but limited to pro GPUs, not gaming ones. Fine for modeling, short on power for serious visualization.", "gaming": "The best value when you need a powerful GPU. The cooling and power supply it needs come standard, so it beats a pricier workstation at Enscape, Lumion, and V-Ray." },
+  "PrebuiltTypeNotes": { "mini": "Silent and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.", "office": "A standard office tower. A few fit a low-power GPU, enough for drafting and modeling, but never a fast one.", "workstation": "Certified and supported for professional software, but limited to pro GPUs, not gaming ones. Fine for modeling, short on power for serious visualization. Most architects don't need the certification, so don't pay the premium for it unless your firm requires it.", "gaming": "The best value when you need a powerful GPU. The cooling and power supply it needs come standard, so it beats a pricier workstation at Enscape, Lumion, and V-Ray." },
   "Monitors": [
     { "id": "m5k27", "name": "27\" 5K", "price": 800, "platform": "both", "width": 39, "height": 25 },
     { "id": "m6k32", "name": "32\" 6K", "price": 1300, "platform": "both", "width": 46, "height": 29 },
