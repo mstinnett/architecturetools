@@ -225,7 +225,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PB64",
       "price": "$600--$900",
-      "note": "Core Ultra 5/7, up to 64 GB, four 4K displays. Mounts behind a monitor, and silent.",
+      "note": "Up to 64 GB, drives four 4K displays. Mounts behind a monitor, and silent.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "value": true }
@@ -235,7 +235,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PN55",
       "price": "$600--$800",
-      "note": "AMD Ryzen AI 400, Radeon 800M, four 4K displays. The AMD mini, with a stronger integrated GPU for light 3D.",
+      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Drives four 4K displays.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "cheapest": true },
@@ -246,7 +246,7 @@
       "type": "mini",
       "name": "Intel NUC 14 Pro",
       "price": "$550--$850",
-      "note": "Core Ultra, compact, Thunderbolt 4. Good dock ecosystem.",
+      "note": "Compact, with Thunderbolt 4 and a good dock ecosystem.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {}
     },
@@ -254,7 +254,7 @@
       "type": "mini",
       "name": "Lenovo ThinkCentre Tiny (M90q)",
       "price": "$700--$1,000",
-      "note": "Core Ultra 7, up to 64 GB. A reliable business mini. vPro adds no value if you're buying for yourself, so don't pay extra for it.",
+      "note": "Up to 64 GB. A reliable business mini. vPro adds no value if you're buying for yourself, so don't pay extra for it.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "best": true }
@@ -264,7 +264,7 @@
       "type": "mini",
       "name": "Mac Mini M4 Pro",
       "price": "$1,400--$2,000",
-      "note": "24–48 GB unified. The Mac in mini-PC form.",
+      "note": "24–48 GB unified memory. The mini for anyone who wants macOS.",
       "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {}
     },
@@ -272,7 +272,7 @@
       "type": "office",
       "name": "Lenovo ThinkCentre Neo 50t",
       "price": "$800--$1,200",
-      "note": "i5/i7, 32 GB, with a full GPU slot. Add an RTX 4060 to drive a 3D viewport.",
+      "note": "32 GB, with a full GPU slot. Add an RTX 4060 to drive a 3D viewport.",
       "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {
         "drafting": { "value": true }
@@ -282,7 +282,7 @@
       "type": "office",
       "name": "Dell Inspiron Tower (Plus)",
       "price": "$900--$1,400",
-      "note": "Core Ultra, up to an RTX 4060 from the factory. The cheapest tower that ships with a dedicated GPU.",
+      "note": "Up to an RTX 4060 from the factory. The cheapest tower that ships with a dedicated GPU.",
       "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {
         "modeling": { "cheapest": true }
@@ -292,7 +292,7 @@
       "type": "office",
       "name": "HP ProDesk Tower 400/600",
       "price": "$800--$1,200",
-      "note": "Core i7, optional RTX A400. A plain corporate desktop: cheap, reliable, and everywhere.",
+      "note": "A plain corporate desktop: cheap, reliable, and everywhere. Fine for documents and 2D, not built for 3D.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "drafting": { "cheapest": true }
@@ -302,7 +302,7 @@
       "type": "workstation",
       "name": "Dell Pro Max Tower T2",
       "price": "$1,300--$2,500",
-      "note": "Core Ultra 5/7/9, certified for pro software. Pro GPUs only, no GeForce.",
+      "note": "Certified for pro software. Pro GPUs only, no GeForce.",
       "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {
         "modeling": { "value": true }
@@ -312,7 +312,7 @@
       "type": "workstation",
       "name": "HP Z2 Tower G9 / G10",
       "price": "$1,200--$2,500",
-      "note": "Core i7/i9 or Core Ultra, certified for pro software, and quiet. RTX A-series GPUs.",
+      "note": "Certified for pro software, and quiet. Pro GPUs only.",
       "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {}
     },
@@ -320,7 +320,7 @@
       "type": "workstation",
       "name": "Lenovo ThinkStation P3 Tower",
       "price": "$1,200--$2,500",
-      "note": "Core i7/i9 or Core Ultra 7, up to 128 GB, RTX Ada GPUs. A high memory ceiling for large models.",
+      "note": "Up to 128 GB and pro GPUs. A high memory ceiling for large models.",
       "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {
         "modeling": { "best": true }
