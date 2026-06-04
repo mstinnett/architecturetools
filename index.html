@@ -804,7 +804,7 @@ function runPicker(){
 
     // Laptop
     var mobileStrategy = State.machineType === 'desktop_travel' ? 'travel' : State.machineType === 'desktop_workstation' ? 'workstation' : 'one';
-    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], travel: ['travel'], workstation: ['one', 'desk', 'student'] };
+    var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], travel: ['travel'], workstation: ['one', 'desk', 'travel', 'student'] };
     var macCategoriesByStrategy = { one: ['mac_p', 'mac_s'], travel: ['mac_s'], workstation: ['mac_p', 'mac_s'] };
     var activeCategories = isMacPlatform ? macCategoriesByStrategy[mobileStrategy] : windowsCategoriesByStrategy[mobileStrategy];
     // Collect all matching laptops across categories
