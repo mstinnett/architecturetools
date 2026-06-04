@@ -13,54 +13,26 @@ Workflow:
 Notes:
 - This version is ASCII-only to avoid Rhino's non-ASCII script warning.
 - It stays compatible with Rhino's older Python runtime.
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
 - Default output is PNG and PDF. PNGs are rasterized directly from the
   Make2D linework (System.Drawing) and capped at PNG_MAX_DIM_PX on the
   longest edge so they stay small. Add "svg" to EXPORT_EXTENSIONS if a
   vector copy is also needed.
-<<<<<<< HEAD
-=======
-- Default output is SVG and PDF. If SVG export is not available in your
-  Rhino setup, change EXPORT_EXTENSIONS to ("ai", "pdf").
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
 """
 
 import math
 import os
 
 import Rhino
-<<<<<<< HEAD
-<<<<<<< HEAD
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
 import System
 
 SCRIPT_VERSION = "2026-05-11.5"
-=======
-import System
-=======
->>>>>>> 26e835f (updates)
-import rhinoscriptsyntax as rs
-import scriptcontext as sc
-import System
-
-<<<<<<< HEAD
-SCRIPT_VERSION = "2026-04-30.22"
->>>>>>> d6820e1 (new make2d)
-=======
-SCRIPT_VERSION = "2026-05-06.1"
->>>>>>> 26e835f (updates)
 
 
 # =============================================================================
 # CONFIGURATION - Edit these paths
 # =============================================================================
-<<<<<<< HEAD
 #
 # COMPONENT_DIR = (
 #     r"C:\Users\mstin\Dropbox\Architecture Tools\make2d\objects"  # Update this
@@ -72,18 +44,6 @@ SCRIPT_VERSION = "2026-05-06.1"
 COMPONENT_DIR = "~/Dropbox/Architecture Tools/make2d/objects/"
 OUTPUT_DIR = "~/Dropbox/Architecture Tools/make2d/output/"
 
-=======
-
-<<<<<<< HEAD
-COMPONENT_DIR = r"~/make2d/objects/"  # Update this
-OUTPUT_DIR = r"~/make2d/output/"      # Update this
->>>>>>> d6820e1 (new make2d)
-=======
-COMPONENT_DIR = (
-    r"C:\Users\mstin\Dropbox\Architecture Tools\make2d\objects"  # Update this
-)
-OUTPUT_DIR = r"C:\Users\mstin\Dropbox\Architecture Tools\make2d\output"  # Update this
->>>>>>> 26e835f (updates)
 
 # View setup for Make2D-style hidden line generation
 WORK_VIEW = "Perspective"
@@ -93,8 +53,6 @@ CAMERA_ELEVATION_DEG = 30
 CAMERA_TARGET = (400, 300, 200)
 USE_PARALLEL = True
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 # Export formats. PNG is the primary raster output; PDF is kept for vector use.
 # Add "svg" if you also want a scalable vector copy.
 EXPORT_EXTENSIONS = ("png", "pdf")
@@ -123,43 +81,6 @@ PNG_HIDDEN_STROKE_WIDTH_PX = 1.2
 # 2000px PNG output. Falls back to ModelAbsoluteTolerance if smaller.
 CURVE_SAMPLING_TOLERANCE_MM = 0.1
 
-=======
-# Export formats
-EXPORT_EXTENSIONS = ("svg", "pdf")
-=======
-# Export formats. PNG is the primary raster output; PDF is kept for vector use.
-# Add "svg" if you also want a scalable vector copy.
-EXPORT_EXTENSIONS = ("png", "pdf")
->>>>>>> 26e835f (updates)
-EXPORT_TOP_VIEW = True
-TOP_VIEW_SUFFIX = "_top"
-EXPORT_MARGIN_MM = 10.0
-
-# Vector stroke widths (used when SVG or PDF is in EXPORT_EXTENSIONS).
-# Bumped from 0.18mm to 0.35mm so printed/embedded linework reads darker.
-SVG_STROKE_WIDTH_MM = 0.35
-PDF_STROKE_WIDTH_MM = 0.35
-PDF_DPI = 72
-<<<<<<< HEAD
->>>>>>> d6820e1 (new make2d)
-=======
-
-# PNG raster export settings.
-# PNG_MAX_DIM_PX caps the longest edge of the output, so a wide desk
-# composition is at most this many pixels across.
-PNG_MAX_DIM_PX = 2000
-PNG_BACKGROUND_COLOR_RGB = (255, 255, 255)
-PNG_VISIBLE_LINE_COLOR_RGB = (0, 0, 0)
-PNG_HIDDEN_LINE_COLOR_RGB = (140, 140, 140)
-PNG_VISIBLE_STROKE_WIDTH_PX = 1.8
-PNG_HIDDEN_STROKE_WIDTH_PX = 1.2
-
-# Curve sampling tolerance (mm). Looser values produce fewer polyline
-# points, which keeps SVG file size small and is plenty fine for the
-# 2000px PNG output. Falls back to ModelAbsoluteTolerance if smaller.
-CURVE_SAMPLING_TOLERANCE_MM = 0.1
-
->>>>>>> 26e835f (updates)
 WRITE_DEBUG_CURVES_TO_DOC = False
 
 # Hidden line settings
@@ -175,7 +96,6 @@ DRAW_DESK = False
 
 
 # =============================================================================
-<<<<<<< HEAD
 # TEST MODE - Iterate quickly on one layout
 # =============================================================================
 
@@ -194,8 +114,6 @@ TEST_ISOLATE_COMPONENTS = []  # e.g. ["fractal_tower.3dm"]
 
 
 # =============================================================================
-=======
->>>>>>> d6820e1 (new make2d)
 # MONITOR SPACING
 # =============================================================================
 
@@ -211,24 +129,16 @@ MONITOR_WIDTHS = {
 SCREEN_YAW_DEG = 90.0
 TOWER_YAW_DEG = 90.0
 INPUT_YAW_DEG = 90.0
-<<<<<<< HEAD
 # Laptops are rotated an extra 60 deg CCW from the monitor yaw so they
 # read as turned-in to the user (mac-mini-side angle).
 LAPTOP_YAW_DEG = SCREEN_YAW_DEG + 60.0
-=======
->>>>>>> d6820e1 (new make2d)
 COMPONENT_ROTATIONS_DEG = {
     "fractal_tower.3dm": TOWER_YAW_DEG,
     "monitor_27in.3dm": SCREEN_YAW_DEG,
     "monitor_32in.3dm": SCREEN_YAW_DEG,
     "monitor_34in_ultrawide.3dm": SCREEN_YAW_DEG,
-<<<<<<< HEAD
     "laptop_closed.3dm": LAPTOP_YAW_DEG,
     "macbook_air_open.3dm": LAPTOP_YAW_DEG,
-=======
-    "laptop_closed.3dm": SCREEN_YAW_DEG,
-    "macbook_air_open.3dm": SCREEN_YAW_DEG,
->>>>>>> d6820e1 (new make2d)
     "keyboard.3dm": INPUT_YAW_DEG,
     "mouse.3dm": INPUT_YAW_DEG,
 }
@@ -236,8 +146,6 @@ COMPONENT_ROTATIONS_DEG = {
 # Equipment layout uses desk-space XY in millimeters.
 # +X is desk right. +Y is toward the back/display side of the desk.
 MONITOR_Y_MM = DESK_DEPTH * 0.3
-<<<<<<< HEAD
-<<<<<<< HEAD
 # Reduced from 180mm to 60mm. The previous value pushed machines too far
 # away from the displays in dual-monitor setups.
 DUAL_DISPLAY_MACHINE_SPACING_MM = 60.0
@@ -252,31 +160,11 @@ TOWER_DESK_Y_MM = 350.0
 MAC_MINI_ANCHOR_FILENAME = "macmini.3dm"
 MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM = 200.0
 MAC_MINI_DESK_Y_OFFSET_MM = -50.0
-=======
-DUAL_DISPLAY_MACHINE_SPACING_MM = 180.0
-=======
-# Reduced from 180mm to 60mm. The previous value pushed machines too far
-# away from the displays in dual-monitor setups.
-DUAL_DISPLAY_MACHINE_SPACING_MM = 60.0
->>>>>>> 26e835f (updates)
-
-# The tower lives on the -X side of the displays so it renders on the
-# camera-right of the composition (the iso camera sits at +X +Y, which
-# inverts world-X relative to the screen).
-TOWER_ANCHOR_FILENAME = "fractal_tower.3dm"
-TOWER_LEFTMOST_DISPLAY_GAP_MM = 380.0
-TOWER_DESK_Y_MM = -80.0
-
-MAC_MINI_ANCHOR_FILENAME = "macmini.3dm"
-MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM = 260.0
-MAC_MINI_DESK_Y_OFFSET_MM = -250.0
->>>>>>> d6820e1 (new make2d)
 
 LAPTOP_ANCHOR_FILENAMES = (
     "laptop_closed.3dm",
     "macbook_air_open.3dm",
 )
-<<<<<<< HEAD
 # Single-laptop configs: laptop sits this many mm to the left of the
 # leftmost monitor edge (so it lands on the camera-right of the displays).
 LAPTOP_LEFTMOST_DISPLAY_GAP_MM = 200.0
@@ -287,10 +175,6 @@ LAPTOP_DESK_Y_MM = 395.0
 # this gap (same shape as get_mac_mini_anchor_position).
 LAPTOP_MULTI_RIGHTMOST_DISPLAY_GAP_MM = 200.0
 LAPTOP_MULTI_DESK_Y_MM = 395.0
-=======
-LAPTOP_DESK_X_MM = -500.0
-LAPTOP_DESK_Y_MM = 395.0
->>>>>>> d6820e1 (new make2d)
 
 KEYBOARD_FILENAME = "keyboard.3dm"
 MOUSE_FILENAME = "mouse.3dm"
@@ -304,14 +188,7 @@ MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM = 60.0
 # DESK CONFIGURATIONS
 # =============================================================================
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> d6820e1 (new make2d)
-=======
-
->>>>>>> 26e835f (updates)
 def mon(filename, x_offset=0):
     return (filename, x_offset)
 
@@ -325,15 +202,7 @@ def compute_dual_offsets(mon1_file, mon2_file):
     return x1, x2
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 TOWER_POS = (-500, 50)
-=======
-TOWER_POS = (500, 50)
->>>>>>> d6820e1 (new make2d)
-=======
-TOWER_POS = (-500, 50)
->>>>>>> 26e835f (updates)
 LAPTOP_CENTER_POS = (0, -50)
 MAC_MINI_POS = (350, 200)
 
@@ -354,15 +223,7 @@ MACHINES = {
         "label": "MBP",
     },
     "mac_mini_air": {
-<<<<<<< HEAD
-<<<<<<< HEAD
         "file": "macmini.3dm",
-=======
-        "file": "mac_mini.3dm",
->>>>>>> d6820e1 (new make2d)
-=======
-        "file": "macmini.3dm",
->>>>>>> 26e835f (updates)
         "pos": MAC_MINI_POS,
         "label": "MacMini",
     },
@@ -376,15 +237,7 @@ MACHINES = {
         "pos": (-250, -50),
         "label": "X1Tower",
         "extras": [
-<<<<<<< HEAD
-<<<<<<< HEAD
             ("fractal_tower.3dm", -500, 50),
-=======
-            ("fractal_tower.3dm", 500, 50),
->>>>>>> d6820e1 (new make2d)
-=======
-            ("fractal_tower.3dm", -500, 50),
->>>>>>> 26e835f (updates)
         ],
     },
 }
@@ -495,19 +348,9 @@ def cleanup_existing_temp_artifacts():
         if layer is None or layer.IsDeleted:
             continue
         layer_name = get_layer_full_path(layer)
-<<<<<<< HEAD
-<<<<<<< HEAD
         if layer_name == TEMP_LAYER_ROOT or layer_name.startswith(
             TEMP_LAYER_ROOT + "::"
         ):
-=======
-        if layer_name == TEMP_LAYER_ROOT or layer_name.startswith(TEMP_LAYER_ROOT + "::"):
->>>>>>> d6820e1 (new make2d)
-=======
-        if layer_name == TEMP_LAYER_ROOT or layer_name.startswith(
-            TEMP_LAYER_ROOT + "::"
-        ):
->>>>>>> 26e835f (updates)
             layer_names.append(layer_name)
 
     layer_names.sort(key=layer_depth, reverse=True)
@@ -557,15 +400,7 @@ def vector3d_between(start_point, end_point):
     return Rhino.Geometry.Vector3d(
         end_point.X - start_point.X,
         end_point.Y - start_point.Y,
-<<<<<<< HEAD
-<<<<<<< HEAD
         end_point.Z - start_point.Z,
-=======
-        end_point.Z - start_point.Z
->>>>>>> d6820e1 (new make2d)
-=======
-        end_point.Z - start_point.Z,
->>>>>>> 26e835f (updates)
     )
 
 
@@ -713,19 +548,6 @@ def get_dual_display_spacing_mm(config):
     return 0.0
 
 
-<<<<<<< HEAD
-=======
-def get_left_display_expansion_mm(config):
-    cluster_info = get_monitor_cluster_info(config)
-    monitors = config.get("monitors") or []
-    if not cluster_info or len(monitors) < 2:
-        return 0.0
-
-    first_monitor_width = get_monitor_width_mm(monitors[0][0])
-    return cluster_info["left_x"] + (first_monitor_width / 2.0)
-
-
->>>>>>> d6820e1 (new make2d)
 def get_rightmost_monitor_edge_position(config):
     cluster_info = get_monitor_cluster_info(config)
     if not cluster_info:
@@ -739,21 +561,11 @@ def get_mac_mini_anchor_position(config):
         return None
 
     anchor_x, anchor_y = anchor_position
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
     x_value = (
         anchor_x
         + MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM
         + get_dual_display_spacing_mm(config)
     )
-<<<<<<< HEAD
-=======
-    x_value = anchor_x + MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM + get_dual_display_spacing_mm(config)
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
     y_value = anchor_y + MAC_MINI_DESK_Y_OFFSET_MM
     return x_value, y_value
 
@@ -763,7 +575,6 @@ def get_laptop_anchor_position(config):
     if not cluster_info:
         return None
 
-<<<<<<< HEAD
     if config.get("extras"):
         rightmost_x = cluster_info["right_x"]
         x_value = (
@@ -779,11 +590,6 @@ def get_laptop_anchor_position(config):
         - LAPTOP_LEFTMOST_DISPLAY_GAP_MM
         - get_dual_display_spacing_mm(config)
     )
-=======
-    x_value = LAPTOP_DESK_X_MM
-    x_value += get_left_display_expansion_mm(config)
-    x_value -= get_dual_display_spacing_mm(config)
->>>>>>> d6820e1 (new make2d)
     return x_value, LAPTOP_DESK_Y_MM
 
 
@@ -801,15 +607,7 @@ def get_input_device_positions(config):
         (
             MOUSE_FILENAME,
             keyboard_x + MOUSE_CENTER_X_FROM_KEYBOARD_CENTER_MM,
-<<<<<<< HEAD
-<<<<<<< HEAD
             keyboard_y + MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM,
-=======
-            keyboard_y + MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM
->>>>>>> d6820e1 (new make2d)
-=======
-            keyboard_y + MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM,
->>>>>>> 26e835f (updates)
         ),
     ]
 
@@ -830,8 +628,6 @@ def get_component_base_position(config, filename, x_value, y_value):
     if filename != TOWER_ANCHOR_FILENAME:
         return x_value, y_value
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     cluster_info = get_monitor_cluster_info(config)
     if not cluster_info:
         return x_value, y_value
@@ -840,24 +636,6 @@ def get_component_base_position(config, filename, x_value, y_value):
     x_value = (
         leftmost_x - TOWER_LEFTMOST_DISPLAY_GAP_MM - get_dual_display_spacing_mm(config)
     )
-=======
-    anchor_position = get_rightmost_monitor_edge_position(config)
-    if not anchor_position:
-        return x_value, y_value
-
-    anchor_x, anchor_y = anchor_position
-    x_value = anchor_x + TOWER_RIGHTMOST_DISPLAY_GAP_MM + get_dual_display_spacing_mm(config)
->>>>>>> d6820e1 (new make2d)
-=======
-    cluster_info = get_monitor_cluster_info(config)
-    if not cluster_info:
-        return x_value, y_value
-
-    leftmost_x = cluster_info["left_x"]
-    x_value = (
-        leftmost_x - TOWER_LEFTMOST_DISPLAY_GAP_MM - get_dual_display_spacing_mm(config)
-    )
->>>>>>> 26e835f (updates)
     y_value = TOWER_DESK_Y_MM
     return x_value, y_value
 
@@ -868,7 +646,6 @@ def rotate_objects(object_ids, rotation_deg, center_point):
     rs.RotateObjects(object_ids, center_point, rotation_deg, None, False)
 
 
-<<<<<<< HEAD
 def is_test_config_match(config_name):
     if not TEST_CONFIG_NAMES:
         return True
@@ -891,9 +668,6 @@ def load_component_into_doc(filepath, dx=0, dy=0, dz=0, rotation_deg=0):
     if not should_load_component(os.path.basename(filepath)):
         return []
 
-=======
-def load_component_into_doc(filepath, dx=0, dy=0, dz=0, rotation_deg=0):
->>>>>>> d6820e1 (new make2d)
     if not os.path.exists(filepath):
         print("WARNING: Missing file: {}".format(filepath))
         return []
@@ -926,17 +700,7 @@ def load_3dm_component(filepath, dx=0, dy=0, dz=0, rotation_deg=0):
         rotation_radians = math.radians(rotation_deg)
         transforms.append(
             Rhino.Geometry.Transform.Rotation(
-<<<<<<< HEAD
-<<<<<<< HEAD
                 rotation_radians, Rhino.Geometry.Vector3d.ZAxis, point3d(0.0, 0.0, 0.0)
-=======
-                rotation_radians,
-                Rhino.Geometry.Vector3d.ZAxis,
-                point3d(0.0, 0.0, 0.0)
->>>>>>> d6820e1 (new make2d)
-=======
-                rotation_radians, Rhino.Geometry.Vector3d.ZAxis, point3d(0.0, 0.0, 0.0)
->>>>>>> 26e835f (updates)
             )
         )
     transforms.append(Rhino.Geometry.Transform.Translation(dx, dy, dz))
@@ -1002,21 +766,11 @@ def compose_configuration(config):
     for monitor_file, monitor_x in config["monitors"]:
         monitor_path = os.path.join(COMPONENT_DIR, monitor_file)
         monitor_rotation = get_component_rotation_deg(monitor_file)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
         all_ids.extend(
             load_component_into_doc(
                 monitor_path, monitor_x, MONITOR_Y_MM, 0, monitor_rotation
             )
         )
-<<<<<<< HEAD
-=======
-        all_ids.extend(load_component_into_doc(monitor_path, monitor_x, MONITOR_Y_MM, 0, monitor_rotation))
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
 
     for input_file, input_x, input_y in get_input_device_positions(config):
         input_path = os.path.join(COMPONENT_DIR, input_file)
@@ -1027,8 +781,6 @@ def compose_configuration(config):
 
     for extra_file, extra_x, extra_y in config.get("extras", []):
         extra_path = os.path.join(COMPONENT_DIR, extra_file)
-<<<<<<< HEAD
-<<<<<<< HEAD
         extra_x, extra_y = get_component_base_position(
             config, extra_file, extra_x, extra_y
         )
@@ -1036,20 +788,6 @@ def compose_configuration(config):
         all_ids.extend(
             load_component_into_doc(extra_path, extra_x, extra_y, 0, extra_rotation)
         )
-=======
-        extra_x, extra_y = get_component_base_position(config, extra_file, extra_x, extra_y)
-        extra_rotation = get_component_rotation_deg(extra_file)
-        all_ids.extend(load_component_into_doc(extra_path, extra_x, extra_y, 0, extra_rotation))
->>>>>>> d6820e1 (new make2d)
-=======
-        extra_x, extra_y = get_component_base_position(
-            config, extra_file, extra_x, extra_y
-        )
-        extra_rotation = get_component_rotation_deg(extra_file)
-        all_ids.extend(
-            load_component_into_doc(extra_path, extra_x, extra_y, 0, extra_rotation)
-        )
->>>>>>> 26e835f (updates)
 
     return all_ids
 
@@ -1096,40 +834,17 @@ def get_angle_tolerance_radians():
     return math.radians(5.0)
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
 def get_curve_sampling_tolerance():
     return max(float(CURVE_SAMPLING_TOLERANCE_MM), float(sc.doc.ModelAbsoluteTolerance))
 
 
-<<<<<<< HEAD
-=======
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
 def curve_to_points(curve):
     if curve is None or not curve.IsValid:
         return []
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     sampling_tolerance = get_curve_sampling_tolerance()
     polyline_curve = curve.ToPolyline(
         sampling_tolerance, sampling_tolerance, get_angle_tolerance_radians(), 1000.0
-=======
-    polyline_curve = curve.ToPolyline(
-        sc.doc.ModelAbsoluteTolerance,
-        sc.doc.ModelAbsoluteTolerance,
-        get_angle_tolerance_radians(),
-        1000.0
->>>>>>> d6820e1 (new make2d)
-=======
-    sampling_tolerance = get_curve_sampling_tolerance()
-    polyline_curve = curve.ToPolyline(
-        sampling_tolerance, sampling_tolerance, get_angle_tolerance_radians(), 1000.0
->>>>>>> 26e835f (updates)
     )
     if polyline_curve:
         polyline = polyline_curve.ToPolyline()
@@ -1178,15 +893,7 @@ def write_svg(curve_entries, filepath):
             format_number(width_mm),
             format_number(height_mm),
             format_number(width_mm),
-<<<<<<< HEAD
-<<<<<<< HEAD
             format_number(height_mm),
-=======
-            format_number(height_mm)
->>>>>>> d6820e1 (new make2d)
-=======
-            format_number(height_mm),
->>>>>>> 26e835f (updates)
         ),
         '<g fill="none" stroke="#000000" stroke-width="{}" stroke-linecap="round" stroke-linejoin="round">'.format(
             format_number(SVG_STROKE_WIDTH_MM)
@@ -1201,8 +908,6 @@ def write_svg(curve_entries, filepath):
             continue
 
         page_points = curve_points_to_page(points, bbox)
-<<<<<<< HEAD
-<<<<<<< HEAD
         svg_points = " ".join(
             "{},{}".format(format_number(x), format_number(y)) for x, y in page_points
         )
@@ -1211,22 +916,6 @@ def write_svg(curve_entries, filepath):
             hidden_lines.append(
                 '<polyline points="{}" stroke-dasharray="3 2" />'.format(svg_points)
             )
-=======
-        svg_points = " ".join("{},{}".format(format_number(x), format_number(y)) for x, y in page_points)
-
-        if entry["style"] == "hidden":
-            hidden_lines.append('<polyline points="{}" stroke-dasharray="3 2" />'.format(svg_points))
->>>>>>> d6820e1 (new make2d)
-=======
-        svg_points = " ".join(
-            "{},{}".format(format_number(x), format_number(y)) for x, y in page_points
-        )
-
-        if entry["style"] == "hidden":
-            hidden_lines.append(
-                '<polyline points="{}" stroke-dasharray="3 2" />'.format(svg_points)
-            )
->>>>>>> 26e835f (updates)
         else:
             visible_lines.append('<polyline points="{}" />'.format(svg_points))
 
@@ -1272,26 +961,10 @@ def write_pdf(curve_entries, filepath):
 
         for start_point, end_point in zip(page_points_mm[:-1], page_points_mm[1:]):
             from_point = System.Drawing.PointF(
-<<<<<<< HEAD
-<<<<<<< HEAD
                 float(mm_to_points(start_point[0])), float(mm_to_points(start_point[1]))
             )
             to_point = System.Drawing.PointF(
                 float(mm_to_points(end_point[0])), float(mm_to_points(end_point[1]))
-=======
-                float(mm_to_points(start_point[0])),
-                float(mm_to_points(start_point[1]))
-            )
-            to_point = System.Drawing.PointF(
-                float(mm_to_points(end_point[0])),
-                float(mm_to_points(end_point[1]))
->>>>>>> d6820e1 (new make2d)
-=======
-                float(mm_to_points(start_point[0])), float(mm_to_points(start_point[1]))
-            )
-            to_point = System.Drawing.PointF(
-                float(mm_to_points(end_point[0])), float(mm_to_points(end_point[1]))
->>>>>>> 26e835f (updates)
             )
             line_drawn = False
             page_candidates = [draw_page_number, draw_page_number + 1]
@@ -1303,40 +976,20 @@ def write_pdf(curve_entries, filepath):
                     continue
                 seen_candidates.add(candidate)
                 try:
-<<<<<<< HEAD
-<<<<<<< HEAD
                     pdf.DrawLine(
                         candidate, from_point, to_point, color, float(stroke_width)
                     )
-=======
-                    pdf.DrawLine(candidate, from_point, to_point, color, float(stroke_width))
->>>>>>> d6820e1 (new make2d)
-=======
-                    pdf.DrawLine(
-                        candidate, from_point, to_point, color, float(stroke_width)
-                    )
->>>>>>> 26e835f (updates)
                     line_drawn = True
                     break
                 except Exception as exc:
                     last_error = exc
 
             if not line_drawn:
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
                 print(
                     "  PDF draw error on page {}: {}".format(
                         draw_page_number, last_error
                     )
                 )
-<<<<<<< HEAD
-=======
-                print("  PDF draw error on page {}: {}".format(draw_page_number, last_error))
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
                 return False
 
     try:
@@ -1356,15 +1009,7 @@ def write_pdf(curve_entries, filepath):
             filepath,
             System.IO.FileMode.Create,
             System.IO.FileAccess.Write,
-<<<<<<< HEAD
-<<<<<<< HEAD
             getattr(System.IO.FileShare, "None"),
-=======
-            getattr(System.IO.FileShare, "None")
->>>>>>> d6820e1 (new make2d)
-=======
-            getattr(System.IO.FileShare, "None"),
->>>>>>> 26e835f (updates)
         )
         try:
             write_result = pdf.Write(file_stream)
@@ -1384,10 +1029,6 @@ def write_pdf(curve_entries, filepath):
     return os.path.exists(filepath) and os.path.getsize(filepath) > 0
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
 def write_png(curve_entries, filepath):
     bbox = get_curve_entries_bbox(curve_entries)
     page_size = get_export_page_size_mm(curve_entries, bbox)
@@ -1465,11 +1106,6 @@ def write_png(curve_entries, filepath):
     return os.path.exists(filepath) and os.path.getsize(filepath) > 0
 
 
-<<<<<<< HEAD
-=======
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
 def write_debug_curves(curve_entries, config_name):
     if not WRITE_DEBUG_CURVES_TO_DOC or not curve_entries:
         return []
@@ -1482,17 +1118,7 @@ def write_debug_curves(curve_entries, config_name):
         return []
 
     translation = Rhino.Geometry.Transform.Translation(
-<<<<<<< HEAD
-<<<<<<< HEAD
         -bbox.Min.X + EXPORT_MARGIN_MM, -bbox.Min.Y + EXPORT_MARGIN_MM, 0.0
-=======
-        -bbox.Min.X + EXPORT_MARGIN_MM,
-        -bbox.Min.Y + EXPORT_MARGIN_MM,
-        0.0
->>>>>>> d6820e1 (new make2d)
-=======
-        -bbox.Min.X + EXPORT_MARGIN_MM, -bbox.Min.Y + EXPORT_MARGIN_MM, 0.0
->>>>>>> 26e835f (updates)
     )
 
     object_ids = []
@@ -1510,19 +1136,9 @@ def write_debug_curves(curve_entries, config_name):
     return object_ids
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 def collect_hidden_line_output(
     source_ids, view_name, config_name, projection_name="iso"
 ):
-=======
-def collect_hidden_line_output(source_ids, view_name, config_name, projection_name="iso"):
->>>>>>> d6820e1 (new make2d)
-=======
-def collect_hidden_line_output(
-    source_ids, view_name, config_name, projection_name="iso"
-):
->>>>>>> 26e835f (updates)
     if not source_ids:
         return [], {}
 
@@ -1532,21 +1148,11 @@ def collect_hidden_line_output(
         viewport = build_hidden_line_viewport(view_name, source_ids)
 
     if viewport is None:
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
         print(
             "WARNING: Could not build hidden line viewport for '{}'.".format(
                 config_name
             )
         )
-<<<<<<< HEAD
-=======
-        print("WARNING: Could not build hidden line viewport for '{}'.".format(config_name))
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
         return [], {}
 
     params = Rhino.Geometry.HiddenLineDrawingParameters()
@@ -1590,19 +1196,9 @@ def collect_hidden_line_output(
         elif segment.SegmentVisibility == visibility_enum.Duplicate:
             stats["duplicate"] += 1
             style = "visible"
-<<<<<<< HEAD
-<<<<<<< HEAD
         elif (
             INCLUDE_HIDDEN_LINES and segment.SegmentVisibility == visibility_enum.Hidden
         ):
-=======
-        elif INCLUDE_HIDDEN_LINES and segment.SegmentVisibility == visibility_enum.Hidden:
->>>>>>> d6820e1 (new make2d)
-=======
-        elif (
-            INCLUDE_HIDDEN_LINES and segment.SegmentVisibility == visibility_enum.Hidden
-        ):
->>>>>>> 26e835f (updates)
             stats["hidden"] += 1
             style = "hidden"
         else:
@@ -1615,25 +1211,12 @@ def collect_hidden_line_output(
         if curve is None or not curve.IsValid:
             continue
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 26e835f (updates)
         curve_entries.append(
             {
                 "curve": curve,
                 "style": style,
             }
         )
-<<<<<<< HEAD
-=======
-        curve_entries.append({
-            "curve": curve,
-            "style": style,
-        })
->>>>>>> d6820e1 (new make2d)
-=======
->>>>>>> 26e835f (updates)
 
     return curve_entries, stats
 
@@ -1648,8 +1231,6 @@ def export_output(curve_entries, config_name):
     for ext in EXPORT_EXTENSIONS:
         output_path = os.path.join(OUTPUT_DIR, "{}.{}".format(config_name, ext))
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         ext_lower = ext.lower()
         if ext_lower == "svg":
             success = write_svg(curve_entries, output_path)
@@ -1657,21 +1238,6 @@ def export_output(curve_entries, config_name):
             success = write_pdf(curve_entries, output_path)
         elif ext_lower == "png":
             success = write_png(curve_entries, output_path)
-=======
-        if ext.lower() == "svg":
-=======
-        ext_lower = ext.lower()
-        if ext_lower == "svg":
->>>>>>> 26e835f (updates)
-            success = write_svg(curve_entries, output_path)
-        elif ext_lower == "pdf":
-            success = write_pdf(curve_entries, output_path)
-<<<<<<< HEAD
->>>>>>> d6820e1 (new make2d)
-=======
-        elif ext_lower == "png":
-            success = write_png(curve_entries, output_path)
->>>>>>> 26e835f (updates)
         else:
             print("  WARNING: Unsupported export extension '{}'".format(ext))
             success = False
@@ -1695,15 +1261,7 @@ def print_segment_stats(prefix, stats):
             stats.get("visible", 0),
             stats.get("duplicate", 0),
             stats.get("hidden", 0),
-<<<<<<< HEAD
-<<<<<<< HEAD
             stats.get("other", 0),
-=======
-            stats.get("other", 0)
->>>>>>> d6820e1 (new make2d)
-=======
-            stats.get("other", 0),
->>>>>>> 26e835f (updates)
         )
     )
 
@@ -1735,12 +1293,8 @@ def main():
     ensure_layer(SOURCE_LAYER_NAME)
 
     view_name = get_work_view_name()
-<<<<<<< HEAD
     configs_to_run = filter_configurations(CONFIGURATIONS)
     total = len(configs_to_run)
-=======
-    total = len(CONFIGURATIONS)
->>>>>>> d6820e1 (new make2d)
     completed = 0
 
     print("=" * 60)
@@ -1750,7 +1304,6 @@ def main():
     print("Output dir: {}".format(OUTPUT_DIR))
     print("Using view: {}".format(view_name))
     print("{} configurations to process".format(total))
-<<<<<<< HEAD
     if TEST_CONFIG_NAMES:
         print(
             "TEST_CONFIG_NAMES filter active: {} ({} of {} configs matched)".format(
@@ -1767,17 +1320,11 @@ def main():
                 ", ".join(TEST_ISOLATE_COMPONENTS)
             )
         )
-=======
->>>>>>> d6820e1 (new make2d)
     print("=" * 60)
 
     rs.EnableRedraw(False)
     try:
-<<<<<<< HEAD
         for index, config in enumerate(configs_to_run):
-=======
-        for index, config in enumerate(CONFIGURATIONS):
->>>>>>> d6820e1 (new make2d)
             print("")
             print("[{}/{}] {}".format(index + 1, total, config["name"]))
 
@@ -1790,19 +1337,9 @@ def main():
                     print("  Skipped: no source objects were created")
                     continue
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                 curve_entries, stats = collect_hidden_line_output(
                     source_ids, view_name, config["name"]
                 )
-=======
-                curve_entries, stats = collect_hidden_line_output(source_ids, view_name, config["name"])
->>>>>>> d6820e1 (new make2d)
-=======
-                curve_entries, stats = collect_hidden_line_output(
-                    source_ids, view_name, config["name"]
-                )
->>>>>>> 26e835f (updates)
                 print_segment_stats("", stats)
 
                 if not curve_entries:
@@ -1817,35 +1354,14 @@ def main():
                 if EXPORT_TOP_VIEW:
                     top_config_name = config["name"] + TOP_VIEW_SUFFIX
                     top_curve_entries, top_stats = collect_hidden_line_output(
-<<<<<<< HEAD
-<<<<<<< HEAD
                         source_ids, view_name, top_config_name, "top"
-=======
-                        source_ids,
-                        view_name,
-                        top_config_name,
-                        "top"
->>>>>>> d6820e1 (new make2d)
-=======
-                        source_ids, view_name, top_config_name, "top"
->>>>>>> 26e835f (updates)
                     )
                     print_segment_stats("Top ", top_stats)
 
                     if top_curve_entries:
-<<<<<<< HEAD
-<<<<<<< HEAD
                         debug_ids.extend(
                             write_debug_curves(top_curve_entries, top_config_name)
                         )
-=======
-                        debug_ids.extend(write_debug_curves(top_curve_entries, top_config_name))
->>>>>>> d6820e1 (new make2d)
-=======
-                        debug_ids.extend(
-                            write_debug_curves(top_curve_entries, top_config_name)
-                        )
->>>>>>> 26e835f (updates)
                         export_output(top_curve_entries, top_config_name)
                     else:
                         print("  Skipped: top hidden line output was empty")
