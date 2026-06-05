@@ -435,12 +435,24 @@ function runPicker(){
     laptopSeeAllOpen: false
   };
 
+  // Escape a CMS-supplied string before it goes into innerHTML, so a stray
+  // <, >, &, or " in the data (CSV/JSON) renders as literal text instead of
+  // breaking the page or injecting markup. Used only at innerHTML sites; values
+  // placed via textContent/setAttribute already escape themselves.
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function renderBudgetOptions() {
     var budgetOptionsContainer = document.getElementById('budgetOptions');
     var budgetOptionsMarkup = '';
     for (var budgetIndex = 0; budgetIndex < Data.PickerOptions.budgetOptions.length; budgetIndex++) {
       var budgetOption = Data.PickerOptions.budgetOptions[budgetIndex];
-      budgetOptionsMarkup += '<div class="option-pill' + (State.budget === budgetOption.id ? ' active' : '') + '" data-budget="' + budgetOption.id + '"><div>' + budgetOption.label + '</div><div class="pill-detail">' + budgetOption.detail + '</div></div>';
+      budgetOptionsMarkup += '<div class="option-pill' + (State.budget === budgetOption.id ? ' active' : '') + '" data-budget="' + budgetOption.id + '"><div>' + esc(budgetOption.label) + '</div><div class="pill-detail">' + esc(budgetOption.detail) + '</div></div>';
     }
     budgetOptionsContainer.innerHTML = budgetOptionsMarkup;
   }
@@ -500,7 +512,7 @@ function runPicker(){
     return specsByWorkload[workloadProfileId][State.scale][budgetId || State.budget];
   }
   function windowsDesktopReferenceSummary(windowsSpec) {
-    return windowsSpec.cpu + ' / ' + windowsSpec.gpu + ' / ' + windowsSpec.ram;
+    return esc(windowsSpec.cpu) + ' / ' + esc(windowsSpec.gpu) + ' / ' + esc(windowsSpec.ram);
   }
   function prebuiltEquivalenceNoteHTML(prebuilt, workloadProfileId, windowsDesktopSpec) {
     if (!windowsDesktopSpec) return '';
@@ -537,7 +549,7 @@ function runPicker(){
         for (var j = 0; j < c.monitors.length; j++) { var mon = findMonitor(c.monitors[j]); if (mon) visual += monitorSVG(mon, 0.36); }
         row += '<div class="mon-config' + (i === State.monitorConfig ? ' selected' : '') + (c.rec ? ' recommended' : '') +
           '" data-config="' + i + '"><div class="mon-config-visual">' + visual +
-          '</div><span class="mbadge">rec</span><div class="mon-config-name">' + c.name + '</div></div>';
+          '</div><span class="mbadge">rec</span><div class="mon-config-name">' + esc(c.name) + '</div></div>';
       }
       if (row) markup += '<div class="mon-tier"><div class="mon-tier-label">' + tiers[t][1] + '</div><div class="mon-tier-row">' + row + '</div></div>';
     }
@@ -611,15 +623,15 @@ function runPicker(){
     window.scrollTo(0, y);
   }
   function windowsSpecHTML(spec) {
-    return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">' + spec.cpu + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">' + spec.gpu + '</div><div class="spec-item-note">' + spec.gpuNote + '</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">' + spec.ram + '</div>' + (spec.ramNote ? '<div class="spec-item-note">' + spec.ramNote + '</div>' : '') + '</div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">A good baseline. Adjust to your own needs.</div></div>';
+    return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">' + esc(spec.cpu) + '</div><div class="spec-item-note">' + esc(spec.cpuNote) + '</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">' + esc(spec.gpu) + '</div><div class="spec-item-note">' + esc(spec.gpuNote) + '</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">' + esc(spec.ram) + '</div>' + (spec.ramNote ? '<div class="spec-item-note">' + esc(spec.ramNote) + '</div>' : '') + '</div>' +
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + esc(spec.storage) + '</div><div class="spec-item-note">A good baseline. Adjust to your own needs.</div></div>';
   }
   function macSpecHTML(spec) {
-    return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">' + spec.chip + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + spec.memory + '</div>' + (spec.memoryNote ? '<div class="spec-item-note">' + spec.memoryNote + '</div>' : '') + '</div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">A good baseline. Adjust to your own needs.</div></div>';
+    return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">' + esc(spec.chip) + '</div><div class="spec-item-note">' + esc(spec.cpuNote) + '</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + esc(spec.memory) + '</div>' + (spec.memoryNote ? '<div class="spec-item-note">' + esc(spec.memoryNote) + '</div>' : '') + '</div>' +
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + esc(spec.storage) + '</div><div class="spec-item-note">A good baseline. Adjust to your own needs.</div></div>';
   }
 
   // ---- Prebuilt desktop rendering ----
@@ -642,7 +654,7 @@ function runPicker(){
   }
   function oemLink(name) {
     var u = oemUrl(name);
-    return u ? '<a href="' + u + '" target="_blank" rel="noopener">' + name + '</a>' : name;
+    return u ? '<a href="' + u + '" target="_blank" rel="noopener">' + esc(name) + '</a>' : esc(name);
   }
 
   function buildPrebuiltHTML(activeProfile, windowsDesktopSpec) {
@@ -658,14 +670,14 @@ function runPicker(){
       }
       if (matchingPrebuilts.length === 0) continue;
       prebuiltMarkup += '<div class="laptop-category">';
-      prebuiltMarkup += '<div class="laptop-category-label">' + Data.PrebuiltTypeLabels[prebuiltType] + '</div>';
-      if (Data.PrebuiltTypeNotes[prebuiltType]) prebuiltMarkup += '<div class="laptop-list-note" style="margin-bottom:0.35rem;margin-top:0">' + Data.PrebuiltTypeNotes[prebuiltType] + '</div>';
+      prebuiltMarkup += '<div class="laptop-category-label">' + esc(Data.PrebuiltTypeLabels[prebuiltType]) + '</div>';
+      if (Data.PrebuiltTypeNotes[prebuiltType]) prebuiltMarkup += '<div class="laptop-list-note" style="margin-bottom:0.35rem;margin-top:0">' + esc(Data.PrebuiltTypeNotes[prebuiltType]) + '</div>';
       for (var matchIndex = 0; matchIndex < matchingPrebuilts.length; matchIndex++) {
         var matchedPrebuilt = matchingPrebuilts[matchIndex];
         var isBuilder = matchedPrebuilt.type === 'builder';
         var isRecommended = isBuilder || isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
         prebuiltMarkup += '<div class="laptop-row' + (isRecommended ? ' is-rec' : '') + '">';
-        prebuiltMarkup += '<div class="laptop-name">' + oemLink(matchedPrebuilt.name) + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended && !isBuilder ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
+        prebuiltMarkup += '<div class="laptop-name">' + oemLink(matchedPrebuilt.name) + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + esc(matchedPrebuilt.note) + '</div>' + (isRecommended && !isBuilder ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
         prebuiltMarkup += '</div>';
       }
       prebuiltMarkup += '</div>';
@@ -687,12 +699,12 @@ function runPicker(){
       GlossDefs[term] = entry.def || '';
       var surfaces = [term].concat(entry.aka || []);
       surfaces.forEach(function(surface) {
-        var esc = surface.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        var escapedSurface = surface.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         // Match the surface form at word edges, allowing an optional plural -s.
         // The leading group keeps the boundary char; trailing lookahead blocks
         // partial hits (so "X3D" never lights up inside "9950X3D").
         GlossForms.push({ term: term, surface: surface,
-          re: new RegExp('(^|[^A-Za-z0-9])(' + esc + ')(s)?(?![A-Za-z0-9])', 'i') });
+          re: new RegExp('(^|[^A-Za-z0-9])(' + escapedSurface + ')(s)?(?![A-Za-z0-9])', 'i') });
       });
     });
     GlossForms.sort(function(a, b) { return b.surface.length - a.surface.length; });
@@ -812,12 +824,12 @@ function runPicker(){
     if (isMacPlatform) {
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
+      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + esc(Data.MacSpecs[activeWorkloadProfile].priority) + '</p>';
       document.getElementById('d-prebuilts').innerHTML = '<div class="section-label" style="margin-top:2rem">Where to Buy</div><div class="two-machine-desk-note"><a href="https://www.apple.com/shop/refurbished/mac" target="_blank" rel="noopener">Apple\'s refurbished store</a> is the best value: certified like-new, full warranty, usually around 15% off. For new, <a href="https://www.apple.com/mac/" target="_blank" rel="noopener">Apple</a>, <a href="https://www.bestbuy.com" target="_blank" rel="noopener">Best Buy</a>, and <a href="https://www.bhphotovideo.com" target="_blank" rel="noopener">B&amp;H Photo</a> are all authorized and hassle-free.</div>';
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
-      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.WindowsSpecs[activeWorkloadProfile].priority + '</p>';
+      document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + esc(Data.WindowsSpecs[activeWorkloadProfile].priority) + '</p>';
       document.getElementById('d-prebuilts').innerHTML = buildPrebuiltHTML(activeWorkloadProfile, selectedWindowsDesktopSpec);
     }
 
@@ -871,11 +883,11 @@ function runPicker(){
         if (allLaptopMatches[li].category === cat) catItems.push(allLaptopMatches[li].laptop);
       }
       if (catItems.length === 0) continue;
-      fullListMarkup += '<div class="laptop-category"><div class="laptop-category-label">' + Data.LaptopCategoryLabels[cat] + '</div>';
+      fullListMarkup += '<div class="laptop-category"><div class="laptop-category-label">' + esc(Data.LaptopCategoryLabels[cat]) + '</div>';
       for (var mi = 0; mi < catItems.length; mi++) {
         var ml = catItems[mi];
         var isRec = (mobileStrategy === 'travel') ? (ml === primaryLaptop) : isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
-        fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + oemLink(ml.name) + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span></div></div>';
+        fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + oemLink(ml.name) + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + esc(ml.note) + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + esc(ml.weight) + '</span></div></div>';
       }
       fullListMarkup += '</div>';
     }
@@ -889,10 +901,10 @@ function runPicker(){
       var recCategory = allLaptopMatches[primaryRecIndex].category;
       mobileMarkup += '<div class="laptop-rec-featured">';
       var recCategoryLabel = (mobileStrategy === 'travel') ? 'Travel machine' : (mobileStrategy === 'workstation') ? 'Powerful laptop' : Data.LaptopCategoryLabels[recCategory];
-      mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + recCategoryLabel + '</div>';
+      mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + esc(recCategoryLabel) + '</div>';
       mobileMarkup += '<div class="laptop-rec-featured-name">' + oemLink(recLaptop.name) + '</div>';
-      mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-weight">' + recLaptop.weight + '</span></div>';
-      mobileMarkup += '<div class="laptop-rec-featured-note">' + recLaptop.note + '</div>';
+      mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-weight">' + esc(recLaptop.weight) + '</span></div>';
+      mobileMarkup += '<div class="laptop-rec-featured-note">' + esc(recLaptop.note) + '</div>';
       mobileMarkup += '</div>';
       if (allLaptopMatches.length > 1) {
         mobileMarkup += '<button class="laptop-see-all-btn' + (State.laptopSeeAllOpen ? ' is-open' : '') + '" type="button">' + (State.laptopSeeAllOpen ? 'Hide options' : 'See all options (' + allLaptopMatches.length + ')') + '</button>';
