@@ -52,7 +52,7 @@
     "budgetOptions": [
       { "id": "cheapest", "label": "Cheapest", "detail": "The least you can spend and still do the work" },
       { "id": "value", "label": "Best Value", "detail": "Most of the performance, far less money" },
-      { "id": "best", "label": "Best Available", "detail": "The fastest parts worth buying" }
+      { "id": "best", "label": "Best Available", "detail": "The fastest parts, more than most need" }
     ],
     "deskMonitorDefaults": {
       "cheapest": [ "m1k24", "m1k24" ],

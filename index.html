@@ -629,7 +629,7 @@ function runPicker(){
       for (var prebuiltIndex = 0; prebuiltIndex < Data.Prebuilts.length; prebuiltIndex++) {
         var prebuilt = Data.Prebuilts[prebuiltIndex];
         if (prebuilt.type !== prebuiltType) continue;
-        if (hasWorkloadProfile(prebuilt.workloadProfiles, activeProfile)) matchingPrebuilts.push(prebuilt);
+        if (prebuilt.type === 'builder' || hasWorkloadProfile(prebuilt.workloadProfiles, activeProfile)) matchingPrebuilts.push(prebuilt);
       }
       if (matchingPrebuilts.length === 0) continue;
       prebuiltMarkup += '<div class="laptop-category">';
