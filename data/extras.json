@@ -874,11 +874,20 @@
   "MonitorConfigs": [
     {
       "tier": "cheapest",
+      "name": "Dual 27\" 4K",
+      "monitors": [
+        "m4k27",
+        "m4k27"
+      ],
+      "rec": true
+    },
+    {
+      "tier": "cheapest",
       "name": "Single 24\"",
       "monitors": [
         "m1k24"
       ],
-      "rec": true
+      "rec": false
     },
     {
       "tier": "value",

@@ -159,11 +159,11 @@
   .mon-configs{display:flex;flex-direction:column;gap:0.9rem;}
   .mon-tier-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.4rem;}
   .mon-tier-row{display:flex;flex-wrap:wrap;gap:0.5rem;}
-  .mon-config{display:flex;flex-direction:column;align-items:center;width:158px;gap:0.35rem;padding:0.55rem 0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;background:var(--white);position:relative;transition:border-color 0.15s,background 0.15s;}
+  .mon-config{display:flex;flex-direction:column;align-items:center;width:148px;gap:0.35rem;padding:0.55rem 0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;background:var(--white);position:relative;transition:border-color 0.15s,background 0.15s;}
   .mon-config:hover{border-color:var(--gray-500);}
   .mon-config.selected{border:2px solid var(--black);padding:calc(0.55rem - 1px) calc(0.4rem - 1px);background:var(--gray-50);}
-  .mon-config-visual{display:flex;gap:0.25rem;align-items:flex-end;min-height:26px;}
-  .mon-config-name{font-size:0.72rem;font-weight:400;text-align:center;white-space:nowrap;}
+  .mon-config-visual{display:flex;gap:0.25rem;align-items:flex-end;min-height:22px;}
+  .mon-config-name{font-size:0.7rem;font-weight:400;text-align:center;white-space:nowrap;}
   .mon-config .mbadge{display:none;position:absolute;top:3px;right:3px;font-size:0.4rem;font-family:var(--font-body);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
   .mon-config.recommended .mbadge{display:block;}
 
@@ -533,7 +533,7 @@ function runPicker(){
         var c = Data.MonitorConfigs[i];
         if (c.tier !== tiers[t][0] || !configAvailable(c, platform)) continue;
         var visual = '';
-        for (var j = 0; j < c.monitors.length; j++) { var mon = findMonitor(c.monitors[j]); if (mon) visual += monitorSVG(mon, 0.4); }
+        for (var j = 0; j < c.monitors.length; j++) { var mon = findMonitor(c.monitors[j]); if (mon) visual += monitorSVG(mon, 0.36); }
         row += '<div class="mon-config' + (i === State.monitorConfig ? ' selected' : '') + (c.rec ? ' recommended' : '') +
           '" data-config="' + i + '"><div class="mon-config-visual">' + visual +
           '</div><span class="mbadge">rec</span><div class="mon-config-name">' + c.name + '</div></div>';
