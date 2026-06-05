@@ -231,17 +231,17 @@
     },
     {
       "type": "builder",
-      "name": "BIMBOX",
-      "price": "$2,500--$6,000",
-      "note": "PCs built and tuned for Revit and BIM, with help setting them up. Aimed at architecture firms.",
+      "name": "Puget Systems",
+      "price": "$2,500--$8,000",
+      "note": "Custom workstations with published CAD and render benchmarks. They spec the build with you and support it after.",
       "workloadProfiles": [ "drafting", "modeling", "viz", "modeling_viz", "production" ],
       "recommendedFor": {}
     },
     {
       "type": "builder",
-      "name": "Puget Systems",
-      "price": "$2,500--$8,000",
-      "note": "Custom workstations with published CAD and render benchmarks. They spec the build with you and support it after.",
+      "name": "BIMBOX",
+      "price": "$2,500--$6,000",
+      "note": "PCs built and tuned for Revit and BIM, with help setting them up. Aimed at architecture firms.",
       "workloadProfiles": [ "drafting", "modeling", "viz", "modeling_viz", "production" ],
       "recommendedFor": {}
     },
@@ -297,7 +297,7 @@
       "name": "Lenovo ThinkCentre Neo 50t",
       "price": "$800--$1,200",
       "note": "32 GB, with a full GPU slot. Add an RTX 4060 to drive a 3D viewport.",
-      "workloadProfiles": [ "review", "drafting", "modeling" ],
+      "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "drafting": { "value": true }
       }
@@ -307,7 +307,7 @@
       "name": "Dell Inspiron Tower (Plus)",
       "price": "$900--$1,400",
       "note": "Up to an RTX 4060 from the factory. The cheapest tower that ships with a dedicated GPU.",
-      "workloadProfiles": [ "review", "drafting", "modeling" ],
+      "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "modeling": { "cheapest": true }
       }
@@ -327,7 +327,7 @@
       "name": "Dell Pro Max Tower T2",
       "price": "$1,300--$2,500",
       "note": "Certified for pro software. Pro GPUs only, no GeForce.",
-      "workloadProfiles": [ "review", "drafting", "modeling" ],
+      "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "modeling": { "value": true }
       }
@@ -337,7 +337,7 @@
       "name": "HP Z2 Tower G9 / G10",
       "price": "$1,200--$2,500",
       "note": "Certified for pro software, and quiet. Pro GPUs only.",
-      "workloadProfiles": [ "review", "drafting", "modeling" ],
+      "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {}
     },
     {
@@ -345,7 +345,7 @@
       "name": "Lenovo ThinkStation P3 Tower",
       "price": "$1,200--$2,500",
       "note": "Up to 128 GB and pro GPUs. A high memory ceiling for large models.",
-      "workloadProfiles": [ "review", "drafting", "modeling" ],
+      "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "modeling": { "best": true }
       }

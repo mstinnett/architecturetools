@@ -14,7 +14,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#5c5c5c;--gray-400:#757575;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#f9f9f8;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
+  :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#5c5c5c;--gray-400:#757575;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#eae8e2;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
   html{font-size:18px;}
   body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;}
   .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);display:flex;flex-direction:column;}
@@ -162,7 +162,7 @@
   .mon-config{display:flex;flex-direction:column;align-items:center;width:158px;gap:0.35rem;padding:0.55rem 0.4rem;border:1px solid var(--gray-700);cursor:pointer;user-select:none;background:var(--white);position:relative;transition:border-color 0.15s,background 0.15s;}
   .mon-config:hover{border-color:var(--gray-500);}
   .mon-config.selected{border:2px solid var(--black);padding:calc(0.55rem - 1px) calc(0.4rem - 1px);background:var(--gray-50);}
-  .mon-config-visual{display:flex;gap:0.25rem;align-items:flex-end;min-height:38px;}
+  .mon-config-visual{display:flex;gap:0.25rem;align-items:flex-end;min-height:26px;}
   .mon-config-name{font-size:0.72rem;font-weight:400;text-align:center;white-space:nowrap;}
   .mon-config .mbadge{display:none;position:absolute;top:3px;right:3px;font-size:0.4rem;font-family:var(--font-body);background:var(--black);color:var(--white);padding:0 3px;letter-spacing:0.1em;text-transform:uppercase;}
   .mon-config.recommended .mbadge{display:block;}
@@ -170,11 +170,11 @@
   /* Laptop list */
   .laptop-category{margin-bottom:1.5rem;}
   .laptop-category-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-500);margin-bottom:0.5rem;padding-bottom:0.35rem;border-bottom:1px solid var(--gray-700);}
-  .laptop-row{display:flex;align-items:baseline;padding:0.5rem 0;border-bottom:1px solid var(--gray-700);gap:0.75rem;}
+  .laptop-row{display:flex;align-items:baseline;padding:0.62rem 0;border-bottom:1px solid var(--gray-700);gap:0.75rem;}
   .laptop-row:last-child{border-bottom:none;}
-  .laptop-row.is-rec{background:var(--gray-50);margin:0 -0.5rem;padding:0.5rem;border-bottom-color:transparent;}
+  .laptop-row.is-rec{background:var(--gray-50);margin:0 -0.5rem;padding:0.62rem 0.5rem;border-bottom-color:transparent;}
   .laptop-name{font-size:0.82rem;font-weight:400;flex:1;min-width:0;}
-  .laptop-rec-badge{font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;background:var(--black);color:var(--white);padding:1px 5px;flex-shrink:0;display:none;}
+  .laptop-rec-badge{font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;background:var(--black);color:var(--white);padding:1px 5px;flex-shrink:0;margin-left:0.6rem;display:none;}
   .laptop-row.is-rec .laptop-rec-badge{display:inline-block;}
   .laptop-note{font-size:0.8rem;color:var(--gray-800);font-weight:300;margin-top:0.15rem;line-height:1.45;}
   .laptop-equivalence-note{margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--gray-200);font-size:0.74rem;color:var(--gray-800);font-weight:300;line-height:1.55;}
@@ -505,7 +505,7 @@ function runPicker(){
     if (prebuilt.type === 'mini' && (workloadProfileId === 'review' || workloadProfileId === 'drafting')) {
       equivalenceNote += ' The recommended tower uses its GPU mostly to drive displays here, so this mini matches it on integrated graphics.';
     }
-    equivalenceNote += ' The ' + budgetOptionLabel(State.budget) + ' build above is ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
+    equivalenceNote += ' The build recommended above is ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
     return '<div class="laptop-equivalence-note"><span class="laptop-equivalence-label">How it compares</span>' + equivalenceNote + '</div>';
   }
 
@@ -531,7 +531,7 @@ function runPicker(){
         var c = Data.MonitorConfigs[i];
         if (c.tier !== tiers[t][0] || !configAvailable(c, platform)) continue;
         var visual = '';
-        for (var j = 0; j < c.monitors.length; j++) { var mon = findMonitor(c.monitors[j]); if (mon) visual += monitorSVG(mon, 0.62); }
+        for (var j = 0; j < c.monitors.length; j++) { var mon = findMonitor(c.monitors[j]); if (mon) visual += monitorSVG(mon, 0.4); }
         row += '<div class="mon-config' + (i === State.monitorConfig ? ' selected' : '') + (c.rec ? ' recommended' : '') +
           '" data-config="' + i + '"><div class="mon-config-visual">' + visual +
           '</div><span class="mbadge">rec</span><div class="mon-config-name">' + c.name + '</div></div>';
@@ -611,12 +611,12 @@ function runPicker(){
     return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">' + spec.cpu + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
       '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">' + spec.gpu + '</div><div class="spec-item-note">' + spec.gpuNote + '</div></div>' +
       '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">' + spec.ram + '</div>' + (spec.ramNote ? '<div class="spec-item-note">' + spec.ramNote + '</div>' : '') + '</div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div></div>';
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">Adjust to your own needs.</div></div>';
   }
   function macSpecHTML(spec) {
     return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">' + spec.chip + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
       '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + spec.memory + '</div><div class="spec-item-note">Unified -- RAM and GPU memory</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div></div>';
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">Adjust to your own needs.</div></div>';
   }
 
   // ---- Prebuilt desktop rendering ----
@@ -634,7 +634,7 @@ function runPicker(){
       if (matchingPrebuilts.length === 0) continue;
       prebuiltMarkup += '<div class="laptop-category">';
       prebuiltMarkup += '<div class="laptop-category-label">' + Data.PrebuiltTypeLabels[prebuiltType] + '</div>';
-      if (Data.PrebuiltTypeNotes[prebuiltType]) prebuiltMarkup += '<div class="laptop-list-note" style="margin-bottom:0.5rem;margin-top:0">' + Data.PrebuiltTypeNotes[prebuiltType] + '</div>';
+      if (Data.PrebuiltTypeNotes[prebuiltType]) prebuiltMarkup += '<div class="laptop-list-note" style="margin-bottom:0.35rem;margin-top:0">' + Data.PrebuiltTypeNotes[prebuiltType] + '</div>';
       for (var matchIndex = 0; matchIndex < matchingPrebuilts.length; matchIndex++) {
         var matchedPrebuilt = matchingPrebuilts[matchIndex];
         var isBuilder = matchedPrebuilt.type === 'builder';
@@ -789,7 +789,7 @@ function runPicker(){
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
       document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
-      document.getElementById('d-prebuilts').innerHTML = '<div class="section-label" style="margin-top:2rem">Where to Buy</div><div class="two-machine-desk-note">Macs have no prebuilt variants to weigh, so it comes down to where you buy. Apple\'s refurbished store is the best value: certified like-new, full warranty, usually around 15% off. For new, Apple, Best Buy, and B&amp;H are all authorized and hassle-free.</div>';
+      document.getElementById('d-prebuilts').innerHTML = '<div class="section-label" style="margin-top:2rem">Where to Buy</div><div class="two-machine-desk-note">Apple\'s refurbished store is the best value: certified like-new, full warranty, usually around 15% off. For new, Apple, Best Buy, and B&amp;H Photo are all authorized and hassle-free.</div>';
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
