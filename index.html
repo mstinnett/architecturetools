@@ -501,12 +501,12 @@ function runPicker(){
   }
   function prebuiltEquivalenceNoteHTML(prebuilt, workloadProfileId, windowsDesktopSpec) {
     if (!windowsDesktopSpec) return '';
-    var equivalenceNote = 'Similar fit for ' + workloadProfileLabels[workloadProfileId] + ', not an exact parts match.';
+    var equivalenceNote = 'A close fit for ' + workloadProfileLabels[workloadProfileId] + ', not an exact parts match.';
     if (prebuilt.type === 'mini' && (workloadProfileId === 'review' || workloadProfileId === 'drafting')) {
-      equivalenceNote += ' The tower spec uses its GPU mostly for display output here; this mini PC reaches the same tier on integrated graphics instead.';
+      equivalenceNote += ' The recommended tower uses its GPU mostly to drive displays here, so this mini matches it on integrated graphics.';
     }
-    equivalenceNote += ' Current ' + budgetOptionLabel(State.budget) + ' target spec: ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
-    return '<div class="laptop-equivalence-note"><span class="laptop-equivalence-label">Comparable target</span>' + equivalenceNote + '</div>';
+    equivalenceNote += ' The ' + budgetOptionLabel(State.budget) + ' build above is ' + windowsDesktopReferenceSummary(windowsDesktopSpec) + '.';
+    return '<div class="laptop-equivalence-note"><span class="laptop-equivalence-label">How it compares</span>' + equivalenceNote + '</div>';
   }
 
   function monitorSVG(monitor, scale) {
@@ -621,7 +621,7 @@ function runPicker(){
 
   // ---- Prebuilt desktop rendering ----
   function buildPrebuiltHTML(activeProfile, windowsDesktopSpec) {
-    var prebuiltTypes = ['mini', 'office', 'workstation', 'gaming'];
+    var prebuiltTypes = ['builder', 'mini', 'office', 'workstation', 'gaming'];
     var prebuiltMarkup = '<div class="section-label" style="margin-top:2rem">Prebuilt Options</div>';
     for (var typeIndex = 0; typeIndex < prebuiltTypes.length; typeIndex++) {
       var prebuiltType = prebuiltTypes[typeIndex];
@@ -637,9 +637,10 @@ function runPicker(){
       if (Data.PrebuiltTypeNotes[prebuiltType]) prebuiltMarkup += '<div class="laptop-list-note" style="margin-bottom:0.5rem;margin-top:0">' + Data.PrebuiltTypeNotes[prebuiltType] + '</div>';
       for (var matchIndex = 0; matchIndex < matchingPrebuilts.length; matchIndex++) {
         var matchedPrebuilt = matchingPrebuilts[matchIndex];
-        var isRecommended = isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
+        var isBuilder = matchedPrebuilt.type === 'builder';
+        var isRecommended = isBuilder || isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
         prebuiltMarkup += '<div class="laptop-row' + (isRecommended ? ' is-rec' : '') + '">';
-        prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
+        prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended && !isBuilder ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
         prebuiltMarkup += '</div>';
       }
       prebuiltMarkup += '</div>';

@@ -94,10 +94,52 @@
   },
   "Prebuilts": [
     {
+      "type": "builder",
+      "name": "BOXX APEXX",
+      "price": "$3,000--$8,000",
+      "note": "Workstations tuned for CAD, often overclocked for the single-core speed Revit and Rhino want. Phone support and a long warranty.",
+      "workloadProfiles": [
+        "drafting",
+        "modeling",
+        "viz",
+        "modeling_viz",
+        "production"
+      ],
+      "recommendedFor": {}
+    },
+    {
+      "type": "builder",
+      "name": "BIMBOX",
+      "price": "$2,500--$6,000",
+      "note": "PCs built and tuned for Revit and BIM, with help setting them up. Aimed at architecture firms.",
+      "workloadProfiles": [
+        "drafting",
+        "modeling",
+        "viz",
+        "modeling_viz",
+        "production"
+      ],
+      "recommendedFor": {}
+    },
+    {
+      "type": "builder",
+      "name": "Puget Systems",
+      "price": "$2,500--$8,000",
+      "note": "Custom workstations with published CAD and render benchmarks. They spec the build with you and support it after.",
+      "workloadProfiles": [
+        "drafting",
+        "modeling",
+        "viz",
+        "modeling_viz",
+        "production"
+      ],
+      "recommendedFor": {}
+    },
+    {
       "type": "mini",
       "name": "ASUS ExpertCenter PB64",
       "price": "$600--$900",
-      "note": "Up to 64 GB, drives four 4K displays. Mounts behind a monitor, and silent.",
+      "note": "Up to 64 GB, drives two displays up to 6K. Mounts behind a monitor, and silent.",
       "workloadProfiles": [
         "review",
         "drafting"
@@ -112,7 +154,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PN55",
       "price": "$600--$800",
-      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Drives four 4K displays.",
+      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Drives two displays up to 6K.",
       "workloadProfiles": [
         "review",
         "drafting"
@@ -343,12 +385,14 @@
     }
   ],
   "PrebuiltTypeLabels": {
+    "builder": "Built to Order",
     "mini": "Mini PC",
     "office": "Office Tower",
     "workstation": "Entry Workstation",
     "gaming": "Gaming Desktop"
   },
   "PrebuiltTypeNotes": {
+    "builder": "Bespoke builders who spec, test, and support the machine, and walk you through the order. The best route for a small firm with no IT.",
     "mini": "Silent and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.",
     "office": "A standard office tower. A few fit a low-power GPU, enough for drafting and modeling, but never a fast one.",
     "workstation": "Certified and supported for professional software, but limited to pro GPUs, not gaming ones. Fine for modeling, short on power for serious visualization. Most architects don't need the certification, so don't pay the premium for it unless your firm requires it.",
