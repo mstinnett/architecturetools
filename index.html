@@ -923,14 +923,14 @@ function runPicker(){
 
     var mobilePriorityNote;
     if (mobileStrategy === 'travel') mobilePriorityNote = isMacPlatform
-      ? 'The Mac does the heavy work at the desk; the laptop just travels. A MacBook Air is under 3 lbs with all-day battery.'
-      : 'The desktop does the heavy work; the laptop just travels. Light, long battery, and it docks at your desk over USB-C.';
+      ? 'The Mac does the heavy work at the desk, and the laptop just travels. A MacBook Air weighs under 3 lbs and lasts all day.'
+      : 'The desktop does the heavy work, and the laptop just travels. Light, long battery, and one cable docks it at your desk.';
     else if (mobileStrategy === 'workstation') mobilePriorityNote = isMacPlatform
-      ? 'A second full machine you can work on anywhere. A MacBook Pro with M4 Pro or Max runs real modeling, with the desktop for the longest jobs.'
-      : 'A second full machine you can work on anywhere. It runs your software away from the desk, though sustained rendering still favors the desktop.';
+      ? 'A second full machine for working anywhere. A MacBook Pro with the M4 Pro or Max handles modeling on the road, with the desktop for the longest jobs.'
+      : 'A second full machine for working anywhere. It runs your software away from the desk, though the longest renders still belong at the desktop.';
     else mobilePriorityNote = isMacPlatform
-      ? 'Every MacBook docks natively over Thunderbolt. The MacBook Pro with M4 Pro or Max is a genuine one-machine solution.'
-      : 'One laptop, one set of files. Dock it at your desk, undock and go. Thermals limit sustained rendering, so heavy jobs run in bursts.';
+      ? 'Every MacBook drives your monitors over one cable. A MacBook Pro with the M4 Pro or Max can be your only machine.'
+      : 'One laptop, one set of files. Dock it at your desk, unplug and go. It won\'t hold up to long renders like a desktop, so leave those at the desk.';
     document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
     // Auto-link glossary terms in the freshly rendered copy. innerHTML is rebuilt
