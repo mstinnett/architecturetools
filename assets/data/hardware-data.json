@@ -145,12 +145,12 @@
       "small": {
         "cheapest": { "chip": "macmini_m4", "cpuNote": "Quiet and small. Plenty for documents. For review work, a refurbished previous-gen Mac is great value.", "memory": "16 GB unified", "memoryNote": "Enough for documents and a stack of tabs.", "storage": "512 GB SSD", "price": "$800--$1,000" },
         "value": { "chip": "macmini_m4pro", "cpuNote": "More than enough for documents.", "memory": "24 GB unified", "memoryNote": "More than documents need.", "storage": "512 GB SSD", "price": "$1,400--$1,600" },
-        "best": { "chip": "macmini_m4pro", "cpuNote": "More memory than documents will use.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
+        "best": { "chip": "macmini_m4pro", "cpuNote": "More chip than documents need.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
       },
       "large": {
-        "cheapest": { "chip": "macmini_m4", "cpuNote": "24 GB for larger document sets. A refurbished previous-gen Mac also does this work well.", "memory": "24 GB unified", "memoryNote": "Holds large document sets.", "storage": "512 GB SSD", "price": "$1,000--$1,200" },
-        "value": { "chip": "macmini_m4pro", "cpuNote": "Even large document sets use little of the chip. The extra memory lets you keep more open at once.", "memory": "48 GB unified", "memoryNote": "Keeps many large sets open at once.", "storage": "1 TB SSD", "price": "$1,800--$2,000" },
-        "best": { "chip": "macmini_m4pro", "cpuNote": "More memory than documents will ever use.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
+        "cheapest": { "chip": "macmini_m4", "cpuNote": "Handles larger document sets. A refurbished previous-gen Mac also does this work well.", "memory": "24 GB unified", "memoryNote": "Holds large document sets.", "storage": "512 GB SSD", "price": "$1,000--$1,200" },
+        "value": { "chip": "macmini_m4pro", "cpuNote": "Even large document sets use little of the chip.", "memory": "48 GB unified", "memoryNote": "Keeps many large sets open at once.", "storage": "1 TB SSD", "price": "$1,800--$2,000" },
+        "best": { "chip": "macmini_m4pro", "cpuNote": "Far more chip than documents need.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
       },
       "priority": "You primarily work on documents, and any Mac handles that. The display matters more than the Mac."
     },
@@ -163,7 +163,7 @@
       "large": {
         "cheapest": { "chip": "macmini_m4pro", "cpuNote": "Workable for big drawing sets on a budget.", "memory": "24 GB unified", "memoryNote": "Enough for large drawing sets.", "storage": "1 TB SSD", "price": "$1,600--$1,800" },
         "value": { "chip": "macstudio_m4max", "cpuNote": "Handles large drawing sets with many xrefs.", "memory": "36 GB unified", "memoryNote": "Handles large drawing sets.", "storage": "1 TB SSD", "price": "$2,000--$2,400" },
-        "best": { "chip": "macstudio_m4max", "cpuNote": "64 GB for complex drawings and lots of multitasking.", "memory": "64 GB unified", "memoryNote": "Room for complex drawings and heavy multitasking.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
+        "best": { "chip": "macstudio_m4max", "cpuNote": "More chip than 2D drafting needs, even for complex drawings.", "memory": "64 GB unified", "memoryNote": "Room for complex drawings and heavy multitasking.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
       },
       "priority": "Drafting runs one operation at a time, and Apple's CPU cores are fast at it. The display matters more than the Mac."
     },
@@ -171,7 +171,7 @@
       "small": {
         "cheapest": { "chip": "macmini_m4pro", "cpuNote": "Handles ArchiCAD, Rhino, and SketchUp while models stay moderate.", "memory": "48 GB unified", "memoryNote": "Holds a single building, GPU included.", "storage": "1 TB SSD", "price": "$1,800--$2,100" },
         "value": { "chip": "macstudio_m4max", "cpuNote": "GPU cores keep ArchiCAD, Rhino, and SketchUp viewports smooth.", "memory": "36 GB unified", "memoryNote": "Enough for a single building.", "storage": "1 TB SSD", "price": "$2,000--$2,400" },
-        "best": { "chip": "macstudio_m4max", "cpuNote": "64 GB of unified memory for larger models.", "memory": "64 GB unified", "memoryNote": "Comfortable with larger, linked models.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
+        "best": { "chip": "macstudio_m4max", "cpuNote": "The top single-core for modeling.", "memory": "64 GB unified", "memoryNote": "Comfortable with larger, linked models.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
       },
       "large": {
         "cheapest": { "chip": "macmini_m4pro", "cpuNote": "Even large models run fine here. This clears ArchiCAD's commercial baseline.", "memory": "48 GB unified", "memoryNote": "The least I'd use for large models.", "storage": "1 TB SSD", "price": "$2,400--$2,800" },
@@ -210,11 +210,11 @@
       "small": {
         "cheapest": { "chip": "macstudio_m4max", "cpuNote": "The entry point if you're set on rendering on a Mac, though a PC offers far better value for this work.", "memory": "64 GB unified", "memoryNote": "Holds small render scenes.", "storage": "2 TB SSD", "price": "$3,200--$3,800" },
         "value": { "chip": "macstudio_m4ultra", "cpuNote": "Maximum cores for V-Ray, plus Metal GPU rendering.", "memory": "96 GB unified", "memoryNote": "Room for larger render scenes.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "best": { "chip": "macstudio_m4ultra", "cpuNote": "Maximum cores and memory for small-scale rendering.", "memory": "128 GB unified", "memoryNote": "Holds small-scale renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
+        "best": { "chip": "macstudio_m4ultra", "cpuNote": "Maximum cores for small-scale rendering.", "memory": "128 GB unified", "memoryNote": "Holds small-scale renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
       "large": {
         "cheapest": { "chip": "macstudio_m4ultra", "cpuNote": "The cheapest Mac I'd trust with large renders.", "memory": "96 GB unified", "memoryNote": "Holds large renders.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "value": { "chip": "macstudio_m4ultra", "cpuNote": "Large scenes need 128 GB to hold the render.", "memory": "128 GB unified", "memoryNote": "Room to hold large renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" },
+        "value": { "chip": "macstudio_m4ultra", "cpuNote": "Maximum cores for large renders.", "memory": "128 GB unified", "memoryNote": "Room to hold large renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" },
         "best": { "chip": "macstudio_m4ultra", "cpuNote": "The maximum Mac, and still slower than a mid-range RTX 4070 PC at V-Ray.", "memory": "192 GB unified", "memoryNote": "Holds the largest renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
       "priority": "Final rendering is the Mac's weakest workload. V-Ray runs on Metal, but a mid-range Windows PC with an RTX 4070 still outrenders a maxed Mac Studio. Choose Mac here for the ecosystem, display, and silence. Not for render speed."

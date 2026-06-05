@@ -16,7 +16,7 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   :root{--black:#111;--gray-800:#333;--gray-700:#555;--gray-500:#5c5c5c;--gray-400:#757575;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--page-bg:#eae8e2;--selected-bg:#333;--font-body:'Verlag','Jost','Futura PT',sans-serif;}
   html{font-size:18px;}
-  body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  body{font-family:var(--font-body);color:var(--black);background:var(--page-bg);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-anchor:none;}
   .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--white);display:flex;flex-direction:column;}
   /* Page order: hero, then the heading, then the picker controls, then the results, then prebuilts/footer. */
   .picker>.desk-hero{order:1;} .picker-header{order:2;} .picker>.controls-cluster{order:3;} .picker>.mon-drawer{order:4;} .picker>.input-section{order:5;} .picker>.divider{order:6;} .picker>#panelsWrapper{order:7;} .picker>.picker-footer{order:8;}
@@ -613,12 +613,12 @@ function runPicker(){
     return '<div class="spec-item"><div class="spec-item-label">CPU</div><div class="spec-item-value">' + spec.cpu + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
       '<div class="spec-item"><div class="spec-item-label">GPU</div><div class="spec-item-value">' + spec.gpu + '</div><div class="spec-item-note">' + spec.gpuNote + '</div></div>' +
       '<div class="spec-item"><div class="spec-item-label">RAM</div><div class="spec-item-value">' + spec.ram + '</div>' + (spec.ramNote ? '<div class="spec-item-note">' + spec.ramNote + '</div>' : '') + '</div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">Adjust to your own needs.</div></div>';
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">A good baseline. Adjust to your own needs.</div></div>';
   }
   function macSpecHTML(spec) {
     return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">' + spec.chip + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
       '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + spec.memory + '</div>' + (spec.memoryNote ? '<div class="spec-item-note">' + spec.memoryNote + '</div>' : '') + '</div>' +
-      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">Adjust to your own needs.</div></div>';
+      '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">A good baseline. Adjust to your own needs.</div></div>';
   }
 
   // ---- Prebuilt desktop rendering ----
