@@ -174,6 +174,8 @@
   .laptop-row:last-child{border-bottom:none;}
   .laptop-row.is-rec{background:var(--gray-50);margin:0 -0.5rem;padding:0.62rem 0.5rem;border-bottom-color:transparent;}
   .laptop-name{font-size:0.82rem;font-weight:400;flex:1;min-width:0;}
+  .laptop-name a, .laptop-rec-featured-name a, .two-machine-desk-note a{color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-300);transition:border-color 0.15s;}
+  .laptop-name a:hover, .laptop-rec-featured-name a:hover, .two-machine-desk-note a:hover{border-bottom-color:var(--black);}
   .laptop-rec-badge{font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;background:var(--black);color:var(--white);padding:1px 5px;flex-shrink:0;margin-left:0.6rem;display:none;}
   .laptop-row.is-rec .laptop-rec-badge{display:inline-block;}
   .laptop-note{font-size:0.8rem;color:var(--gray-800);font-weight:300;margin-top:0.15rem;line-height:1.45;}
@@ -620,6 +622,28 @@ function runPicker(){
   }
 
   // ---- Prebuilt desktop rendering ----
+  // Link a product/box name to its maker's site (brand-token match, case-insensitive).
+  function oemUrl(name) {
+    var n = name.toLowerCase();
+    var map = [
+      ['puget', 'https://www.pugetsystems.com'], ['boxx', 'https://www.boxx.com'], ['bimbox', 'https://bimboxusa.com'],
+      ['cyberpowerpc', 'https://www.cyberpowerpc.com'], ['ibuypower', 'https://www.ibuypower.com'], ['nzxt', 'https://nzxt.com'],
+      ['thinkpad', 'https://www.lenovo.com'], ['thinkcentre', 'https://www.lenovo.com'], ['thinkstation', 'https://www.lenovo.com'], ['legion', 'https://www.lenovo.com'], ['loq', 'https://www.lenovo.com'], ['lenovo', 'https://www.lenovo.com'],
+      ['zbook', 'https://www.hp.com'], ['prodesk', 'https://www.hp.com'], ['omnibook', 'https://www.hp.com'], ['hp ', 'https://www.hp.com'],
+      ['inspiron', 'https://www.dell.com'], ['dell', 'https://www.dell.com'],
+      ['nuc', 'https://www.asus.com'], ['proart', 'https://www.asus.com'], ['zephyrus', 'https://www.asus.com'], ['expertcenter', 'https://www.asus.com'], ['rog', 'https://www.asus.com'], ['tuf', 'https://www.asus.com'], ['asus', 'https://www.asus.com'],
+      ['msi', 'https://www.msi.com'], ['predator', 'https://www.acer.com'], ['acer', 'https://www.acer.com'],
+      ['razer', 'https://www.razer.com'], ['blade', 'https://www.razer.com'],
+      ['macbook', 'https://www.apple.com'], ['mac mini', 'https://www.apple.com'], ['apple', 'https://www.apple.com']
+    ];
+    for (var i = 0; i < map.length; i++) if (n.indexOf(map[i][0]) !== -1) return map[i][1];
+    return '';
+  }
+  function oemLink(name) {
+    var u = oemUrl(name);
+    return u ? '<a href="' + u + '" target="_blank" rel="noopener">' + name + '</a>' : name;
+  }
+
   function buildPrebuiltHTML(activeProfile, windowsDesktopSpec) {
     var prebuiltTypes = ['builder', 'mini', 'office', 'workstation', 'gaming'];
     var prebuiltMarkup = '<div class="section-label" style="margin-top:2rem">Prebuilt Options</div>';
@@ -640,7 +664,7 @@ function runPicker(){
         var isBuilder = matchedPrebuilt.type === 'builder';
         var isRecommended = isBuilder || isRecommendedForBudget(matchedPrebuilt, activeProfile, State.budget);
         prebuiltMarkup += '<div class="laptop-row' + (isRecommended ? ' is-rec' : '') + '">';
-        prebuiltMarkup += '<div class="laptop-name">' + matchedPrebuilt.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended && !isBuilder ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
+        prebuiltMarkup += '<div class="laptop-name">' + oemLink(matchedPrebuilt.name) + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + matchedPrebuilt.note + '</div>' + (isRecommended && !isBuilder ? prebuiltEquivalenceNoteHTML(matchedPrebuilt, activeProfile, windowsDesktopSpec) : '') + '</div>';
         prebuiltMarkup += '</div>';
       }
       prebuiltMarkup += '</div>';
@@ -789,7 +813,7 @@ function runPicker(){
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
       document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
-      document.getElementById('d-prebuilts').innerHTML = '<div class="section-label" style="margin-top:2rem">Where to Buy</div><div class="two-machine-desk-note">Apple\'s refurbished store is the best value: certified like-new, full warranty, usually around 15% off. For new, Apple, Best Buy, and B&amp;H Photo are all authorized and hassle-free.</div>';
+      document.getElementById('d-prebuilts').innerHTML = '<div class="section-label" style="margin-top:2rem">Where to Buy</div><div class="two-machine-desk-note"><a href="https://www.apple.com/shop/refurbished/mac" target="_blank" rel="noopener">Apple\'s refurbished store</a> is the best value: certified like-new, full warranty, usually around 15% off. For new, <a href="https://www.apple.com/mac/" target="_blank" rel="noopener">Apple</a>, <a href="https://www.bestbuy.com" target="_blank" rel="noopener">Best Buy</a>, and <a href="https://www.bhphotovideo.com" target="_blank" rel="noopener">B&amp;H Photo</a> are all authorized and hassle-free.</div>';
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
@@ -851,7 +875,7 @@ function runPicker(){
       for (var mi = 0; mi < catItems.length; mi++) {
         var ml = catItems[mi];
         var isRec = (mobileStrategy === 'travel') ? (ml === primaryLaptop) : isRecommendedForBudget(ml, activeWorkloadProfile, laptopBudgetTier);
-        fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + ml.name + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span></div></div>';
+        fullListMarkup += '<div class="laptop-row' + (isRec ? ' is-rec' : '') + '"><div class="laptop-name">' + oemLink(ml.name) + '<span class="laptop-rec-badge">rec</span><div class="laptop-note">' + ml.note + '</div></div><div class="laptop-meta"><span class="laptop-weight">' + ml.weight + '</span></div></div>';
       }
       fullListMarkup += '</div>';
     }
@@ -866,7 +890,7 @@ function runPicker(){
       mobileMarkup += '<div class="laptop-rec-featured">';
       var recCategoryLabel = (mobileStrategy === 'travel') ? 'Travel machine' : (mobileStrategy === 'workstation') ? 'Powerful laptop' : Data.LaptopCategoryLabels[recCategory];
       mobileMarkup += '<div class="laptop-rec-featured-label">Recommended &middot; ' + recCategoryLabel + '</div>';
-      mobileMarkup += '<div class="laptop-rec-featured-name">' + recLaptop.name + '</div>';
+      mobileMarkup += '<div class="laptop-rec-featured-name">' + oemLink(recLaptop.name) + '</div>';
       mobileMarkup += '<div class="laptop-rec-featured-meta"><span class="laptop-rec-featured-weight">' + recLaptop.weight + '</span></div>';
       mobileMarkup += '<div class="laptop-rec-featured-note">' + recLaptop.note + '</div>';
       mobileMarkup += '</div>';
