@@ -21,13 +21,31 @@ Notes:
 
 import math
 import os
+import sys
 
 import Rhino
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
 import System
 
-SCRIPT_VERSION = "2026-05-11.5"
+SCRIPT_VERSION = "2026-06-05.layout-wired"
+
+# Composition (which components, where, what rotation) now comes from the shared
+# make2d_layout module -- the same source of truth solve.py / render.py use -- so
+# this script's high-quality Make2D linework composes with the exact placements
+# you dial in there. The legacy placement constants/functions further down are
+# kept for reference but no longer drive composition (see compose_configuration).
+_LAYOUT_DIR = ""  # set to the tools/ folder if Rhino does not expose __file__
+try:
+    _here = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    _here = _LAYOUT_DIR or os.getcwd()
+if _here and _here not in sys.path:
+    sys.path.insert(0, _here)
+# Rhino caches imported modules across runs; evict so layout edits always reload.
+if "make2d_layout" in sys.modules:
+    del sys.modules["make2d_layout"]
+import make2d_layout as layout
 
 
 # =============================================================================
@@ -114,163 +132,13 @@ TEST_ISOLATE_COMPONENTS = []  # e.g. ["fractal_tower.3dm"]
 
 
 # =============================================================================
-# MONITOR SPACING
-# =============================================================================
-
-MONITOR_GAP = 15
-
-MONITOR_WIDTHS = {
-    "monitor_27in.3dm": 612,
-    "monitor_32in.3dm": 724,
-    "monitor_34in_ultrawide.3dm": 816,
-}
-
-# Rotate screen-based components so they face the configured camera side.
-SCREEN_YAW_DEG = 90.0
-TOWER_YAW_DEG = 90.0
-INPUT_YAW_DEG = 90.0
-# Laptops are rotated an extra 60 deg CCW from the monitor yaw so they
-# read as turned-in to the user (mac-mini-side angle).
-LAPTOP_YAW_DEG = SCREEN_YAW_DEG + 60.0
-COMPONENT_ROTATIONS_DEG = {
-    "fractal_tower.3dm": TOWER_YAW_DEG,
-    "monitor_27in.3dm": SCREEN_YAW_DEG,
-    "monitor_32in.3dm": SCREEN_YAW_DEG,
-    "monitor_34in_ultrawide.3dm": SCREEN_YAW_DEG,
-    "laptop_closed.3dm": LAPTOP_YAW_DEG,
-    "macbook_air_open.3dm": LAPTOP_YAW_DEG,
-    "keyboard.3dm": INPUT_YAW_DEG,
-    "mouse.3dm": INPUT_YAW_DEG,
-}
-
-# Equipment layout uses desk-space XY in millimeters.
-# +X is desk right. +Y is toward the back/display side of the desk.
-MONITOR_Y_MM = DESK_DEPTH * 0.3
-# Reduced from 180mm to 60mm. The previous value pushed machines too far
-# away from the displays in dual-monitor setups.
-DUAL_DISPLAY_MACHINE_SPACING_MM = 60.0
-
-# The tower lives on the -X side of the displays so it renders on the
-# camera-right of the composition (the iso camera sits at +X +Y, which
-# inverts world-X relative to the screen).
-TOWER_ANCHOR_FILENAME = "fractal_tower.3dm"
-TOWER_LEFTMOST_DISPLAY_GAP_MM = 200.0
-TOWER_DESK_Y_MM = 350.0
-
-MAC_MINI_ANCHOR_FILENAME = "macmini.3dm"
-MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM = 200.0
-MAC_MINI_DESK_Y_OFFSET_MM = -50.0
-
-LAPTOP_ANCHOR_FILENAMES = (
-    "laptop_closed.3dm",
-    "macbook_air_open.3dm",
-)
-# Single-laptop configs: laptop sits this many mm to the left of the
-# leftmost monitor edge (so it lands on the camera-right of the displays).
-LAPTOP_LEFTMOST_DISPLAY_GAP_MM = 200.0
-LAPTOP_DESK_Y_MM = 395.0
-# Multi-machine configs (extras present, e.g. x1_tower). The tower
-# already sits past the leftmost monitor edge, so the laptop goes on
-# the opposite side -- anchored to the rightmost monitor edge with
-# this gap (same shape as get_mac_mini_anchor_position).
-LAPTOP_MULTI_RIGHTMOST_DISPLAY_GAP_MM = 200.0
-LAPTOP_MULTI_DESK_Y_MM = 395.0
-
-KEYBOARD_FILENAME = "keyboard.3dm"
-MOUSE_FILENAME = "mouse.3dm"
-KEYBOARD_CENTER_X_FROM_DISPLAY_CENTER_MM = 100.0
-KEYBOARD_CENTER_Y_MM = MONITOR_Y_MM + 120.0
-MOUSE_CENTER_X_FROM_KEYBOARD_CENTER_MM = -310.0
-MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM = 60.0
-
-
-# =============================================================================
 # DESK CONFIGURATIONS
 # =============================================================================
+# Composition -- machines, monitor combos, positions, rotations -- lives in the
+# shared make2d_layout module, the single source of truth for solve.py,
+# render.py and this script. Edit placement there.
 
-
-def mon(filename, x_offset=0):
-    return (filename, x_offset)
-
-
-def compute_dual_offsets(mon1_file, mon2_file):
-    w1 = MONITOR_WIDTHS.get(mon1_file, 620)
-    w2 = MONITOR_WIDTHS.get(mon2_file, 620)
-    total = w1 + MONITOR_GAP + w2
-    x1 = -(total / 2.0) + (w1 / 2.0)
-    x2 = (total / 2.0) - (w2 / 2.0)
-    return x1, x2
-
-
-TOWER_POS = (-500, 50)
-LAPTOP_CENTER_POS = (0, -50)
-MAC_MINI_POS = (350, 200)
-
-MACHINES = {
-    "north_xl": {
-        "file": "fractal_tower.3dm",
-        "pos": TOWER_POS,
-        "label": "NorthXL",
-    },
-    "laptop_generic": {
-        "file": "laptop_closed.3dm",
-        "pos": LAPTOP_CENTER_POS,
-        "label": "Laptop",
-    },
-    "macbook_pro": {
-        "file": "laptop_closed.3dm",
-        "pos": LAPTOP_CENTER_POS,
-        "label": "MBP",
-    },
-    "mac_mini_air": {
-        "file": "macmini.3dm",
-        "pos": MAC_MINI_POS,
-        "label": "MacMini",
-    },
-    "proart": {
-        "file": "laptop_closed.3dm",
-        "pos": LAPTOP_CENTER_POS,
-        "label": "ProArt",
-    },
-    "x1_tower": {
-        "file": "laptop_closed.3dm",
-        "pos": (-250, -50),
-        "label": "X1Tower",
-        "extras": [
-            ("fractal_tower.3dm", -500, 50),
-        ],
-    },
-}
-
-MONITOR_COMBOS = {
-    "1x27": [mon("monitor_27in.3dm", 0)],
-    "2x27": None,
-    "1x32": [mon("monitor_32in.3dm", 0)],
-    "2x32": None,
-    "1x27_1x32": None,
-    "1xUW": [mon("monitor_34in_ultrawide.3dm", 0)],
-}
-
-x1, x2 = compute_dual_offsets("monitor_27in.3dm", "monitor_27in.3dm")
-MONITOR_COMBOS["2x27"] = [mon("monitor_27in.3dm", x1), mon("monitor_27in.3dm", x2)]
-
-x1, x2 = compute_dual_offsets("monitor_32in.3dm", "monitor_32in.3dm")
-MONITOR_COMBOS["2x32"] = [mon("monitor_32in.3dm", x1), mon("monitor_32in.3dm", x2)]
-
-x1, x2 = compute_dual_offsets("monitor_27in.3dm", "monitor_32in.3dm")
-MONITOR_COMBOS["1x27_1x32"] = [mon("monitor_27in.3dm", x1), mon("monitor_32in.3dm", x2)]
-
-CONFIGURATIONS = []
-for mach_key, mach in MACHINES.items():
-    for mon_key, mons in MONITOR_COMBOS.items():
-        config = {
-            "name": "{}_{}".format(mach["label"], mon_key),
-            "machine": mach["file"],
-            "machine_pos": mach["pos"],
-            "monitors": mons,
-            "extras": mach.get("extras", []),
-        }
-        CONFIGURATIONS.append(config)
+CONFIGURATIONS = layout.CONFIGURATIONS
 
 
 # =============================================================================
@@ -502,142 +370,9 @@ def draw_desk_surface():
     return []
 
 
-def get_component_rotation_deg(filename):
-    return COMPONENT_ROTATIONS_DEG.get(filename, 0.0)
-
-
-def get_monitor_width_mm(filename):
-    return MONITOR_WIDTHS.get(filename, 620.0)
-
-
-def get_monitor_cluster_info(config):
-    monitors = config.get("monitors") or []
-    if not monitors:
-        return None
-
-    leftmost_edge_x = None
-    rightmost_edge_x = None
-
-    for monitor_file, monitor_x in monitors:
-        left_edge_x = monitor_x - (get_monitor_width_mm(monitor_file) / 2.0)
-        edge_x = monitor_x + (get_monitor_width_mm(monitor_file) / 2.0)
-        if leftmost_edge_x is None or left_edge_x < leftmost_edge_x:
-            leftmost_edge_x = left_edge_x
-        if rightmost_edge_x is None or edge_x > rightmost_edge_x:
-            rightmost_edge_x = edge_x
-
-    if leftmost_edge_x is None or rightmost_edge_x is None:
-        return None
-
-    return {
-        "left_x": leftmost_edge_x,
-        "right_x": rightmost_edge_x,
-        "center_x": (leftmost_edge_x + rightmost_edge_x) / 2.0,
-        "y": MONITOR_Y_MM,
-        "count": len(monitors),
-    }
-
-
-def is_dual_display_config(config):
-    return len(config.get("monitors") or []) > 1
-
-
-def get_dual_display_spacing_mm(config):
-    if is_dual_display_config(config):
-        return DUAL_DISPLAY_MACHINE_SPACING_MM
-    return 0.0
-
-
-def get_rightmost_monitor_edge_position(config):
-    cluster_info = get_monitor_cluster_info(config)
-    if not cluster_info:
-        return None
-    return cluster_info["right_x"], cluster_info["y"]
-
-
-def get_mac_mini_anchor_position(config):
-    anchor_position = get_rightmost_monitor_edge_position(config)
-    if not anchor_position:
-        return None
-
-    anchor_x, anchor_y = anchor_position
-    x_value = (
-        anchor_x
-        + MAC_MINI_RIGHTMOST_DISPLAY_GAP_MM
-        + get_dual_display_spacing_mm(config)
-    )
-    y_value = anchor_y + MAC_MINI_DESK_Y_OFFSET_MM
-    return x_value, y_value
-
-
-def get_laptop_anchor_position(config):
-    cluster_info = get_monitor_cluster_info(config)
-    if not cluster_info:
-        return None
-
-    if config.get("extras"):
-        rightmost_x = cluster_info["right_x"]
-        x_value = (
-            rightmost_x
-            + LAPTOP_MULTI_RIGHTMOST_DISPLAY_GAP_MM
-            + get_dual_display_spacing_mm(config)
-        )
-        return x_value, LAPTOP_MULTI_DESK_Y_MM
-
-    leftmost_x = cluster_info["left_x"]
-    x_value = (
-        leftmost_x
-        - LAPTOP_LEFTMOST_DISPLAY_GAP_MM
-        - get_dual_display_spacing_mm(config)
-    )
-    return x_value, LAPTOP_DESK_Y_MM
-
-
-def get_input_device_positions(config):
-    cluster_info = get_monitor_cluster_info(config)
-    if not cluster_info:
-        return []
-
-    center_x = cluster_info["center_x"]
-    keyboard_x = center_x + KEYBOARD_CENTER_X_FROM_DISPLAY_CENTER_MM
-    keyboard_y = KEYBOARD_CENTER_Y_MM
-
-    return [
-        (KEYBOARD_FILENAME, keyboard_x, keyboard_y),
-        (
-            MOUSE_FILENAME,
-            keyboard_x + MOUSE_CENTER_X_FROM_KEYBOARD_CENTER_MM,
-            keyboard_y + MOUSE_CENTER_Y_FROM_KEYBOARD_CENTER_MM,
-        ),
-    ]
-
-
-def get_component_base_position(config, filename, x_value, y_value):
-    if filename == MAC_MINI_ANCHOR_FILENAME:
-        anchor_position = get_mac_mini_anchor_position(config)
-        if anchor_position:
-            return anchor_position
-        return x_value, y_value
-
-    if filename in LAPTOP_ANCHOR_FILENAMES:
-        anchor_position = get_laptop_anchor_position(config)
-        if anchor_position:
-            return anchor_position
-        return x_value, y_value
-
-    if filename != TOWER_ANCHOR_FILENAME:
-        return x_value, y_value
-
-    cluster_info = get_monitor_cluster_info(config)
-    if not cluster_info:
-        return x_value, y_value
-
-    leftmost_x = cluster_info["left_x"]
-    x_value = (
-        leftmost_x - TOWER_LEFTMOST_DISPLAY_GAP_MM - get_dual_display_spacing_mm(config)
-    )
-    y_value = TOWER_DESK_Y_MM
-    return x_value, y_value
+# Placement math (cluster geometry, anchors, rotations, input device
+# positions) lives in make2d_layout; compose_configuration uses
+# resolve_placements.
 
 
 def rotate_objects(object_ids, rotation_deg, center_point):
@@ -752,42 +487,29 @@ def import_component(filepath, dx=0, dy=0, dz=0, rotation_deg=0):
 
 
 def compose_configuration(config):
+    """Compose one desk setup from the SHARED layout's resolved placements, so
+    this script's Make2D output matches solve.py / render.py exactly. Each
+    placement carries its file, position, rotation and place_mode:
+    'origin' loads with the local origin at (x, y); 'center' loads then moves
+    the bbox center to (x, y) (the input devices)."""
     all_ids = []
 
     desk_ids = draw_desk_surface()
     all_ids.extend(desk_ids)
 
-    machine_path = os.path.join(COMPONENT_DIR, config["machine"])
-    mx, my = config["machine_pos"]
-    mx, my = get_component_base_position(config, config["machine"], mx, my)
-    machine_rotation = get_component_rotation_deg(config["machine"])
-    all_ids.extend(load_component_into_doc(machine_path, mx, my, 0, machine_rotation))
-
-    for monitor_file, monitor_x in config["monitors"]:
-        monitor_path = os.path.join(COMPONENT_DIR, monitor_file)
-        monitor_rotation = get_component_rotation_deg(monitor_file)
-        all_ids.extend(
-            load_component_into_doc(
-                monitor_path, monitor_x, MONITOR_Y_MM, 0, monitor_rotation
+    for placement in layout.resolve_placements(config):
+        path = os.path.join(COMPONENT_DIR, placement["file"])
+        rotation = placement["rotation"]
+        if placement.get("place_mode") == "center":
+            ids = load_component_into_doc(path, 0, 0, 0, rotation)
+            move_objects_bbox_center_to(ids, placement["x"], placement["y"])
+            all_ids.extend(ids)
+        else:
+            all_ids.extend(
+                load_component_into_doc(
+                    path, placement["x"], placement["y"], 0, rotation
+                )
             )
-        )
-
-    for input_file, input_x, input_y in get_input_device_positions(config):
-        input_path = os.path.join(COMPONENT_DIR, input_file)
-        input_rotation = get_component_rotation_deg(input_file)
-        input_ids = load_component_into_doc(input_path, 0, 0, 0, input_rotation)
-        move_objects_bbox_center_to(input_ids, input_x, input_y)
-        all_ids.extend(input_ids)
-
-    for extra_file, extra_x, extra_y in config.get("extras", []):
-        extra_path = os.path.join(COMPONENT_DIR, extra_file)
-        extra_x, extra_y = get_component_base_position(
-            config, extra_file, extra_x, extra_y
-        )
-        extra_rotation = get_component_rotation_deg(extra_file)
-        all_ids.extend(
-            load_component_into_doc(extra_path, extra_x, extra_y, 0, extra_rotation)
-        )
 
     return all_ids
 
@@ -1207,7 +929,13 @@ def collect_hidden_line_output(
         if style is None:
             continue
 
-        curve = segment.CurveGeometry.DuplicateCurve()
+        # Guard the curve materialization: CurveGeometry is an HldCurveProxy and
+        # a single bad segment should be skipped, not abort the whole export.
+        try:
+            curve = segment.CurveGeometry.DuplicateCurve()
+        except Exception:
+            stats["other"] += 1
+            continue
         if curve is None or not curve.IsValid:
             continue
 
