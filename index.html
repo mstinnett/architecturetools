@@ -617,7 +617,7 @@ function runPicker(){
   }
   function macSpecHTML(spec) {
     return '<div class="spec-item"><div class="spec-item-label">Mac</div><div class="spec-item-value">' + spec.chip + '</div><div class="spec-item-note">' + spec.cpuNote + '</div></div>' +
-      '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + spec.memory + '</div><div class="spec-item-note">Unified -- RAM and GPU memory</div></div>' +
+      '<div class="spec-item"><div class="spec-item-label">Memory</div><div class="spec-item-value">' + spec.memory + '</div>' + (spec.memoryNote ? '<div class="spec-item-note">' + spec.memoryNote + '</div>' : '') + '</div>' +
       '<div class="spec-item"><div class="spec-item-label">Storage</div><div class="spec-item-value">' + spec.storage + '</div><div class="spec-item-note">Adjust to your own needs.</div></div>';
   }
 

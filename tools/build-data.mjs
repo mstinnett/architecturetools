@@ -118,7 +118,7 @@ const winByProfile = buildSpecs('data/specs-win.csv', (r, where) => {
 
 const macByProfile = buildSpecs('data/specs-mac.csv', (r, where) => {
   checkRef(Chips, r.chip, where, 'chip', 'chips.csv');
-  return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, storage: r.storage, price: r.price };
+  return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, memoryNote: r.memoryNote, storage: r.storage, price: r.price };
 });
 
 // ---- priorities ----
