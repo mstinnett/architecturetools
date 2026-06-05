@@ -49,10 +49,10 @@
   /* Machine type strip (below divider) — full-width tabs */
 
   /* make2d desk illustration hero */
-  /* Fixed-height slot so swapping make2d images of different sizes doesn't
-     reflow the page; each image fits inside (contain) on a white field. */
-  .desk-hero{max-width:760px;height:clamp(220px,42vw,400px);margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;}
-  .desk-hero img{max-width:100%;max-height:100%;width:auto;height:auto;display:block;}
+  /* Hero fills its width; the make2d images are a uniform canvas now, so no
+     fixed slot is needed. */
+  .desk-hero{max-width:880px;margin:0 auto 1.5rem;}
+  .desk-hero img{width:100%;height:auto;display:block;}
 
   /* Software nav + scroll */
   .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
@@ -802,7 +802,6 @@ function runPicker(){
     document.getElementById('panel-desktop').classList.toggle('active', showDesktop);
     document.getElementById('panel-mobile').classList.toggle('active', showLaptop);
     document.getElementById('panelsWrapper').classList.toggle('panels-split', isSplit);
-    document.querySelector('.picker').classList.toggle('split-mode', isSplit);
 
     // Hero desk illustration -- one big image that swaps with state.
     var heroRole = isSplit ? 'combo' : (State.machineType === 'laptop' ? 'laptop' : 'desktop');
@@ -925,8 +924,8 @@ function runPicker(){
 
     var mobilePriorityNote;
     if (mobileStrategy === 'travel') mobilePriorityNote = isMacPlatform
-      ? 'The Mac does the heavy work at the desk, and the laptop just travels. A MacBook Air weighs under 3 lbs and lasts all day.'
-      : 'The desktop does the heavy work, and the laptop just travels. Light, long battery, and one cable docks it at your desk.';
+      ? 'The Mac does the demanding work at the desk, and the laptop just travels. A MacBook Air weighs under 3 lbs and lasts all day.'
+      : 'The desktop does the demanding work, and the laptop just travels. Light, long battery, and one cable docks it at your desk.';
     else if (mobileStrategy === 'workstation') mobilePriorityNote = isMacPlatform
       ? 'A second full machine for working anywhere. A MacBook Pro with the M4 Pro or Max handles modeling on the road, with the desktop for the longest jobs.'
       : 'A second full machine for working anywhere. It runs your software away from the desk, though the longest renders still belong at the desktop.';

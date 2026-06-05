@@ -53,12 +53,7 @@
       { "id": "cheapest", "label": "Cheapest", "detail": "The least you can spend and still do the work" },
       { "id": "value", "label": "Best Value", "detail": "Most of the performance, far less money" },
       { "id": "best", "label": "Best Available", "detail": "The fastest parts, more than most need" }
-    ],
-    "deskMonitorDefaults": {
-      "cheapest": [ "m1k24", "m1k24" ],
-      "value": [ "m5k27", "m5k27" ],
-      "best": [ "m6k32", "m6k32" ]
-    }
+    ]
   },
   "WindowsSpecs": {
     "review": {
@@ -719,7 +714,7 @@
       }
     }
   ],
-  "LaptopCategoryLabels": { "one": "One-Machine Solution", "desk": "Desk-Bound Powerhouses", "travel": "Document / Travel", "student": "Student", "mac_p": "MacBook", "mac_s": "Student" },
+  "LaptopCategoryLabels": { "one": "One-Machine Solution", "desk": "Desk-Bound Powerhouses", "travel": "Document / Travel", "student": "Budget", "mac_p": "MacBook", "mac_s": "Compact" },
   "Glossary": {
     "VRAM": { "def": "A dedicated GPU's own memory. It holds the scene while you work, so it sets how large a scene fits." },
     "unified memory": { "def": "On Apple Silicon, one pool of memory shared by the processor and the graphics. It counts as both RAM and VRAM." },
