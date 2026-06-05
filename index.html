@@ -431,7 +431,8 @@ function runPicker(){
     monitorConfig: -1,
     budget: defaultPickerState.budget,
     scale: defaultPickerState.scale,
-    machineType: 'desktop'
+    machineType: 'desktop',
+    laptopSeeAllOpen: false
   };
 
   function renderBudgetOptions() {
@@ -631,7 +632,7 @@ function runPicker(){
       ['thinkpad', 'https://www.lenovo.com'], ['thinkcentre', 'https://www.lenovo.com'], ['thinkstation', 'https://www.lenovo.com'], ['legion', 'https://www.lenovo.com'], ['loq', 'https://www.lenovo.com'], ['lenovo', 'https://www.lenovo.com'],
       ['zbook', 'https://www.hp.com'], ['prodesk', 'https://www.hp.com'], ['omnibook', 'https://www.hp.com'], ['hp ', 'https://www.hp.com'],
       ['inspiron', 'https://www.dell.com'], ['dell', 'https://www.dell.com'],
-      ['nuc', 'https://www.asus.com'], ['proart', 'https://www.asus.com'], ['zephyrus', 'https://www.asus.com'], ['expertcenter', 'https://www.asus.com'], ['rog', 'https://www.asus.com'], ['tuf', 'https://www.asus.com'], ['asus', 'https://www.asus.com'],
+      ['intel nuc', 'https://www.asus.com'], ['proart', 'https://www.asus.com'], ['zephyrus', 'https://www.asus.com'], ['expertcenter', 'https://www.asus.com'], ['rog', 'https://www.asus.com'], ['tuf', 'https://www.asus.com'], ['asus', 'https://www.asus.com'],
       ['msi', 'https://www.msi.com'], ['predator', 'https://www.acer.com'], ['acer', 'https://www.acer.com'],
       ['razer', 'https://www.razer.com'], ['blade', 'https://www.razer.com'],
       ['macbook', 'https://www.apple.com'], ['mac mini', 'https://www.apple.com'], ['apple', 'https://www.apple.com']
@@ -858,7 +859,7 @@ function runPicker(){
       }
       // Workstation mode always presents a clear pick; if nothing is flagged at
       // this budget, feature the first (most portable) match.
-      if (primaryRecIndex < 0 && mobileStrategy === 'workstation' && allLaptopMatches.length) primaryRecIndex = 0;
+      if (primaryRecIndex < 0 && mobileStrategy !== 'travel' && allLaptopMatches.length) primaryRecIndex = 0;
     }
     var primaryLaptop = primaryRecIndex >= 0 ? allLaptopMatches[primaryRecIndex].laptop : null;
 
@@ -895,8 +896,8 @@ function runPicker(){
       mobileMarkup += '<div class="laptop-rec-featured-note">' + recLaptop.note + '</div>';
       mobileMarkup += '</div>';
       if (allLaptopMatches.length > 1) {
-        mobileMarkup += '<button class="laptop-see-all-btn" type="button">See all options (' + allLaptopMatches.length + ')</button>';
-        mobileMarkup += '<div class="laptop-all-list">' + fullListMarkup + '</div>';
+        mobileMarkup += '<button class="laptop-see-all-btn' + (State.laptopSeeAllOpen ? ' is-open' : '') + '" type="button">' + (State.laptopSeeAllOpen ? 'Hide options' : 'See all options (' + allLaptopMatches.length + ')') + '</button>';
+        mobileMarkup += '<div class="laptop-all-list' + (State.laptopSeeAllOpen ? ' is-open' : '') + '">' + fullListMarkup + '</div>';
       }
     } else {
       mobileMarkup += fullListMarkup;
@@ -915,6 +916,7 @@ function runPicker(){
       var totalCount = allLaptopMatches.length;
       seeAllBtn.addEventListener('click', function() {
         var opening = !allList.classList.contains('is-open');
+        State.laptopSeeAllOpen = opening;
         allList.classList.toggle('is-open', opening);
         seeAllBtn.classList.toggle('is-open', opening);
         seeAllBtn.textContent = opening ? 'Hide options' : 'See all options (' + totalCount + ')';

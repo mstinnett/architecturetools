@@ -102,7 +102,7 @@
     },
     "viz": {
       "small": {
-        "cheapest": { "cpu": "x3d", "cpuNote": "Plenty for loading scenes. Pick on price.", "gpu": "rtx5070", "gpuNote": "12 GB of VRAM is the cheapest GPU that handles real scenes.", "ram": "32 GB DDR5", "ramNote": "32 GB to load typical scenes.", "storage": "1 TB NVMe", "priceRange": "$1,900--$2,300" },
+        "cheapest": { "cpu": "x3d", "cpuNote": "Plenty for loading scenes. Pick on price.", "gpu": "rtx5070", "gpuNote": "12 GB of VRAM is the cheapest GPU that handles full scenes.", "ram": "32 GB DDR5", "ramNote": "32 GB to load typical scenes.", "storage": "1 TB NVMe", "priceRange": "$1,900--$2,300" },
         "value": { "cpu": "x3d", "cpuNote": "Loads scenes fast. Either brand is fine.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM. The best value in real-time visualization right now.", "ram": "64 GB DDR5", "ramNote": "64 GB for larger scenes and assets.", "storage": "2 TB NVMe", "priceRange": "$2,400--$2,900" },
         "best": { "cpu": "top", "cpuNote": "16 CPU cores load and process scenes fast.", "gpu": "rtx5090", "gpuNote": "32 GB of VRAM. Maximum real-time performance, enough for VR and large scenes.", "ram": "64 GB DDR5", "ramNote": "64 GB for large scenes.", "storage": "2 TB NVMe", "priceRange": "$4,500--$5,500" }
       },
@@ -116,7 +116,7 @@
     "modeling_viz": {
       "small": {
         "cheapest": { "cpu": "x3d", "cpuNote": "The X3D favors the modeling side. Single-core speed for Revit and Rhino.", "gpu": "rtx5070", "gpuNote": "A 5070 is enough to start real-time visualization without overspending.", "ram": "64 GB DDR5", "ramNote": "64 GB to run a model and a scene together.", "storage": "2 TB NVMe", "priceRange": "$2,100--$2,500" },
-        "value": { "cpu": "mixed_x3d", "cpuNote": "AMD's 9950X3D. 16 cores for visualization, X3D cache for modeling.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM handles both modeling and real visualization.", "ram": "64 GB DDR5", "ramNote": "64 GB for a model plus a visualization scene.", "storage": "2 TB NVMe", "priceRange": "$2,300--$2,800" },
+        "value": { "cpu": "mixed_x3d", "cpuNote": "AMD's 9950X3D. 16 cores for visualization, X3D cache for modeling.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM handles both modeling and visualization.", "ram": "64 GB DDR5", "ramNote": "64 GB for a model plus a visualization scene.", "storage": "2 TB NVMe", "priceRange": "$2,300--$2,800" },
         "best": { "cpu": "top_x3d", "cpuNote": "AMD's 9950X3D2. Dual V-Cache and 16 cores for both at once.", "gpu": "rtx5080", "gpuNote": "16 GB of VRAM. Serious visualization without the 5090's price.", "ram": "64 GB DDR5", "ramNote": "64 GB for model and scene together.", "storage": "2 TB NVMe", "priceRange": "$3,000--$3,600" }
       },
       "large": {
@@ -163,7 +163,7 @@
       "large": {
         "cheapest": { "chip": "macmini_m4pro", "cpuNote": "Workable for big drawing sets on a budget.", "memory": "24 GB unified", "memoryNote": "Enough for large drawing sets.", "storage": "1 TB SSD", "price": "$1,600--$1,800" },
         "value": { "chip": "macstudio_m4max", "cpuNote": "Handles large drawing sets with many xrefs.", "memory": "36 GB unified", "memoryNote": "Handles large drawing sets.", "storage": "1 TB SSD", "price": "$2,000--$2,400" },
-        "best": { "chip": "macstudio_m4max", "cpuNote": "More chip than 2D drafting needs, even for complex drawings.", "memory": "64 GB unified", "memoryNote": "Room for complex drawings and heavy multitasking.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
+        "best": { "chip": "macstudio_m4max", "cpuNote": "More chip than 2D drafting needs, even for complex drawings.", "memory": "64 GB unified", "memoryNote": "Room for complex drawings and multitasking.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
       },
       "priority": "Drafting runs one operation at a time, and Apple's CPU cores are fast at it. The display matters more than the Mac."
     },
@@ -710,7 +710,7 @@
       "name": "MacBook Pro 14\" M4",
       "price": "$1,600--$1,800",
       "weight": "3.4 lbs",
-      "note": "Base M4 with a fan, 14-inch XDR. Better sustained performance than the Air, for real modeling on the move.",
+      "note": "Base M4 with a fan, 14-inch XDR. Better sustained performance than the Air, for modeling on the move.",
       "workloadProfiles": [ "modeling", "drafting", "viz" ],
       "recommendedFor": {
         "drafting": { "cheapest": true },

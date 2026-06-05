@@ -10,7 +10,7 @@ drafting,small,value,macmini_m4pro,Fast enough for 2D CAD.,24 GB unified,Plenty 
 drafting,small,best,macstudio_m4max,"More than drafting needs, and it also handles larger drawings.",36 GB unified,More than 2D drafting needs.,1 TB SSD,"$2,000--$2,400"
 drafting,large,cheapest,macmini_m4pro,Workable for big drawing sets on a budget.,24 GB unified,Enough for large drawing sets.,1 TB SSD,"$1,600--$1,800"
 drafting,large,value,macstudio_m4max,Handles large drawing sets with many xrefs.,36 GB unified,Handles large drawing sets.,1 TB SSD,"$2,000--$2,400"
-drafting,large,best,macstudio_m4max,"More chip than 2D drafting needs, even for complex drawings.",64 GB unified,Room for complex drawings and heavy multitasking.,2 TB SSD,"$2,800--$3,200"
+drafting,large,best,macstudio_m4max,"More chip than 2D drafting needs, even for complex drawings.",64 GB unified,Room for complex drawings and multitasking.,2 TB SSD,"$2,800--$3,200"
 modeling,small,cheapest,macmini_m4pro,"Handles ArchiCAD, Rhino, and SketchUp while models stay moderate.",48 GB unified,"Holds a single building, GPU included.",1 TB SSD,"$1,800--$2,100"
 modeling,small,value,macstudio_m4max,"GPU cores keep ArchiCAD, Rhino, and SketchUp viewports smooth.",36 GB unified,Enough for a single building.,1 TB SSD,"$2,000--$2,400"
 modeling,small,best,macstudio_m4max,The top single-core for modeling.,64 GB unified,"Comfortable with larger, linked models.",2 TB SSD,"$2,800--$3,200"
