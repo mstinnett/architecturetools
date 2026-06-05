@@ -789,7 +789,7 @@ function runPicker(){
       var selectedMacDesktopSpec = selectedDesktopSpec(Data.MacSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = macSpecHTML(selectedMacDesktopSpec);
       document.getElementById('d-priority').innerHTML = '<div class="priority-box-label">Where the money matters</div><p>' + Data.MacSpecs[activeWorkloadProfile].priority + '</p>';
-      document.getElementById('d-prebuilts').innerHTML = '';
+      document.getElementById('d-prebuilts').innerHTML = '<div class="section-label" style="margin-top:2rem">Where to Buy</div><div class="two-machine-desk-note">Macs have no prebuilt variants to weigh, so it comes down to where you buy. Apple\'s refurbished store is the best value: certified like-new, full warranty, usually around 15% off. For new, Apple, Best Buy, and B&amp;H are all authorized and hassle-free.</div>';
     } else {
       var selectedWindowsDesktopSpec = selectedDesktopSpec(Data.WindowsSpecs, activeWorkloadProfile, desktopBudgetTier);
       document.getElementById('d-spec').innerHTML = windowsSpecHTML(selectedWindowsDesktopSpec);
