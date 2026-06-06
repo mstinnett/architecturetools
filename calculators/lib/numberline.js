@@ -30,7 +30,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var MM = 960, IN = 24384;
+  var MM = 960, IN = 24384, FT = 12 * 24384;
 
   /* ---- display precision (shared) ---------------------------------------- */
 
@@ -67,16 +67,33 @@
     return trim((units / MM).toFixed(dp)) + ' mm';
   }
 
+  // imperial readouts group into feet-inches at >= 1 ft, so a same-system
+  // conversion reformats decimal inches as ft-in (12" -> 1'). Below a foot it
+  // stays plain inches.
+  function imperialFeetInch(units, denom) {        // on-grid value -> ft-in fraction
+    var sign = units < 0 ? '-' : '', abs = Math.abs(units);
+    if (abs < FT) { var f = imperialFraction(abs, denom); return sign + (f != null ? f : imperialDecimal(abs, 4)); }
+    var feet = Math.floor(abs / FT), rem = abs - feet * FT;
+    var inchStr = imperialFraction(rem, denom);
+    if (inchStr == null) inchStr = imperialDecimal(rem, 4);
+    return inchStr === '0"' ? sign + feet + "'" : sign + feet + "'-" + inchStr;
+  }
+  function imperialFeetInchDecimal(units) {         // off-grid value -> ft-in decimal
+    var sign = units < 0 ? '-' : '', abs = Math.abs(units);
+    if (abs < FT) return sign + imperialDecimal(abs, 4);
+    var feet = Math.floor(abs / FT), remIn = (abs - feet * FT) / IN;
+    return remIn === 0 ? sign + feet + "'" : sign + feet + "'-" + trim(remIn.toFixed(4)) + '"';
+  }
+
   // the main snapped readout for a value known to be on the target grid
   function formatSnapped(units, system, denom) {
     if (system === 'metric') return metricWhole(units);
-    var f = imperialFraction(units, denom || 64);
-    return f != null ? f : imperialDecimal(units, 4);
+    return imperialFeetInch(units, denom || 64);
   }
 
   // a true (off-grid) value, in either system, full but legible precision
   function formatTrue(units, system) {
-    return system === 'metric' ? metricDecimal(units, 2) : imperialDecimal(units, 4);
+    return system === 'metric' ? metricDecimal(units, 2) : imperialFeetInchDecimal(units);
   }
 
   // residual: needs MORE precision than the readout or small costs vanish
@@ -250,9 +267,9 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
 
   // Example 1: 1 m → 1/8". Nearest collapses onto Min; two distinct ticks.
   var e1 = NL.snapTriple(1000 * MM_, IN_ / 8);
-  ok('ex1 Max = 39.250"', NL.formatSnapped(e1.maxU, 'imperial', 8) === '39 1/4"');
+  ok('ex1 Max = 3\'-3 1/4"', NL.formatSnapped(e1.maxU, 'imperial', 8) === "3'-3 1/4\"");
   ok('ex1 Nearest collapses onto Min', e1.nearIsMin && !e1.nearIsMax);
-  ok('ex1 Min = 39 3/8"', NL.formatSnapped(e1.minU, 'imperial', 8) === '39 3/8"');
+  ok('ex1 Min = 3\'-3 3/8"', NL.formatSnapped(e1.minU, 'imperial', 8) === "3'-3 3/8\"");
   ok('ex1 two distinct ticks', e1.maxU !== e1.minU && e1.nearU === e1.minU);
 
   // Example 2: 33.33 mm = 31997 units. Collapse side FLIPS between 1/8 and 1/16.

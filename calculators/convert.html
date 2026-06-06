@@ -163,6 +163,7 @@
     text: '',
     defaultUnit: 'in',
     target: 'imperial',
+    targetPinned: false,                                  // true once the user taps the target
     grid: { imperial: { denom: 8 }, metric: { mm: 5 } }   // remembered per system
   };
 
@@ -351,11 +352,13 @@
   }
 
   /* ---- main render ------------------------------------------------------ */
-  // When the input states a system (an explicit unit somewhere), flip the
-  // bare-number default toggle to match — the field IS the source, so the
-  // toggle reflects the detected system instead of sitting on a stale guess.
-  // A pure bare number states nothing, so the toggle stays the user's choice.
-  function syncDetectedDefault(result) {
+  // When the input states a system (an explicit unit somewhere): flip the
+  // bare-number default toggle to match the source, and — since this is a
+  // converter — switch the target to the OPPOSITE system so you see the other
+  // units by default. The target auto-follows until you tap it yourself, after
+  // which it stays pinned (same-system is then yours: grid snap + ft-in
+  // reformatting). A pure bare number states nothing, so neither moves.
+  function syncDetected(result) {
     if (!result || !result.interpretation) return;
     var sys = result.unitSystem;
     if (sys !== 'imperial' && sys !== 'metric') return;       // ambiguous/mixed → leave it
@@ -363,16 +366,24 @@
       return t.role === 'length' && !t.inferred;              // an explicit unit was typed
     });
     if (!stated) return;
-    var want = sys === 'metric' ? 'mm' : 'in';
-    if (state.defaultUnit !== want) {
-      state.defaultUnit = want;
+
+    var srcUnit = sys === 'metric' ? 'mm' : 'in';
+    if (state.defaultUnit !== srcUnit) {
+      state.defaultUnit = srcUnit;
       setActive('[data-default]', 'default', state.defaultUnit);
+    }
+    if (!state.targetPinned) {
+      var opp = sys === 'metric' ? 'imperial' : 'metric';
+      if (state.target !== opp) {
+        state.target = opp;
+        setActive('[data-target]', 'target', state.target);
+      }
     }
   }
 
   function render() {
     var result = parseLength(state.text, { defaultUnit: state.defaultUnit });
-    syncDetectedDefault(result);
+    syncDetected(result);
     renderOverlay(result);
     renderEcho(result);
 
@@ -405,7 +416,8 @@
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-target]'), function (el) {
     el.addEventListener('click', function () {
-      state.target = el.dataset.target; setActive('[data-target]', 'target', state.target); render();
+      state.target = el.dataset.target; state.targetPinned = true;
+      setActive('[data-target]', 'target', state.target); render();
     });
   });
 
