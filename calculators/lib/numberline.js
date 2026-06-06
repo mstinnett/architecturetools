@@ -141,6 +141,8 @@
     var padL = 24, padR = 24;
     var x0 = padL, x1 = W - padR, axisW = x1 - x0;
     var ySrc = 64, yTgt = 150;                 // the two scale lines
+    var yHatchTop = 110;                        // hatch hugs the lower (target) half
+    var yResid = 98;                            // residual labels sit in the clear lane above
     function X(u) { return x0 + (u - lo) / (hi - lo) * axisW; }
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
@@ -163,11 +165,14 @@
     svg += '<text x="' + x0 + '" y="' + (yTgt + 40) + '" class="nl-axis-label" text-anchor="start">' + esc(target) + ' (target)</text>';
 
     // ---- hatched residual bands (true → each snap) ----
+    // The hatch hugs the lower half of the figure (the target scale it is
+    // measured against); the signed residual is labelled in the clear lane
+    // ABOVE the hatch, so the number never sits on the cross-hatching.
     function band(snapU) {
       if (snapU === units) return '';
       var a = X(units), b = X(snapU);
       var bx = Math.min(a, b), bw = Math.abs(b - a);
-      return '<rect x="' + bx + '" y="' + ySrc + '" width="' + bw + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
+      return '<rect x="' + bx + '" y="' + yHatchTop + '" width="' + bw + '" height="' + (yTgt - yHatchTop) + '" fill="url(#nlhatch)" stroke="none"/>';
     }
     // draw Max & Min bands; Nearest band only if it is distinct from both
     svg += band(t.maxU);
@@ -198,11 +203,13 @@
       svg += '<text x="' + sx + '" y="' + (ySrc - 14 - stagger) + '" class="nl-snap-role" text-anchor="middle">' + esc(grp.roles.join(' = ')) + '</text>';
       // top (source) equivalent of this physical point
       svg += '<text x="' + sx + '" y="' + (ySrc - 2 - stagger) + '" class="nl-src-val" text-anchor="middle">' + esc(formatTrue(grp.u, source)) + '</text>';
-      // residual label (use the first non-zero role's residual; same for merged)
+      // residual label — in the clear lane above the hatch, with a short
+      // leader down to its band, and a white halo so the true tick can't cut it
       var res = grp.u - units;
       if (res !== 0) {
         var mx = (sx + X(units)) / 2;
-        svg += '<text x="' + mx + '" y="' + ((ySrc + yTgt) / 2) + '" class="nl-residual" text-anchor="middle">' + esc(formatResidual(res, target)) + '</text>';
+        svg += '<line x1="' + mx + '" y1="' + (yResid + 3) + '" x2="' + mx + '" y2="' + yHatchTop + '" stroke="#bbb" stroke-width="0.75"/>';
+        svg += '<text x="' + mx + '" y="' + yResid + '" class="nl-residual" text-anchor="middle" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(formatResidual(res, target)) + '</text>';
       }
     });
 
