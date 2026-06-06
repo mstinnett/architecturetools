@@ -306,6 +306,8 @@
   }
 
   /* ---- multiplicative fold ---- */
+  function markScalar(v) { if (v && v.kind === 'bare') v._role = 'scalar'; }
+
   function applyMul(op, left, right) {
     if (left.kind === 'null') return left;
     if (right.kind === 'null') return right;
@@ -316,25 +318,29 @@
       if (lLen || rLen) {
         var len = lLen ? left : right;
         var sc = lLen ? right : left;
+        markScalar(sc);
         var s = bareScalarNumDen(sc);
         return assign({}, len, { units: roundDiv(len.units * s.num, s.den) });
       }
       // scalar * scalar
+      markScalar(left); markScalar(right);
       var a = bareScalarNumDen(left), b = bareScalarNumDen(right);
-      return { kind: 'bare', num: a.num * b.num, den: a.den * b.den, dim: 0 };
+      return { kind: 'bare', num: a.num * b.num, den: a.den * b.den, dim: 0, _role: 'scalar' };
     }
     // op === '/'
     if (lLen && rLen) {
       return ratioOf(left.units, right.units);
     }
     if (lLen && !rLen) { // length ÷ scalar → n-section length
+      markScalar(right);
       var s2 = bareScalarNumDen(right);
       return assign({}, left, { units: roundDiv(left.units * s2.den, s2.num) });
     }
     if (!lLen && rLen) return NULL_INV; // scalar ÷ length
     // scalar ÷ scalar
+    markScalar(left); markScalar(right);
     var la = bareScalarNumDen(left), rb = bareScalarNumDen(right);
-    return { kind: 'bare', num: la.num * rb.den, den: la.den * rb.num, dim: 0 };
+    return { kind: 'bare', num: la.num * rb.den, den: la.den * rb.num, dim: 0, _role: 'scalar' };
   }
 
   // length ÷ length → dimensionless "how many fit" (+ exact ratio)
@@ -372,13 +378,16 @@
     var resolveName = finest || defaultUnit;
     var resolveInfo = UNIT_TABLE[resolveName];
 
-    // resolve bares → lengths
+    // resolve bares → lengths (annotate the ORIGINAL bare so the 1c echo can
+    // show its inherited unit, then return the resolved length value)
     var resolved = operands.map(function (v) {
       if (v.kind === 'length') return v;
       if (v.kind === 'bare') {
+        var u = roundDiv(v.num * resolveInfo.units, v.den);
+        v._role = 'length'; v._resolvedUnit = resolveName; v._resolvedUnits = u;
         return {
           kind: 'length', dim: 1,
-          units: roundDiv(v.num * resolveInfo.units, v.den),
+          units: u,
           system: resolveInfo.system, finestUnit: resolveName, unitHint: resolveName,
           inferredUnit: true, hadUnit: false
         };
@@ -510,76 +519,76 @@
     return name === 'ft+in' ? 'ft + in' : name;
   }
 
-  function buildInterpretation(toks, status, value, original, defaultUnit) {
-    var terms = [], assumptions = [];
-    // Build per-term echo from the leaf term tokens.
-    for (var k = 0; k < toks.length; k++) {
-      var tk = toks[k];
-      if (tk.type !== 'term' || status[k] !== 'parsed') continue;
-      var val = tk.value;
-      var rawText = original.slice(spanStart(tk, toks), spanEnd(tk, toks));
-      var role = (val.kind === 'length') ? 'length' : 'scalar';
-      var unit = val.kind === 'length' ? unitLabel(val.finestUnit) : '';
-      var inferred = !!val.inferredUnit || (val.kind === 'bare');
-      terms.push({
-        raw: rawText.trim(),
-        value_mm: val.kind === 'length' ? val.units / 960 : null,
-        unit: unit, role: role, inferred: inferred
-      });
-    }
-    // assumptions (plain-language, shown not warned)
-    if (value && value.kind === 'length' && value.inferredUnit) {
-      // a bare term inherited / defaulted somewhere
-    }
-    var ord = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
-    var ti = 0;
-    for (var m = 0; m < toks.length; m++) {
-      if (toks[m].type !== 'term' || status[m] !== 'parsed') continue;
-      var tv = toks[m].value;
-      if ((tv.kind === 'bare') || (tv.kind === 'length' && tv.inferredUnit && !tv.hadUnit)) {
-        var name = (value && value.finestUnit) ? value.finestUnit : defaultUnit;
-        assumptions.push((ord[ti] || (ti + 1) + 'th') + ' term assumed ' + unitLabel(name) + '.');
-      }
-      ti++;
-    }
-    var canonical = buildCanonical(toks, status, original);
-    return { terms: terms, canonical: canonical, assumptions: assumptions };
+  function termIsInferred(v) {
+    if (v.kind === 'length') return !!v.inferredUnit;     // e.g. assumed-inches compound
+    if (v.kind === 'bare') return v._role === 'length';   // a bare that became a length
+    return false;
   }
 
-  function spanStart(tk, toks) { return tk._os; }
-  function spanEnd(tk, toks) { return tk._oe; }
+  function termEcho(v, original, tk) {
+    if (v.kind === 'length') return formatLengthEcho(v);
+    if (v.kind === 'bare') {
+      if (v._role === 'length' && v._resolvedUnit) return trimNum(v.num / v.den) + ' ' + v._resolvedUnit;
+      return trimNum(v.num / v.den); // bare scalar multiplier
+    }
+    return original.slice(tk._os, tk._oe).trim();
+  }
 
-  function buildCanonical(toks, status, original) {
-    var parts = [];
+  function buildInterpretation(toks, status, value, original, defaultUnit) {
+    var terms = [], assumptions = [], parts = [];
+    var ord = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
+    var ti = 0;
+
     for (var i = 0; i < toks.length; i++) {
       var t = toks[i];
       if (status[i] !== 'parsed') continue;
-      if (t.type === 'op') parts.push(t.op);
-      else if (t.type === 'lparen') parts.push('(');
-      else if (t.type === 'rparen') parts.push(')');
-      else if (t.type === 'term') {
-        var v = t.value;
-        if (v.kind === 'length') parts.push(formatLength(v));
-        else if (v.kind === 'bare') parts.push(fmtRational(v.num, v.den));
-        else parts.push(original.slice(t._os, t._oe).trim());
+      if (t.type === 'op') { parts.push({ type: 'op', text: t.op }); continue; }
+      if (t.type === 'lparen') { parts.push({ type: 'paren', text: '(' }); continue; }
+      if (t.type === 'rparen') { parts.push({ type: 'paren', text: ')' }); continue; }
+      if (t.type !== 'term') continue;
+
+      var v = t.value;
+      var inferred = termIsInferred(v);
+      var echo = termEcho(v, original, t);
+      parts.push({ type: 'term', text: echo, inferred: inferred });
+
+      var unit = v.kind === 'length' ? unitLabel(v.finestUnit)
+               : (v.kind === 'bare' && v._role === 'length' ? v._resolvedUnit : '');
+      var value_mm = v.kind === 'length' ? v.units / 960
+                   : (v.kind === 'bare' && v._resolvedUnits != null ? v._resolvedUnits / 960 : null);
+      terms.push({
+        raw: original.slice(t._os, t._oe).trim(),
+        value_mm: value_mm,
+        unit: unit,
+        role: (v.kind === 'length' || (v.kind === 'bare' && v._role === 'length')) ? 'length' : 'scalar',
+        inferred: inferred
+      });
+
+      if (inferred) {
+        var name = unit || defaultUnit;
+        assumptions.push((ord[ti] || (ti + 1) + 'th') + ' term assumed ' + name + '.');
       }
+      ti++;
     }
-    return parts.join(' ').replace(/\(\s/g, '(').replace(/\s\)/g, ')');
+
+    var canonical = parts.map(function (p) { return p.text; }).join(' ')
+                         .replace(/\(\s/g, '(').replace(/\s\)/g, ')');
+    return { terms: terms, canonical: canonical, parts: parts, assumptions: assumptions };
   }
 
-  function fmtRational(num, den) {
-    if (den === 1) return String(num);
-    var v = num / den;
-    return String(Math.round(v * 10000) / 10000);
-  }
+  function trimNum(v) { return String(Math.round(v * 10000) / 10000); }
 
-  function formatLength(v) {
-    // descriptive echo of a single resolved length term
+  function formatLengthEcho(v) {
+    if (v.unitHint === 'ft+in') {
+      var feet = Math.trunc(v.units / FT);
+      var rest = v.units - feet * FT;
+      var inches = rest / IN;
+      if (inches === 0) return feet + ' ft';
+      return feet + ' ft ' + trimNum(inches) + ' in';
+    }
     var name = v.finestUnit;
-    if (name === 'ft+in') return '(ft+in)';
     var info = UNIT_TABLE[name] || UNIT_TABLE[v.system === 'metric' ? 'mm' : 'in'];
-    var qty = v.units / info.units;
-    return fmtRational(Math.round(qty * 10000), 10000) + ' ' + name;
+    return trimNum(v.units / info.units) + ' ' + name;
   }
 
   /* ====================================================================
@@ -612,6 +621,8 @@
     // the default unit — this is the only place defaultUnit applies.
     if (value && value.kind === 'bare') {
       var di = UNIT_TABLE[defaultUnit];
+      value._role = 'length'; value._resolvedUnit = defaultUnit;
+      value._resolvedUnits = roundDiv(value.num * di.units, value.den);
       value = {
         kind: 'length', dim: 1,
         units: roundDiv(value.num * di.units, value.den),
