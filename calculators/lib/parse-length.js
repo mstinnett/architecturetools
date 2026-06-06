@@ -433,32 +433,37 @@
 
     function parseExpr() { return parseAdd(); }
 
+    // each parse fn returns null, or { value, node } where node is a display
+    // AST: { t:'term', value, tok } | { t:'un', op, x } | { t:'bin', op, l, r }
     function parseAdd() {
       var first = parseMul();
       if (first === null) return null;
-      var operands = [first], ops = [], opIdx = [];
+      var operands = [first.value], ops = [], node = first.node;
       while (peek() && peek().type === 'op' && (peek().op === '+' || peek().op === '-')) {
         var oi = pos; var op = peek().op; pos++;
         var rhs = parseMul();
         if (rhs === null) { status[oi] = 'pending'; pos = oi; break; } // dangling operator
         markUsed(oi);
-        operands.push(rhs); ops.push(op); opIdx.push(oi);
+        operands.push(rhs.value); ops.push(op);
+        node = { t: 'bin', op: op, l: node, r: rhs.node };
       }
       if (operands.length === 1) return first;
-      return applyAdd(operands, ops, defaultUnit);
+      return { value: applyAdd(operands, ops, defaultUnit), node: node };
     }
 
     function parseMul() {
       var left = parseUnary();
       if (left === null) return null;
+      var value = left.value, node = left.node;
       while (peek() && peek().type === 'op' && (peek().op === '*' || peek().op === '/')) {
         var oi = pos; var op = peek().op; pos++;
         var right = parseUnary();
         if (right === null) { status[oi] = 'pending'; pos = oi; break; }
         markUsed(oi);
-        left = applyMul(op, left, right);
+        value = applyMul(op, value, right.value);
+        node = { t: 'bin', op: op, l: node, r: right.node };
       }
-      return left;
+      return { value: value, node: node };
     }
 
     function parseUnary() {
@@ -467,7 +472,7 @@
         var operand = parseUnary();
         if (operand === null) { status[oi] = 'pending'; pos = oi; return null; }
         markUsed(oi);
-        return op === '-' ? negate(operand) : operand;
+        return { value: op === '-' ? negate(operand.value) : operand.value, node: { t: 'un', op: op, x: operand.node } };
       }
       return parsePrimary();
     }
@@ -484,19 +489,19 @@
       }
       if (t.type === 'term') {
         if (t.value && t.value.conflict) { status[pos] = 'pending'; pos++; return null; }
-        markUsed(pos); pos++;
-        return t.value;
+        var ti = pos; markUsed(pos); pos++;
+        return { value: t.value, node: { t: 'term', value: t.value, tok: ti } };
       }
       return null; // op/junk/rparen here → caller handles
     }
 
-    var result = parseExpr();
+    var top = parseExpr();
     // any token never visited, or junk, is pending
     for (var i = 0; i < toks.length; i++) {
       if (toks[i].type === 'junk') status[i] = 'pending';
       else if (status[i] === undefined) status[i] = 'pending';
     }
-    return { result: result, status: status };
+    return { result: top ? top.value : null, node: top ? top.node : null, status: status };
   }
 
   /* ====================================================================
@@ -540,24 +545,58 @@
     return original.slice(tk._os, tk._oe).trim();
   }
 
-  function buildInterpretation(toks, status, value, original, defaultUnit) {
-    var terms = [], assumptions = [], parts = [];
+  // node precedence: term/unary bind tightest, then * /, then + -
+  function nodePrec(n) {
+    if (n.t === 'term') return 4;
+    if (n.t === 'un') return 3;
+    return (n.op === '*' || n.op === '/') ? 2 : 1;
+  }
+
+  // Print the AST to echo parts, adding parentheses around higher-precedence
+  // sub-expressions so the reading is unambiguous — `7'-1'/2` echoes as
+  // `7 ft − (1 ft ÷ 2)`, not the flat `7 ft − 1 ft ÷ 2` a reader can misgroup.
+  function printNode(node, original) {
+    if (!node) return [];
+    if (node.t === 'term') {
+      var v = node.value;
+      return [{ type: 'term', text: termEcho(v, original, { _os: 0, _oe: 0 }), inferred: termIsInferred(v) }];
+    }
+    if (node.t === 'un') {
+      var inner = printNode(node.x, original);
+      if (nodePrec(node.x) < 3) inner = wrap(inner);
+      return [{ type: 'op', text: node.op, unary: true }].concat(inner);
+    }
+    // binary
+    var p = nodePrec(node);
+    var lp = printNode(node.l, original);
+    var rp = printNode(node.r, original);
+    var lprec = nodePrec(node.l), rprec = nodePrec(node.r);
+    if (p === 1) {                                  // under + - : parenthesise any * / child for clarity
+      if (lprec === 2 || lprec < p) lp = wrap(lp);
+      if (rprec === 2 || rprec < p || (rprec === p && node.op === '-')) rp = wrap(rp);
+    } else {                                        // under * / : only the minimal necessary parens
+      if (lprec < p) lp = wrap(lp);
+      if (rprec < p || (rprec === p && node.op === '/')) rp = wrap(rp);
+    }
+    return lp.concat([{ type: 'op', text: node.op }]).concat(rp);
+  }
+  function wrap(parts) {
+    return [{ type: 'paren', text: '(' }].concat(parts).concat([{ type: 'paren', text: ')' }]);
+  }
+
+  function buildInterpretation(toks, status, node, original, defaultUnit) {
+    var terms = [], assumptions = [];
     var ord = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
     var ti = 0;
 
+    // terms[] + assumptions are derived from the leaf term tokens (also the
+    // signal convert.html uses to detect a stated system)
     for (var i = 0; i < toks.length; i++) {
       var t = toks[i];
-      if (status[i] !== 'parsed') continue;
-      if (t.type === 'op') { parts.push({ type: 'op', text: t.op }); continue; }
-      if (t.type === 'lparen') { parts.push({ type: 'paren', text: '(' }); continue; }
-      if (t.type === 'rparen') { parts.push({ type: 'paren', text: ')' }); continue; }
-      if (t.type !== 'term') continue;
-
+      if (t.type !== 'term' || status[i] !== 'parsed') continue;
       var v = t.value;
+      if (v && v.conflict) continue;
       var inferred = termIsInferred(v);
-      var echo = termEcho(v, original, t);
-      parts.push({ type: 'term', text: echo, inferred: inferred });
-
       var unit = v.kind === 'length' ? unitLabel(v.finestUnit)
                : (v.kind === 'bare' && v._role === 'length' ? v._resolvedUnit : '');
       var value_mm = v.kind === 'length' ? v.units / 960
@@ -569,14 +608,12 @@
         role: (v.kind === 'length' || (v.kind === 'bare' && v._role === 'length')) ? 'length' : 'scalar',
         inferred: inferred
       });
-
-      if (inferred) {
-        var name = unit || defaultUnit;
-        assumptions.push((ord[ti] || (ti + 1) + 'th') + ' term assumed ' + name + '.');
-      }
+      if (inferred) assumptions.push((ord[ti] || (ti + 1) + 'th') + ' term assumed ' + (unit || defaultUnit) + '.');
       ti++;
     }
 
+    // parts (the styled, precedence-grouped echo) come from the AST
+    var parts = printNode(node, original);
     var canonical = parts.map(function (p) { return p.text; }).join(' ')
                          .replace(/\(\s/g, '(').replace(/\s\)/g, ')');
     return { terms: terms, canonical: canonical, parts: parts, assumptions: assumptions };
@@ -642,7 +679,7 @@
     // area / inverse-length / other out-of-scope dimensions → null (contract)
     if (value && value.kind === 'null') return null;
 
-    var interpretation = buildInterpretation(toks, ev.status, value, original, defaultUnit);
+    var interpretation = buildInterpretation(toks, ev.status, ev.node, original, defaultUnit);
 
     // a term existed but nothing resolved (e.g. conflicting compound) →
     // return an object with null units so the UI can show WHY (spans pending).

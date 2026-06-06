@@ -394,6 +394,9 @@
 
   els.input.addEventListener('input', function () { state.text = els.input.value; render(); });
   els.input.addEventListener('scroll', function () { els.overlay.scrollLeft = els.input.scrollLeft; });
+  // selecting the field selects its text, so a new entry overwrites the old one
+  // (deferred to the next tick so iOS doesn't collapse the selection on tap)
+  els.input.addEventListener('focus', function () { setTimeout(function () { els.input.select(); }, 0); });
 
   Array.prototype.forEach.call(document.querySelectorAll('[data-default]'), function (el) {
     el.addEventListener('click', function () {
