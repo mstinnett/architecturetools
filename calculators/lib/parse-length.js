@@ -1,0 +1,668 @@
+/* parse-length.js — text → canonical exact-integer length
+   =========================================================================
+   PURE MODULE. No DOM, no globals, no UI. Imported verbatim by convert.html
+   and (later) DocCheck. The only rounding here is input quantization to the
+   nearest unit at parse time; no snap, no conversion-out, no styling.
+
+   CANONICAL UNIT — an exact integer count of 1/960 mm (the `units` field).
+     1 mm = 960   ·   1 in = 24384 (2^6·3·127)   ·   1 ft = 292608
+     1 cm = 9600  ·   1 m  = 960000
+   Every grid the converter can output is an exact lattice point, so a snapped
+   result is exact, never an approximation. value_mm = units / 960 is a derived
+   display convenience.
+
+   THREE INTERNAL STAGES (folded behind one public parseLength):
+     1a  tokenizer + single-term parser + glyph normalization (+ source map)
+     1b  recursive-descent evaluator: + - * /, parens, unit-aware dimensions
+     1c  interpretation echo (terms/canonical/assumptions) + spans
+
+   PUBLIC CONTRACT
+     parseLength(input, { defaultUnit: "in" | "mm" })
+       → { units, value_mm, sign, dimension, original, unitSystem,
+           interpretation: { terms, canonical, assumptions }, spans }
+       | null     (only when no dimensional content exists at all)
+   ========================================================================= */
+
+(function (root, factory) {
+  var mod = factory();
+  if (typeof module !== 'undefined' && module.exports) module.exports = mod;
+  else { root.ParseLength = mod; root.parseLength = mod.parseLength; }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  /* ---- unit constants (exact integers, never derived from decimals) ---- */
+  var MM = 960, CM = 9600, M = 960000, IN = 24384, FT = 12 * IN; // FT = 292608
+
+  var UNIT_TABLE = {
+    "'":  { units: FT, system: 'imperial', name: 'ft', kind: 'ft' },
+    'ft': { units: FT, system: 'imperial', name: 'ft', kind: 'ft' },
+    '"':  { units: IN, system: 'imperial', name: 'in', kind: 'in' },
+    'in': { units: IN, system: 'imperial', name: 'in', kind: 'in' },
+    'mm': { units: MM, system: 'metric',   name: 'mm', kind: 'mm' },
+    'cm': { units: CM, system: 'metric',   name: 'cm', kind: 'cm' },
+    'm':  { units: M,  system: 'metric',   name: 'm',  kind: 'm'  }
+  };
+
+  /* round half away from zero, integer division by q>0 */
+  function roundDiv(p, q) {
+    var a = Math.abs(p);
+    var r = Math.floor((2 * a + q) / (2 * q));
+    return p < 0 ? -r : r;
+  }
+
+  /* ====================================================================
+     1a — GLYPH NORMALIZATION + SOURCE MAP
+     Emits normalized text plus per-char maps back to ORIGINAL indices, so
+     every span (1c) is reported in original-input coordinates even though
+     `3′ 4½″` collapses to `3' 4 1/2"`. This is the load-bearing piece.
+     ==================================================================== */
+
+  var FRACTION_GLYPHS = {
+    '½': '1/2', '⅓': '1/3', '⅔': '2/3', '¼': '1/4',
+    '¾': '3/4', '⅕': '1/5', '⅖': '2/5', '⅗': '3/5',
+    '⅘': '4/5', '⅙': '1/6', '⅚': '5/6', '⅐': '1/7',
+    '⅛': '1/8', '⅜': '3/8', '⅝': '5/8', '⅞': '7/8',
+    '⅑': '1/9', '⅒': '1/10'
+  };
+  var CHAR_GLYPHS = {
+    '′': "'", '″': '"',            // prime, double-prime
+    '‘': "'", '’': "'",            // smart single quotes
+    '“': '"', '”': '"',            // smart double quotes
+    '−': '-',                            // minus sign
+    '×': '*', '∗': '*',            // multiplication sign / asterisk operator
+    '÷': '/',                            // division sign
+    ' ': ' '                             // non-breaking space
+  };
+
+  function isWs(c) { return c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\f' || c === '\v'; }
+
+  // → { text, os, oe } where os[i]/oe[i] are the original [start,end) for
+  // normalized char i. A normalized range [a,b) maps to original [os[a], oe[b-1]).
+  function normalize(input) {
+    var raw = [];
+    for (var k = 0; k < input.length; k++) {
+      var c = input[k];
+      if (FRACTION_GLYPHS.hasOwnProperty(c)) {
+        var rep = FRACTION_GLYPHS[c];
+        // "4½" must become "4 1/2" (mixed), not "41/2" (=20.5): insert a
+        // separating space when a digit immediately precedes the glyph.
+        var prev = raw.length ? raw[raw.length - 1].ch : '';
+        if (/[0-9]/.test(prev)) raw.push({ ch: ' ', os: k, oe: k + 1, ws: false });
+        for (var j = 0; j < rep.length; j++) raw.push({ ch: rep[j], os: k, oe: k + 1, ws: false });
+      } else if (CHAR_GLYPHS.hasOwnProperty(c)) {
+        var rc = CHAR_GLYPHS[c];
+        raw.push({ ch: rc, os: k, oe: k + 1, ws: rc === ' ' });
+      } else if (isWs(c)) {
+        raw.push({ ch: ' ', os: k, oe: k + 1, ws: true });
+      } else {
+        raw.push({ ch: c, os: k, oe: k + 1, ws: false });
+      }
+    }
+    // collapse whitespace runs to a single space; trim leading/trailing
+    var out = [];
+    for (var i = 0; i < raw.length; i++) {
+      if (raw[i].ws) {
+        var s = raw[i].os, e = raw[i].oe;
+        while (i + 1 < raw.length && raw[i + 1].ws) { i++; e = raw[i].oe; }
+        if (out.length > 0) out.push({ ch: ' ', os: s, oe: e }); // drop leading
+      } else {
+        out.push({ ch: raw[i].ch, os: raw[i].os, oe: raw[i].oe });
+      }
+    }
+    while (out.length && out[out.length - 1].ch === ' ') out.pop(); // trailing
+    var text = '', os = [], oe = [];
+    for (var t = 0; t < out.length; t++) { text += out[t].ch; os.push(out[t].os); oe.push(out[t].oe); }
+    return { text: text, os: os, oe: oe };
+  }
+
+  /* ====================================================================
+     1a — NUMBER + UNIT + TERM readers (operate on normalized text)
+     ==================================================================== */
+
+  // → { num, den, end } | null   (exact rational; decimals become n/10^k)
+  function readNumber(s, i) {
+    var rest = s.slice(i);
+    var m;
+    // mixed number: whole <space> int/int   (e.g. "4 1/2", "40 1/2")
+    m = /^(\d+) (\d+)\/(\d+)/.exec(rest);
+    if (m) {
+      var w = +m[1], n = +m[2], d = +m[3];
+      return { num: w * d + n, den: d, end: i + m[0].length };
+    }
+    // fraction literal: int/int   (e.g. "1/2", "3/12", "7/16")
+    m = /^(\d+)\/(\d+)/.exec(rest);
+    if (m) return { num: +m[1], den: +m[2], end: i + m[0].length };
+    // decimal or integer
+    m = /^(\d+)\.(\d+)/.exec(rest);
+    if (m) {
+      var den = Math.pow(10, m[2].length);
+      return { num: (+m[1]) * den + (+m[2]), den: den, end: i + m[0].length };
+    }
+    m = /^\.(\d+)/.exec(rest);
+    if (m) {
+      var den2 = Math.pow(10, m[1].length);
+      return { num: +m[1], den: den2, end: i + m[0].length };
+    }
+    m = /^(\d+)\./.exec(rest);            // trailing dot: "40."
+    if (m) return { num: +m[1], den: 1, end: i + m[0].length };
+    m = /^(\d+)/.exec(rest);
+    if (m) return { num: +m[1], den: 1, end: i + m[0].length };
+    return null;
+  }
+
+  // unit immediately after a number, with an optional single separating space.
+  // → { unit, info, end } | null   (does NOT consume the space if no unit follows)
+  function readUnit(s, i) {
+    var j = i;
+    if (s[j] === ' ') j++;
+    var m = /^(mm|cm|ft|in|m|'|")/i.exec(s.slice(j));
+    if (!m) return null;
+    var key = m[0].toLowerCase();
+    return { unit: key, info: UNIT_TABLE[key], end: j + m[0].length };
+  }
+
+  // Read one dimensional term starting at a digit/dot. Handles foot-inch
+  // compounds (at most one foot + one inch component) and flags conflicts.
+  // → { end, value } | null     value = { conflict:true } on contradiction
+  function readTerm(s, i) {
+    var num1 = readNumber(s, i);
+    if (!num1) return null;
+    var u1 = readUnit(s, num1.end);
+    var p = u1 ? u1.end : num1.end;
+    var atoms = [{ num: num1, info: u1 ? u1.info : null, start: i, end: p }];
+
+    // compound continuation only after a feet component
+    if (u1 && u1.info.kind === 'ft') {
+      while (true) {
+        var q = p;
+        var sep = /^[ -]+/.exec(s.slice(q)); // foot-inch separator: spaces and/or a dash
+        if (sep) q += sep[0].length;
+        var num2 = readNumber(s, q);
+        if (!num2) break;                    // nothing more → term ends (separator not consumed)
+        var u2 = readUnit(s, num2.end);
+        var a2end = u2 ? u2.end : num2.end;
+        atoms.push({ num: num2, info: u2 ? u2.info : null, start: q, end: a2end });
+        p = a2end;
+      }
+    }
+
+    // ---- validate atom shape ----
+    var conflict = false;
+    if (atoms.length === 1) {
+      // single atom, fine
+    } else if (atoms.length === 2) {
+      var second = atoms[1].info;
+      // second must be inches (explicit) or unitless (assumed inches)
+      if (second && second.kind !== 'in') conflict = true;
+    } else {
+      conflict = true; // 3+ components in one term (e.g. "3' 4' 5\"")
+    }
+    if (conflict) return { end: p, value: { conflict: true } };
+
+    // ---- compute exact units (single, or feet+inch) ----
+    var ft = atoms[0];
+    var inch = atoms.length === 2 ? atoms[1] : null;
+    var system, finestUnit, unitHint, inferredUnit = false, units, raw, hadUnit;
+
+    if (inch) {
+      // feet + inches: combine over common denominator, then quantize once
+      var A = ft.num.num * FT * inch.num.den;
+      var B = inch.num.num * IN * ft.num.den;
+      var D = ft.num.den * inch.num.den;
+      units = roundDiv(A + B, D);
+      if (!atoms[1].info) inferredUnit = true; // inch unit was assumed
+      return { end: p, value: termValue(units, 'imperial', 'in', 'ft+in', false, inferredUnit, true) };
+    }
+
+    var info = ft.info;
+    if (info) {
+      units = roundDiv(ft.num.num * info.units, ft.num.den);
+      return { end: p, value: termValue(units, info.system, info.name, info.name, false, false, true) };
+    }
+    // bare number — unit unknown, resolved later by context/default
+    return {
+      end: p,
+      value: {
+        kind: 'bare',
+        num: ft.num.num, den: ft.num.den,
+        dim: null, units: null,
+        finestUnit: null, system: null, unitHint: null,
+        hadUnit: false
+      }
+    };
+  }
+
+  function termValue(units, system, finestUnit, unitHint, isBare, inferredUnit, hadUnit) {
+    return {
+      kind: 'length', units: units, dim: 1,
+      system: system, finestUnit: finestUnit, unitHint: unitHint,
+      inferredUnit: !!inferredUnit, hadUnit: !!hadUnit
+    };
+  }
+
+  /* ====================================================================
+     1b — TOKENIZER (over normalized text)
+     Emits term / op / paren / junk tokens. Fraction bars and foot-inch
+     dashes are consumed INSIDE readTerm, so any '/' or '-' seen here at top
+     level is an operator, never a literal.
+     ==================================================================== */
+
+  function tokenize(s) {
+    var toks = [];
+    var i = 0, n = s.length;
+    while (i < n) {
+      var c = s[i];
+      if (c === ' ') { i++; continue; }
+      if (c === '(') { toks.push({ type: 'lparen', ns: i, ne: i + 1 }); i++; continue; }
+      if (c === ')') { toks.push({ type: 'rparen', ns: i, ne: i + 1 }); i++; continue; }
+      if (c === '+' || c === '-' || c === '*' || c === '/') {
+        toks.push({ type: 'op', op: c, ns: i, ne: i + 1 }); i++; continue;
+      }
+      if (/[0-9]/.test(c) || (c === '.' && /[0-9]/.test(s[i + 1] || ''))) {
+        var t = readTerm(s, i);
+        if (t) { toks.push({ type: 'term', value: t.value || t, ns: i, ne: t.end }); i = t.end; continue; }
+      }
+      // junk: a run of characters that is not whitespace/operator/paren/number-start
+      var start = i;
+      while (i < n) {
+        var d = s[i];
+        if (d === ' ' || d === '(' || d === ')' || d === '+' || d === '-' || d === '*' || d === '/') break;
+        if (/[0-9]/.test(d) || (d === '.' && /[0-9]/.test(s[i + 1] || ''))) break;
+        i++;
+      }
+      if (i === start) i++; // safety
+      toks.push({ type: 'junk', ns: start, ne: i });
+    }
+    return toks;
+  }
+
+  /* ====================================================================
+     1b — VALUE ALGEBRA (unit-aware dimensions)
+     ==================================================================== */
+
+  var NULL_AREA = { kind: 'null', dim: 2, note: 'area (dimension 2) — out of scope for the length tool' };
+  var NULL_INV  = { kind: 'null', dim: -1, note: 'inverse length (dimension -1) — out of scope' };
+
+  function isNum(v) { return v && (v.kind === 'length' || v.kind === 'bare' || v.kind === 'scalar' || v.kind === 'ratio'); }
+  function bareScalarNumDen(v) {
+    if (v.kind === 'bare' || v.kind === 'scalar') return { num: v.num, den: v.den };
+    if (v.kind === 'ratio') return { num: v.ratioNum, den: v.ratioDen };
+    return null;
+  }
+
+  function negate(v) {
+    if (!v) return v;
+    if (v.kind === 'length') return assign({}, v, { units: -v.units });
+    if (v.kind === 'bare' || v.kind === 'scalar') return assign({}, v, { num: -v.num });
+    if (v.kind === 'ratio') return assign({}, v, { ratio: -v.ratio, ratioNum: -v.ratioNum, count: -v.count });
+    return v;
+  }
+  function assign(t) { for (var i = 1; i < arguments.length; i++) { var o = arguments[i]; for (var k in o) if (o.hasOwnProperty(k)) t[k] = o[k]; } return t; }
+
+  // finer = smaller unit count
+  function finerUnitName(a, b) {
+    if (!a) return b; if (!b) return a;
+    return UNIT_TABLE[a].units <= UNIT_TABLE[b].units ? a : b;
+  }
+
+  /* ---- multiplicative fold ---- */
+  function applyMul(op, left, right) {
+    if (left.kind === 'null') return left;
+    if (right.kind === 'null') return right;
+    var lLen = left.kind === 'length', rLen = right.kind === 'length';
+
+    if (op === '*') {
+      if (lLen && rLen) return NULL_AREA;
+      if (lLen || rLen) {
+        var len = lLen ? left : right;
+        var sc = lLen ? right : left;
+        var s = bareScalarNumDen(sc);
+        return assign({}, len, { units: roundDiv(len.units * s.num, s.den) });
+      }
+      // scalar * scalar
+      var a = bareScalarNumDen(left), b = bareScalarNumDen(right);
+      return { kind: 'bare', num: a.num * b.num, den: a.den * b.den, dim: 0 };
+    }
+    // op === '/'
+    if (lLen && rLen) {
+      return ratioOf(left.units, right.units);
+    }
+    if (lLen && !rLen) { // length ÷ scalar → n-section length
+      var s2 = bareScalarNumDen(right);
+      return assign({}, left, { units: roundDiv(left.units * s2.den, s2.num) });
+    }
+    if (!lLen && rLen) return NULL_INV; // scalar ÷ length
+    // scalar ÷ scalar
+    var la = bareScalarNumDen(left), rb = bareScalarNumDen(right);
+    return { kind: 'bare', num: la.num * rb.den, den: la.den * rb.num, dim: 0 };
+  }
+
+  // length ÷ length → dimensionless "how many fit" (+ exact ratio)
+  function ratioOf(aUnits, bUnits) {
+    var sign = (aUnits < 0) !== (bUnits < 0) ? -1 : 1;
+    var A = Math.abs(aUnits), B = Math.abs(bUnits);
+    var count = B === 0 ? 0 : Math.floor(A / B);
+    var rem = B === 0 ? 0 : A % B;
+    return {
+      kind: 'ratio', dim: 0,
+      ratio: bUnits === 0 ? 0 : aUnits / bUnits,
+      ratioNum: aUnits, ratioDen: bUnits,
+      count: sign * count, remainder_units: rem
+    };
+  }
+
+  /* ---- additive fold with bare-unit inheritance ----
+     operands: array of value objects; ops: array of '+'/'-' (length = operands-1)
+     A bare operand inherits the finest STATED unit in the additive run;
+     if none is stated, it takes defaultUnit. */
+  function applyAdd(operands, ops, defaultUnit) {
+    // bubble up null/area
+    for (var z = 0; z < operands.length; z++) if (operands[z].kind === 'null') return operands[z];
+
+    // finest stated unit across the run
+    var finest = null, system = null, anyLength = false;
+    for (var a = 0; a < operands.length; a++) {
+      var v = operands[a];
+      if (v.kind === 'length') {
+        anyLength = true;
+        finest = finerUnitName(finest, v.finestUnit);
+        system = system === null ? v.system : (system === v.system ? system : 'mixed');
+      }
+    }
+    var resolveName = finest || defaultUnit;
+    var resolveInfo = UNIT_TABLE[resolveName];
+
+    // resolve bares → lengths
+    var resolved = operands.map(function (v) {
+      if (v.kind === 'length') return v;
+      if (v.kind === 'bare') {
+        return {
+          kind: 'length', dim: 1,
+          units: roundDiv(v.num * resolveInfo.units, v.den),
+          system: resolveInfo.system, finestUnit: resolveName, unitHint: resolveName,
+          inferredUnit: true, hadUnit: false
+        };
+      }
+      return v; // ratio/scalar left as-is (rare in additive)
+    });
+
+    var acc = resolved[0];
+    if (acc.kind !== 'length') return acc;
+    for (var k = 0; k < ops.length; k++) {
+      var rhs = resolved[k + 1];
+      if (rhs.kind !== 'length') continue;
+      var u = ops[k] === '-' ? acc.units - rhs.units : acc.units + rhs.units;
+      acc = assign({}, acc, { units: u });
+    }
+    if (!anyLength) {
+      // all bares → default-unit length; mark inferred system from default
+      acc = assign({}, acc, { system: resolveInfo.system, finestUnit: resolveName });
+    } else if (system === 'mixed') {
+      acc = assign({}, acc, { system: 'mixed' });
+    }
+    acc = assign({}, acc, { finestUnit: resolveName });
+    return acc;
+  }
+
+  /* ====================================================================
+     1b — RECURSIVE-DESCENT PARSER
+     Tolerant: a dangling operator or missing operand is marked pending,
+     never thrown. Records token status (parsed / pending) as a side effect.
+     ==================================================================== */
+
+  function evaluate(toks, defaultUnit) {
+    var pos = 0;
+    var status = new Array(toks.length); // 'parsed' | 'pending' | undefined
+    function peek() { return toks[pos]; }
+    function markUsed(idx) { if (status[idx] === undefined) status[idx] = 'parsed'; }
+
+    function parseExpr() { return parseAdd(); }
+
+    function parseAdd() {
+      var first = parseMul();
+      if (first === null) return null;
+      var operands = [first], ops = [], opIdx = [];
+      while (peek() && peek().type === 'op' && (peek().op === '+' || peek().op === '-')) {
+        var oi = pos; var op = peek().op; pos++;
+        var rhs = parseMul();
+        if (rhs === null) { status[oi] = 'pending'; pos = oi; break; } // dangling operator
+        markUsed(oi);
+        operands.push(rhs); ops.push(op); opIdx.push(oi);
+      }
+      if (operands.length === 1) return first;
+      return applyAdd(operands, ops, defaultUnit);
+    }
+
+    function parseMul() {
+      var left = parseUnary();
+      if (left === null) return null;
+      while (peek() && peek().type === 'op' && (peek().op === '*' || peek().op === '/')) {
+        var oi = pos; var op = peek().op; pos++;
+        var right = parseUnary();
+        if (right === null) { status[oi] = 'pending'; pos = oi; break; }
+        markUsed(oi);
+        left = applyMul(op, left, right);
+      }
+      return left;
+    }
+
+    function parseUnary() {
+      if (peek() && peek().type === 'op' && (peek().op === '+' || peek().op === '-')) {
+        var oi = pos; var op = peek().op; pos++;
+        var operand = parseUnary();
+        if (operand === null) { status[oi] = 'pending'; pos = oi; return null; }
+        markUsed(oi);
+        return op === '-' ? negate(operand) : operand;
+      }
+      return parsePrimary();
+    }
+
+    function parsePrimary() {
+      var t = peek();
+      if (!t) return null;
+      if (t.type === 'lparen') {
+        var open = pos; pos++;
+        var inner = parseExpr();
+        if (peek() && peek().type === 'rparen') { markUsed(open); markUsed(pos); pos++; }
+        else if (open < toks.length) { status[open] = 'pending'; }
+        return inner;
+      }
+      if (t.type === 'term') {
+        if (t.value && t.value.conflict) { status[pos] = 'pending'; pos++; return null; }
+        markUsed(pos); pos++;
+        return t.value;
+      }
+      return null; // op/junk/rparen here → caller handles
+    }
+
+    var result = parseExpr();
+    // any token never visited, or junk, is pending
+    for (var i = 0; i < toks.length; i++) {
+      if (toks[i].type === 'junk') status[i] = 'pending';
+      else if (status[i] === undefined) status[i] = 'pending';
+    }
+    return { result: result, status: status };
+  }
+
+  /* ====================================================================
+     1c — INTERPRETATION + SPANS (original-input coordinates)
+     ==================================================================== */
+
+  function buildSpans(toks, status, os, oe) {
+    var spans = [];
+    for (var i = 0; i < toks.length; i++) {
+      var t = toks[i];
+      var st = status[i] === 'parsed' ? 'parsed' : 'pending';
+      spans.push({ start: os[t.ns], end: oe[t.ne - 1], status: st });
+    }
+    // merge adjacent same-status spans
+    var merged = [];
+    for (var j = 0; j < spans.length; j++) {
+      var last = merged[merged.length - 1];
+      if (last && last.status === spans[j].status && spans[j].start <= last.end + 1) {
+        last.end = Math.max(last.end, spans[j].end);
+      } else merged.push({ start: spans[j].start, end: spans[j].end, status: spans[j].status });
+    }
+    return merged;
+  }
+
+  function unitLabel(name) {
+    return name === 'ft+in' ? 'ft + in' : name;
+  }
+
+  function buildInterpretation(toks, status, value, original, defaultUnit) {
+    var terms = [], assumptions = [];
+    // Build per-term echo from the leaf term tokens.
+    for (var k = 0; k < toks.length; k++) {
+      var tk = toks[k];
+      if (tk.type !== 'term' || status[k] !== 'parsed') continue;
+      var val = tk.value;
+      var rawText = original.slice(spanStart(tk, toks), spanEnd(tk, toks));
+      var role = (val.kind === 'length') ? 'length' : 'scalar';
+      var unit = val.kind === 'length' ? unitLabel(val.finestUnit) : '';
+      var inferred = !!val.inferredUnit || (val.kind === 'bare');
+      terms.push({
+        raw: rawText.trim(),
+        value_mm: val.kind === 'length' ? val.units / 960 : null,
+        unit: unit, role: role, inferred: inferred
+      });
+    }
+    // assumptions (plain-language, shown not warned)
+    if (value && value.kind === 'length' && value.inferredUnit) {
+      // a bare term inherited / defaulted somewhere
+    }
+    var ord = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
+    var ti = 0;
+    for (var m = 0; m < toks.length; m++) {
+      if (toks[m].type !== 'term' || status[m] !== 'parsed') continue;
+      var tv = toks[m].value;
+      if ((tv.kind === 'bare') || (tv.kind === 'length' && tv.inferredUnit && !tv.hadUnit)) {
+        var name = (value && value.finestUnit) ? value.finestUnit : defaultUnit;
+        assumptions.push((ord[ti] || (ti + 1) + 'th') + ' term assumed ' + unitLabel(name) + '.');
+      }
+      ti++;
+    }
+    var canonical = buildCanonical(toks, status, original);
+    return { terms: terms, canonical: canonical, assumptions: assumptions };
+  }
+
+  function spanStart(tk, toks) { return tk._os; }
+  function spanEnd(tk, toks) { return tk._oe; }
+
+  function buildCanonical(toks, status, original) {
+    var parts = [];
+    for (var i = 0; i < toks.length; i++) {
+      var t = toks[i];
+      if (status[i] !== 'parsed') continue;
+      if (t.type === 'op') parts.push(t.op);
+      else if (t.type === 'lparen') parts.push('(');
+      else if (t.type === 'rparen') parts.push(')');
+      else if (t.type === 'term') {
+        var v = t.value;
+        if (v.kind === 'length') parts.push(formatLength(v));
+        else if (v.kind === 'bare') parts.push(fmtRational(v.num, v.den));
+        else parts.push(original.slice(t._os, t._oe).trim());
+      }
+    }
+    return parts.join(' ').replace(/\(\s/g, '(').replace(/\s\)/g, ')');
+  }
+
+  function fmtRational(num, den) {
+    if (den === 1) return String(num);
+    var v = num / den;
+    return String(Math.round(v * 10000) / 10000);
+  }
+
+  function formatLength(v) {
+    // descriptive echo of a single resolved length term
+    var name = v.finestUnit;
+    if (name === 'ft+in') return '(ft+in)';
+    var info = UNIT_TABLE[name] || UNIT_TABLE[v.system === 'metric' ? 'mm' : 'in'];
+    var qty = v.units / info.units;
+    return fmtRational(Math.round(qty * 10000), 10000) + ' ' + name;
+  }
+
+  /* ====================================================================
+     PUBLIC ENTRY
+     ==================================================================== */
+
+  function parseLength(input, opts) {
+    if (input == null) return null;
+    var defaultUnit = (opts && opts.defaultUnit) || 'in';
+    if (defaultUnit !== 'in' && defaultUnit !== 'mm') defaultUnit = 'in';
+    var original = String(input);
+
+    var norm = normalize(original);
+    var toks = tokenize(norm.text);
+
+    // attach original-coordinate ranges to each token
+    for (var i = 0; i < toks.length; i++) {
+      toks[i]._os = norm.os[toks[i].ns];
+      toks[i]._oe = norm.oe[toks[i].ne - 1];
+    }
+
+    // nothing dimensional at all → null
+    var hasTerm = toks.some(function (t) { return t.type === 'term'; });
+    if (!hasTerm) return null;
+
+    var ev = evaluate(toks, defaultUnit);
+    var value = ev.result;
+
+    // a lone bare number (never folded through an additive run) resolves to
+    // the default unit — this is the only place defaultUnit applies.
+    if (value && value.kind === 'bare') {
+      var di = UNIT_TABLE[defaultUnit];
+      value = {
+        kind: 'length', dim: 1,
+        units: roundDiv(value.num * di.units, value.den),
+        system: di.system, finestUnit: defaultUnit, unitHint: defaultUnit,
+        inferredUnit: true, hadUnit: false
+      };
+    }
+
+    var spans = buildSpans(toks, ev.status, norm.os, norm.oe);
+
+    // area / inverse-length / other out-of-scope dimensions → null (contract)
+    if (value && value.kind === 'null') return null;
+
+    var interpretation = buildInterpretation(toks, ev.status, value, original, defaultUnit);
+
+    // a term existed but nothing resolved (e.g. conflicting compound) →
+    // return an object with null units so the UI can show WHY (spans pending).
+    if (!value || (value.kind !== 'length' && value.kind !== 'ratio')) {
+      return {
+        units: null, value_mm: null, sign: 1, dimension: 1,
+        original: original, unitSystem: 'imperial',
+        interpretation: interpretation, spans: spans
+      };
+    }
+
+    if (value.kind === 'ratio') {
+      return {
+        units: null, value_mm: null,
+        sign: value.ratio < 0 ? -1 : 1, dimension: 0,
+        original: original, unitSystem: 'imperial',
+        ratio: value.ratio, count: value.count, remainder_units: value.remainder_units,
+        interpretation: interpretation, spans: spans
+      };
+    }
+
+    // dim 1 length
+    return {
+      units: value.units,
+      value_mm: value.units / 960,
+      sign: value.units < 0 ? -1 : 1,
+      dimension: 1,
+      original: original,
+      unitSystem: value.system || (defaultUnit === 'mm' ? 'metric' : 'imperial'),
+      interpretation: interpretation,
+      spans: spans
+    };
+  }
+
+  return {
+    parseLength: parseLength,
+    normalize: normalize,
+    UNITS: { MM: MM, CM: CM, M: M, IN: IN, FT: FT }
+  };
+});
