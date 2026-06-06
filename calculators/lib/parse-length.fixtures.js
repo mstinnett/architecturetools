@@ -32,6 +32,13 @@
     { input: "3' 4.5\"",              expect: { units: 3 * FT + 9 * IN / 2 }, gate: '1a-4' },
     { input: "3ft 4.5in",            expect: { units: 3 * FT + 9 * IN / 2 }, gate: '1a-4' },
     { input: "3'-0\"",               expect: { units: 3 * FT },              gate: '1a-4' },
+    { input: "7'-1\"",               expect: { units: 7 * FT + 1 * IN },     gate: '1a-4' }, // dash + inch = compound
+    { input: "7'-1",                 expect: { units: 7 * FT + 1 * IN },     gate: '1a-4' }, // dash + unitless = inches
+
+    // dash before FEET is subtraction, not a foot-inch separator
+    { input: "7'-1'",                expect: { units: 7 * FT - 1 * FT },     gate: '1b' },
+    { input: "7' - 1'",             expect: { units: 7 * FT - 1 * FT },     gate: '1b' },
+    { input: "10'-6' + 2\"",        expect: { units: 10 * FT - 6 * FT + 2 * IN }, gate: '1b' },
 
     // ---- 1a-1  glyph normalization ----
     { input: "3′-4½″", expect: { units: 3 * FT + 9 * IN / 2 }, gate: '1a-1' }, // 3′-4½″

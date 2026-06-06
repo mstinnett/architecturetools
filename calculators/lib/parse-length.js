@@ -180,6 +180,12 @@
         var num2 = readNumber(s, q);
         if (!num2) break;                    // nothing more → term ends (separator not consumed)
         var u2 = readUnit(s, num2.end);
+        var isInch = !u2 || u2.info.kind === 'in';   // unitless after feet → inches
+        var hasDash = !!sep && sep[0].indexOf('-') !== -1;
+        // a '-' before a NON-inch component is subtraction, not a foot-inch
+        // separator: 7'-1' is 7 ft − 1 ft = 6 ft, not a conflicting compound.
+        // (Spaces before feet stay a conflict: 3' 4' 5" — see validation below.)
+        if (!isInch && hasDash) break;
         var a2end = u2 ? u2.end : num2.end;
         atoms.push({ num: num2, info: u2 ? u2.info : null, start: q, end: a2end });
         p = a2end;
