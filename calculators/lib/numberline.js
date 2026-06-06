@@ -159,7 +159,6 @@
     var x0 = padL, x1 = W - padR, axisW = x1 - x0;
     var ySrc = 64, yTgt = 150;                 // the two scale lines
     var yHatchTop = 110;                        // hatch hugs the lower (target) half
-    var yResid = 98;                            // residual labels sit in the clear lane above
     function X(u) { return x0 + (u - lo) / (hi - lo) * axisW; }
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
@@ -220,13 +219,16 @@
       svg += '<text x="' + sx + '" y="' + (ySrc - 14 - stagger) + '" class="nl-snap-role" text-anchor="middle">' + esc(grp.roles.join(' = ')) + '</text>';
       // top (source) equivalent of this physical point
       svg += '<text x="' + sx + '" y="' + (ySrc - 2 - stagger) + '" class="nl-src-val" text-anchor="middle">' + esc(formatTrue(grp.u, source)) + '</text>';
-      // residual label — in the clear lane above the hatch, with a short
-      // leader down to its band, and a white halo so the true tick can't cut it
+      // residual label — flanking the band on its OUTER side (Max to the left,
+      // Min to the right), at the hatch mid-height, so it never sits on the
+      // hatch or the true tick. White halo for safety.
       var res = grp.u - units;
       if (res !== 0) {
-        var mx = (sx + X(units)) / 2;
-        svg += '<line x1="' + mx + '" y1="' + (yResid + 3) + '" x2="' + mx + '" y2="' + yHatchTop + '" stroke="#bbb" stroke-width="0.75"/>';
-        svg += '<text x="' + mx + '" y="' + yResid + '" class="nl-residual" text-anchor="middle" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(formatResidual(res, target)) + '</text>';
+        var onLeft = grp.u < units;                 // floor/Max → left, ceil/Min → right
+        var rx = onLeft ? (sx - 6) : (sx + 6);
+        var anchor = onLeft ? 'end' : 'start';
+        var ry = (yHatchTop + yTgt) / 2 + 4;
+        svg += '<text x="' + rx + '" y="' + ry + '" class="nl-residual" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(formatResidual(res, target)) + '</text>';
       }
     });
 
