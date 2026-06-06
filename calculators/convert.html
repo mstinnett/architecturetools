@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Precise Unit Converter -- architecture.tools</title>
+<meta name="description" content="A length converter that shows the cost of rounding: free-text dimension in, snapped to a grid, with Min / Nearest / Max and their signed residuals drawn on a dual-scale number line.">
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only; all behaviour lives in the imported modules ---- */
+
+  /* The entry field is an overlay-mirror: a styled div renders the parsed /
+     pending spans behind a caret-only transparent <input>. A monospace face
+     is used here (not the site body face) so the overlay aligns to the caret
+     glyph-for-glyph — alignment correctness over the proportional face. */
+  .field-wrap { position: relative; margin-bottom: var(--space-lg); max-width: 100%; }
+  .field-mono { font-family: 'SF Mono', 'DM Mono', ui-monospace, 'Menlo', monospace;
+                font-size: 1.35rem; font-weight: 400; line-height: 1.5;
+                letter-spacing: 0; padding: 0.7rem 0.8rem; border: 1px solid var(--gray-300);
+                width: 100%; box-sizing: border-box; white-space: pre; overflow-x: auto; }
+  #dimInput { position: relative; z-index: 2; background: transparent; color: transparent;
+              caret-color: var(--black); outline: none; -webkit-appearance: none; appearance: none; }
+  #dimInput:focus { border-color: var(--black); }
+  .field-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+                   color: var(--black); border-color: transparent; overflow: hidden; }
+  .field-overlay .pending { color: var(--gray-400); }   /* not-parsable-yet: construction line */
+
+  .opt-line { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: var(--space-lg); }
+  .opt-cluster { display: flex; align-items: center; gap: 0.5rem; }
+  .opt-cluster .section-label { margin-bottom: 0; }
+  .mini-pill { padding: 0.3rem 0.7rem; border: 1px solid var(--gray-300); cursor: pointer;
+               font-size: var(--text-sm); background: var(--white); user-select: none; }
+  .mini-pill.active { background: var(--selected-bg); color: var(--white); border-color: var(--selected-bg); }
+
+  /* echo — the primary result surface; confidence by line weight */
+  .echo { margin: var(--space-lg) 0; padding: 1rem 1.2rem; border: var(--border-heavy); }
+  .echo-line { font-size: var(--text-lg); font-weight: 300; line-height: 1.9; }
+  .echo .tok { padding-bottom: 1px; }
+  .echo .tok.stated   { border-bottom: 2px solid var(--black); color: var(--black); }      /* what you told me */
+  .echo .tok.inferred { border-bottom: 1px solid var(--gray-400); color: var(--gray-600); } /* what I assumed */
+  .echo .op { color: var(--gray-500); padding: 0 0.15em; }
+  .echo .eq { color: var(--gray-500); padding: 0 0.2em; }
+  .echo .result { font-weight: 400; }
+  .echo-assumptions { margin-top: 0.6rem; font-size: var(--text-sm); color: var(--gray-600); }
+  .echo-assumptions div::before { content: '— '; color: var(--gray-400); }
+
+  /* grid presets = a precision dial */
+  .grid-presets { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: var(--space-md); }
+  .grid-box { padding: 0.45rem 0.7rem; border: 1px solid var(--gray-700); cursor: pointer;
+              font-size: var(--text-sm); background: var(--white); user-select: none; min-width: 2.4rem; text-align: center; }
+  .grid-box.active { border: 2px solid var(--selected-bg); padding: calc(0.45rem - 1px) calc(0.7rem - 1px);
+                     background: var(--selected-bg); color: var(--white); }
+  .grid-sep { width: 1px; align-self: stretch; background: var(--gray-200); margin: 0 0.3rem; }
+  .grid-custom { width: 90px; font-family: inherit; font-size: var(--text-sm); padding: 0.4rem 0.5rem;
+                 border: 1px solid var(--gray-300); outline: none; }
+  .grid-custom:focus { border-color: var(--black); }
+  .grid-group-label { font-size: var(--text-xs); color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .figure-wrap { margin: var(--space-lg) 0; overflow-x: auto; }
+  svg.nl { display: block; max-width: 100%; }
+  svg.nl text { font-family: var(--font-body); }
+  .nl-axis-label  { font-size: 10px; fill: var(--gray-400); letter-spacing: 0.06em; text-transform: uppercase; }
+  .nl-snap-val    { font-size: 12px; fill: var(--black); font-weight: 400; }
+  .nl-snap-role   { font-size: 9px;  fill: var(--gray-500); letter-spacing: 0.04em; text-transform: uppercase; }
+  .nl-src-val     { font-size: 10px; fill: var(--gray-500); }
+  .nl-residual    { font-size: 10px; fill: var(--gray-700); }
+  .nl-true-role   { font-size: 10px; fill: var(--black); letter-spacing: 0.06em; text-transform: uppercase; }
+  .nl-true-val    { font-size: 13px; fill: var(--black); font-weight: 400; }
+  .nl-note        { font-size: 10px; fill: var(--gray-500); font-style: italic; }
+
+  /* snap readout rows */
+  .snap-rows { margin-top: var(--space-md); }
+  .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
+  .snap-row:last-child { border-bottom: none; }
+  .snap-row.is-true { border-bottom: 2px solid var(--black); }
+  .snap-name { width: 130px; flex-shrink: 0; font-size: var(--text-xs); font-weight: 400;
+               text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); }
+  .snap-value { flex: 1; font-size: var(--text-md); font-weight: 300; }
+  .snap-resid { width: 130px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
+  .snap-row.is-exact .snap-resid { color: var(--black); }
+
+  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--gray-50); border: var(--border-light); }
+  .ratio-big { font-size: var(--text-xl); font-weight: 300; }
+
+  @media (max-width: 480px) {
+    .field-mono { font-size: 1.1rem; }
+    .snap-name { width: 96px; }
+    .snap-resid { width: 96px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Precise Unit Converter</h1>
+    <p>Type a dimension in any format — feet-inches, fractions, metric, or a small
+       expression. It converts, snaps to a grid, and shows the cost of that rounding:
+       Min, Nearest, and Max at once, each with its signed residual.</p>
+  </div>
+
+  <div class="section-label">Dimension</div>
+  <div class="field-wrap field-mono">
+    <div class="field-overlay field-mono" id="overlay" aria-hidden="true"></div>
+    <input type="text" id="dimInput" class="field-mono" spellcheck="false"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 1m  ·  3'-4 1/2&quot;  ·  8' + 3 1/2&quot;" autofocus>
+  </div>
+
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Bare number</span>
+      <span class="mini-pill" data-default="in">inches</span>
+      <span class="mini-pill" data-default="mm">mm</span>
+    </div>
+    <div class="opt-cluster">
+      <span class="section-label">Convert to</span>
+      <span class="mini-pill" data-target="imperial">imperial</span>
+      <span class="mini-pill" data-target="metric">metric</span>
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <div id="lengthOut" style="display:none;">
+      <div class="section-label">Grid <span style="color:var(--gray-400);text-transform:none;letter-spacing:0;">— the precision dial</span></div>
+      <div class="grid-presets" id="gridPresets"></div>
+
+      <div class="figure-wrap" id="figure"></div>
+
+      <div class="snap-rows" id="snapRows"></div>
+    </div>
+
+    <div class="ratio-box" id="ratioOut" style="display:none;"></div>
+  </div>
+
+  <div class="page-footer">
+    architecture.tools — exact on a 1/960&nbsp;mm integer lattice; the only rounding is
+    input quantization (sub-micron). The parser, snap, and number-line modules are pure
+    and reused beyond this page.
+    <br><a class="back-link" href="../index.html">← all tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+
+  var state = {
+    text: '',
+    defaultUnit: 'in',
+    target: 'imperial',
+    grid: { imperial: { denom: 8 }, metric: { mm: 5 } }   // remembered per system
+  };
+
+  var els = {
+    input: document.getElementById('dimInput'),
+    overlay: document.getElementById('overlay'),
+    echo: document.getElementById('echo'),
+    echoLine: document.getElementById('echoLine'),
+    echoAssume: document.getElementById('echoAssume'),
+    lengthOut: document.getElementById('lengthOut'),
+    gridPresets: document.getElementById('gridPresets'),
+    figure: document.getElementById('figure'),
+    snapRows: document.getElementById('snapRows'),
+    ratioOut: document.getElementById('ratioOut')
+  };
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function currentGridCount() {
+    if (state.target === 'imperial') return Math.round(IN / state.grid.imperial.denom);
+    return Math.round(state.grid.metric.mm * MM);
+  }
+  function currentDenom() {
+    return state.target === 'imperial' ? state.grid.imperial.denom : null;
+  }
+
+  /* ---- in-field overlay: parsed (black) vs pending (gray) ---------------- */
+  function renderOverlay(result) {
+    var text = state.text;
+    if (!text) { els.overlay.innerHTML = ''; return; }
+    var status = new Array(text.length).fill('parsed');
+    if (result && result.spans) {
+      result.spans.forEach(function (sp) {
+        if (sp.status !== 'pending') return;
+        for (var i = sp.start; i < sp.end && i < text.length; i++) status[i] = 'pending';
+      });
+    }
+    var html = '', run = status[0], start = 0;
+    function flush(end) {
+      var chunk = escapeHtml(text.slice(start, end));
+      html += run === 'pending' ? '<span class="pending">' + chunk + '</span>' : chunk;
+    }
+    for (var i = 1; i <= text.length; i++) {
+      if (i === text.length || status[i] !== run) { flush(i); start = i; run = status[i]; }
+    }
+    els.overlay.innerHTML = html;
+    els.overlay.scrollLeft = els.input.scrollLeft;
+  }
+
+  /* ---- interpretation echo (primary result surface) --------------------- */
+  var OP_GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+
+  function renderEcho(result) {
+    if (!result) { els.echo.style.display = 'none'; return; }
+    var parts = result.interpretation.parts || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op') html += '<span class="op">' + (OP_GLYPH[p.text] || escapeHtml(p.text)) + '</span>';
+      else if (p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+
+    if (result.dimension === 1 && result.units != null) {
+      var conv = NumberLine.formatTrue(result.units, state.target);
+      html += '<span class="eq">=</span><span class="result">' + escapeHtml(conv) + '</span>';
+    } else if (result.dimension === 0) {
+      var r = Math.round(result.ratio * 10000) / 10000;
+      html += '<span class="eq">=</span><span class="result">' + r + '</span>';
+    } else if (result.units == null) {
+      html += '<span class="eq">—</span><span class="op">unresolved</span>';
+    }
+
+    els.echoLine.innerHTML = html;
+    var asm = result.interpretation.assumptions || [];
+    if (result.units == null && result.dimension === 1) asm = asm.concat(['this term could not be resolved — see the grayed text above']);
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- grid preset control --------------------------------------------- */
+  function renderGridPresets() {
+    var html = '';
+    if (state.target === 'imperial') {
+      var denoms = [2, 4, 8, 16, 32, 64];
+      var labels = { 2: '½', 4: '¼', 8: '⅛', 16: '1/16', 32: '1/32', 64: '1/64' };
+      denoms.forEach(function (d) {
+        var on = state.grid.imperial.denom === d ? ' active' : '';
+        html += '<span class="grid-box' + on + '" data-denom="' + d + '">' + labels[d] + '</span>';
+      });
+      html += '<span class="grid-group-label" style="margin-left:.4rem;">custom 1/</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" min="1" step="1" placeholder="denom">';
+    } else {
+      var fine = [1, 5, 10], modular = [100, 300, 600];
+      html += '<span class="grid-group-label">fine</span>';
+      fine.forEach(function (m) {
+        var on = state.grid.metric.mm === m ? ' active' : '';
+        html += '<span class="grid-box' + on + '" data-mm="' + m + '">' + m + '</span>';
+      });
+      html += '<span class="grid-sep"></span><span class="grid-group-label">modular mm</span>';
+      modular.forEach(function (m) {
+        var on = state.grid.metric.mm === m ? ' active' : '';
+        html += '<span class="grid-box' + on + '" data-mm="' + m + '">' + m + '</span>';
+      });
+      html += '<span class="grid-group-label" style="margin-left:.4rem;">custom</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" min="0" step="any" placeholder="mm">';
+    }
+    els.gridPresets.innerHTML = html;
+
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      box.addEventListener('click', function () {
+        if (box.dataset.denom) state.grid.imperial.denom = +box.dataset.denom;
+        if (box.dataset.mm) state.grid.metric.mm = +box.dataset.mm;
+        render();
+      });
+    });
+    var custom = document.getElementById('gridCustom');
+    if (custom) custom.addEventListener('input', function () {
+      var v = parseFloat(custom.value);
+      if (!(v > 0)) return;
+      if (state.target === 'imperial') state.grid.imperial.denom = Math.round(v);
+      else state.grid.metric.mm = v;
+      render();
+    });
+  }
+
+  /* ---- snap readout rows + figure --------------------------------------- */
+  function renderLength(result) {
+    els.lengthOut.style.display = '';
+    els.ratioOut.style.display = 'none';
+    renderGridPresets();
+
+    var units = result.units;
+    var g = currentGridCount();
+    var denom = currentDenom();
+    var source = result.unitSystem === 'metric' ? 'metric'
+               : result.unitSystem === 'imperial' ? 'imperial' : 'mixed';
+
+    // figure
+    var width = Math.max(320, Math.min(680, els.figure.clientWidth || 640));
+    els.figure.innerHTML = NumberLine.numberline({
+      units: units, gridCount: g, targetSystem: state.target,
+      sourceSystem: source, width: width
+    });
+
+    // rows: true + Max ≤ (floor) / Nearest ≈ / Min ≥ (ceil), using snap.js
+    var rows = [
+      { name: 'True', dir: null, isTrue: true },
+      { name: 'Min ≥ (round up)', dir: 'ceil' },
+      { name: 'Nearest ≈', dir: 'nearest' },
+      { name: 'Max ≤ (round down)', dir: 'floor' }
+    ];
+    var html = '';
+    rows.forEach(function (r) {
+      if (r.isTrue) {
+        html += '<div class="snap-row is-true"><div class="snap-name">' + r.name + '</div>'
+              + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(units, state.target)) + '</div>'
+              + '<div class="snap-resid">exact</div></div>';
+        return;
+      }
+      var s = snap(units, g, r.dir);
+      var resid = s - units;
+      var exact = resid === 0;
+      html += '<div class="snap-row' + (exact ? ' is-exact' : '') + '"><div class="snap-name">' + r.name + '</div>'
+            + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(s, state.target, denom)) + '</div>'
+            + '<div class="snap-resid">' + escapeHtml(exact ? 'on grid' : NumberLine.formatResidual(resid, state.target)) + '</div></div>';
+    });
+    els.snapRows.innerHTML = html;
+  }
+
+  function renderRatio(result) {
+    els.lengthOut.style.display = 'none';
+    els.ratioOut.style.display = '';
+    var r = Math.round(result.ratio * 10000) / 10000;
+    var html = '<div class="section-label">Ratio — how many fit</div>'
+             + '<div class="ratio-big">' + r + '</div>';
+    if (Math.abs(result.ratio) >= 1) {
+      var rem = result.remainder_units;
+      var remTxt = rem === 0 ? 'remainder 0'
+        : 'remainder ' + NumberLine.formatTrue(rem, result.unitSystem === 'metric' ? 'metric' : 'imperial');
+      html += '<div style="margin-top:.4rem;color:var(--gray-700);font-size:var(--text-sm);">'
+            + result.count + (Math.abs(result.count) === 1 ? ' fits' : ' fit') + ', ' + remTxt + '</div>';
+    }
+    els.ratioOut.innerHTML = html;
+  }
+
+  /* ---- main render ------------------------------------------------------ */
+  function render() {
+    var result = parseLength(state.text, { defaultUnit: state.defaultUnit });
+    renderOverlay(result);
+    renderEcho(result);
+
+    if (!result || (result.units == null && result.dimension !== 0)) {
+      els.lengthOut.style.display = 'none';
+      els.ratioOut.style.display = 'none';
+      return;
+    }
+    if (result.dimension === 0) { renderRatio(result); return; }
+    renderLength(result);
+  }
+
+  /* ---- wiring ----------------------------------------------------------- */
+  function setActive(selector, attr, value) {
+    Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
+      el.classList.toggle('active', el.dataset[attr] === value);
+    });
+  }
+
+  els.input.addEventListener('input', function () { state.text = els.input.value; render(); });
+  els.input.addEventListener('scroll', function () { els.overlay.scrollLeft = els.input.scrollLeft; });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-default]'), function (el) {
+    el.addEventListener('click', function () {
+      state.defaultUnit = el.dataset.default; setActive('[data-default]', 'default', state.defaultUnit); render();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-target]'), function (el) {
+    el.addEventListener('click', function () {
+      state.target = el.dataset.target; setActive('[data-target]', 'target', state.target); render();
+    });
+  });
+
+  // initial state — defaults reproduce worked example 1 (1 m → 1/8")
+  setActive('[data-default]', 'default', state.defaultUnit);
+  setActive('[data-target]', 'target', state.target);
+  els.input.value = '1m';
+  state.text = '1m';
+  render();
+})();
+</script>
+</body>
+</html>
