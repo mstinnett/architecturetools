@@ -9,26 +9,21 @@
 <style>
   /* ---- page-specific only; all behaviour lives in the imported modules ---- */
 
-  /* The entry field is an overlay-mirror: a styled div renders the parsed /
-     pending spans behind a caret-only transparent <input>. A monospace face
-     is used here (not the site body face) so the overlay aligns to the caret
-     glyph-for-glyph — alignment correctness over the proportional face. */
-  .field-wrap { position: relative; margin-bottom: var(--space-lg); max-width: 100%; }
-  .field-mono { font-family: 'SF Mono', 'DM Mono', ui-monospace, 'Menlo', monospace;
-                font-size: 1.35rem; font-weight: 400; line-height: 1.5;
-                letter-spacing: 0; padding: 0.7rem 0.8rem; border: 1px solid var(--gray-300);
-                width: 100%; box-sizing: border-box; white-space: pre; overflow-x: auto; }
-  /* the real, interactive layer; its text is hidden (iOS needs
-     -webkit-text-fill-color, not just color) so only the caret shows over the
-     colored mirror behind it */
-  #dimInput { position: relative; z-index: 2; display: block; margin: 0;
-              background: transparent; color: transparent;
-              -webkit-text-fill-color: transparent; caret-color: var(--black);
+  /* Plain, robust entry field — a normal visible input (the overlay-mirror
+     trick broke on mobile: invisible text + lost focus). Parsed/pending
+     feedback lives in the echo below instead of in the field. */
+  .field-wrap { margin-bottom: var(--space-lg); max-width: 100%; }
+  #dimInput { font-family: 'SF Mono', 'DM Mono', ui-monospace, 'Menlo', monospace;
+              font-size: 1.35rem; font-weight: 400; line-height: 1.5;
+              color: var(--black); background: var(--white);
+              padding: 0.7rem 0.8rem; border: 1px solid var(--gray-300);
+              width: 100%; box-sizing: border-box;
               outline: none; -webkit-appearance: none; appearance: none; border-radius: 0; }
   #dimInput:focus { border-color: var(--black); }
-  .field-overlay { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none;
-                   color: var(--black); border-color: transparent; overflow: hidden; }
-  .field-overlay .pending { color: var(--gray-400); }   /* not-parsable-yet: construction line */
+
+  /* anything typed that didn't parse, shown quietly under the field */
+  .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-400); min-height: 1.1em; }
+  .field-note .pending { color: var(--gray-500); }
 
   .opt-line { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: var(--space-lg); }
   .opt-cluster { display: flex; align-items: center; gap: 0.5rem; }
@@ -37,16 +32,17 @@
                font-size: var(--text-sm); background: var(--white); user-select: none; }
   .mini-pill.active { background: var(--selected-bg); color: var(--white); border-color: var(--selected-bg); }
 
-  /* echo — the primary result surface; confidence by line weight */
-  .echo { margin: var(--space-lg) 0; padding: 1rem 1.2rem; border: var(--border-heavy); }
-  .echo-line { font-size: var(--text-lg); font-weight: 300; line-height: 1.9; }
+  /* echo — the reading + exact conversion, kept quiet so the snapped readout
+     and figure carry the weight (no heavy box, modest type) */
+  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.6rem 0.85rem; background: var(--gray-50); }
+  .echo-line { font-size: var(--text-base); font-weight: 300; line-height: 1.7; color: var(--gray-700); }
   .echo .tok { padding-bottom: 1px; }
   .echo .tok.stated   { border-bottom: 2px solid var(--black); color: var(--black); }      /* what you told me */
   .echo .tok.inferred { border-bottom: 1px solid var(--gray-400); color: var(--gray-600); } /* what I assumed */
-  .echo .op { color: var(--gray-500); padding: 0 0.15em; }
-  .echo .eq { color: var(--gray-500); padding: 0 0.2em; }
-  .echo .result { font-weight: 400; }
-  .echo-assumptions { margin-top: 0.6rem; font-size: var(--text-sm); color: var(--gray-600); }
+  .echo .op { color: var(--gray-400); padding: 0 0.15em; }
+  .echo .eq { color: var(--gray-400); padding: 0 0.2em; }
+  .echo .result { font-weight: 400; color: var(--black); }
+  .echo-assumptions { margin-top: 0.45rem; font-size: var(--text-sm); color: var(--gray-500); }
   .echo-assumptions div::before { content: '— '; color: var(--gray-400); }
 
   /* grid presets = a precision dial */
@@ -106,9 +102,9 @@
 
   <div class="section-label">Dimension</div>
   <div class="field-wrap">
-    <div class="field-overlay field-mono" id="overlay" aria-hidden="true"></div>
-    <input type="text" id="dimInput" class="field-mono" spellcheck="false"
+    <input type="text" id="dimInput" spellcheck="false"
            autocomplete="off" autocapitalize="off" placeholder="e.g. 1m  ·  3'-4 1/2&quot;  ·  8' + 3 1/2&quot;" autofocus>
+    <div class="field-note" id="fieldNote"></div>
   </div>
 
   <div class="opt-line">
@@ -164,12 +160,13 @@
     defaultUnit: 'in',
     target: 'imperial',
     targetPinned: false,                                  // true once the user taps the target
+    lastSource: null,                                     // last detected source system
     grid: { imperial: { denom: 8 }, metric: { mm: 5 } }   // remembered per system
   };
 
   var els = {
     input: document.getElementById('dimInput'),
-    overlay: document.getElementById('overlay'),
+    fieldNote: document.getElementById('fieldNote'),
     echo: document.getElementById('echo'),
     echoLine: document.getElementById('echoLine'),
     echoAssume: document.getElementById('echoAssume'),
@@ -192,27 +189,19 @@
     return state.target === 'imperial' ? state.grid.imperial.denom : null;
   }
 
-  /* ---- in-field overlay: parsed (black) vs pending (gray) ---------------- */
-  function renderOverlay(result) {
+  /* ---- pending hint: anything typed that didn't parse, shown under field -- */
+  function renderFieldNote(result) {
     var text = state.text;
-    if (!text) { els.overlay.innerHTML = ''; return; }
-    var status = new Array(text.length).fill('parsed');
-    if (result && result.spans) {
-      result.spans.forEach(function (sp) {
-        if (sp.status !== 'pending') return;
-        for (var i = sp.start; i < sp.end && i < text.length; i++) status[i] = 'pending';
-      });
-    }
-    var html = '', run = status[0], start = 0;
-    function flush(end) {
-      var chunk = escapeHtml(text.slice(start, end));
-      html += run === 'pending' ? '<span class="pending">' + chunk + '</span>' : chunk;
-    }
-    for (var i = 1; i <= text.length; i++) {
-      if (i === text.length || status[i] !== run) { flush(i); start = i; run = status[i]; }
-    }
-    els.overlay.innerHTML = html;
-    els.overlay.scrollLeft = els.input.scrollLeft;
+    if (!text || !result || !result.spans) { els.fieldNote.innerHTML = ''; return; }
+    var bits = [];
+    result.spans.forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = text.slice(sp.start, sp.end).trim();
+      if (frag) bits.push(frag);
+    });
+    els.fieldNote.innerHTML = bits.length
+      ? 'ignoring <span class="pending">' + escapeHtml(bits.join(' ')) + '</span>'
+      : '';
   }
 
   /* ---- interpretation echo (primary result surface) --------------------- */
@@ -256,7 +245,7 @@
         html += '<span class="grid-box' + on + '" data-denom="' + d + '">' + labels[d] + '</span>';
       });
       html += '<span class="grid-group-label" style="margin-left:.4rem;">custom 1/</span>';
-      html += '<input class="grid-custom" id="gridCustom" type="number" min="1" step="1" placeholder="denom">';
+      html += '<input class="grid-custom" id="gridCustom" type="number" min="1" step="1" placeholder="n">';
     } else {
       var fine = [1, 5, 10], modular = [100, 300, 600];
       html += '<span class="grid-group-label">fine</span>';
@@ -355,9 +344,11 @@
   // When the input states a system (an explicit unit somewhere): flip the
   // bare-number default toggle to match the source, and — since this is a
   // converter — switch the target to the OPPOSITE system so you see the other
-  // units by default. The target auto-follows until you tap it yourself, after
-  // which it stays pinned (same-system is then yours: grid snap + ft-in
-  // reformatting). A pure bare number states nothing, so neither moves.
+  // units by default. Every time a NEW source system is detected the target
+  // re-flips (and any manual pin is cleared), so it always keeps up; while you
+  // stay in one system a manual target choice holds (that's how you get
+  // same-system: grid snap + ft-in reformatting). A pure bare number states
+  // nothing, so nothing moves.
   function syncDetected(result) {
     if (!result || !result.interpretation) return;
     var sys = result.unitSystem;
@@ -372,6 +363,10 @@
       state.defaultUnit = srcUnit;
       setActive('[data-default]', 'default', state.defaultUnit);
     }
+    if (sys !== state.lastSource) {                           // a new system → re-flip target
+      state.lastSource = sys;
+      state.targetPinned = false;
+    }
     if (!state.targetPinned) {
       var opp = sys === 'metric' ? 'imperial' : 'metric';
       if (state.target !== opp) {
@@ -384,7 +379,7 @@
   function render() {
     var result = parseLength(state.text, { defaultUnit: state.defaultUnit });
     syncDetected(result);
-    renderOverlay(result);
+    renderFieldNote(result);
     renderEcho(result);
 
     if (!result || (result.units == null && result.dimension !== 0)) {
@@ -404,7 +399,6 @@
   }
 
   els.input.addEventListener('input', function () { state.text = els.input.value; render(); });
-  els.input.addEventListener('scroll', function () { els.overlay.scrollLeft = els.input.scrollLeft; });
   // selecting the field selects its text, so a new entry overwrites the old one
   // (deferred to the next tick so iOS doesn't collapse the selection on tap)
   els.input.addEventListener('focus', function () { setTimeout(function () { els.input.select(); }, 0); });
