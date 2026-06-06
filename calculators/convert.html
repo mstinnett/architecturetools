@@ -351,8 +351,28 @@
   }
 
   /* ---- main render ------------------------------------------------------ */
+  // When the input states a system (an explicit unit somewhere), flip the
+  // bare-number default toggle to match — the field IS the source, so the
+  // toggle reflects the detected system instead of sitting on a stale guess.
+  // A pure bare number states nothing, so the toggle stays the user's choice.
+  function syncDetectedDefault(result) {
+    if (!result || !result.interpretation) return;
+    var sys = result.unitSystem;
+    if (sys !== 'imperial' && sys !== 'metric') return;       // ambiguous/mixed → leave it
+    var stated = (result.interpretation.terms || []).some(function (t) {
+      return t.role === 'length' && !t.inferred;              // an explicit unit was typed
+    });
+    if (!stated) return;
+    var want = sys === 'metric' ? 'mm' : 'in';
+    if (state.defaultUnit !== want) {
+      state.defaultUnit = want;
+      setActive('[data-default]', 'default', state.defaultUnit);
+    }
+  }
+
   function render() {
     var result = parseLength(state.text, { defaultUnit: state.defaultUnit });
+    syncDetectedDefault(result);
     renderOverlay(result);
     renderEcho(result);
 
