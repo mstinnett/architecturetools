@@ -18,10 +18,15 @@
                 font-size: 1.35rem; font-weight: 400; line-height: 1.5;
                 letter-spacing: 0; padding: 0.7rem 0.8rem; border: 1px solid var(--gray-300);
                 width: 100%; box-sizing: border-box; white-space: pre; overflow-x: auto; }
-  #dimInput { position: relative; z-index: 2; background: transparent; color: transparent;
-              caret-color: var(--black); outline: none; -webkit-appearance: none; appearance: none; }
+  /* the real, interactive layer; its text is hidden (iOS needs
+     -webkit-text-fill-color, not just color) so only the caret shows over the
+     colored mirror behind it */
+  #dimInput { position: relative; z-index: 2; display: block; margin: 0;
+              background: transparent; color: transparent;
+              -webkit-text-fill-color: transparent; caret-color: var(--black);
+              outline: none; -webkit-appearance: none; appearance: none; border-radius: 0; }
   #dimInput:focus { border-color: var(--black); }
-  .field-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  .field-overlay { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none;
                    color: var(--black); border-color: transparent; overflow: hidden; }
   .field-overlay .pending { color: var(--gray-400); }   /* not-parsable-yet: construction line */
 
@@ -100,7 +105,7 @@
   </div>
 
   <div class="section-label">Dimension</div>
-  <div class="field-wrap field-mono">
+  <div class="field-wrap">
     <div class="field-overlay field-mono" id="overlay" aria-hidden="true"></div>
     <input type="text" id="dimInput" class="field-mono" spellcheck="false"
            autocomplete="off" autocapitalize="off" placeholder="e.g. 1m  ·  3'-4 1/2&quot;  ·  8' + 3 1/2&quot;" autofocus>
