@@ -152,14 +152,14 @@
     var target = opts.targetSystem || 'imperial';
     var source = opts.sourceSystem || target;
     var W = opts.width || 680;
-    var H = opts.height || 156;
+    var H = opts.height || 160;
 
     var denom = target === 'imperial' ? Math.round(IN / g) : null;
     var t = snapTriple(units, g);
     var floorU = t.maxU, ceilU = t.minU;        // round down (left), round up (right)
 
     var x0 = 24, x1 = W - 24, axisW = x1 - x0;
-    var ySrc = 58, yTgt = 120, bandMid = (ySrc + yTgt) / 2;   // the band's two scale lines
+    var ySrc = 46, yTgt = 108, bandMid = (ySrc + yTgt) / 2;   // the band's two scale lines
 
     // ONE fixed-scale ruler: a nice reference interval (independent of grid) drawn
     // with every grid line, so tick DENSITY carries the absolute scale (1/8" = 8
@@ -237,11 +237,11 @@
     svg += ruler(source, ySrc, true, 0);
 
     // end labels: target (grid-aligned) below, source above
-    svg += txt(x0, yTgt + 30, 'nl-axis-label', 'start', formatSnapped(winLo, target, denom));
-    svg += txt(x1, yTgt + 30, 'nl-axis-label', 'end', formatSnapped(winHi, target, denom));
+    svg += txt(x0, yTgt + 16, 'nl-axis-label', 'start', formatSnapped(winLo, target, denom));
+    svg += txt(x1, yTgt + 16, 'nl-axis-label', 'end', formatSnapped(winHi, target, denom));
     if (source !== target) {
-      svg += txt(x0, ySrc - 20, 'nl-axis-label', 'start', formatTrue(winLo, source));
-      svg += txt(x1, ySrc - 20, 'nl-axis-label', 'end', formatTrue(winHi, source));
+      svg += txt(x0, ySrc - 18, 'nl-axis-label', 'start', formatTrue(winLo, source));
+      svg += txt(x1, ySrc - 18, 'nl-axis-label', 'end', formatTrue(winHi, source));
     }
 
     if (!t.onGrid) {
@@ -266,10 +266,11 @@
       svg += boundBlock(ceilU, false, t.nearIsMin);
     }
 
-    // true tick spanning both rulers + the band, exact value at the very top
-    svg += '<line x1="' + tx + '" y1="' + (ySrc - 14) + '" x2="' + tx + '" y2="' + (yTgt + 14) + '" stroke="#0a0a0a" stroke-width="2"/>';
-    svg += txt(tx, 18, 'nl-true-val', 'middle', formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''));
-    if (source !== target) svg += txt(tx, 30, 'nl-src-val', 'middle', formatTrue(units, source));
+    // true tick — from the hatch top extending only DOWNWARD (not up through the
+    // source ruler), pointing at the exact value placed below the number line
+    svg += '<line x1="' + tx + '" y1="' + ySrc + '" x2="' + tx + '" y2="' + (yTgt + 24) + '" stroke="#0a0a0a" stroke-width="2"/>';
+    svg += txt(tx, yTgt + 32, 'nl-true-val', 'middle', formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''));
+    if (source !== target) svg += txt(tx, yTgt + 44, 'nl-src-val', 'middle', formatTrue(units, source));
 
     svg += '</svg>';
     return svg;
