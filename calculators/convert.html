@@ -9,6 +9,8 @@
 <style>
   /* ---- page-specific only; all behaviour lives in the imported modules ---- */
 
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
   /* Plain, robust entry field — a normal visible input (the overlay-mirror
      trick broke on mobile: invisible text + lost focus). Parsed/pending
      feedback lives in the echo below instead of in the field. */
@@ -53,16 +55,26 @@
   .echo-assumptions div::before { content: '— '; color: var(--gray-400); }
 
   /* grid presets = a precision dial */
-  .grid-presets { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: var(--space-md); }
+  .grid-presets { margin-bottom: var(--space-md); }
   .grid-box { padding: 0.45rem 0.7rem; border: 1px solid var(--gray-700); cursor: pointer;
               font-size: var(--text-sm); background: var(--white); user-select: none; min-width: 2.4rem; text-align: center; }
   .grid-box.active { border: 2px solid var(--selected-bg); padding: calc(0.45rem - 1px) calc(0.7rem - 1px);
                      background: var(--selected-bg); color: var(--white); }
   .grid-sep { width: 1px; align-self: stretch; background: var(--gray-200); margin: 0 0.3rem; }
-  .grid-custom { width: 90px; font-family: inherit; font-size: var(--text-sm); padding: 0.4rem 0.5rem;
-                 border: 1px solid var(--gray-300); outline: none; }
+  .grid-custom { width: 84px; font-family: inherit; font-size: 16px; padding: 0.35rem 0.5rem;
+                 border: 1px solid var(--gray-300); outline: none; -webkit-appearance: none; appearance: none; }
   .grid-custom:focus { border-color: var(--black); }
   .grid-group-label { font-size: var(--text-xs); color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; }
+  /* metric presets group on their own rows so modular doesn't break awkwardly */
+  .grid-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
+  .grid-row:last-child { margin-bottom: 0; }
+
+  /* the engine's exact integer math, shown as a footnote (proves the lattice) */
+  .mathnote { margin-top: var(--space-xl); padding-top: var(--space-md); border-top: 1px solid var(--gray-100);
+              font-family: 'SF Mono', 'DM Mono', ui-monospace, monospace; font-size: var(--text-xs);
+              color: var(--gray-400); line-height: 1.7; }
+  .mathnote b { color: var(--gray-600); font-weight: 400; }
+  .mathnote:empty { display: none; }
 
   .figure-wrap { margin: var(--space-lg) 0; overflow-x: auto; }
   svg.nl { display: block; max-width: 100%; }
@@ -109,9 +121,8 @@
 
   <div class="page-header">
     <h1>Precise Unit Converter</h1>
-    <p>Type a dimension in any format — feet-inches, fractions, metric, or a small
-       expression. It converts, snaps to a grid, and shows the cost of that rounding:
-       Min, Nearest, and Max at once, each with its signed residual.</p>
+    <p>Type a dimension in any format — feet-inches, fractions, metric. You can
+       include +, &minus;, /, x, *, and ().</p>
   </div>
 
   <div class="section-label">Dimension</div>
@@ -138,7 +149,7 @@
     </div>
 
     <div id="lengthOut" style="display:none;">
-      <div class="section-label">Grid <span style="color:var(--gray-400);text-transform:none;letter-spacing:0;">— the precision dial</span></div>
+      <div class="section-label">Snap tolerance</div>
       <div class="grid-presets" id="gridPresets"></div>
 
       <div class="figure-wrap" id="figure"></div>
@@ -147,13 +158,12 @@
     </div>
 
     <div class="ratio-box" id="ratioOut" style="display:none;"></div>
+
+    <div class="mathnote" id="mathNote"></div>
   </div>
 
   <div class="page-footer">
-    architecture.tools — exact on a 1/960&nbsp;mm integer lattice; the only rounding is
-    input quantization (sub-micron). The parser, snap, and number-line modules are pure
-    and reused beyond this page.
-    <br><a class="back-link" href="../index.html">← all tools</a>
+    <a class="back-link" href="../index.html">← all tools</a>
   </div>
 </div>
 
@@ -187,7 +197,8 @@
     gridPresets: document.getElementById('gridPresets'),
     figure: document.getElementById('figure'),
     snapRows: document.getElementById('snapRows'),
-    ratioOut: document.getElementById('ratioOut')
+    ratioOut: document.getElementById('ratioOut'),
+    mathNote: document.getElementById('mathNote')
   };
 
   function escapeHtml(s) {
@@ -273,22 +284,24 @@
   // <input> mid-type (lost focus, blanked text).
   function buildGridPresets() {
     var html = '';
+    function box(attr, v, label) { return '<span class="grid-box" data-' + attr + '="' + v + '">' + label + '</span>'; }
     if (state.target === 'imperial') {
-      var denoms = [2, 4, 8, 16, 32, 64];
       var labels = { 2: '½', 4: '¼', 8: '⅛', 16: '1/16', 32: '1/32', 64: '1/64' };
-      denoms.forEach(function (d) {
-        html += '<span class="grid-box" data-denom="' + d + '">' + labels[d] + '</span>';
-      });
-      html += '<span class="grid-group-label" style="margin-left:.4rem;">custom 1/</span>';
-      html += '<input class="grid-custom" id="gridCustom" type="number" min="1" step="1" placeholder="n">';
+      html += '<div class="grid-row">';
+      [2, 4, 8, 16, 32, 64].forEach(function (d) { html += box('denom', d, labels[d]); });
+      html += '<span class="grid-group-label" style="margin-left:.3rem;">custom 1/</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="numeric" min="1" step="1" placeholder="n">';
+      html += '</div>';
     } else {
-      var fine = [1, 5, 10], modular = [100, 300, 600];
-      html += '<span class="grid-group-label">fine</span>';
-      fine.forEach(function (m) { html += '<span class="grid-box" data-mm="' + m + '">' + m + '</span>'; });
-      html += '<span class="grid-sep"></span><span class="grid-group-label">modular mm</span>';
-      modular.forEach(function (m) { html += '<span class="grid-box" data-mm="' + m + '">' + m + '</span>'; });
-      html += '<span class="grid-group-label" style="margin-left:.4rem;">custom</span>';
-      html += '<input class="grid-custom" id="gridCustom" type="number" min="0" step="any" placeholder="mm">';
+      // whole numbers, then custom, then modular on its own row
+      html += '<div class="grid-row"><span class="grid-group-label">mm</span>';
+      [1, 5, 10].forEach(function (m) { html += box('mm', m, m); });
+      html += '<span class="grid-group-label" style="margin-left:.3rem;">custom</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="decimal" min="0" step="any" placeholder="mm">';
+      html += '</div>';
+      html += '<div class="grid-row"><span class="grid-group-label">modular mm</span>';
+      [100, 300, 600].forEach(function (m) { html += box('mm', m, m); });
+      html += '</div>';
     }
     els.gridPresets.innerHTML = html;
     state.gridUiSystem = state.target;
@@ -333,8 +346,10 @@
     var source = result.unitSystem === 'metric' ? 'metric'
                : result.unitSystem === 'imperial' ? 'imperial' : 'mixed';
 
-    // figure
-    var width = Math.max(320, Math.min(680, els.figure.clientWidth || 640));
+    // figure — size to the actual container (never wider, so margins stay even)
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
     els.figure.innerHTML = NumberLine.numberline({
       units: units, gridCount: g, targetSystem: state.target,
       sourceSystem: source, width: width
@@ -351,6 +366,7 @@
       return state.target === 'imperial' ? '<span class="snap-dec">' + escapeHtml(NumberLine.imperialDecimal(u, 4)) + '</span>' : '';
     }
     var floorU = snap(units, g, 'floor'), ceilU = snap(units, g, 'ceil'), nearU = snap(units, g, 'nearest');
+    var truePrec = state.target === 'imperial' ? '0.0001″' : '0.01 mm';
     var html = '';
     if (floorU === ceilU) {                               // on grid — one value, exact
       html = '<div class="snap-row is-primary is-exact">' + nameCell('On grid', 'exact — no rounding')
@@ -365,16 +381,23 @@
               + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(b.u, state.target, denom)) + decUnder(b.u) + '</div>'
               + '<div class="snap-resid">' + escapeHtml(NumberLine.formatResidual(b.u - units, state.target)) + '</div></div>';
       });
-      html += '<div class="snap-row is-ref">' + nameCell('Exact', 'true value')
+      html += '<div class="snap-row is-ref">' + nameCell('True value', 'to the nearest ' + truePrec)
             + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(units, state.target)) + decUnder(units) + '</div>'
             + '<div class="snap-resid">—</div></div>';
     }
     els.snapRows.innerHTML = html;
+
+    // footnote: the engine's exact integer arithmetic on the 1/960 mm lattice
+    els.mathNote.innerHTML =
+      '<b>engine</b> — exact integers of 1/960 mm. '
+      + 'true = <b>' + units + '</b> · grid = <b>' + g + '</b> · nearest = <b>' + nearU + '</b> · '
+      + 'residual = <b>' + (nearU - units) + '</b> units (' + escapeHtml(NumberLine.formatResidual(nearU - units, state.target)) + ').';
   }
 
   function renderRatio(result) {
     els.lengthOut.style.display = 'none';
     els.ratioOut.style.display = '';
+    els.mathNote.innerHTML = '';
     var r = Math.round(result.ratio * 10000) / 10000;
     var html = '<div class="section-label">Ratio — how many fit</div>'
              + '<div class="ratio-big">' + r + '</div>';
@@ -430,6 +453,7 @@
     if (!result || (result.units == null && result.dimension !== 0)) {
       els.lengthOut.style.display = 'none';
       els.ratioOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
       return;
     }
     if (result.dimension === 0) { renderRatio(result); return; }
