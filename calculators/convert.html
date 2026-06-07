@@ -158,6 +158,7 @@
     </div>
 
     <div class="ratio-box" id="ratioOut" style="display:none;"></div>
+    <div class="ratio-box" id="areaOut" style="display:none;"></div>
 
     <div class="mathnote" id="mathNote"></div>
   </div>
@@ -198,11 +199,17 @@
     figure: document.getElementById('figure'),
     snapRows: document.getElementById('snapRows'),
     ratioOut: document.getElementById('ratioOut'),
+    areaOut: document.getElementById('areaOut'),
     mathNote: document.getElementById('mathNote')
   };
 
   function escapeHtml(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function sig(n) {                                  // ≤4 significant figures, trimmed
+    if (n === 0) return '0';
+    var d = Math.max(0, 4 - Math.floor(Math.log(Math.abs(n)) / Math.LN10) - 1);
+    return String(parseFloat(n.toFixed(Math.min(6, d))));
   }
 
   function currentGridCount() {
@@ -267,6 +274,8 @@
     } else if (result.dimension === 0) {
       var r = Math.round(result.ratio * 10000) / 10000;
       html += '<span class="eq">=</span><span class="result">' + r + '</span>';
+    } else if (result.dimension === 2 && result.area_mm2 != null) {
+      html += '<span class="eq">=</span><span class="result">' + escapeHtml(sig(result.area_mm2 / 1e6) + ' m²') + '</span>';
     } else if (result.note) {
       html += '<span class="eq">=</span><span class="op">' + escapeHtml(result.note) + '</span>';
     } else if (result.units == null) {
@@ -399,8 +408,26 @@
       + escapeHtml(NumberLine.formatResidual(nearU - units, state.target)) + ').';
   }
 
+  function renderArea(result) {
+    els.lengthOut.style.display = 'none';
+    els.ratioOut.style.display = 'none';
+    els.areaOut.style.display = '';
+    var mm2 = result.area_mm2, neg = mm2 < 0 ? '−' : '';
+    var a = Math.abs(mm2), m2 = a / 1e6, in2 = a / 645.16, ft2 = in2 / 144;
+    els.areaOut.innerHTML =
+      '<div class="section-label">Area <span style="color:var(--gray-400);text-transform:none;letter-spacing:0;">— length × length</span></div>'
+      + '<div class="ratio-big">' + neg + sig(m2) + ' m²</div>'
+      + '<div style="margin-top:.4rem;color:var(--gray-700);font-size:var(--text-sm);">'
+      + neg + sig(in2) + ' in²  ·  ' + neg + sig(ft2) + ' ft²  ·  ' + neg + sig(a) + ' mm²</div>';
+    // footnote shows the factor arithmetic in units
+    els.mathNote.innerHTML =
+      '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + escapeHtml(result.interpretation.work) + ' (unit²) = ' + neg + sig(a) + ' mm² = ' + neg + sig(m2) + ' m².';
+  }
+
   function renderRatio(result) {
     els.lengthOut.style.display = 'none';
+    els.areaOut.style.display = 'none';
     els.ratioOut.style.display = '';
     els.mathNote.innerHTML = '';
     var r = Math.round(result.ratio * 10000) / 10000;
@@ -455,13 +482,17 @@
     renderBareAsk(result);
     renderEcho(result);
 
+    if (result && result.dimension === 2 && result.area_mm2 != null) { renderArea(result); return; }
+
     if (!result || (result.units == null && result.dimension !== 0)) {
       els.lengthOut.style.display = 'none';
       els.ratioOut.style.display = 'none';
+      els.areaOut.style.display = 'none';
       els.mathNote.innerHTML = '';
       return;
     }
     if (result.dimension === 0) { renderRatio(result); return; }
+    els.areaOut.style.display = 'none';
     renderLength(result);
   }
 

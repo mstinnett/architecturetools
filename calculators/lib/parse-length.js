@@ -291,6 +291,17 @@
 
   var NULL_AREA = { kind: 'null', dim: 2, note: 'area (dimension 2) — out of scope for the length tool' };
   var NULL_INV  = { kind: 'null', dim: -1, note: 'inverse length (dimension -1) — out of scope' };
+  var NULL_VOLUME = { kind: 'null', dim: 3, note: 'volume (dimension 3) — out of scope' };
+
+  // length × length → an area. Held in mm² (float) since unit² can exceed the
+  // safe-integer range for very large dimensions; the display rounds anyway.
+  function makeArea(a, b) {
+    return {
+      kind: 'area', dim: 2,
+      mm2: (a.units / 960) * (b.units / 960),
+      system: a.system === b.system ? a.system : 'mixed'
+    };
+  }
 
   function isNum(v) { return v && (v.kind === 'length' || v.kind === 'bare' || v.kind === 'scalar' || v.kind === 'ratio'); }
   function bareScalarNumDen(v) {
@@ -304,6 +315,7 @@
     if (v.kind === 'length') return assign({}, v, { units: -v.units });
     if (v.kind === 'bare' || v.kind === 'scalar') return assign({}, v, { num: -v.num });
     if (v.kind === 'ratio') return assign({}, v, { ratio: -v.ratio, ratioNum: -v.ratioNum, count: -v.count });
+    if (v.kind === 'area') return assign({}, v, { mm2: -v.mm2 });
     return v;
   }
   function assign(t) { for (var i = 1; i < arguments.length; i++) { var o = arguments[i]; for (var k in o) if (o.hasOwnProperty(k)) t[k] = o[k]; } return t; }
@@ -321,9 +333,17 @@
     if (left.kind === 'null') return left;
     if (right.kind === 'null') return right;
     var lLen = left.kind === 'length', rLen = right.kind === 'length';
+    var lArea = left.kind === 'area', rArea = right.kind === 'area';
 
     if (op === '*') {
-      if (lLen && rLen) return NULL_AREA;
+      if (lLen && rLen) return makeArea(left, right);          // length × length → area
+      if (lArea && rLen || lLen && rArea) return NULL_VOLUME;  // area × length → volume (3D)
+      if (lArea || rArea) {                                    // area × scalar → scaled area
+        var areaV = lArea ? left : right, oth = lArea ? right : left;
+        if (oth.kind !== 'bare' && oth.kind !== 'scalar') return NULL_VOLUME;
+        markScalar(oth); var sa = bareScalarNumDen(oth);
+        return { kind: 'area', dim: 2, mm2: areaV.mm2 * sa.num / sa.den, system: areaV.system };
+      }
       if (lLen || rLen) {
         var len = lLen ? left : right;
         var sc = lLen ? right : left;
@@ -337,6 +357,11 @@
       return { kind: 'bare', num: a.num * b.num, den: a.den * b.den, dim: 0, _role: 'scalar' };
     }
     // op === '/'
+    if (lArea && !rLen && !rArea) {                            // area ÷ scalar → area
+      markScalar(right); var sd = bareScalarNumDen(right);
+      return { kind: 'area', dim: 2, mm2: left.mm2 * sd.den / sd.num, system: left.system };
+    }
+    if (lArea || rArea) return NULL_VOLUME;                    // other area division → out of scope
     if (lLen && rLen) {
       return ratioOf(left.units, right.units);
     }
@@ -371,8 +396,20 @@
      A bare operand inherits the finest STATED unit in the additive run;
      if none is stated, it takes defaultUnit. */
   function applyAdd(operands, ops, defaultUnit) {
-    // bubble up null/area
+    // bubble up null
     for (var z = 0; z < operands.length; z++) if (operands[z].kind === 'null') return operands[z];
+
+    // areas: sum if every term is an area; mixing area with length is out of scope
+    if (operands.some(function (o) { return o.kind === 'area'; })) {
+      if (!operands.every(function (o) { return o.kind === 'area'; }))
+        return { kind: 'null', dim: 2, note: 'area mixed with length — out of scope' };
+      var mm2 = operands[0].mm2, sys = operands[0].system;
+      for (var q = 0; q < ops.length; q++) {
+        mm2 = ops[q] === '-' ? mm2 - operands[q + 1].mm2 : mm2 + operands[q + 1].mm2;
+        if (operands[q + 1].system !== sys) sys = 'mixed';
+      }
+      return { kind: 'area', dim: 2, mm2: mm2, system: sys };
+    }
 
     // the finest stated unit of each operand (null if it isn't a stated length),
     // plus the run-wide system + overall finest (for the result's own labels)
@@ -741,9 +778,20 @@
     var spans = buildSpans(toks, ev.status, norm.os, norm.oe);
     var interpretation = buildInterpretation(toks, ev.status, ev.node, original, defaultUnit);
 
-    // area / inverse-length / other out-of-scope dimensions: resolved, but not a
-    // length this tool handles. Return an object (not null) carrying the reading
-    // and a note, so the page can SHOW why instead of going blank.
+    // area (length × length): compute and return it. Not a length (no snap/grid),
+    // but a real result — the page shows the area + the factor terms.
+    if (value && value.kind === 'area') {
+      return {
+        units: null, value_mm: null, sign: value.mm2 < 0 ? -1 : 1, dimension: 2,
+        original: original, unitSystem: value.system || 'mixed',
+        area_mm2: value.mm2,
+        interpretation: interpretation, spans: spans
+      };
+    }
+
+    // inverse-length / volume / other out-of-scope dimensions: resolved, but not
+    // a length this tool handles. Return an object (not null) carrying the
+    // reading and a note, so the page can SHOW why instead of going blank.
     if (value && value.kind === 'null') {
       return {
         units: null, value_mm: null, sign: 1, dimension: value.dim,

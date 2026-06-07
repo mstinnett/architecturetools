@@ -95,7 +95,7 @@
     { input: "3m 50cm 5mm",        expect: { units: 3 * M + 50 * CM + 5 * MM }, gate: '1b' },
 
     // ---- 1b  dimensional outcomes ----
-    { input: "12\" * 3\"",           expect: { units: null },                gate: '1b' }, // area → object w/ note, units null
+    { input: "12\" * 3\"",           expect: { areaMm2: 304.8 * 76.2 },      gate: '1b' }, // area = 36 in²
     { input: "12\" / 3\"",           expect: { dim0: { count: 4, remainder_units: 0 } },     gate: '1b' },
     { input: "13\" / 3\"",           expect: { dim0: { count: 4, remainder_units: 1 * IN } }, gate: '1b' },
 
@@ -118,6 +118,11 @@
       return fails;
     }
     if (r === null) { fails.push('got null, expected object'); return fails; }
+
+    if (e.areaMm2 != null) {
+      if (r.dimension !== 2) fails.push('dimension ' + r.dimension + ' !== 2 (area)');
+      if (r.area_mm2 == null || Math.abs(r.area_mm2 - e.areaMm2) > 1) fails.push('area_mm2 ' + r.area_mm2 + ' !== ' + e.areaMm2);
+    }
 
     if (e.hasOwnProperty('units')) {
       if (r.units !== e.units) fails.push('units ' + r.units + ' !== ' + e.units);
