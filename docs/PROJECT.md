@@ -12,6 +12,22 @@ The site uses a minimal, high-contrast design language. No framework, no build t
 
 ---
 
+## Branches: live vs. workbench
+
+This file records actual repo and shipping state, and that now differs by branch:
+
+- **`main` — the live site, picker-only.** `index.html` (the picker) plus its
+  support files; `picker.html` redirects to `/`. `components.html`,
+  `site-screen.html`, and `calculators/` were trimmed off `main` in `f01b200`.
+- **`dev` — the workbench (this branch).** The full site below **plus** the
+  calculator engine (`calculators/lib/`) and the shipped Precise Unit Converter
+  (`calculators/convert.html`). Finished tools promote to `main` one at a time.
+
+The file structure below describes the **`dev`** tree. See `docs/HANDOFF.md` for
+the engine, the build plan, and the promotion/provenance rules.
+
+---
+
 ## Structural model
 
 The site is now organized as a **set of sets**.
@@ -70,32 +86,50 @@ They are part of the site structure, but they do not need premature renaming or 
 │   └── data/
 │       └── hardware-data.json      # GENERATED from data/*.csv — do not hand-edit
 ├── data/                           # Hardware data source (edit in Numbers; see data/README.md)
-│   ├── catalog.csv                 # CPUs / GPUs / Chips — name + note, defined once
+│   ├── cpus.csv                    # Each CPU rec — key, intel option, amd option, note
+│   ├── gpus.csv                    # Each GPU rec — key, name, note
+│   ├── chips.csv                   # Each Mac chip — key, name
 │   ├── specs-win.csv               # Windows spec matrix (one row per cell)
 │   ├── specs-mac.csv               # Mac spec matrix (one row per cell)
 │   ├── priorities.csv              # Per-profile "where the money matters" note
-│   └── extras.json                 # Non-tabular data (apps, prebuilts, monitors…)
+│   ├── extras.json                 # Non-tabular data (apps, prebuilts, monitors…)
+│   └── README.md                   # The authoritative data-pipeline contract
 ├── tools/
-│   └── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
-├── calculators/
-│   ├── index.html                  # Calculator index / C-0 candidate
-│   ├── dimension-converter.html
-│   ├── slope-calculator.html
-│   ├── sheet-sizes.html
-│   ├── occupant-load.html
-│   ├── stair-calculator.html
-│   ├── parking-ratio.html
-│   ├── egress-width.html
-│   └── fixture-calc.html
+│   ├── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
+│   └── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
+├── calculators/                    # NOTE: deferred off main; lives on dev
+│   ├── convert.html                # Precise Unit Converter — engine-powered, SHIPPED
+│   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)
+│   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
+│   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)
+│   │   ├── numberline.js           # Pure SVG-string figure (no DOM)
+│   │   └── parse-length.fixtures.js
+│   ├── dimension-converter.html    # LEGACY standalone — superseded by convert.html, retire
+│   ├── slope-calculator.html       # LEGACY standalone — rebuild onto the engine
+│   ├── stair-calculator.html       # LEGACY standalone — rebuild onto the engine
+│   ├── sheet-sizes.html            # LEGACY standalone — rebuild onto the engine
+│   ├── occupant-load.html          # LEGACY — code-lookup lineage, out of engine scope
+│   ├── parking-ratio.html          # LEGACY — code-lookup lineage, out of engine scope
+│   ├── egress-width.html           # LEGACY — code-lookup lineage, out of engine scope
+│   └── fixture-calc.html           # LEGACY — code-lookup lineage, out of engine scope
+├── .github/workflows/
+│   └── build-data.yml              # Rebuilds hardware-data.json on push, commits it back
+├── CNAME                           # Custom domain: architecture.tools
+├── .nojekyll                       # Serve files as-is on GitHub Pages
 └── docs/
-    ├── PROJECT.md
-    └── SITE_FRAMEWORK.md
+    ├── PROJECT.md                  # This file — actual repo & shipping state
+    ├── SITE_FRAMEWORK.md           # The structural/editorial roadmap
+    ├── HANDOFF.md                  # Calculator-engine charter, build plan, provenance
+    ├── voice.md                    # Recommendation-copy voice & glossary
+    └── decisions/                  # Autonomous work system (state, backlog, queue, guide)
 ```
 
 Notes:
-- `/a/`, `/c/`, and `/l/` are the long-term structural homes.
-- The existing root-level pages remain valid and should stay prominent.
-- `calculators/index.html` can initially do the job of **C-0** even if `/c/index.html` is not added immediately.
+- `/a/`, `/c/`, and `/l/` are the long-term structural homes (not created yet).
+- `calculators/index.html` (a C-0 cover) is not built yet; add it once the
+  engine-based tools settle.
+- On `main` the picker is the only page; the rest of this tree is `dev`-only
+  until promoted.
 
 ---
 
@@ -178,8 +212,8 @@ The picker fetches `assets/data/hardware-data.json` at runtime, but that file is
 `data/`, compiled by `tools/build-data.mjs`. Full workflow is in
 `data/README.md`; the short version:
 
-- `data/catalog.csv` — every CPU / GPU / Mac chip (key, name, standard note),
-  defined **once**.
+- `data/cpus.csv`, `data/gpus.csv`, `data/chips.csv` — the catalog: every CPU,
+  GPU, and Mac chip (key, name(s), standard note), each defined **once**.
 - `data/specs-win.csv`, `data/specs-mac.csv` — the spec matrices, one row per
   `profile / scale / tier` cell, naming components by their catalog key.
 - `data/priorities.csv` — the per-profile "where the money matters" note.
@@ -192,7 +226,7 @@ format, since a 72-row matrix is far nicer to edit there than as JSON.
 **No duplication.** A spec cell names a component by catalog key (`rtx5090`), not
 the full model string. Its `cpuNote`/`gpuNote` cell is **blank** to inherit the
 catalog note, **plain text** to replace it, or **`+ text`** to add a line on top
-of it. So the RTX 5090's `$2,900+` caveat lives once in `catalog.csv` and each
+of it. So the RTX 5090's `$2,900+` caveat lives once in `gpus.csv` and each
 build adds its own flavor. `hydrateSpecs()` in `index.html` resolves these
 references at load into the flat `{ cpu, cpuNote, gpu, gpuNote, ... }` shape the
 render code expects.
@@ -205,12 +239,15 @@ or a duplicate, so typos never ship.
 
 ---
 
-## Current flagship live pages
+## Flagship pages
 
-These are the center of gravity of the shipping site.
+The picker is the center of gravity, and **the only one live on `main`**.
+`components.html` and `site-screen.html` are full pages on `dev` but are not yet
+promoted — they're documented here as the intended companions.
 
-### picker.html
-The main hardware recommendation page.
+### picker.html — live (as `index.html`)
+The main hardware recommendation page, and the site home page. `picker.html`
+remains only as a redirect to `/`.
 
 User flow:
 1. Select software used
@@ -224,7 +261,7 @@ Why it matters:
 - data is explicit rather than auto-generated
 - the page is immediately useful and should remain highly visible from AT-0
 
-### components.html
+### components.html — on dev, not yet promoted
 The companion current-picks page.
 
 Role:
@@ -234,7 +271,7 @@ Role:
 
 This is a live companion to the broader editorial sheets, not a subordinate appendix.
 
-### site-screen.html
+### site-screen.html — on dev, not yet promoted
 A distinct interactive feasibility tool.
 
 Role:
@@ -250,32 +287,39 @@ This is broader than the workstation/hardware material and should remain a separ
 
 ## Calculators
 
-The calculators are already a coherent set and should be treated as such.
+The calculators are the **C-series**, and they are mid-transition from a set of
+standalone pages to a family built on a **shared engine**. They live on `dev`
+(deferred off `main`); finished tools promote to `main` one at a time. The full
+charter — engine model, build plan, conventions — is `docs/HANDOFF.md`.
 
-### Current role
-A grouped library of quick-answer utility pages for architects.
+### The engine (`calculators/lib/`)
+The spine of the family: **parse a dimension expression → resolve it against a
+discrete constraint → show the residual on a number line.** Modules:
+`parse-length.js` (expression evaluator, never throws), `snap.js` (integer-exact
+snap to a grid, fails loud), `numberline.js` (pure SVG-string figure). New tools
+follow the engine conventions: UMD wrapper, pure functions, an inline test
+block, relative asset paths only.
 
-### Structural role
-This is the beginning of the **C-series**.
+### Engine-powered pages
+- `calculators/convert.html` — **Precise Unit Converter. Shipped and frozen.**
+  The first and currently only tool on the engine.
 
-### Immediate implementation recommendation
-Add or refine a calculator index page that functions as **C-0**.
+### Next on the engine (see HANDOFF §5)
+A `partition()` primitive (tile cuts, n-sections, on-center, balusters), then
+slope, then area + coverage, then a scale converter.
 
-That page should:
-- frame calculators as a set
-- explain what kinds of questions they answer
-- link clearly to each calculator
-- feel like a cover sheet, not just a utility list
+### Legacy standalone pages (not on the engine)
+- Rebuild onto the engine, then retire the standalone:
+  `dimension-converter.html` (superseded by `convert.html` — retire, don't port),
+  `slope-calculator.html`, `stair-calculator.html`, `sheet-sizes.html`.
+- A different lineage (code/table lookups, not the dimensional engine) — out of
+  engine scope: `occupant-load.html`, `egress-width.html`, `fixture-calc.html`,
+  `parking-ratio.html`.
 
-### Current calculator pages
-- `calculators/dimension-converter.html`
-- `calculators/slope-calculator.html`
-- `calculators/sheet-sizes.html`
-- `calculators/occupant-load.html`
-- `calculators/stair-calculator.html`
-- `calculators/parking-ratio.html`
-- `calculators/egress-width.html`
-- `calculators/fixture-calc.html`
+### C-0 cover
+A `calculators/index.html` that frames the set, explains what questions it
+answers, and links each tool — still to build, once the engine-based tools
+settle.
 
 ---
 
@@ -327,29 +371,38 @@ The goal is to leave room for these without re-architecting later.
 
 ## Shipping MVP
 
-The shipping MVP should make the current site feel intentional immediately.
+What actually shipped is a **picker-only launch** on `main`. The pages below
+all exist on `dev`; the MVP is to promote them as each is ready, not to land
+them all at once.
 
-### Core pages
-- `index.html` as **AT-0**
-- `picker.html`
-- `components.html`
-- `site-screen.html`
-- `calculators/index.html` as **C-0** or a practical stand-in for it
-- the existing calculator pages
+### Live now (`main`)
+- `index.html` — the picker, doubling as the home page (a fuller **AT-0** cover
+  is deferred behind the picker-only launch).
 
-### Why this is the MVP
-Because these pages already exist, already work, and already define the product better than a larger but emptier framework would.
+### Promote from `dev` as ready
+- `calculators/convert.html` — already engine-complete; a strong first promotion
+- `components.html`, `site-screen.html`
+- the next engine-based calculators (HANDOFF §5)
+- a `calculators/index.html` as **C-0**
 
-The numbered set structure should grow around them.
+### Why this is the path
+These pages already exist and work; promoting them one at a time keeps `main`
+intentional while the numbered set structure grows around them.
 
 ---
 
 ## Current priorities
 
-1. Add / refine `index.html` as **AT-0**
-2. Add / refine a calculator index as **C-0**
-3. Bring more pages onto `global.css`
-4. Keep `picker.html`, `components.html`, and `site-screen.html` prominent
+These seed `docs/decisions/backlog.md` (the work source); keep the two in step.
+The backlog leads with the calculator-engine thread (HANDOFF §5).
+
+1. Extend the calculator engine — `partition()`, then slope, area+coverage,
+   scale — and retire the superseded `dimension-converter.html`
+2. Close the provenance loose ends (noindex on dev WIP, a neutral preview host)
+3. Grow `index.html` toward a fuller **AT-0** cover; add a **C-0** calculator
+   index once the engine tools settle
+4. Bring pages onto `global.css` as they're touched (the picker still uses
+   inline styles)
 5. Add thin A-series pages gradually rather than waiting for a complete set
 
 ---

@@ -132,8 +132,13 @@ rather than port. The code-compliance calculators (`occupant-load`,
 
 ## 6. Reconcile before relying on the agent docs
 
+> **Done (2026-06-07).** `state.md` and `backlog.md` have been reconciled: the
+> engine + converter are folded in, the removed/deferred pages and the
+> CNAME/workflow/CSV-pipeline facts are corrected, and the backlog now leads
+> with the engine build plan (§5). The notes below record what was fixed.
+
 `docs/decisions/state.md` and `docs/decisions/backlog.md` (the autonomous-agent
-system) are **out of date** as of this handoff:
+system) were **out of date** as of this handoff:
 - They still list `components.html` / `site-screen.html` as live "flagship"
   pages — they were removed from `main` (§2).
 - They say no `CNAME`/workflow exists in the repo — both now exist.

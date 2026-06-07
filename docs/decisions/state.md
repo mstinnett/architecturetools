@@ -4,20 +4,37 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-05-29 (picker-only launch revision)_
+_Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 
 ## Live architectural picture
 
 - **What this is:** `architecture.tools` — a static site for architects.
   Vanilla HTML/CSS/JS. No framework, no build step, no backend
   (`docs/PROJECT.md`).
+- **Two branches (read `docs/HANDOFF.md` first):**
+  - **`main` — the live site, picker-only.** `index.html` is the picker (the
+    home page); `picker.html` redirects to `/`. Plus `assets/`, `data/`,
+    `tools/`, `docs/`, the `build-data` workflow, `CNAME`, `.nojekyll`. Trimmed
+    to this in commit `f01b200` (removed `components.html`, `site-screen.html`,
+    and `calculators/`). The picker links to no deferred page, so nothing 404s.
+  - **`dev` — the workbench (this branch).** The full prior site
+    (`components.html`, `site-screen.html`, `calculators/`) **plus** the new
+    calculator engine and converter. All work-in-progress lives here.
+  - **Promotion model:** build on `dev` → preview on a neutral host → move one
+    finished page (and any new `lib/` module) to `main` in a small commit. Live
+    the moment it's on `main`.
+- **Calculator engine (`calculators/lib/`):** the spine of the calculator
+  family. Model: **parse a dimension expression → resolve it against a discrete
+  constraint → show the residual on a number line.** Modules: `parse-length.js`
+  (never throws), `snap.js` (fails loud), `numberline.js` (pure SVG string).
+  Powers exactly one tool today — `calculators/convert.html`, the Precise Unit
+  Converter, which is **shipped and frozen ("done for now")**. Every other
+  `calculators/*.html` is older, standalone, and does **not** use the engine.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
-  C-series (calculators), L-series (library). See `docs/SITE_FRAMEWORK.md`.
+  C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` (design tokens + reusable
-  components); `assets/data/hardware-data.json` (recommendation data, the
-  single source of truth for hardware picks).
-- **Flagship live pages:** `picker.html`, `components.html`,
-  `site-screen.html` — stay named, not numbered, for now.
+  components); `assets/data/hardware-data.json` (the picker's runtime data,
+  generated from the `data/` CSV tables — see the pipeline contract below).
 - **Verification gate:** `.claude/gate/run.sh` — htmlhint + stylelint +
   internal-link check. A dependency carve-out under `.claude/gate/`; not
   shipped with the site.
@@ -27,26 +44,61 @@ _Last updated: 2026-05-29 (picker-only launch revision)_
 - `docs/PROJECT.md` — actual repo/shipping state; the page-classification
   rule (AT / A / C / L / named live page).
 - `docs/SITE_FRAMEWORK.md` — the canonical structural and editorial roadmap.
+- `docs/HANDOFF.md` — the calculator-engine charter: the engine model, the
+  build plan, and the provenance rule.
 - The "no build tools / no framework / no backend" rule for the site itself.
 - The `assets/css/global.css` token and component vocabulary.
-- `assets/data/hardware-data.json` as the single source of hardware data
-  (edited in Pages CMS via `.pages.yml`; the picker fetches it at runtime).
+- The hardware-data pipeline: the CSV tables under `data/` (`cpus.csv`,
+  `gpus.csv`, `chips.csv`, `specs-win.csv`, `specs-mac.csv`, `priorities.csv`,
+  `extras.json`) are the single source of truth. `tools/build-data.mjs`
+  compiles them to `assets/data/hardware-data.json` (generated — never
+  hand-edited); the picker fetches that JSON at runtime, and a GitHub Action
+  rebuilds it on push. Full contract in `data/README.md`.
+- The engine conventions (`calculators/lib/`): UMD wrapper (browser + node),
+  pure functions, an inline test block per module, **relative asset paths
+  only**. New tools follow them.
+- The provenance rule: never serve WIP on `architecture.tools` or a subdomain
+  of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
 
 ## Recent decisions
 
-- 2026-05-29 — Picker-only launch revision (operator-directed). The picker is
-  now the site home page (`index.html`; `picker.html` redirects to `/`). Live
-  pricing was removed from the picker UI (price data retained, unrendered).
-  Hardware data moved from `hardware-data.js` to `hardware-data.json`, loaded
-  via `fetch` and editable in Pages CMS (`.pages.yml`). Other pages
-  (components, site-screen, calculators) still exist but are not linked at launch.
+- 2026-06-07 — Precise Unit Converter shipped (frozen), and the calculator
+  **engine** (`calculators/lib/`) established as the spine for the family. Build
+  plan and provenance rule captured in `docs/HANDOFF.md`. These agent docs
+  (`state.md`, `backlog.md`) were reconciled to match — they previously omitted
+  the engine entirely and still listed removed pages as live.
+- 2026-06-07 — `main` trimmed to picker-only (`f01b200`): `components.html`,
+  `site-screen.html`, and `calculators/` removed from the live branch and kept
+  on `dev`. The two-branch promotion model (above) is the working arrangement.
+- 2026-06-05 — Deployment moved in-repo. `CNAME` points the custom domain
+  (architecture.tools) at the site; `.github/workflows/build-data.yml`
+  recompiles `hardware-data.json` on push and commits it back. With `.nojekyll`
+  this is a GitHub Pages setup serving `main`, not an external pipeline.
+- 2026-06-03 — Hardware data split into per-table CSVs. The single `catalog.csv`
+  became `cpus.csv` + `gpus.csv` + `chips.csv`; the spec matrices reference
+  catalog keys, compiled by `tools/build-data.mjs`. `data/README.md` is
+  authoritative. (Supersedes the earlier Pages-CMS / `.pages.yml` idea, which
+  never shipped.)
+- 2026-05-29 — Picker-only launch revision (operator-directed). The picker
+  became the site home page; live pricing was removed from the picker UI (price
+  data retained, unrendered).
 - 2026-05-22 — Autonomous work system bootstrapped. Setup choices recorded
   in `docs/decisions/OPERATING_GUIDE.md`.
 
 ## Active concerns
 
-- `index.html` now exists as the picker (the launch home page), so `href="/"`
-  has a target. The richer AT-0 master cover (a multi-set index) is deferred
-  behind the picker-only launch — tracked in the backlog.
-- Deployment/DNS lives outside this repo (no workflow or CNAME here). Actually
-  replacing the live landing page requires pointing the domain at this site.
+- **Next build:** a `partition()` engine module (sibling to `snap.js`) — one
+  primitive unlocks tile cuts, n-sections-with-gaps, on-center layout, and
+  baluster spacing. Then slope, area+coverage, scale. See `docs/HANDOFF.md` §5
+  and the backlog.
+- **Provenance loose end:** the `noindex` meta tag is **not** yet on the `dev`
+  WIP pages (`convert.html`, the legacy calculators), and no preview host is
+  configured. Add `noindex` before any preview is shared; remove it on
+  promotion to `main`.
+- **Legacy calculators are off-engine.** `slope`, `stair`, `sheet-sizes` get
+  rebuilt onto the engine; `dimension-converter.html` is superseded by
+  `convert.html` and should be retired, not ported. The code-compliance
+  calculators (`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`)
+  are a different lineage (table lookups) — out of scope for the engine thread.
+- The richer AT-0 master cover (a multi-set index) is deferred behind the
+  picker-only launch — tracked in the backlog.
