@@ -22,7 +22,6 @@ time (see `docs/HANDOFF.md` §2).
 
 ## Open — provenance / hosting (loose ends from HANDOFF §4)
 
-- [ ] **Add `noindex` to the `dev` WIP pages.** Source: HANDOFF.md §4. `convert.html` and the legacy calculators carry no `<meta name="robots" content="noindex, nofollow">`. Add it to anything not yet on `main`; remove on promotion.
 - [ ] **Stand up a neutral preview host + `docs/staging.md`.** Source: HANDOFF.md §4. Recommended: Cloudflare Pages on its `*.pages.dev` URL (auto-noindexed; do not attach the custom domain). Never serve WIP under `architecture.tools` or a subdomain of it.
 
 ## Open — site structure (lower priority)
@@ -34,6 +33,7 @@ time (see `docs/HANDOFF.md` §2).
 
 ## Done
 
+- [x] **Add `noindex` to the `dev` WIP pages.** Source: HANDOFF.md §4. `<meta name="robots" content="noindex, nofollow">` (with a "remove on promotion" comment) added to all 11 pages not yet on `main`: `components.html`, `site-screen.html`, and every `calculators/*.html`.
 - [x] **Precise Unit Converter + calculator engine.** Source: HANDOFF.md. `calculators/lib/` (`parse-length`, `snap`, `numberline`) plus `convert.html` — shipped and frozen on `dev`.
 - [x] **Reconcile the agent docs with the engine thread.** Source: HANDOFF.md §6. `state.md` and `backlog.md` refreshed: engine + converter folded in, removed/deferred pages corrected, CNAME/workflow + CSV pipeline facts fixed.
 - [x] **Repo hygiene: remove committed `.DS_Store` files and ignore them.** Source: ad-hoc (noticed at bootstrap). Run as the system's end-to-end dry-run — Rung 1, scout → implement → reviewer → commit.

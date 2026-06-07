@@ -91,10 +91,10 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
   primitive unlocks tile cuts, n-sections-with-gaps, on-center layout, and
   baluster spacing. Then slope, area+coverage, scale. See `docs/HANDOFF.md` §5
   and the backlog.
-- **Provenance loose end:** the `noindex` meta tag is **not** yet on the `dev`
-  WIP pages (`convert.html`, the legacy calculators), and no preview host is
-  configured. Add `noindex` before any preview is shared; remove it on
-  promotion to `main`.
+- **Provenance loose end:** `noindex` is now on all 11 `dev` WIP pages
+  (`components`, `site-screen`, every `calculators/*.html`) — remove on
+  promotion. Still open: no neutral preview host is configured, so WIP can only
+  be viewed locally until one is stood up.
 - **Legacy calculators are off-engine.** `slope`, `stair`, `sheet-sizes` get
   rebuilt onto the engine; `dimension-converter.html` is superseded by
   `convert.html` and should be retired, not ported. The code-compliance
