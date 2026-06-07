@@ -160,22 +160,21 @@
     // rounding error. Refining the grid shrinks the cell honestly. Reference: the
     // containing inch (imperial) or a fixed metric span; endpoints are round
     // "best values". Precise per-bound numbers live in the rows below.
-    var refSpan = target === 'imperial' ? IN : (g <= 10 * MM ? 50 * MM : 3000 * MM);
-    var refLo = Math.floor(floorU / refSpan) * refSpan, refHi = refLo + refSpan;
-    while (ceilU > refHi) refHi += refSpan;
-    while (floorU < refLo) refLo -= refSpan;
-
     // Focus+context (fisheye) mapping: the active cell is magnified to the
-    // middle third (so the hatch stays a large, centred, legible size), while
-    // the rest of the reference is compressed into the side margins. The grid
-    // ticks in those margins pack denser as the grid refines — that density is
-    // the sense of scale, without shrinking the hatch.
+    // middle third (so the hatch stays a large, centred, legible size), and the
+    // window FLOATS so the context is symmetric — an equal span (ctx) compressed
+    // into each side margin. The grid ticks there pack denser as the grid
+    // refines: that density is the sense of scale, with the hatch fixed. (The
+    // ends float with the value rather than snapping to round boundaries.)
+    var ctxSpan = target === 'imperial' ? IN : (g <= 10 * MM ? 50 * MM : 3000 * MM);
+    var ctx = ctxSpan / 2;
+    var winLo = floorU - ctx, winHi = ceilU + ctx;
     var xA = x0 + axisW / 3, xB = x0 + 2 * axisW / 3;
     function X(u) {
-      if (t.onGrid) return x0 + (u - refLo) / (refHi - refLo) * axisW;     // no cell to magnify
-      if (u <= floorU) return floorU > refLo ? x0 + (u - refLo) / (floorU - refLo) * (xA - x0) : x0;
+      if (t.onGrid) return x0 + (u - winLo) / (winHi - winLo) * axisW;     // no cell to magnify
+      if (u <= floorU) return x0 + (u - winLo) / (floorU - winLo) * (xA - x0);
       if (u <= ceilU) return xA + (u - floorU) / (ceilU - floorU) * (xB - xA);
-      return refHi > ceilU ? xB + (u - ceilU) / (refHi - ceilU) * (x1 - xB) : x1;
+      return xB + (u - ceilU) / (winHi - ceilU) * (x1 - xB);
     }
     var tx = X(units), xL = X(floorU), xR = X(ceilU);
 
@@ -192,13 +191,13 @@
     svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
     // every grid line — density in the compressed margins = fineness = scale
     // (skip the cell's own edges; they're drawn heavier below)
-    for (var gu = Math.ceil(refLo / g) * g; gu <= refHi + 0.5; gu += g) {
+    for (var gu = Math.ceil(winLo / g) * g; gu <= winHi + 0.5; gu += g) {
       if (!t.onGrid && (gu === floorU || gu === ceilU)) continue;
       svg += '<line x1="' + X(gu) + '" y1="' + yTgt + '" x2="' + X(gu) + '" y2="' + (yTgt + 4) + '" stroke="#ccc" stroke-width="1"/>';
     }
-    // reference endpoints — round "best values" anchoring the scale
-    svg += txt(x0, yTgt + 16, 'nl-axis-label', 'start', formatTrue(refLo, target));
-    svg += txt(x1, yTgt + 16, 'nl-axis-label', 'end', formatTrue(refHi, target));
+    // window endpoints — float with the value (equal span each side)
+    svg += txt(x0, yTgt + 16, 'nl-axis-label', 'start', formatTrue(winLo, target));
+    svg += txt(x1, yTgt + 16, 'nl-axis-label', 'end', formatTrue(winHi, target));
 
     if (!t.onGrid) {
       // active cell: hatched, framed by its two grid edges (nearer one heavier)
