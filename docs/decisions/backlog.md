@@ -14,7 +14,7 @@ time (see `docs/HANDOFF.md` §2).
 
 ## Open — calculator engine (the active thread)
 
-- [ ] **`partition()` engine module — highest-leverage next build.** Source: HANDOFF.md §5. A sibling to `snap.js` reusing `snap` + `numberline`. One primitive unlocks four tools: tile run + joint (end cut), n sections + gaps (leftover), on-center spacing (studs/joists/pickets drift), baluster gap (smallest n with gap ≤ 4″). Follow the engine conventions (UMD wrapper, pure functions, inline test block, relative paths) and add `noindex` to any new WIP page.
+- [ ] **Partition tool page (convert.html-style) on `partition.js`.** Source: HANDOFF.md §5. The primitive is built; this is the UI layer — a page that parses a run (via `parse-length`), runs `partition` in the chosen mode (tiles / sections / on-center / balusters), and draws the layout + residual the way `convert.html` draws the number line. Reuse `numberline`'s format helpers for the readouts. Add `noindex` to the new page.
 - [ ] **Slope tool on the engine.** Source: HANDOFF.md §5. Uses the parser's `ratio` kind (rise vs run / vs code limit). Then fold the legacy standalone `slope-calculator.html` and `stair-calculator.html` onto the engine and retire the standalones.
 - [ ] **Area + coverage tool on the engine.** Source: HANDOFF.md §5. Uses the parser's `area` kind (`makeArea`) — area, area ÷ coverage, sheet count. Then fold legacy `sheet-sizes.html` onto the engine.
 - [ ] **Scale converter (quick win).** Source: HANDOFF.md §5. Pure parse, no snap — can land anytime.
@@ -33,6 +33,7 @@ time (see `docs/HANDOFF.md` §2).
 
 ## Done
 
+- [x] **`partition()` engine module.** Source: HANDOFF.md §5. `calculators/lib/partition.js` — the layout primitive (sibling to `snap.js`, reuses its integer division). Four modes (sections / tiles / on-center / balusters) behind one dispatcher; pure, fails loud, 34 inline `node` tests passing. The four tool pages are now thin layers on it (tracked above).
 - [x] **Add `noindex` to the `dev` WIP pages.** Source: HANDOFF.md §4. `<meta name="robots" content="noindex, nofollow">` (with a "remove on promotion" comment) added to all 11 pages not yet on `main`: `components.html`, `site-screen.html`, and every `calculators/*.html`.
 - [x] **Precise Unit Converter + calculator engine.** Source: HANDOFF.md. `calculators/lib/` (`parse-length`, `snap`, `numberline`) plus `convert.html` — shipped and frozen on `dev`.
 - [x] **Reconcile the agent docs with the engine thread.** Source: HANDOFF.md §6. `state.md` and `backlog.md` refreshed: engine + converter folded in, removed/deferred pages corrected, CNAME/workflow + CSV pipeline facts fixed.

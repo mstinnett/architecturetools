@@ -25,11 +25,15 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
     the moment it's on `main`.
 - **Calculator engine (`calculators/lib/`):** the spine of the calculator
   family. Model: **parse a dimension expression → resolve it against a discrete
-  constraint → show the residual on a number line.** Modules: `parse-length.js`
-  (never throws), `snap.js` (fails loud), `numberline.js` (pure SVG string).
-  Powers exactly one tool today — `calculators/convert.html`, the Precise Unit
-  Converter, which is **shipped and frozen ("done for now")**. Every other
-  `calculators/*.html` is older, standalone, and does **not** use the engine.
+  constraint → show the residual.** Modules: `parse-length.js` (never throws),
+  `snap.js` (fails loud, floor/nearest/ceil to a grid), `numberline.js` (pure
+  SVG string), and `partition.js` (fails loud; divides a run into a whole number
+  of equal parts — sections, tiles, on-center, balusters — and exposes the
+  residual; reuses snap's integer division). `convert.html`, the Precise Unit
+  Converter, is the only **tool page** yet built on the engine — **shipped and
+  frozen**; it uses parse/snap/numberline. `partition.js` is landed and tested
+  but has no tool page yet. Every other `calculators/*.html` is older,
+  standalone, and does **not** use the engine.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` (design tokens + reusable
@@ -62,6 +66,12 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 
 ## Recent decisions
 
+- 2026-06-07 — `partition.js` shipped: the layout primitive (sibling to
+  `snap.js`) that divides a run into a whole number of equal parts and exposes
+  the residual, unifying four tools (sections / tiles / on-center / balusters)
+  behind one module. Pure integer math, fails loud, 34 inline `node` tests
+  passing. No tool page consumes it yet — that is the next build.
+- 2026-06-07 — `noindex` added to all 11 `dev` WIP pages (provenance §4).
 - 2026-06-07 — Precise Unit Converter shipped (frozen), and the calculator
   **engine** (`calculators/lib/`) established as the spine for the family. Build
   plan and provenance rule captured in `docs/HANDOFF.md`. These agent docs
@@ -87,10 +97,10 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 
 ## Active concerns
 
-- **Next build:** a `partition()` engine module (sibling to `snap.js`) — one
-  primitive unlocks tile cuts, n-sections-with-gaps, on-center layout, and
-  baluster spacing. Then slope, area+coverage, scale. See `docs/HANDOFF.md` §5
-  and the backlog.
+- **Next build:** a **tool page** on `partition.js` — a convert.html-style page
+  (figure + parsed input + residual) exposing tile cuts / n-sections / on-center
+  / balusters. The primitive is done; this is the UI layer. Then slope,
+  area+coverage, scale. See `docs/HANDOFF.md` §5 and the backlog.
 - **Provenance loose end:** `noindex` is now on all 11 `dev` WIP pages
   (`components`, `site-screen`, every `calculators/*.html`) — remove on
   promotion. Still open: no neutral preview host is configured, so WIP can only

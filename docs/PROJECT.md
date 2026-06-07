@@ -103,6 +103,7 @@ They are part of the site structure, but they do not need premature renaming or 
 │   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
 │   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)
 │   │   ├── numberline.js           # Pure SVG-string figure (no DOM)
+│   │   ├── partition.js            # Run → whole-number layout + residual (fails loud)
 │   │   └── parse-length.fixtures.js
 │   ├── dimension-converter.html    # LEGACY standalone — superseded by convert.html, retire
 │   ├── slope-calculator.html       # LEGACY standalone — rebuild onto the engine
@@ -294,19 +295,22 @@ charter — engine model, build plan, conventions — is `docs/HANDOFF.md`.
 
 ### The engine (`calculators/lib/`)
 The spine of the family: **parse a dimension expression → resolve it against a
-discrete constraint → show the residual on a number line.** Modules:
-`parse-length.js` (expression evaluator, never throws), `snap.js` (integer-exact
-snap to a grid, fails loud), `numberline.js` (pure SVG-string figure). New tools
-follow the engine conventions: UMD wrapper, pure functions, an inline test
-block, relative asset paths only.
+discrete constraint → show the residual.** Modules: `parse-length.js`
+(expression evaluator, never throws), `snap.js` (integer-exact snap to a grid,
+fails loud), `numberline.js` (pure SVG-string figure), and `partition.js`
+(divides a run into a whole number of equal parts — sections, tiles, on-center,
+balusters — and exposes the residual; reuses snap's integer division, fails
+loud). New tools follow the engine conventions: UMD wrapper, pure functions, an
+inline test block, relative asset paths only.
 
 ### Engine-powered pages
 - `calculators/convert.html` — **Precise Unit Converter. Shipped and frozen.**
   The first and currently only tool on the engine.
 
 ### Next on the engine (see HANDOFF §5)
-A `partition()` primitive (tile cuts, n-sections, on-center, balusters), then
-slope, then area + coverage, then a scale converter.
+The `partition.js` primitive is built (tile cuts, n-sections, on-center,
+balusters); its **tool page** is the next build. Then slope, then area +
+coverage, then a scale converter.
 
 ### Legacy standalone pages (not on the engine)
 - Rebuild onto the engine, then retire the standalone:
