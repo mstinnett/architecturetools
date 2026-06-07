@@ -183,7 +183,16 @@
     var ctx = ctxSpan / 2;
     var winLo = Math.floor((floorU - ctx) / g) * g;
     var winHi = Math.ceil((ceilU + ctx) / g) * g;
-    var xA = x0 + axisW / 3, xB = x0 + 2 * axisW / 3;
+
+    // coarseness c ∈ [0,1] (1 = coarsest) drives three cues: text size, and the
+    // magnified cell's WIDTH — wider for coarse grids, clamped narrower (~2/3 of
+    // the old third) for the finest, with the side margins absorbing the rest.
+    var c = target === 'imperial'
+      ? Math.max(0, Math.min(1, (6 - Math.log(denom) / Math.LN2) / 5))   // 1/2"→1 … 1/64"→0
+      : Math.max(0, Math.min(1, (Math.log(g / MM) / Math.LN10) / 3));    // 1mm→0 … 1000mm→1
+    var fscale = 1 + c * 0.45;
+    var cellW = (0.22 + c * 0.20) * axisW;       // fine ≈0.22·W … coarse ≈0.42·W
+    var xA = x0 + (axisW - cellW) / 2, xB = xA + cellW;
     function X(u) {
       if (t.onGrid) return x0 + (u - winLo) / (winHi - winLo) * axisW;     // no cell to magnify
       if (u <= floorU) return x0 + (u - winLo) / (floorU - winLo) * (xA - x0);
@@ -191,14 +200,6 @@
       return xB + (u - ceilU) / (winHi - ceilU) * (x1 - xB);
     }
     var tx = X(units), xL = X(floorU), xR = X(ceilU);
-
-    // coarseness → text size: a coarser grid rounds more, so its labels read
-    // larger; finer grids shrink the text (a third scale cue beside tick height
-    // and density). c ∈ [0,1], 1 = coarsest.
-    var c = target === 'imperial'
-      ? Math.max(0, Math.min(1, (6 - Math.log(denom) / Math.LN2) / 5))   // 1/2"→1 … 1/64"→0
-      : Math.max(0, Math.min(1, (Math.log(g / MM) / Math.LN10) / 3));    // 1mm→0 … 1000mm→1
-    var fscale = 1 + c * 0.45;
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
     svg += '<defs><pattern id="nlhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
