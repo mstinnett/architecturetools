@@ -39,12 +39,6 @@
   };
   function tickH(i) { return Math.max(3, 13 - i * 2); }
 
-  // base font sizes (px) for the figure's text, scaled at render by coarseness
-  var BASE = {
-    'nl-true-val': 13, 'nl-snap-val': 12, 'nl-snap-role': 9,
-    'nl-src-val': 10, 'nl-residual': 10, 'nl-axis-label': 10
-  };
-
   /* ---- display precision (shared) ---------------------------------------- */
 
   function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
@@ -184,13 +178,12 @@
     var winLo = Math.floor((floorU - ctx) / g) * g;
     var winHi = Math.ceil((ceilU + ctx) / g) * g;
 
-    // coarseness c ∈ [0,1] (1 = coarsest) drives three cues: text size, and the
-    // magnified cell's WIDTH — wider for coarse grids, clamped narrower (~2/3 of
-    // the old third) for the finest, with the side margins absorbing the rest.
+    // coarseness c ∈ [0,1] (1 = coarsest) drives the magnified cell's WIDTH —
+    // wider for coarse grids, clamped narrower (~2/3 of the old third) for the
+    // finest, with the side margins absorbing the rest.
     var c = target === 'imperial'
       ? Math.max(0, Math.min(1, (6 - Math.log(denom) / Math.LN2) / 5))   // 1/2"→1 … 1/64"→0
       : Math.max(0, Math.min(1, (Math.log(g / MM) / Math.LN10) / 3));    // 1mm→0 … 1000mm→1
-    var fscale = 1 + c * 0.45;
     var cellW = (0.22 + c * 0.20) * axisW;       // fine ≈0.22·W … coarse ≈0.42·W
     var xA = x0 + (axisW - cellW) / 2, xB = xA + cellW;
     function X(u) {
@@ -206,8 +199,7 @@
          + '<line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
 
     function txt(x, y, cls, anchor, s) {
-      var fs = ((BASE[cls.split(' ')[0]] || 11) * fscale).toFixed(1);
-      return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke;font-size:' + fs + 'px">' + esc(s) + '</text>';
+      return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
     }
 
     // hierarchical ruler: taller ticks for coarser units (a ruler look), denser
