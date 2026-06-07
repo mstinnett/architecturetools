@@ -39,6 +39,12 @@
   };
   function tickH(i) { return Math.max(3, 13 - i * 2); }
 
+  // base font sizes (px) for the figure's text, scaled at render by coarseness
+  var BASE = {
+    'nl-true-val': 13, 'nl-snap-val': 12, 'nl-snap-role': 9,
+    'nl-src-val': 10, 'nl-residual': 10, 'nl-axis-label': 10
+  };
+
   /* ---- display precision (shared) ---------------------------------------- */
 
   function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
@@ -186,12 +192,21 @@
     }
     var tx = X(units), xL = X(floorU), xR = X(ceilU);
 
+    // coarseness → text size: a coarser grid rounds more, so its labels read
+    // larger; finer grids shrink the text (a third scale cue beside tick height
+    // and density). c ∈ [0,1], 1 = coarsest.
+    var c = target === 'imperial'
+      ? Math.max(0, Math.min(1, (6 - Math.log(denom) / Math.LN2) / 5))   // 1/2"→1 … 1/64"→0
+      : Math.max(0, Math.min(1, (Math.log(g / MM) / Math.LN10) / 3));    // 1mm→0 … 1000mm→1
+    var fscale = 1 + c * 0.45;
+
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
     svg += '<defs><pattern id="nlhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
 
     function txt(x, y, cls, anchor, s) {
-      return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
+      var fs = ((BASE[cls.split(' ')[0]] || 11) * fscale).toFixed(1);
+      return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke;font-size:' + fs + 'px">' + esc(s) + '</text>';
     }
 
     // hierarchical ruler: taller ticks for coarser units (a ruler look), denser
