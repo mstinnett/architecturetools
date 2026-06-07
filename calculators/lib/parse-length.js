@@ -123,8 +123,11 @@
   function readNumber(s, i) {
     var rest = s.slice(i);
     var m;
-    // mixed number: whole <space> int/int   (e.g. "4 1/2", "40 1/2")
-    m = /^(\d+) (\d+)\/(\d+)/.exec(rest);
+    // mixed number: whole, then a space OR a dash, then a fraction
+    // (e.g. "4 1/2", "40 1/2", "8-1/2"). The dash binds whole+fraction here —
+    // people write 8-1/2" for eight-and-a-half. Subtracting a fraction needs a
+    // unit on the left (8"-1/2"), which has its own unit so never reaches here.
+    m = /^(\d+)(?:\s*-\s*|\s+)(\d+)\/(\d+)/.exec(rest);
     if (m) {
       var w = +m[1], n = +m[2], d = +m[3];
       return { num: w * d + n, den: d, end: i + m[0].length };

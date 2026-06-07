@@ -80,9 +80,14 @@
     // ---- 1b/1c  inheritance (bare takes the NEAREST stated unit) ----
     { input: "8'4\" + 3",            expect: { units: 8 * FT + 4 * IN + 3 * IN, inferred: [false, true] }, gate: '1b/1c' },
     { input: "8' + 3",              expect: { units: 8 * FT + 3 * FT, inferred: [false, true] },          gate: '1b/1c' },
-    // leading bare takes the adjacent inch term (not the finer cm further off)
-    { input: "8 - 1/2\" + 11cm",    expect: { units: 8 * IN - IN / 2 + 11 * CM, inferred: [true, false, false] }, gate: '1b/1c' },
+    // a genuine bare takes its nearest stated unit (inches, not the further cm)
     { input: "5\" + 3 + 2cm",       expect: { units: 5 * IN + 3 * IN + 2 * CM, inferred: [false, true, false] }, gate: '1b/1c' },
+
+    // whole-dash-fraction is a mixed number, not subtraction
+    { input: "8-1/2\"",             expect: { units: 17 * IN / 2 }, gate: '1a-3' },     // 8½"
+    { input: "8 - 1/2\"",          expect: { units: 17 * IN / 2 }, gate: '1a-3' },     // whitespace doesn't change it
+    { input: "8-1/2\" + 11cm",     expect: { units: 17 * IN / 2 + 11 * CM, inferred: [false, false] }, gate: '1b' },
+    { input: "8\"-1/2\"",          expect: { units: 8 * IN - IN / 2 }, gate: '1b' },   // unit on left → subtraction = 7½"
 
     // ---- 1b  dimensional outcomes ----
     { input: "12\" * 3\"",           expect: { isNull: true },               gate: '1b' }, // area

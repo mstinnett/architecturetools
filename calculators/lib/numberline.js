@@ -145,77 +145,66 @@
     var target = opts.targetSystem || 'imperial';
     var source = opts.sourceSystem || target;
     var W = opts.width || 680;
-    var H = opts.height || 132;
+    var H = opts.height || 150;
 
     var denom = target === 'imperial' ? Math.round(IN / g) : null;
     var t = snapTriple(units, g);
     var floorU = t.maxU, ceilU = t.minU;        // round down (left), round up (right)
 
-    // window: the bracketing cell [floor, ceil] plus one cell of margin each side
+    // window: the bracketing cell [floor, ceil] sits in the middle third, a cell
+    // of margin each side for the flanking value blocks
     var lo = floorU - g, hi = ceilU + g;
     if (hi === lo) { lo -= g; hi += g; }         // on-grid: floor == ceil
 
-    var padL = 24, padR = 24;
-    var x0 = padL, x1 = W - padR, axisW = x1 - x0;
-    var yAxis = 70;
+    var x0 = 24, x1 = W - 24, axisW = x1 - x0;
+    var ySrc = 52, yTgt = 116, bandMid = (ySrc + yTgt) / 2;   // the rectangle's two edges
     function X(u) { return x0 + (u - lo) / (hi - lo) * axisW; }
+    var tx = X(units);
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
     svg += '<defs><pattern id="nlhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
 
-    // axis + minor grid ticks
-    svg += '<line x1="' + x0 + '" y1="' + yAxis + '" x2="' + x1 + '" y2="' + yAxis + '" stroke="#0a0a0a" stroke-width="1"/>';
-    var gStart = Math.ceil(lo / g) * g;
-    for (var gu = gStart; gu <= hi; gu += g) {
-      var gx = X(gu);
-      svg += '<line x1="' + gx + '" y1="' + yAxis + '" x2="' + gx + '" y2="' + (yAxis + 6) + '" stroke="#bbb" stroke-width="1"/>';
-    }
-
-    var tx = X(units);
-    // hatch the two residual gaps (true → each bound); fills the cell when off-grid
-    function band(a, b) {
-      var bx = Math.min(a, b), bw = Math.abs(b - a);
-      if (bw < 0.5) return '';
-      return '<rect x="' + bx + '" y="' + (yAxis - 12) + '" width="' + bw + '" height="24" fill="url(#nlhatch)" stroke="none"/>';
-    }
-    svg += band(X(floorU), tx);
-    svg += band(tx, X(ceilU));
-
-    // bound ticks (1px) and true tick (2px)
-    svg += '<line x1="' + X(floorU) + '" y1="' + (yAxis - 12) + '" x2="' + X(floorU) + '" y2="' + (yAxis + 6) + '" stroke="#0a0a0a" stroke-width="1"/>';
-    svg += '<line x1="' + X(ceilU) + '" y1="' + (yAxis - 12) + '" x2="' + X(ceilU) + '" y2="' + (yAxis + 6) + '" stroke="#0a0a0a" stroke-width="1"/>';
-    svg += '<line x1="' + tx + '" y1="' + (yAxis - 24) + '" x2="' + tx + '" y2="' + (yAxis + 8) + '" stroke="#0a0a0a" stroke-width="2"/>';
-
     function txt(x, y, cls, anchor, s) {
       return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
     }
 
-    // true value, centred on its tick
-    svg += txt(tx, yAxis - 30, 'nl-true-role', 'middle', 'exact');
-    svg += txt(tx, yAxis + 22, 'nl-true-val', 'middle', formatTrue(units, target));
-    if (source !== target) svg += txt(tx, yAxis + 35, 'nl-src-val', 'middle', formatTrue(units, source));
-
     if (t.onGrid) {
-      svg += txt(W / 2, yAxis + 35, 'nl-note', 'middle', 'on grid — exact, no rounding');
-      svg += '</svg>'; return svg;
+      svg += '<line x1="' + tx + '" y1="' + (ySrc - 6) + '" x2="' + tx + '" y2="' + (yTgt + 6) + '" stroke="#0a0a0a" stroke-width="2"/>';
+      svg += txt(tx, ySrc - 16, 'nl-true-role', 'middle', 'exact · on grid');
+      if (source !== target) svg += txt(tx, ySrc - 3, 'nl-src-val', 'middle', formatTrue(units, source));
+      svg += txt(tx, yTgt + 18, 'nl-true-val', 'middle', formatTrue(units, target));
+      return svg + '</svg>';
     }
 
-    // a bound's stacked block, flanking the hatch on its outer side
-    function boundBlock(snapU, side, isNearest) {
-      var x = side === 'left' ? x0 : x1;
-      var anchor = side === 'left' ? 'start' : 'end';
-      var role = (side === 'left' ? 'round down' : 'round up') + (isNearest ? ' · nearest' : '');
+    var xL = X(floorU), xR = X(ceilU);
+    // the rounding cell, as a hatched rectangle: top edge reads in the source
+    // system, bottom edge in the target system; the gap is the cost of rounding
+    svg += '<rect x="' + xL + '" y="' + ySrc + '" width="' + (xR - xL) + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="#0a0a0a" stroke-width="1"/>';
+    // true tick inside the cell, extending just beyond each edge
+    svg += '<line x1="' + tx + '" y1="' + (ySrc - 6) + '" x2="' + tx + '" y2="' + (yTgt + 6) + '" stroke="#0a0a0a" stroke-width="2"/>';
+
+    // exact value — source above the top edge, target below the bottom edge
+    svg += txt(tx, ySrc - 19, 'nl-true-role', 'middle', 'exact');
+    if (source !== target) svg += txt(tx, ySrc - 6, 'nl-src-val', 'middle', formatTrue(units, source));
+    svg += txt(tx, yTgt + 18, 'nl-true-val', 'middle', formatTrue(units, target));
+
+    // each bound's value hugs the outer edge of the hatch, mirrored: round down
+    // is right-aligned against the left edge, round up left-aligned against the
+    // right edge. Decimal revealed under the fraction so it compares to exact.
+    function boundBlock(snapU, atLeft, isNearest) {
+      var x = atLeft ? (xL - 8) : (xR + 8);
+      var anchor = atLeft ? 'end' : 'start';
+      var role = (atLeft ? 'round down' : 'round up') + (isNearest ? ' · nearest' : '');
       var valCls = 'nl-snap-val' + (isNearest ? ' nl-nearest' : '');
-      var s = '';
-      s += txt(x, yAxis - 30, 'nl-snap-role', anchor, role);
-      s += txt(x, yAxis - 14, valCls, anchor, formatSnapped(snapU, target, denom));
-      if (target === 'imperial') s += txt(x, yAxis + 16, 'nl-src-val', anchor, formatTrue(snapU, target));
-      s += txt(x, yAxis + (target === 'imperial' ? 29 : 16), 'nl-residual', anchor, formatResidual(snapU - units, target));
+      var s = txt(x, bandMid - 16, 'nl-snap-role', anchor, role);
+      s += txt(x, bandMid, valCls, anchor, formatSnapped(snapU, target, denom));
+      if (target === 'imperial') s += txt(x, bandMid + 14, 'nl-src-val', anchor, formatTrue(snapU, target));
+      s += txt(x, bandMid + (target === 'imperial' ? 28 : 14), 'nl-residual', anchor, formatResidual(snapU - units, target));
       return s;
     }
-    svg += boundBlock(floorU, 'left', t.nearIsMax);
-    svg += boundBlock(ceilU, 'right', t.nearIsMin);
+    svg += boundBlock(floorU, true, t.nearIsMax);
+    svg += boundBlock(ceilU, false, t.nearIsMin);
 
     svg += '</svg>';
     return svg;
