@@ -164,7 +164,19 @@
     var refLo = Math.floor(floorU / refSpan) * refSpan, refHi = refLo + refSpan;
     while (ceilU > refHi) refHi += refSpan;
     while (floorU < refLo) refLo -= refSpan;
-    function X(u) { return x0 + (u - refLo) / (refHi - refLo) * axisW; }
+
+    // Focus+context (fisheye) mapping: the active cell is magnified to the
+    // middle third (so the hatch stays a large, centred, legible size), while
+    // the rest of the reference is compressed into the side margins. The grid
+    // ticks in those margins pack denser as the grid refines — that density is
+    // the sense of scale, without shrinking the hatch.
+    var xA = x0 + axisW / 3, xB = x0 + 2 * axisW / 3;
+    function X(u) {
+      if (t.onGrid) return x0 + (u - refLo) / (refHi - refLo) * axisW;     // no cell to magnify
+      if (u <= floorU) return floorU > refLo ? x0 + (u - refLo) / (floorU - refLo) * (xA - x0) : x0;
+      if (u <= ceilU) return xA + (u - floorU) / (ceilU - floorU) * (xB - xA);
+      return refHi > ceilU ? xB + (u - ceilU) / (refHi - ceilU) * (x1 - xB) : x1;
+    }
     var tx = X(units), xL = X(floorU), xR = X(ceilU);
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
@@ -178,8 +190,10 @@
     // band: source line on top, target line on bottom
     svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke="#999" stroke-width="1"/>';
     svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
-    // every grid line — density = fineness = scale
+    // every grid line — density in the compressed margins = fineness = scale
+    // (skip the cell's own edges; they're drawn heavier below)
     for (var gu = Math.ceil(refLo / g) * g; gu <= refHi + 0.5; gu += g) {
+      if (!t.onGrid && (gu === floorU || gu === ceilU)) continue;
       svg += '<line x1="' + X(gu) + '" y1="' + yTgt + '" x2="' + X(gu) + '" y2="' + (yTgt + 4) + '" stroke="#ccc" stroke-width="1"/>';
     }
     // reference endpoints — round "best values" anchoring the scale
