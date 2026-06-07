@@ -32,6 +32,13 @@
 
   var MM = 960, IN = 24384, FT = 12 * 24384;
 
+  // ruler tick ladders (coarse → fine) and heights (coarser = taller)
+  var LADDER = {
+    imperial: [IN, IN / 2, IN / 4, IN / 8, IN / 16, IN / 32, IN / 64],
+    metric: [1000 * MM, 500 * MM, 100 * MM, 50 * MM, 10 * MM, 5 * MM, 1 * MM]
+  };
+  function tickH(i) { return Math.max(3, 13 - i * 2); }
+
   /* ---- display precision (shared) ---------------------------------------- */
 
   function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
@@ -145,14 +152,14 @@
     var target = opts.targetSystem || 'imperial';
     var source = opts.sourceSystem || target;
     var W = opts.width || 680;
-    var H = opts.height || 150;
+    var H = opts.height || 156;
 
     var denom = target === 'imperial' ? Math.round(IN / g) : null;
     var t = snapTriple(units, g);
     var floorU = t.maxU, ceilU = t.minU;        // round down (left), round up (right)
 
     var x0 = 24, x1 = W - 24, axisW = x1 - x0;
-    var ySrc = 50, yTgt = 108, bandMid = (ySrc + yTgt) / 2;   // the band's two scale lines
+    var ySrc = 58, yTgt = 120, bandMid = (ySrc + yTgt) / 2;   // the band's two scale lines
 
     // ONE fixed-scale ruler: a nice reference interval (independent of grid) drawn
     // with every grid line, so tick DENSITY carries the absolute scale (1/8" = 8
@@ -187,18 +194,47 @@
       return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
     }
 
-    // band: source line on top, target line on bottom
+    // hierarchical ruler: taller ticks for coarser units (a ruler look), denser
+    // as the grid refines — both cue the scale. Drawn through the fisheye map X.
+    function ruler(system, baseY, up, gMin) {
+      var lad = LADDER[system === 'metric' ? 'metric' : 'imperial'];
+      var levels = [], i, j;
+      for (i = 0; i < lad.length; i++) {
+        if (gMin && lad[i] < gMin) continue;             // target: nothing finer than the grid
+        if ((winHi - winLo) / lad[i] > 80) continue;     // density guard
+        levels.push({ step: lad[i], h: tickH(i) });
+      }
+      if (gMin) {                                        // ensure the grid line itself is drawn
+        var has = false;
+        for (j = 0; j < levels.length; j++) if (levels[j].step === gMin) has = true;
+        if (!has) levels.push({ step: gMin, h: 3 });
+      }
+      levels.sort(function (a, b) { return b.step - a.step; });  // coarse (tall) first
+      var seen = {}, out = '', k, u, x, key, y2;
+      for (k = 0; k < levels.length; k++) {
+        for (u = Math.ceil(winLo / levels[k].step) * levels[k].step; u <= winHi + 0.5; u += levels[k].step) {
+          x = X(u); key = Math.round(x * 2);
+          if (seen[key]) continue; seen[key] = 1;
+          y2 = up ? baseY - levels[k].h : baseY + levels[k].h;
+          out += '<line x1="' + x.toFixed(2) + '" y1="' + baseY + '" x2="' + x.toFixed(2) + '" y2="' + y2 + '" stroke="#bbb" stroke-width="1"/>';
+        }
+      }
+      return out;
+    }
+
+    // two scale lines + dual hierarchical rulers (source on top, target below)
     svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke="#999" stroke-width="1"/>';
     svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
-    // every grid line — density in the compressed margins = fineness = scale
-    // (skip the cell's own edges; they're drawn heavier below)
-    for (var gu = Math.ceil(winLo / g) * g; gu <= winHi + 0.5; gu += g) {
-      if (!t.onGrid && (gu === floorU || gu === ceilU)) continue;
-      svg += '<line x1="' + X(gu) + '" y1="' + yTgt + '" x2="' + X(gu) + '" y2="' + (yTgt + 4) + '" stroke="#ccc" stroke-width="1"/>';
+    svg += ruler(target, yTgt, false, g);
+    svg += ruler(source, ySrc, true, 0);
+
+    // end labels: target (grid-aligned) below, source above
+    svg += txt(x0, yTgt + 30, 'nl-axis-label', 'start', formatSnapped(winLo, target, denom));
+    svg += txt(x1, yTgt + 30, 'nl-axis-label', 'end', formatSnapped(winHi, target, denom));
+    if (source !== target) {
+      svg += txt(x0, ySrc - 20, 'nl-axis-label', 'start', formatTrue(winLo, source));
+      svg += txt(x1, ySrc - 20, 'nl-axis-label', 'end', formatTrue(winHi, source));
     }
-    // window endpoints — clean grid-aligned "selected unit" values
-    svg += txt(x0, yTgt + 16, 'nl-axis-label', 'start', formatSnapped(winLo, target, denom));
-    svg += txt(x1, yTgt + 16, 'nl-axis-label', 'end', formatSnapped(winHi, target, denom));
 
     if (!t.onGrid) {
       // active cell: hatched, framed by its two grid edges (nearer one heavier)
@@ -206,8 +242,7 @@
       svg += '<line x1="' + xL + '" y1="' + ySrc + '" x2="' + xL + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMax ? 2 : 1) + '"/>';
       svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMin ? 2 : 1) + '"/>';
 
-      // bound values hug the hatch edges, mirrored: round down right-aligned at
-      // the left edge, round up left-aligned at the right; decimal under each
+      // bound values hug the hatch edges, mirrored; decimal under each
       function boundBlock(snapU, atLeft, isNearest) {
         var x = atLeft ? (xL - 8) : (xR + 8);
         var anchor = atLeft ? 'end' : 'start';
@@ -223,10 +258,10 @@
       svg += boundBlock(ceilU, false, t.nearIsMin);
     }
 
-    // true tick (2px) + exact value above it (target prominent, source small)
-    svg += '<line x1="' + tx + '" y1="' + (ySrc - 7) + '" x2="' + tx + '" y2="' + (yTgt + 7) + '" stroke="#0a0a0a" stroke-width="2"/>';
-    svg += txt(tx, ySrc - 8, 'nl-true-val', 'middle', formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''));
-    if (source !== target) svg += txt(tx, ySrc - 20, 'nl-src-val', 'middle', formatTrue(units, source));
+    // true tick spanning both rulers + the band, exact value at the very top
+    svg += '<line x1="' + tx + '" y1="' + (ySrc - 14) + '" x2="' + tx + '" y2="' + (yTgt + 14) + '" stroke="#0a0a0a" stroke-width="2"/>';
+    svg += txt(tx, 18, 'nl-true-val', 'middle', formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''));
+    if (source !== target) svg += txt(tx, 30, 'nl-src-val', 'middle', formatTrue(units, source));
 
     svg += '</svg>';
     return svg;
