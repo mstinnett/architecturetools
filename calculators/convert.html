@@ -69,16 +69,21 @@
   .nl-true-val    { font-size: 13px; fill: var(--black); font-weight: 400; }
   .nl-note        { font-size: 10px; fill: var(--gray-500); font-style: italic; }
 
-  /* snap readout rows */
+  /* snap readout rows — Nearest leads and is emphasised */
   .snap-rows { margin-top: var(--space-md); }
   .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
   .snap-row:last-child { border-bottom: none; }
-  .snap-row.is-true { border-bottom: 2px solid var(--black); }
-  .snap-name { width: 130px; flex-shrink: 0; font-size: var(--text-xs); font-weight: 400;
+  .snap-name { width: 150px; flex-shrink: 0; font-size: var(--text-xs); font-weight: 400;
                text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); }
+  .snap-gloss { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--gray-400);
+                text-transform: none; letter-spacing: 0; }
   .snap-value { flex: 1; font-size: var(--text-md); font-weight: 300; }
-  .snap-resid { width: 130px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
+  .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
   .snap-row.is-exact .snap-resid { color: var(--black); }
+  .snap-row.is-primary { border-bottom: 2px solid var(--black); }
+  .snap-row.is-primary .snap-name { color: var(--black); }
+  .snap-row.is-primary .snap-value { font-size: var(--text-lg); font-weight: 400; }
+  .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--gray-500); }
 
   .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--gray-50); border: var(--border-light); }
   .ratio-big { font-size: var(--text-xl); font-weight: 300; }
@@ -299,28 +304,31 @@
       sourceSystem: source, width: width
     });
 
-    // rows: true + Max ≤ (floor) / Nearest ≈ / Min ≥ (ceil), using snap.js
+    // Nearest is the answer most entries want, so it leads and is emphasised;
+    // round up/down follow with their constraint use; the exact value is a
+    // quiet reference at the foot. Snapping uses snap.js.
     var rows = [
-      { name: 'True', dir: null, isTrue: true },
-      { name: 'Min ≥ (round up)', dir: 'ceil' },
-      { name: 'Nearest ≈', dir: 'nearest' },
-      { name: 'Max ≤ (round down)', dir: 'floor' }
+      { name: 'Nearest', gloss: '', dir: 'nearest', primary: true },
+      { name: 'Round up', gloss: 'for a minimum', dir: 'ceil' },
+      { name: 'Round down', gloss: 'for a maximum', dir: 'floor' }
     ];
+    function nameCell(name, gloss) {
+      return '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>';
+    }
     var html = '';
     rows.forEach(function (r) {
-      if (r.isTrue) {
-        html += '<div class="snap-row is-true"><div class="snap-name">' + r.name + '</div>'
-              + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(units, state.target)) + '</div>'
-              + '<div class="snap-resid">exact</div></div>';
-        return;
-      }
       var s = snap(units, g, r.dir);
       var resid = s - units;
       var exact = resid === 0;
-      html += '<div class="snap-row' + (exact ? ' is-exact' : '') + '"><div class="snap-name">' + r.name + '</div>'
+      var cls = 'snap-row' + (r.primary ? ' is-primary' : '') + (exact ? ' is-exact' : '');
+      html += '<div class="' + cls + '">' + nameCell(r.name, r.gloss)
             + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(s, state.target, denom)) + '</div>'
             + '<div class="snap-resid">' + escapeHtml(exact ? 'on grid' : NumberLine.formatResidual(resid, state.target)) + '</div></div>';
     });
+    // exact (true) value, as a reference the residuals are measured from
+    html += '<div class="snap-row is-ref">' + nameCell('Exact', 'true value')
+          + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(units, state.target)) + '</div>'
+          + '<div class="snap-resid">—</div></div>';
     els.snapRows.innerHTML = html;
   }
 

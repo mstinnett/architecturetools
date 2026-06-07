@@ -198,9 +198,9 @@
     // ---- snap ticks + dual labels ----
     // group snaps by exact units to merge coincident labels
     var snaps = [
-      { u: t.maxU, role: 'Max ≤' },
-      { u: t.nearU, role: 'Nearest ≈' },
-      { u: t.minU, role: 'Min ≥' }
+      { u: t.maxU, role: 'round down' },     // floor — never exceeds true (for a maximum)
+      { u: t.nearU, role: 'nearest' },
+      { u: t.minU, role: 'round up' }        // ceil — never falls short of true (for a minimum)
     ];
     var groups = {};
     snaps.forEach(function (s) {
@@ -216,7 +216,7 @@
       // bottom (target) value + role tag; stagger to reduce collisions
       var stagger = (gi % 2) * 14;
       svg += '<text x="' + sx + '" y="' + (yTgt + 18 + stagger) + '" class="nl-snap-val" text-anchor="middle">' + esc(formatSnapped(grp.u, target, denom)) + '</text>';
-      svg += '<text x="' + sx + '" y="' + (ySrc - 14 - stagger) + '" class="nl-snap-role" text-anchor="middle">' + esc(grp.roles.join(' = ')) + '</text>';
+      svg += '<text x="' + sx + '" y="' + (ySrc - 14 - stagger) + '" class="nl-snap-role" text-anchor="middle">' + esc(grp.roles.join(' · ')) + '</text>';
       // top (source) equivalent of this physical point
       svg += '<text x="' + sx + '" y="' + (ySrc - 2 - stagger) + '" class="nl-src-val" text-anchor="middle">' + esc(formatTrue(grp.u, source)) + '</text>';
       // residual label — flanking the band on its OUTER side (Max to the left,
