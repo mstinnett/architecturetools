@@ -267,6 +267,8 @@
     } else if (result.dimension === 0) {
       var r = Math.round(result.ratio * 10000) / 10000;
       html += '<span class="eq">=</span><span class="result">' + r + '</span>';
+    } else if (result.note) {
+      html += '<span class="eq">=</span><span class="op">' + escapeHtml(result.note) + '</span>';
     } else if (result.units == null) {
       html += '<span class="eq">—</span><span class="op">unresolved</span>';
     }

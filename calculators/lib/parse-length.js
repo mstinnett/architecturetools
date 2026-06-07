@@ -69,7 +69,7 @@
     '‘': "'", '’': "'",            // smart single quotes
     '“': '"', '”': '"',            // smart double quotes
     '−': '-',                            // minus sign
-    '×': '*', '∗': '*',            // multiplication sign / asterisk operator
+    '×': '*', '∗': '*', 'x': '*', 'X': '*', // multiplication: ×, asterisk, and ascii x
     '÷': '/',                            // division sign
     ' ': ' '                             // non-breaking space
   };
@@ -709,11 +709,18 @@
     }
 
     var spans = buildSpans(toks, ev.status, norm.os, norm.oe);
-
-    // area / inverse-length / other out-of-scope dimensions → null (contract)
-    if (value && value.kind === 'null') return null;
-
     var interpretation = buildInterpretation(toks, ev.status, ev.node, original, defaultUnit);
+
+    // area / inverse-length / other out-of-scope dimensions: resolved, but not a
+    // length this tool handles. Return an object (not null) carrying the reading
+    // and a note, so the page can SHOW why instead of going blank.
+    if (value && value.kind === 'null') {
+      return {
+        units: null, value_mm: null, sign: 1, dimension: value.dim,
+        original: original, unitSystem: 'mixed', note: value.note,
+        interpretation: interpretation, spans: spans
+      };
+    }
 
     // a term existed but nothing resolved (e.g. conflicting compound) →
     // return an object with null units so the UI can show WHY (spans pending).

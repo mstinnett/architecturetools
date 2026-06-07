@@ -95,7 +95,7 @@
     { input: "3m 50cm 5mm",        expect: { units: 3 * M + 50 * CM + 5 * MM }, gate: '1b' },
 
     // ---- 1b  dimensional outcomes ----
-    { input: "12\" * 3\"",           expect: { isNull: true },               gate: '1b' }, // area
+    { input: "12\" * 3\"",           expect: { units: null },                gate: '1b' }, // area → object w/ note, units null
     { input: "12\" / 3\"",           expect: { dim0: { count: 4, remainder_units: 0 } },     gate: '1b' },
     { input: "13\" / 3\"",           expect: { dim0: { count: 4, remainder_units: 1 * IN } }, gate: '1b' },
 
