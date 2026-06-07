@@ -85,12 +85,14 @@
   .snap-gloss { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--gray-400);
                 text-transform: none; letter-spacing: 0; }
   .snap-value { flex: 1; font-size: var(--text-md); font-weight: 300; }
+  .snap-dec { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--gray-400); }
   .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
   .snap-row.is-exact .snap-resid { color: var(--black); }
-  .snap-row.is-primary { border-bottom: 2px solid var(--black); }
-  .snap-row.is-primary .snap-name { color: var(--black); }
+  .snap-row.is-primary .snap-name { color: var(--black); }     /* the nearer bound */
   .snap-row.is-primary .snap-value { font-size: var(--text-lg); font-weight: 400; }
+  .snap-row.is-ref { border-top: 1px solid var(--gray-200); }
   .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--gray-500); }
+  .nl-nearest { font-weight: 600; }
 
   .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--gray-50); border: var(--border-light); }
   .ratio-big { font-size: var(--text-xl); font-weight: 300; }
@@ -338,31 +340,35 @@
       sourceSystem: source, width: width
     });
 
-    // Nearest is the answer most entries want, so it leads and is emphasised;
-    // round up/down follow with their constraint use; the exact value is a
-    // quiet reference at the foot. Snapping uses snap.js.
-    var rows = [
-      { name: 'Nearest', gloss: '', dir: 'nearest', primary: true },
-      { name: 'Round up', gloss: 'for a minimum', dir: 'ceil' },
-      { name: 'Round down', gloss: 'for a maximum', dir: 'floor' }
-    ];
+    // Only two grid values bracket the true value: round down (smaller) and
+    // round up (larger). Nearest is whichever is closer — a flag, not a third
+    // row. Each imperial value reveals its decimal under the fraction, so the
+    // decimals line up against the exact value. Snapping uses snap.js.
     function nameCell(name, gloss) {
       return '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>';
     }
+    function decUnder(u) {
+      return state.target === 'imperial' ? '<span class="snap-dec">' + escapeHtml(NumberLine.imperialDecimal(u, 4)) + '</span>' : '';
+    }
+    var floorU = snap(units, g, 'floor'), ceilU = snap(units, g, 'ceil'), nearU = snap(units, g, 'nearest');
     var html = '';
-    rows.forEach(function (r) {
-      var s = snap(units, g, r.dir);
-      var resid = s - units;
-      var exact = resid === 0;
-      var cls = 'snap-row' + (r.primary ? ' is-primary' : '') + (exact ? ' is-exact' : '');
-      html += '<div class="' + cls + '">' + nameCell(r.name, r.gloss)
-            + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(s, state.target, denom)) + '</div>'
-            + '<div class="snap-resid">' + escapeHtml(exact ? 'on grid' : NumberLine.formatResidual(resid, state.target)) + '</div></div>';
-    });
-    // exact (true) value, as a reference the residuals are measured from
-    html += '<div class="snap-row is-ref">' + nameCell('Exact', 'true value')
-          + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(units, state.target)) + '</div>'
-          + '<div class="snap-resid">—</div></div>';
+    if (floorU === ceilU) {                               // on grid — one value, exact
+      html = '<div class="snap-row is-primary is-exact">' + nameCell('On grid', 'exact — no rounding')
+           + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(units, state.target, denom)) + decUnder(units) + '</div>'
+           + '<div class="snap-resid">on grid</div></div>';
+    } else {
+      [{ name: 'Round down', gloss: 'for a maximum', u: floorU },
+       { name: 'Round up', gloss: 'for a minimum', u: ceilU }].forEach(function (b) {
+        var near = b.u === nearU;
+        var cls = 'snap-row' + (near ? ' is-primary' : '');
+        html += '<div class="' + cls + '">' + nameCell(b.name + (near ? ' · nearest' : ''), b.gloss)
+              + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(b.u, state.target, denom)) + decUnder(b.u) + '</div>'
+              + '<div class="snap-resid">' + escapeHtml(NumberLine.formatResidual(b.u - units, state.target)) + '</div></div>';
+      });
+      html += '<div class="snap-row is-ref">' + nameCell('Exact', 'true value')
+            + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(units, state.target)) + decUnder(units) + '</div>'
+            + '<div class="snap-resid">—</div></div>';
+    }
     els.snapRows.innerHTML = html;
   }
 

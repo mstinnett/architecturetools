@@ -145,100 +145,77 @@
     var target = opts.targetSystem || 'imperial';
     var source = opts.sourceSystem || target;
     var W = opts.width || 680;
-    var H = opts.height || 230;
+    var H = opts.height || 132;
 
     var denom = target === 'imperial' ? Math.round(IN / g) : null;
     var t = snapTriple(units, g);
+    var floorU = t.maxU, ceilU = t.minU;        // round down (left), round up (right)
 
-    // window: active cell ± one cell of margin
-    var lo = Math.min(t.maxU, units) - g;
-    var hi = Math.max(t.minU, units) + g;
-    if (hi === lo) { lo -= g; hi += g; }
+    // window: the bracketing cell [floor, ceil] plus one cell of margin each side
+    var lo = floorU - g, hi = ceilU + g;
+    if (hi === lo) { lo -= g; hi += g; }         // on-grid: floor == ceil
 
     var padL = 24, padR = 24;
     var x0 = padL, x1 = W - padR, axisW = x1 - x0;
-    var ySrc = 64, yTgt = 150;                 // the two scale lines
+    var yAxis = 70;
     function X(u) { return x0 + (u - lo) / (hi - lo) * axisW; }
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
-
-    // hatch pattern — a line pattern, not a fill tint
     svg += '<defs><pattern id="nlhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
 
-    // ---- target grid minor ticks on the bottom scale ----
+    // axis + minor grid ticks
+    svg += '<line x1="' + x0 + '" y1="' + yAxis + '" x2="' + x1 + '" y2="' + yAxis + '" stroke="#0a0a0a" stroke-width="1"/>';
     var gStart = Math.ceil(lo / g) * g;
     for (var gu = gStart; gu <= hi; gu += g) {
       var gx = X(gu);
-      svg += '<line x1="' + gx + '" y1="' + yTgt + '" x2="' + gx + '" y2="' + (yTgt + 6) + '" stroke="#bbb" stroke-width="1"/>';
+      svg += '<line x1="' + gx + '" y1="' + yAxis + '" x2="' + gx + '" y2="' + (yAxis + 6) + '" stroke="#bbb" stroke-width="1"/>';
     }
 
-    // ---- the two scale lines ----
-    svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke="#999" stroke-width="1"/>';
-    svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
-    svg += '<text x="' + x0 + '" y="' + (ySrc - 28) + '" class="nl-axis-label" text-anchor="start">' + esc(source) + ' (source)</text>';
-    svg += '<text x="' + x0 + '" y="' + (yTgt + 40) + '" class="nl-axis-label" text-anchor="start">' + esc(target) + ' (target)</text>';
-
-    // ---- hatched residual bands (true → each snap) ----
-    // Full height between the two scale lines; residual labels flank the bands
-    // to the left/right (below), so nothing sits on the cross-hatching.
-    function band(snapU) {
-      if (snapU === units) return '';
-      var a = X(units), b = X(snapU);
-      var bx = Math.min(a, b), bw = Math.abs(b - a);
-      return '<rect x="' + bx + '" y="' + ySrc + '" width="' + bw + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
-    }
-    // draw Max & Min bands; Nearest band only if it is distinct from both
-    svg += band(t.maxU);
-    svg += band(t.minU);
-    if (!t.nearIsMax && !t.nearIsMin) svg += band(t.nearU);
-
-    // ---- snap ticks + dual labels ----
-    // group snaps by exact units to merge coincident labels
-    var snaps = [
-      { u: t.maxU, role: 'round down' },     // floor — never exceeds true (for a maximum)
-      { u: t.nearU, role: 'nearest' },
-      { u: t.minU, role: 'round up' }        // ceil — never falls short of true (for a minimum)
-    ];
-    var groups = {};
-    snaps.forEach(function (s) {
-      var key = String(s.u);
-      (groups[key] = groups[key] || { u: s.u, roles: [] }).roles.push(s.role);
-    });
-
-    Object.keys(groups).forEach(function (key, gi) {
-      var grp = groups[key];
-      var sx = X(grp.u);
-      // 1px connector across both scales
-      svg += '<line x1="' + sx + '" y1="' + ySrc + '" x2="' + sx + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
-      // bottom (target) value + role tag; stagger to reduce collisions
-      var stagger = (gi % 2) * 14;
-      svg += '<text x="' + sx + '" y="' + (yTgt + 18 + stagger) + '" class="nl-snap-val" text-anchor="middle">' + esc(formatSnapped(grp.u, target, denom)) + '</text>';
-      svg += '<text x="' + sx + '" y="' + (ySrc - 14 - stagger) + '" class="nl-snap-role" text-anchor="middle">' + esc(grp.roles.join(' · ')) + '</text>';
-      // top (source) equivalent of this physical point
-      svg += '<text x="' + sx + '" y="' + (ySrc - 2 - stagger) + '" class="nl-src-val" text-anchor="middle">' + esc(formatTrue(grp.u, source)) + '</text>';
-      // residual label — flanking the band on its OUTER side (Max to the left,
-      // Min to the right), at the hatch mid-height, so it never sits on the
-      // hatch or the true tick. White halo for safety.
-      var res = grp.u - units;
-      if (res !== 0) {
-        var onLeft = grp.u < units;                 // floor/Max → left, ceil/Min → right
-        var rx = onLeft ? (sx - 6) : (sx + 6);
-        var anchor = onLeft ? 'end' : 'start';
-        var ry = (ySrc + yTgt) / 2 + 4;
-        svg += '<text x="' + rx + '" y="' + ry + '" class="nl-residual" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(formatResidual(res, target)) + '</text>';
-      }
-    });
-
-    // ---- true tick (2px, full height, drawn last so it sits on top) ----
     var tx = X(units);
-    svg += '<line x1="' + tx + '" y1="' + (ySrc - 12) + '" x2="' + tx + '" y2="' + (yTgt + 12) + '" stroke="#0a0a0a" stroke-width="2"/>';
-    svg += '<text x="' + tx + '" y="' + (ySrc - 40) + '" class="nl-true-role" text-anchor="middle">true</text>';
-    svg += '<text x="' + tx + '" y="' + (yTgt + 56) + '" class="nl-true-val" text-anchor="middle">' + esc(formatTrue(units, target)) + '</text>';
+    // hatch the two residual gaps (true → each bound); fills the cell when off-grid
+    function band(a, b) {
+      var bx = Math.min(a, b), bw = Math.abs(b - a);
+      if (bw < 0.5) return '';
+      return '<rect x="' + bx + '" y="' + (yAxis - 12) + '" width="' + bw + '" height="24" fill="url(#nlhatch)" stroke="none"/>';
+    }
+    svg += band(X(floorU), tx);
+    svg += band(tx, X(ceilU));
+
+    // bound ticks (1px) and true tick (2px)
+    svg += '<line x1="' + X(floorU) + '" y1="' + (yAxis - 12) + '" x2="' + X(floorU) + '" y2="' + (yAxis + 6) + '" stroke="#0a0a0a" stroke-width="1"/>';
+    svg += '<line x1="' + X(ceilU) + '" y1="' + (yAxis - 12) + '" x2="' + X(ceilU) + '" y2="' + (yAxis + 6) + '" stroke="#0a0a0a" stroke-width="1"/>';
+    svg += '<line x1="' + tx + '" y1="' + (yAxis - 24) + '" x2="' + tx + '" y2="' + (yAxis + 8) + '" stroke="#0a0a0a" stroke-width="2"/>';
+
+    function txt(x, y, cls, anchor, s) {
+      return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
+    }
+
+    // true value, centred on its tick
+    svg += txt(tx, yAxis - 30, 'nl-true-role', 'middle', 'exact');
+    svg += txt(tx, yAxis + 22, 'nl-true-val', 'middle', formatTrue(units, target));
+    if (source !== target) svg += txt(tx, yAxis + 35, 'nl-src-val', 'middle', formatTrue(units, source));
 
     if (t.onGrid) {
-      svg += '<text x="' + (W / 2) + '" y="' + (H - 6) + '" class="nl-note" text-anchor="middle">exactly on grid — every residual is 0</text>';
+      svg += txt(W / 2, yAxis + 35, 'nl-note', 'middle', 'on grid — exact, no rounding');
+      svg += '</svg>'; return svg;
     }
+
+    // a bound's stacked block, flanking the hatch on its outer side
+    function boundBlock(snapU, side, isNearest) {
+      var x = side === 'left' ? x0 : x1;
+      var anchor = side === 'left' ? 'start' : 'end';
+      var role = (side === 'left' ? 'round down' : 'round up') + (isNearest ? ' · nearest' : '');
+      var valCls = 'nl-snap-val' + (isNearest ? ' nl-nearest' : '');
+      var s = '';
+      s += txt(x, yAxis - 30, 'nl-snap-role', anchor, role);
+      s += txt(x, yAxis - 14, valCls, anchor, formatSnapped(snapU, target, denom));
+      if (target === 'imperial') s += txt(x, yAxis + 16, 'nl-src-val', anchor, formatTrue(snapU, target));
+      s += txt(x, yAxis + (target === 'imperial' ? 29 : 16), 'nl-residual', anchor, formatResidual(snapU - units, target));
+      return s;
+    }
+    svg += boundBlock(floorU, 'left', t.nearIsMax);
+    svg += boundBlock(ceilU, 'right', t.nearIsMin);
 
     svg += '</svg>';
     return svg;
