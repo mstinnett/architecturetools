@@ -128,7 +128,7 @@
 
   <div class="section-label">Dimension</div>
   <div class="field-wrap">
-    <input type="text" id="dimInput" spellcheck="false"
+    <input type="text" id="dimInput" spellcheck="false" maxlength="120"
            autocomplete="off" autocapitalize="off" placeholder="e.g. 1m  ·  3'-4 1/2&quot;  ·  8' + 3 1/2&quot;" autofocus>
     <div class="field-note" id="fieldNote"></div>
     <!-- appears only when a number has no unit and nothing to inherit from -->
@@ -177,6 +177,8 @@
 (function () {
   'use strict';
   var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;          // 100 km — beyond this we don't snap/draw
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
 
   var state = {
     text: '',
@@ -269,7 +271,9 @@
       else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
     });
 
-    if (result.dimension === 1 && result.units != null) {
+    if (result.dimension === 1 && result.units != null && outOfRange(result.units)) {
+      html += '<span class="eq">=</span><span class="op">out of range (max ' + (MAX_UNITS / 960000) + ' m)</span>';
+    } else if (result.dimension === 1 && result.units != null) {
       var conv = NumberLine.formatTrue(result.units, state.target);
       html += '<span class="eq">=</span><span class="result">' + escapeHtml(conv) + '</span>';
     } else if (result.dimension === 0) {
@@ -302,14 +306,14 @@
       html += '<div class="grid-row">';
       [2, 4, 8, 16, 32, 64].forEach(function (d) { html += box('denom', d, labels[d]); });
       html += '<span class="grid-group-label" style="margin-left:.3rem;">custom 1/</span>';
-      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="numeric" min="1" step="1" placeholder="n">';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="numeric" min="1" max="256" step="1" placeholder="n">';
       html += '</div>';
     } else {
       // whole numbers, then custom, then modular on its own row
       html += '<div class="grid-row"><span class="grid-group-label">mm</span>';
       [1, 5, 10].forEach(function (m) { html += box('mm', m, m); });
       html += '<span class="grid-group-label" style="margin-left:.3rem;">custom</span>';
-      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="decimal" min="0" step="any" placeholder="mm">';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="decimal" min="0.2" step="any" placeholder="mm">';
       html += '</div>';
       html += '<div class="grid-row"><span class="grid-group-label">modular mm</span>';
       [100, 300, 600].forEach(function (m) { html += box('mm', m, m); });
@@ -329,8 +333,9 @@
     if (custom) custom.addEventListener('input', function () {
       var v = parseFloat(custom.value);
       if (!(v > 0)) return;
-      if (state.target === 'imperial') state.grid.imperial.denom = Math.round(v);
-      else state.grid.metric.mm = v;
+      // clamp so the grid can't be absurdly fine (it would draw a runaway ruler)
+      if (state.target === 'imperial') state.grid.imperial.denom = Math.min(256, Math.max(1, Math.round(v)));
+      else state.grid.metric.mm = Math.min(100000, Math.max(0.2, v));
       render();
     });
   }
@@ -484,6 +489,16 @@
     renderEcho(result);
 
     if (result && result.dimension === 2 && result.area_mm2 != null) { renderArea(result); return; }
+
+    // overflow guard: out-of-range lengths get the echo note above, but no
+    // figure/snap (snap would throw on a non-safe integer)
+    if (result && result.dimension === 1 && result.units != null && outOfRange(result.units)) {
+      els.lengthOut.style.display = 'none';
+      els.ratioOut.style.display = 'none';
+      els.areaOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
 
     if (!result || (result.units == null && result.dimension !== 0)) {
       els.lengthOut.style.display = 'none';

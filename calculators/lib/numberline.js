@@ -212,8 +212,8 @@
         if ((winHi - winLo) / lad[i] > 80) continue;     // density guard
         levels.push({ step: lad[i], h: tickH(i) });
       }
-      if (gMin) {                                        // ensure the grid line itself is drawn
-        var has = false;
+      if (gMin && (winHi - winLo) / gMin <= 600) {       // ensure the grid line is drawn
+        var has = false;                                 // (skip if it would be a runaway count)
         for (j = 0; j < levels.length; j++) if (levels[j].step === gMin) has = true;
         if (!has) levels.push({ step: gMin, h: 3 });
       }
