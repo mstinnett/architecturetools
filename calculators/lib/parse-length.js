@@ -371,30 +371,42 @@
     // bubble up null/area
     for (var z = 0; z < operands.length; z++) if (operands[z].kind === 'null') return operands[z];
 
-    // finest stated unit across the run
-    var finest = null, system = null, anyLength = false;
-    for (var a = 0; a < operands.length; a++) {
-      var v = operands[a];
+    // the finest stated unit of each operand (null if it isn't a stated length),
+    // plus the run-wide system + overall finest (for the result's own labels)
+    var statedAt = operands.map(function (v) { return v.kind === 'length' ? v.finestUnit : null; });
+    var anyLength = false, system = null, finestOverall = null;
+    operands.forEach(function (v) {
       if (v.kind === 'length') {
         anyLength = true;
-        finest = finerUnitName(finest, v.finestUnit);
+        finestOverall = finerUnitName(finestOverall, v.finestUnit);
         system = system === null ? v.system : (system === v.system ? system : 'mixed');
       }
+    });
+
+    // a bare inherits the unit of its NEAREST stated term — previous if any,
+    // else the next — not the finest in the whole run. So in `8 - 1/2" + 11cm`
+    // the leading 8 takes inches (the adjacent inch term), not cm.
+    function nearestUnit(i) {
+      for (var d = 1; d < operands.length; d++) {
+        if (i - d >= 0 && statedAt[i - d]) return statedAt[i - d];   // previous wins ties
+        if (i + d < operands.length && statedAt[i + d]) return statedAt[i + d];
+      }
+      return null;
     }
-    var resolveName = finest || defaultUnit;
-    var resolveInfo = UNIT_TABLE[resolveName];
 
     // resolve bares → lengths (annotate the ORIGINAL bare so the 1c echo can
     // show its inherited unit, then return the resolved length value)
-    var resolved = operands.map(function (v) {
+    var resolved = operands.map(function (v, i) {
       if (v.kind === 'length') return v;
       if (v.kind === 'bare') {
-        var u = roundDiv(v.num * resolveInfo.units, v.den);
-        v._role = 'length'; v._resolvedUnit = resolveName; v._resolvedUnits = u;
+        var name = (anyLength ? nearestUnit(i) : null) || defaultUnit;
+        var info = UNIT_TABLE[name];
+        var u = roundDiv(v.num * info.units, v.den);
+        v._role = 'length'; v._resolvedUnit = name; v._resolvedUnits = u;
         return {
           kind: 'length', dim: 1,
           units: u,
-          system: resolveInfo.system, finestUnit: resolveName, unitHint: resolveName,
+          system: info.system, finestUnit: name, unitHint: name,
           inferredUnit: true, hadUnit: false
         };
       }
@@ -409,13 +421,12 @@
       var u = ops[k] === '-' ? acc.units - rhs.units : acc.units + rhs.units;
       acc = assign({}, acc, { units: u });
     }
+    var resolveName = finestOverall || defaultUnit;
     if (!anyLength) {
-      // all bares → default-unit length; mark inferred system from default
-      acc = assign({}, acc, { system: resolveInfo.system, finestUnit: resolveName });
-    } else if (system === 'mixed') {
-      acc = assign({}, acc, { system: 'mixed' });
+      acc = assign({}, acc, { system: UNIT_TABLE[defaultUnit].system, finestUnit: resolveName });
+    } else {
+      acc = assign({}, acc, { system: system, finestUnit: resolveName });
     }
-    acc = assign({}, acc, { finestUnit: resolveName });
     return acc;
   }
 

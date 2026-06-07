@@ -77,9 +77,12 @@
     { input: "12\" / 3",             expect: { units: 12 * IN / 3 },         gate: '1b' }, // length ÷ scalar
     { input: "12\" / 7",             expect: { units: 41801 },               gate: '1b' }, // per-part quantized
 
-    // ---- 1b/1c  inheritance ----
+    // ---- 1b/1c  inheritance (bare takes the NEAREST stated unit) ----
     { input: "8'4\" + 3",            expect: { units: 8 * FT + 4 * IN + 3 * IN, inferred: [false, true] }, gate: '1b/1c' },
     { input: "8' + 3",              expect: { units: 8 * FT + 3 * FT, inferred: [false, true] },          gate: '1b/1c' },
+    // leading bare takes the adjacent inch term (not the finer cm further off)
+    { input: "8 - 1/2\" + 11cm",    expect: { units: 8 * IN - IN / 2 + 11 * CM, inferred: [true, false, false] }, gate: '1b/1c' },
+    { input: "5\" + 3 + 2cm",       expect: { units: 5 * IN + 3 * IN + 2 * CM, inferred: [false, true, false] }, gate: '1b/1c' },
 
     // ---- 1b  dimensional outcomes ----
     { input: "12\" * 3\"",           expect: { isNull: true },               gate: '1b' }, // area
