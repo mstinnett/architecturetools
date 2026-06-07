@@ -161,14 +161,15 @@
     // containing inch (imperial) or a fixed metric span; endpoints are round
     // "best values". Precise per-bound numbers live in the rows below.
     // Focus+context (fisheye) mapping: the active cell is magnified to the
-    // middle third (so the hatch stays a large, centred, legible size), and the
-    // window FLOATS so the context is symmetric — an equal span (ctx) compressed
-    // into each side margin. The grid ticks there pack denser as the grid
-    // refines: that density is the sense of scale, with the hatch fixed. (The
-    // ends float with the value rather than snapping to round boundaries.)
+    // middle third (the hatch stays a large, centred, legible size). The window
+    // extends a fixed context span each side, ROUNDED OUT to the next grid line,
+    // so the ends are clean "selected unit" values (the next 1/2" on a 1/2"
+    // grid). That rounding is symmetric — equal whole grid-units each side — and
+    // the margin ticks pack denser as the grid refines, carrying the scale.
     var ctxSpan = target === 'imperial' ? IN : (g <= 10 * MM ? 50 * MM : 3000 * MM);
     var ctx = ctxSpan / 2;
-    var winLo = floorU - ctx, winHi = ceilU + ctx;
+    var winLo = Math.floor((floorU - ctx) / g) * g;
+    var winHi = Math.ceil((ceilU + ctx) / g) * g;
     var xA = x0 + axisW / 3, xB = x0 + 2 * axisW / 3;
     function X(u) {
       if (t.onGrid) return x0 + (u - winLo) / (winHi - winLo) * axisW;     // no cell to magnify
@@ -195,9 +196,9 @@
       if (!t.onGrid && (gu === floorU || gu === ceilU)) continue;
       svg += '<line x1="' + X(gu) + '" y1="' + yTgt + '" x2="' + X(gu) + '" y2="' + (yTgt + 4) + '" stroke="#ccc" stroke-width="1"/>';
     }
-    // window endpoints — float with the value (equal span each side)
-    svg += txt(x0, yTgt + 16, 'nl-axis-label', 'start', formatTrue(winLo, target));
-    svg += txt(x1, yTgt + 16, 'nl-axis-label', 'end', formatTrue(winHi, target));
+    // window endpoints — clean grid-aligned "selected unit" values
+    svg += txt(x0, yTgt + 16, 'nl-axis-label', 'start', formatSnapped(winLo, target, denom));
+    svg += txt(x1, yTgt + 16, 'nl-axis-label', 'end', formatSnapped(winHi, target, denom));
 
     if (!t.onGrid) {
       // active cell: hatched, framed by its two grid edges (nearer one heavier)
