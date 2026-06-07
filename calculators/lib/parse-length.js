@@ -650,7 +650,37 @@
     var parts = printNode(node, original);
     var canonical = parts.map(function (p) { return p.text; }).join(' ')
                          .replace(/\(\s/g, '(').replace(/\s\)/g, ')');
-    return { terms: terms, canonical: canonical, parts: parts, assumptions: assumptions };
+    // "work" — the same expression with each term shown in raw 1/960-mm units,
+    // so the arithmetic can be audited by hand
+    return { terms: terms, canonical: canonical, parts: parts, assumptions: assumptions, work: workExpr(node) };
+  }
+
+  // the expression in raw integer units (length terms → unit count, bare scalars
+  // → their number), with the same precedence parens as the echo
+  function workExpr(node) {
+    if (!node) return '';
+    if (node.t === 'term') {
+      var v = node.value;
+      if (v.kind === 'length') return String(v.units);
+      if (v.kind === 'bare') return (v._role === 'length' && v._resolvedUnits != null) ? String(v._resolvedUnits) : trimNum(v.num / v.den);
+      return '?';
+    }
+    if (node.t === 'un') {
+      var x = workExpr(node.x);
+      if (nodePrec(node.x) < 3) x = '(' + x + ')';
+      return (node.op === '-' ? '−' : node.op) + x;
+    }
+    var p = nodePrec(node), lp = workExpr(node.l), rp = workExpr(node.r);
+    var lprec = nodePrec(node.l), rprec = nodePrec(node.r);
+    if (p === 1) {
+      if (lprec === 2 || lprec < p) lp = '(' + lp + ')';
+      if (rprec === 2 || rprec < p || (rprec === p && node.op === '-')) rp = '(' + rp + ')';
+    } else {
+      if (lprec < p) lp = '(' + lp + ')';
+      if (rprec < p || (rprec === p && node.op === '/')) rp = '(' + rp + ')';
+    }
+    var opg = node.op === '*' ? '×' : node.op === '/' ? '÷' : node.op === '-' ? '−' : '+';
+    return lp + ' ' + opg + ' ' + rp;
   }
 
   function trimNum(v) { return String(Math.round(v * 10000) / 10000); }

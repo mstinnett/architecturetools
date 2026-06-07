@@ -389,11 +389,14 @@
     }
     els.snapRows.innerHTML = html;
 
-    // footnote: the engine's exact integer arithmetic on the 1/960 mm lattice
+    // footnote: the engine's exact integer arithmetic on the 1/960 mm lattice,
+    // shown so it can be audited by hand
+    var work = result.interpretation.work;
     els.mathNote.innerHTML =
-      '<b>engine</b> — exact integers of 1/960 mm. '
-      + 'true = <b>' + units + '</b> · grid = <b>' + g + '</b> · nearest = <b>' + nearU + '</b> · '
-      + 'residual = <b>' + (nearU - units) + '</b> units (' + escapeHtml(NumberLine.formatResidual(nearU - units, state.target)) + ').';
+      '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + escapeHtml(work) + ' = <b>' + units + '</b> units = ' + (Math.round(units / 960 * 10000) / 10000) + ' mm<br>'
+      + 'snap ' + g + ' units: nearest <b>' + nearU + '</b> · residual <b>' + (nearU - units) + '</b> units ('
+      + escapeHtml(NumberLine.formatResidual(nearU - units, state.target)) + ').';
   }
 
   function renderRatio(result) {
