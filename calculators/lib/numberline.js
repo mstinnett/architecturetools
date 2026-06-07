@@ -145,14 +145,14 @@
     var target = opts.targetSystem || 'imperial';
     var source = opts.sourceSystem || target;
     var W = opts.width || 680;
-    var H = opts.height || 116;
+    var H = opts.height || 150;
 
     var denom = target === 'imperial' ? Math.round(IN / g) : null;
     var t = snapTriple(units, g);
     var floorU = t.maxU, ceilU = t.minU;        // round down (left), round up (right)
 
     var x0 = 24, x1 = W - 24, axisW = x1 - x0;
-    var ySrc = 48, yTgt = 90;                    // the band's two scale lines
+    var ySrc = 50, yTgt = 108, bandMid = (ySrc + yTgt) / 2;   // the band's two scale lines
 
     // ONE fixed-scale ruler: a nice reference interval (independent of grid) drawn
     // with every grid line, so tick DENSITY carries the absolute scale (1/8" = 8
@@ -205,7 +205,22 @@
       svg += '<rect x="' + xL + '" y="' + ySrc + '" width="' + (xR - xL) + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
       svg += '<line x1="' + xL + '" y1="' + ySrc + '" x2="' + xL + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMax ? 2 : 1) + '"/>';
       svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMin ? 2 : 1) + '"/>';
-      svg += txt(t.nearIsMax ? xL : xR, yTgt + 16, 'nl-snap-role', 'middle', 'nearest');
+
+      // bound values hug the hatch edges, mirrored: round down right-aligned at
+      // the left edge, round up left-aligned at the right; decimal under each
+      function boundBlock(snapU, atLeft, isNearest) {
+        var x = atLeft ? (xL - 8) : (xR + 8);
+        var anchor = atLeft ? 'end' : 'start';
+        var role = (atLeft ? 'round down' : 'round up') + (isNearest ? ' · nearest' : '');
+        var valCls = 'nl-snap-val' + (isNearest ? ' nl-nearest' : '');
+        var s = txt(x, bandMid - 15, 'nl-snap-role', anchor, role);
+        s += txt(x, bandMid + 1, valCls, anchor, formatSnapped(snapU, target, denom));
+        if (target === 'imperial') s += txt(x, bandMid + 15, 'nl-src-val', anchor, formatTrue(snapU, target));
+        s += txt(x, bandMid + (target === 'imperial' ? 28 : 15), 'nl-residual', anchor, formatResidual(snapU - units, target));
+        return s;
+      }
+      svg += boundBlock(floorU, true, t.nearIsMax);
+      svg += boundBlock(ceilU, false, t.nearIsMin);
     }
 
     // true tick (2px) + exact value above it (target prominent, source small)
