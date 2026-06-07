@@ -170,17 +170,33 @@
     }
 
     if (t.onGrid) {
+      svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke="#999" stroke-width="1"/>';
+      svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
+      for (var ge = Math.ceil(lo / g) * g; ge <= hi + 0.5; ge += g) {
+        svg += '<line x1="' + X(ge) + '" y1="' + yTgt + '" x2="' + X(ge) + '" y2="' + (yTgt + 5) + '" stroke="#bbb" stroke-width="1"/>';
+      }
       svg += '<line x1="' + tx + '" y1="' + (ySrc - 6) + '" x2="' + tx + '" y2="' + (yTgt + 6) + '" stroke="#0a0a0a" stroke-width="2"/>';
-      svg += txt(tx, ySrc - 16, 'nl-true-role', 'middle', 'exact · on grid');
-      if (source !== target) svg += txt(tx, ySrc - 3, 'nl-src-val', 'middle', formatTrue(units, source));
+      svg += txt(tx, ySrc - 19, 'nl-true-role', 'middle', 'exact · on grid');
+      if (source !== target) svg += txt(tx, ySrc - 6, 'nl-src-val', 'middle', formatTrue(units, source));
       svg += txt(tx, yTgt + 18, 'nl-true-val', 'middle', formatTrue(units, target));
       return svg + '</svg>';
     }
 
     var xL = X(floorU), xR = X(ceilU);
-    // the rounding cell, as a hatched rectangle: top edge reads in the source
-    // system, bottom edge in the target system; the gap is the cost of rounding
-    svg += '<rect x="' + xL + '" y="' + ySrc + '" width="' + (xR - xL) + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="#0a0a0a" stroke-width="1"/>';
+    // a continuous number-line band: two full-width scale lines (source on top,
+    // target below) with grid ticks, so the active cell reads as one division of
+    // a ruler rather than an isolated box.
+    svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke="#999" stroke-width="1"/>';
+    svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
+    var gStart = Math.ceil(lo / g) * g;
+    for (var gu = gStart; gu <= hi + 0.5; gu += g) {
+      var gx = X(gu);
+      svg += '<line x1="' + gx + '" y1="' + yTgt + '" x2="' + gx + '" y2="' + (yTgt + 5) + '" stroke="#bbb" stroke-width="1"/>';
+    }
+    // the active cell: hatch fill + its two grid edges (the bracketing values)
+    svg += '<rect x="' + xL + '" y="' + ySrc + '" width="' + (xR - xL) + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
+    svg += '<line x1="' + xL + '" y1="' + ySrc + '" x2="' + xL + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
+    svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
     // true tick inside the cell, extending just beyond each edge
     svg += '<line x1="' + tx + '" y1="' + (ySrc - 6) + '" x2="' + tx + '" y2="' + (yTgt + 6) + '" stroke="#0a0a0a" stroke-width="2"/>';
 
