@@ -158,7 +158,6 @@
     var padL = 24, padR = 24;
     var x0 = padL, x1 = W - padR, axisW = x1 - x0;
     var ySrc = 64, yTgt = 150;                 // the two scale lines
-    var yHatchTop = 110;                        // hatch hugs the lower (target) half
     function X(u) { return x0 + (u - lo) / (hi - lo) * axisW; }
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
@@ -181,14 +180,13 @@
     svg += '<text x="' + x0 + '" y="' + (yTgt + 40) + '" class="nl-axis-label" text-anchor="start">' + esc(target) + ' (target)</text>';
 
     // ---- hatched residual bands (true → each snap) ----
-    // The hatch hugs the lower half of the figure (the target scale it is
-    // measured against); the signed residual is labelled in the clear lane
-    // ABOVE the hatch, so the number never sits on the cross-hatching.
+    // Full height between the two scale lines; residual labels flank the bands
+    // to the left/right (below), so nothing sits on the cross-hatching.
     function band(snapU) {
       if (snapU === units) return '';
       var a = X(units), b = X(snapU);
       var bx = Math.min(a, b), bw = Math.abs(b - a);
-      return '<rect x="' + bx + '" y="' + yHatchTop + '" width="' + bw + '" height="' + (yTgt - yHatchTop) + '" fill="url(#nlhatch)" stroke="none"/>';
+      return '<rect x="' + bx + '" y="' + ySrc + '" width="' + bw + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
     }
     // draw Max & Min bands; Nearest band only if it is distinct from both
     svg += band(t.maxU);
@@ -227,7 +225,7 @@
         var onLeft = grp.u < units;                 // floor/Max → left, ceil/Min → right
         var rx = onLeft ? (sx - 6) : (sx + 6);
         var anchor = onLeft ? 'end' : 'start';
-        var ry = (yHatchTop + yTgt) / 2 + 4;
+        var ry = (ySrc + yTgt) / 2 + 4;
         svg += '<text x="' + rx + '" y="' + ry + '" class="nl-residual" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(formatResidual(res, target)) + '</text>';
       }
     });

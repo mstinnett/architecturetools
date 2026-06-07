@@ -25,6 +25,13 @@
   .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-400); min-height: 1.1em; }
   .field-note .pending { color: var(--gray-500); }
 
+  /* contextual bare-number unit choice — only when a number has no unit */
+  .bare-ask { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-500); }
+  .bare-ask:empty { display: none; }
+  .bare-ask .pick { cursor: pointer; padding: 0.1rem 0.45rem; border: 1px solid var(--gray-300);
+                    margin-left: 0.3rem; user-select: none; }
+  .bare-ask .pick.active { background: var(--selected-bg); color: var(--white); border-color: var(--selected-bg); }
+
   .opt-line { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: var(--space-lg); }
   .opt-cluster { display: flex; align-items: center; gap: 0.5rem; }
   .opt-cluster .section-label { margin-bottom: 0; }
@@ -110,14 +117,11 @@
     <input type="text" id="dimInput" spellcheck="false"
            autocomplete="off" autocapitalize="off" placeholder="e.g. 1m  ·  3'-4 1/2&quot;  ·  8' + 3 1/2&quot;" autofocus>
     <div class="field-note" id="fieldNote"></div>
+    <!-- appears only when a number has no unit and nothing to inherit from -->
+    <div class="bare-ask" id="bareAsk"></div>
   </div>
 
   <div class="opt-line">
-    <div class="opt-cluster">
-      <span class="section-label">Bare number</span>
-      <span class="mini-pill" data-default="in">inches</span>
-      <span class="mini-pill" data-default="mm">mm</span>
-    </div>
     <div class="opt-cluster">
       <span class="section-label">Convert to</span>
       <span class="mini-pill" data-target="imperial">imperial</span>
@@ -166,12 +170,14 @@
     target: 'imperial',
     targetPinned: false,                                  // true once the user taps the target
     lastSource: null,                                     // last detected source system
+    gridUiSystem: null,                                   // which system the grid UI is built for
     grid: { imperial: { denom: 8 }, metric: { mm: 5 } }   // remembered per system
   };
 
   var els = {
     input: document.getElementById('dimInput'),
     fieldNote: document.getElementById('fieldNote'),
+    bareAsk: document.getElementById('bareAsk'),
     echo: document.getElementById('echo'),
     echoLine: document.getElementById('echoLine'),
     echoAssume: document.getElementById('echoAssume'),
@@ -209,6 +215,26 @@
       : '';
   }
 
+  /* ---- contextual bare-unit choice -------------------------------------- */
+  // Only when a number has no unit and nothing to inherit from (i.e. the
+  // default governs the whole reading) does the inches/mm choice actually
+  // matter — so it appears just then, and changes the reading, not the text.
+  function renderBareAsk(result) {
+    els.bareAsk.innerHTML = '';
+    if (!result || result.dimension !== 1 || result.units == null) return;
+    var terms = result.interpretation.terms || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;          // a unit was typed → nothing to ask
+    function pick(u, label) {
+      return '<span class="pick' + (state.defaultUnit === u ? ' active' : '') + '" data-bare="' + u + '">' + label + '</span>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+    Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+    });
+  }
+
   /* ---- interpretation echo (primary result surface) --------------------- */
   var OP_GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 
@@ -240,33 +266,30 @@
   }
 
   /* ---- grid preset control --------------------------------------------- */
-  function renderGridPresets() {
+  // Built once per target SYSTEM, then only the active highlight is updated —
+  // rebuilding the innerHTML on every keystroke was destroying the custom
+  // <input> mid-type (lost focus, blanked text).
+  function buildGridPresets() {
     var html = '';
     if (state.target === 'imperial') {
       var denoms = [2, 4, 8, 16, 32, 64];
       var labels = { 2: '½', 4: '¼', 8: '⅛', 16: '1/16', 32: '1/32', 64: '1/64' };
       denoms.forEach(function (d) {
-        var on = state.grid.imperial.denom === d ? ' active' : '';
-        html += '<span class="grid-box' + on + '" data-denom="' + d + '">' + labels[d] + '</span>';
+        html += '<span class="grid-box" data-denom="' + d + '">' + labels[d] + '</span>';
       });
       html += '<span class="grid-group-label" style="margin-left:.4rem;">custom 1/</span>';
       html += '<input class="grid-custom" id="gridCustom" type="number" min="1" step="1" placeholder="n">';
     } else {
       var fine = [1, 5, 10], modular = [100, 300, 600];
       html += '<span class="grid-group-label">fine</span>';
-      fine.forEach(function (m) {
-        var on = state.grid.metric.mm === m ? ' active' : '';
-        html += '<span class="grid-box' + on + '" data-mm="' + m + '">' + m + '</span>';
-      });
+      fine.forEach(function (m) { html += '<span class="grid-box" data-mm="' + m + '">' + m + '</span>'; });
       html += '<span class="grid-sep"></span><span class="grid-group-label">modular mm</span>';
-      modular.forEach(function (m) {
-        var on = state.grid.metric.mm === m ? ' active' : '';
-        html += '<span class="grid-box' + on + '" data-mm="' + m + '">' + m + '</span>';
-      });
+      modular.forEach(function (m) { html += '<span class="grid-box" data-mm="' + m + '">' + m + '</span>'; });
       html += '<span class="grid-group-label" style="margin-left:.4rem;">custom</span>';
       html += '<input class="grid-custom" id="gridCustom" type="number" min="0" step="any" placeholder="mm">';
     }
     els.gridPresets.innerHTML = html;
+    state.gridUiSystem = state.target;
 
     Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
       box.addEventListener('click', function () {
@@ -283,6 +306,17 @@
       else state.grid.metric.mm = v;
       render();
     });
+  }
+  function updateGridActive() {
+    var active = state.target === 'imperial' ? state.grid.imperial.denom : state.grid.metric.mm;
+    var attr = state.target === 'imperial' ? 'denom' : 'mm';
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      box.classList.toggle('active', +box.dataset[attr] === active);
+    });
+  }
+  function renderGridPresets() {
+    if (state.gridUiSystem !== state.target) buildGridPresets();   // only on system change
+    updateGridActive();
   }
 
   /* ---- snap readout rows + figure --------------------------------------- */
@@ -366,11 +400,7 @@
     });
     if (!stated) return;
 
-    var srcUnit = sys === 'metric' ? 'mm' : 'in';
-    if (state.defaultUnit !== srcUnit) {
-      state.defaultUnit = srcUnit;
-      setActive('[data-default]', 'default', state.defaultUnit);
-    }
+    state.defaultUnit = sys === 'metric' ? 'mm' : 'in';      // keep bare default sticky to source
     if (sys !== state.lastSource) {                           // a new system → re-flip target
       state.lastSource = sys;
       state.targetPinned = false;
@@ -388,6 +418,7 @@
     var result = parseLength(state.text, { defaultUnit: state.defaultUnit });
     syncDetected(result);
     renderFieldNote(result);
+    renderBareAsk(result);
     renderEcho(result);
 
     if (!result || (result.units == null && result.dimension !== 0)) {
@@ -411,11 +442,6 @@
   // (deferred to the next tick so iOS doesn't collapse the selection on tap)
   els.input.addEventListener('focus', function () { setTimeout(function () { els.input.select(); }, 0); });
 
-  Array.prototype.forEach.call(document.querySelectorAll('[data-default]'), function (el) {
-    el.addEventListener('click', function () {
-      state.defaultUnit = el.dataset.default; setActive('[data-default]', 'default', state.defaultUnit); render();
-    });
-  });
   Array.prototype.forEach.call(document.querySelectorAll('[data-target]'), function (el) {
     el.addEventListener('click', function () {
       state.target = el.dataset.target; state.targetPinned = true;
@@ -424,7 +450,6 @@
   });
 
   // initial state — defaults reproduce worked example 1 (1 m → 1/8")
-  setActive('[data-default]', 'default', state.defaultUnit);
   setActive('[data-target]', 'target', state.target);
   els.input.value = '1m';
   state.text = '1m';
