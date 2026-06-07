@@ -94,6 +94,11 @@
     { input: "5cm 3mm",            expect: { units: 5 * CM + 3 * MM }, gate: '1b' },
     { input: "3m 50cm 5mm",        expect: { units: 3 * M + 50 * CM + 5 * MM }, gate: '1b' },
 
+    // a unit after a paren applies to the (bare) group, regardless of default
+    { input: "(3+2)cm",            opts: { defaultUnit: 'mm' }, expect: { units: 5 * CM }, gate: '1b' },
+    { input: "8m+(3+2)in",         opts: { defaultUnit: 'mm' }, expect: { units: 8 * M + 5 * IN }, gate: '1b' },
+    { input: "(1+2)*3in",          expect: { units: 9 * IN }, gate: '1b' }, // (1+2) is a scalar → 9 in, not area
+
     // ---- 1b  dimensional outcomes ----
     { input: "12\" * 3\"",           expect: { areaMm2: 304.8 * 76.2 },      gate: '1b' }, // area = 36 in²
     { input: "12\" / 3\"",           expect: { dim0: { count: 4, remainder_units: 0 } },     gate: '1b' },

@@ -24,8 +24,9 @@
   #dimInput:focus { border-color: var(--black); }
 
   /* anything typed that didn't parse, shown quietly under the field */
-  .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-400); min-height: 1.1em; }
+  .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-400); min-height: 1.1em; line-height: 1.5; }
   .field-note .pending { color: var(--gray-500); }
+  .field-note .why { color: var(--gray-400); font-style: italic; }
 
   /* contextual bare-number unit choice — only when a number has no unit */
   .bare-ask { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-500); }
@@ -224,15 +225,15 @@
   function renderFieldNote(result) {
     var text = state.text;
     if (!text || !result || !result.spans) { els.fieldNote.innerHTML = ''; return; }
-    var bits = [];
+    var lines = [];
     result.spans.forEach(function (sp) {
       if (sp.status !== 'pending') return;
       var frag = text.slice(sp.start, sp.end).trim();
-      if (frag) bits.push(frag);
+      if (!frag) return;
+      lines.push('ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : ''));
     });
-    els.fieldNote.innerHTML = bits.length
-      ? 'ignoring <span class="pending">' + escapeHtml(bits.join(' ')) + '</span>'
-      : '';
+    els.fieldNote.innerHTML = lines.join('<br>');
   }
 
   /* ---- contextual bare-unit choice -------------------------------------- */

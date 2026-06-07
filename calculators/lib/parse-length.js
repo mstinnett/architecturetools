@@ -280,7 +280,12 @@
         i++;
       }
       if (i === start) i++; // safety
-      toks.push({ type: 'junk', ns: start, ne: i });
+      // a standalone unit keyword (e.g. the "cm" in "(3+2)cm") is a unit token,
+      // applied to a preceding group; otherwise it's junk.
+      var run = s.slice(start, i);
+      var um = /^(mm|cm|ft|in|m)$/i.exec(run);
+      if (um) toks.push({ type: 'unit', unit: um[1].toLowerCase(), ns: start, ne: i });
+      else toks.push({ type: 'junk', ns: start, ne: i });
     }
     return toks;
   }
@@ -423,6 +428,20 @@
       }
     });
 
+    // No stated unit anywhere and every operand is a bare number → DEFER:
+    // return the bare sum, so an outer context (a trailing unit on a paren, a
+    // scalar multiply, additive inheritance, or the top-level default) decides
+    // the unit. e.g. (3+2) stays 5 until "(3+2)cm" makes it 5 cm.
+    if (!anyLength && operands.every(function (v) { return v.kind === 'bare'; })) {
+      var sn = operands[0].num, sd = operands[0].den;
+      for (var b = 0; b < ops.length; b++) {
+        var o = operands[b + 1];
+        sn = ops[b] === '-' ? sn * o.den - o.num * sd : sn * o.den + o.num * sd;
+        sd = sd * o.den;
+      }
+      return { kind: 'bare', num: sn, den: sd, dim: 0 };
+    }
+
     // a bare inherits the unit of its NEAREST stated term — previous if any,
     // else the next — not the finest in the whole run. So in `8 - 1/2" + 11cm`
     // the leading 8 takes inches (the adjacent inch term), not cm.
@@ -476,6 +495,22 @@
      never thrown. Records token status (parsed / pending) as a side effect.
      ==================================================================== */
 
+  // push a trailing-paren unit down onto the group's leaf bare numbers, so the
+  // echo reads "3 cm + 2 cm" and the work shows the resolved unit counts
+  function applyUnitToNode(node, info) {
+    if (!node) return;
+    if (node.t === 'term') {
+      var v = node.value;
+      if (v && v.kind === 'bare') {
+        v._role = 'length'; v._resolvedUnit = info.name;
+        v._resolvedUnits = roundDiv(v.num * info.units, v.den);
+      }
+      return;
+    }
+    if (node.t === 'un') { applyUnitToNode(node.x, info); return; }
+    applyUnitToNode(node.l, info); applyUnitToNode(node.r, info);
+  }
+
   function evaluate(toks, defaultUnit) {
     var pos = 0;
     var status = new Array(toks.length); // 'parsed' | 'pending' | undefined
@@ -516,7 +551,18 @@
           if (rhs2 === null) break;
           operands.push(rhs2.value); ops.push('+');
           node = { t: 'bin', op: '+', l: node, r: rhs2.node };
-        } else break;
+        } else {
+          // an adjacent term we won't implicitly add — record WHY it's ignored
+          if (nx.type === 'term' && nx.value && nx.value.kind === 'length' && nx.value.hadUnit) {
+            var prev = operands[operands.length - 1];
+            if (prev && prev.kind === 'length' && prev.hadUnit) {
+              nx._reason = prev.system !== nx.value.system
+                ? 'different unit system — use + to combine'
+                : 'not a finer unit — use + to add';
+            }
+          }
+          break;
+        }
       }
       if (operands.length === 1) return first;
       return { value: applyAdd(operands, ops, defaultUnit), node: node };
@@ -556,6 +602,18 @@
         var inner = parseExpr();
         if (peek() && peek().type === 'rparen') { markUsed(open); markUsed(pos); pos++; }
         else if (open < toks.length) { status[open] = 'pending'; }
+        // a unit immediately after the group applies to it: (3+2)cm → 5 cm.
+        // Only meaningful when the group is a unitless (bare) number.
+        if (inner && peek() && peek().type === 'unit' && inner.value && inner.value.kind === 'bare') {
+          var info = UNIT_TABLE[peek().unit];
+          markUsed(pos); pos++;
+          applyUnitToNode(inner.node, info);                 // annotate leaf bares for the echo
+          var bu = roundDiv(inner.value.num * info.units, inner.value.den);
+          return {
+            value: { kind: 'length', dim: 1, units: bu, system: info.system, finestUnit: info.name, unitHint: info.name, inferredUnit: false, hadUnit: true },
+            node: inner.node
+          };
+        }
         return inner;
       }
       if (t.type === 'term') {
@@ -584,15 +642,16 @@
     for (var i = 0; i < toks.length; i++) {
       var t = toks[i];
       var st = status[i] === 'parsed' ? 'parsed' : 'pending';
-      spans.push({ start: os[t.ns], end: oe[t.ne - 1], status: st });
+      spans.push({ start: os[t.ns], end: oe[t.ne - 1], status: st, reason: t._reason || null });
     }
-    // merge adjacent same-status spans
+    // merge adjacent same-status spans (keep the first reason)
     var merged = [];
     for (var j = 0; j < spans.length; j++) {
       var last = merged[merged.length - 1];
       if (last && last.status === spans[j].status && spans[j].start <= last.end + 1) {
         last.end = Math.max(last.end, spans[j].end);
-      } else merged.push({ start: spans[j].start, end: spans[j].end, status: spans[j].status });
+        last.reason = last.reason || spans[j].reason;
+      } else merged.push({ start: spans[j].start, end: spans[j].end, status: spans[j].status, reason: spans[j].reason });
     }
     return merged;
   }
