@@ -145,32 +145,27 @@
     var target = opts.targetSystem || 'imperial';
     var source = opts.sourceSystem || target;
     var W = opts.width || 680;
-    var H = opts.height || 156;
+    var H = opts.height || 116;
 
     var denom = target === 'imperial' ? Math.round(IN / g) : null;
     var t = snapTriple(units, g);
     var floorU = t.maxU, ceilU = t.minU;        // round down (left), round up (right)
 
     var x0 = 24, x1 = W - 24, axisW = x1 - x0;
-    var yOver = 28;                              // fixed-scale overview line
-    var ySrc = 74, yTgt = 124, bandMid = (ySrc + yTgt) / 2;   // detail band edges
+    var ySrc = 48, yTgt = 90;                    // the band's two scale lines
 
-    // DETAIL window: the active cell in the middle third, a cell of margin each
-    // side. This auto-zooms (keeps the residual visible) but loses absolute scale.
-    var lo = floorU - g, hi = ceilU + g;
-    if (hi === lo) { lo -= g; hi += g; }
-    function X(u) { return x0 + (u - lo) / (hi - lo) * axisW; }
-    var tx = X(units);
-
-    // OVERVIEW window: a fixed nice interval (independent of grid) so the
-    // highlighted cell visibly SHRINKS as the grid refines — the missing sense
-    // of absolute scale. Reference: the containing inch (imperial) or a fixed
-    // metric span per grid group; endpoints are round "best values".
+    // ONE fixed-scale ruler: a nice reference interval (independent of grid) drawn
+    // with every grid line, so tick DENSITY carries the absolute scale (1/8" = 8
+    // ticks, 1/64" = 64 dense ticks) while the hatched active cell carries the
+    // rounding error. Refining the grid shrinks the cell honestly. Reference: the
+    // containing inch (imperial) or a fixed metric span; endpoints are round
+    // "best values". Precise per-bound numbers live in the rows below.
     var refSpan = target === 'imperial' ? IN : (g <= 10 * MM ? 50 * MM : 3000 * MM);
     var refLo = Math.floor(floorU / refSpan) * refSpan, refHi = refLo + refSpan;
     while (ceilU > refHi) refHi += refSpan;
     while (floorU < refLo) refLo -= refSpan;
-    function Xo(u) { return x0 + (u - refLo) / (refHi - refLo) * axisW; }
+    function X(u) { return x0 + (u - refLo) / (refHi - refLo) * axisW; }
+    var tx = X(units), xL = X(floorU), xR = X(ceilU);
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
     svg += '<defs><pattern id="nlhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
@@ -180,57 +175,29 @@
       return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
     }
 
-    // ---- overview strip (to scale): reference interval + shrinking cell ----
-    svg += '<line x1="' + x0 + '" y1="' + yOver + '" x2="' + x1 + '" y2="' + yOver + '" stroke="#ccc" stroke-width="1"/>';
-    svg += txt(x0, yOver - 5, 'nl-axis-label', 'start', formatTrue(refLo, target));
-    svg += txt(x1, yOver - 5, 'nl-axis-label', 'end', formatTrue(refHi, target));
-    var oL = Xo(floorU), oR = Xo(ceilU); if (oR - oL < 2) oR = oL + 2;
-    svg += '<rect x="' + oL + '" y="' + (yOver - 4) + '" width="' + (oR - oL) + '" height="8" fill="url(#nlhatch)" stroke="#0a0a0a" stroke-width="0.75"/>';
-    svg += '<line x1="' + Xo(units) + '" y1="' + (yOver - 6) + '" x2="' + Xo(units) + '" y2="' + (yOver + 6) + '" stroke="#0a0a0a" stroke-width="1.5"/>';
-    // funnel connecting the overview slice to the zoomed detail cell
-    svg += '<line x1="' + oL + '" y1="' + (yOver + 5) + '" x2="' + X(floorU) + '" y2="' + ySrc + '" stroke="#ccc" stroke-width="0.75"/>';
-    svg += '<line x1="' + oR + '" y1="' + (yOver + 5) + '" x2="' + X(ceilU) + '" y2="' + ySrc + '" stroke="#ccc" stroke-width="0.75"/>';
-
-    // ---- detail band: continuous number line, active cell hatched ----
+    // band: source line on top, target line on bottom
     svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke="#999" stroke-width="1"/>';
     svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
-    for (var gu = Math.ceil(lo / g) * g; gu <= hi + 0.5; gu += g) {
-      svg += '<line x1="' + X(gu) + '" y1="' + yTgt + '" x2="' + X(gu) + '" y2="' + (yTgt + 5) + '" stroke="#bbb" stroke-width="1"/>';
+    // every grid line — density = fineness = scale
+    for (var gu = Math.ceil(refLo / g) * g; gu <= refHi + 0.5; gu += g) {
+      svg += '<line x1="' + X(gu) + '" y1="' + yTgt + '" x2="' + X(gu) + '" y2="' + (yTgt + 4) + '" stroke="#ccc" stroke-width="1"/>';
+    }
+    // reference endpoints — round "best values" anchoring the scale
+    svg += txt(x0, yTgt + 16, 'nl-axis-label', 'start', formatTrue(refLo, target));
+    svg += txt(x1, yTgt + 16, 'nl-axis-label', 'end', formatTrue(refHi, target));
+
+    if (!t.onGrid) {
+      // active cell: hatched, framed by its two grid edges (nearer one heavier)
+      svg += '<rect x="' + xL + '" y="' + ySrc + '" width="' + (xR - xL) + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
+      svg += '<line x1="' + xL + '" y1="' + ySrc + '" x2="' + xL + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMax ? 2 : 1) + '"/>';
+      svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMin ? 2 : 1) + '"/>';
+      svg += txt(t.nearIsMax ? xL : xR, yTgt + 16, 'nl-snap-role', 'middle', 'nearest');
     }
 
-    if (t.onGrid) {
-      svg += '<line x1="' + tx + '" y1="' + (ySrc - 6) + '" x2="' + tx + '" y2="' + (yTgt + 6) + '" stroke="#0a0a0a" stroke-width="2"/>';
-      svg += txt(tx, ySrc - 8, 'nl-true-role', 'middle', 'exact · on grid');
-      if (source !== target) svg += txt(tx, yTgt + 31, 'nl-src-val', 'middle', formatTrue(units, source));
-      svg += txt(tx, yTgt + 18, 'nl-true-val', 'middle', formatTrue(units, target));
-      return svg + '</svg>';
-    }
-
-    var xL = X(floorU), xR = X(ceilU);
-    svg += '<rect x="' + xL + '" y="' + ySrc + '" width="' + (xR - xL) + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
-    svg += '<line x1="' + xL + '" y1="' + ySrc + '" x2="' + xL + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
-    svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
-    svg += '<line x1="' + tx + '" y1="' + (ySrc - 6) + '" x2="' + tx + '" y2="' + (yTgt + 6) + '" stroke="#0a0a0a" stroke-width="2"/>';
-
-    // exact — source above the top edge, target below the bottom edge
-    svg += txt(tx, ySrc - 8, 'nl-true-role', 'middle', 'exact');
-    svg += txt(tx, yTgt + 18, 'nl-true-val', 'middle', formatTrue(units, target));
-    if (source !== target) svg += txt(tx, yTgt + 31, 'nl-src-val', 'middle', formatTrue(units, source));
-
-    // each bound's value hugs the outer edge of the hatch, mirrored
-    function boundBlock(snapU, atLeft, isNearest) {
-      var x = atLeft ? (xL - 8) : (xR + 8);
-      var anchor = atLeft ? 'end' : 'start';
-      var role = (atLeft ? 'round down' : 'round up') + (isNearest ? ' · nearest' : '');
-      var valCls = 'nl-snap-val' + (isNearest ? ' nl-nearest' : '');
-      var s = txt(x, bandMid - 15, 'nl-snap-role', anchor, role);
-      s += txt(x, bandMid + 1, valCls, anchor, formatSnapped(snapU, target, denom));
-      if (target === 'imperial') s += txt(x, bandMid + 15, 'nl-src-val', anchor, formatTrue(snapU, target));
-      s += txt(x, bandMid + (target === 'imperial' ? 28 : 15), 'nl-residual', anchor, formatResidual(snapU - units, target));
-      return s;
-    }
-    svg += boundBlock(floorU, true, t.nearIsMax);
-    svg += boundBlock(ceilU, false, t.nearIsMin);
+    // true tick (2px) + exact value above it (target prominent, source small)
+    svg += '<line x1="' + tx + '" y1="' + (ySrc - 7) + '" x2="' + tx + '" y2="' + (yTgt + 7) + '" stroke="#0a0a0a" stroke-width="2"/>';
+    svg += txt(tx, ySrc - 8, 'nl-true-val', 'middle', formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''));
+    if (source !== target) svg += txt(tx, ySrc - 20, 'nl-src-val', 'middle', formatTrue(units, source));
 
     svg += '</svg>';
     return svg;
