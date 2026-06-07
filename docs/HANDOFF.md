@@ -1,0 +1,144 @@
+# Handoff — architecture.tools
+
+_Written 2026-06-07. Hand-off point: the **Precise Unit Converter is frozen
+("done for now")**. This doc is for the next context picking up the calculator
+work. It is self-contained; read it before touching `calculators/`._
+
+---
+
+## 1. Where things stand (one paragraph)
+
+`architecture.tools` is a public, no-build static site (vanilla HTML/CSS/JS).
+The **live site is the picker only**. A shared calculation **engine**
+(`calculators/lib/`) now exists and powers exactly one tool, the converter.
+Everything else in `calculators/` is older, standalone, and does **not** use the
+engine. The next phase is extending the engine into a family of dimensional
+calculators. The converter itself needs no further work right now.
+
+---
+
+## 2. Repo & branch layout
+
+- **`main` — the live site (picker only).** Trimmed in commit `f01b200`:
+  removed `components.html`, `site-screen.html`, and all of `calculators/`.
+  Keeps `index.html` (the picker = home), `picker.html` (redirects to `/`),
+  `assets/`, `data/`, `tools/`, `docs/`, the `build-data` workflow, `CNAME`,
+  dotfiles. The picker does **not** link to any deferred page, so nothing 404s.
+- **`dev` — the workbench (this branch).** Full prior site **plus** the engine
+  and converter. All work-in-progress happens here. Promote finished tools to
+  `main` one at a time.
+- **Promotion model:** build on `dev` → preview on a neutral host (§4) → when a
+  tool is done, move that single page (and any new `lib/` module) to `main` in a
+  small commit. Live the moment it's on `main`.
+
+> **Stale-branch note:** the local `claude/build-this-L58m6` was deleted; the
+> **remote** copy plus several other `claude/*` branches could **not** be deleted
+> — this environment's git proxy silently rejects branch deletion (`git push
+> --delete` returns "Everything up-to-date"). Delete them from the GitHub UI.
+> Leave `claude/quirky-rubin-FZS99` and `claude/update-typography-borders-lTwou`
+> — they were pushed very recently and may be active sessions.
+
+---
+
+## 3. The engine (`calculators/lib/`) — the thing that gets extended
+
+The mental model for the whole family: **parse a dimension expression → resolve
+it against a discrete constraint → show the residual on a number line.** The
+converter's constraint is a continuous fabrication grid (1/8″, custom _n_, mm).
+Every planned tool is the same operation with a different constraint.
+
+| Module | What it is | Notes |
+|---|---|---|
+| `parse-length.js` | Expression evaluator over dimensioned quantities | kinds: `length`, `area`, `bare`, `scalar`, `ratio`. Handles feet-inches, fractions, metric, mixed units, `+` and `*`, unit inference. **Never throws.** |
+| `snap.js` | Integer-exact snap of a length to a grid | `floor`/`ceil`/`nearest` = **Max ≤ / Min ≥ / Nearest**. **Fails loud** on programmer error. Has an inline test block at the bottom. |
+| `numberline.js` | Pure SVG-string figure (no DOM) | true-value tick + 3 snaps + residual hatch bands + dual source/target scale. "The figure is the product." |
+| `parse-length.fixtures.js` | Parser test fixtures | — |
+
+**Conventions any new module/tool must follow:**
+- UMD-style wrapper (`(function(root,factory){…})`) so modules load in the
+  browser **and** under node for tests.
+- Pure functions. `numberline` returns a string; `snap` fails loud on misuse;
+  the parser never throws. Keep that split.
+- Ship an inline test block (`eq`/`threw` helpers) like `snap.js`.
+- **Relative asset paths only** (`../assets/...`, `lib/...`). Absolute `/...`
+  paths break githack / pages.dev previews. (All current files comply.)
+- Add `<meta name="robots" content="noindex, nofollow">` to any page not yet on
+  `main`; remove it as part of promotion (see §4).
+
+---
+
+## 4. Hosting & provenance rule (decided this session)
+
+The concern is **provenance**, not secrecy: a preview must never look like, resolve
+as, or get indexed as part of `architecture.tools`.
+
+- **Never serve WIP on `architecture.tools` or a subdomain of it.** A brand
+  subdomain gets discovered via Certificate Transparency logs and indexed under
+  your name — exactly how "unlisted" pages leak. Use a **neutral host**.
+- **GitHub Pages serves only `main`**, so `dev` structurally cannot resolve under
+  the domain. Good.
+- **Recommended preview:** Cloudflare Pages on its `*.pages.dev` URL (do **not**
+  attach the custom domain). Cloudflare auto-adds `X-Robots-Tag: noindex` to
+  `pages.dev` deployments. Add Cloudflare Access only if true privacy is needed.
+- **Quick look:** `raw.githack.com/mstinnett/architecturetools/dev/<path>` works
+  (off-brand, relative paths resolve) but is **not** noindexed — fine for a
+  glance, not a standing preview.
+
+**Not yet done (loose ends):** the `noindex` meta tag has **not** been added to
+the dev WIP pages; no `docs/staging.md` exists yet; no preview host is configured.
+
+---
+
+## 5. Presumed route through (the build plan)
+
+The calculator family, grouped by the engine primitive each reuses:
+
+| Constraint | Residual shown | Tools |
+|---|---|---|
+| Continuous grid | snap error | **Converter** ✅ done |
+| Finite module (size + gap) | the cut / leftover | **tile cuts**, **n sections with gaps**, on-center layout, baluster spacing |
+| Ratio of two lengths | rise vs run / vs code limit | **slope**, ramp & drainage, stair risers |
+| Product of two lengths | area, area ÷ coverage | **area**, coverage/quantity, sheet count |
+| (none — pure parse) | — | **scale converter** |
+
+**What's nearly free:** the parser already has an `area` kind (`makeArea`) and a
+`ratio` kind — so **area** and **slope** are thin layers, and **scale** needs no
+snap at all.
+
+**Highest-leverage next build:** a `partition()` module, sibling to `snap.js`,
+reusing `snap` + `numberline`. One primitive unlocks four tools:
+- **n sections + gaps:** `section = (L − (n−1)·g) / n`, snapped; residual = what
+  won't divide evenly.
+- **tile run + joint:** module `m = tile + joint`; full count `= floor((L+j)/m)`;
+  residual = end cut (split for a balanced layout).
+- **on-center (studs/joists/pickets):** intervals `k = ceil(L / s_max)`; actual
+  spacing `= L/k`, snapped; residual = drift across the run.
+- **baluster gap:** smallest _n_ where `gap = (R − n·w)/(n+1) ≤ 4″`.
+
+**Suggested order:**
+1. `partition()` primitive → ships tile cuts + n-sections + on-center + balusters.
+2. **slope** (then fold legacy `slope`/`stair` onto the engine).
+3. **area + coverage** (then fold legacy `sheet-sizes`).
+4. **scale** — quick win anytime.
+
+**Legacy pages** (`calculators/*.html`, all standalone, no engine):
+`slope`, `stair`, `sheet-sizes` get **rebuilt onto** the engine per the order
+above. `dimension-converter.html` is **superseded by `convert.html` — retire it**
+rather than port. The code-compliance calculators (`occupant-load`,
+`egress-width`, `fixture-calc`, `parking-ratio`) are a **different lineage**
+(table lookups, not the dimensional engine) — out of scope for this thread.
+
+---
+
+## 6. Reconcile before relying on the agent docs
+
+`docs/decisions/state.md` and `docs/decisions/backlog.md` (the autonomous-agent
+system) are **out of date** as of this handoff:
+- They still list `components.html` / `site-screen.html` as live "flagship"
+  pages — they were removed from `main` (§2).
+- They say no `CNAME`/workflow exists in the repo — both now exist.
+- They do **not** mention the `lib/` engine or the converter at all — the
+  calculator-engine thread is currently tracked **only here**.
+
+Fold this thread into `backlog.md`, and refresh `state.md`, before driving work
+through `/work-next` or the architect agent.
