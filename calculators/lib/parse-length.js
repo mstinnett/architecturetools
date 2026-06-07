@@ -449,17 +449,37 @@
 
     // each parse fn returns null, or { value, node } where node is a display
     // AST: { t:'term', value, tok } | { t:'un', op, x } | { t:'bin', op, l, r }
+    // an adjacent term (no operator) in a FINER unit of the same system is an
+    // implicit sum — the metric analogue of the foot-inch compound, so
+    // "24m 105mm" reads 24 m + 105 mm rather than dropping the 105 mm.
+    function finerSameSystem(prevVal, tok) {
+      if (!tok || tok.type !== 'term') return false;
+      var v = tok.value;
+      if (!v || v.kind !== 'length' || !v.hadUnit) return false;
+      if (!prevVal || prevVal.kind !== 'length' || !prevVal.hadUnit) return false;
+      if (prevVal.system !== v.system) return false;
+      return UNIT_TABLE[v.finestUnit].units < UNIT_TABLE[prevVal.finestUnit].units;
+    }
+
     function parseAdd() {
       var first = parseMul();
       if (first === null) return null;
       var operands = [first.value], ops = [], node = first.node;
-      while (peek() && peek().type === 'op' && (peek().op === '+' || peek().op === '-')) {
-        var oi = pos; var op = peek().op; pos++;
-        var rhs = parseMul();
-        if (rhs === null) { status[oi] = 'pending'; pos = oi; break; } // dangling operator
-        markUsed(oi);
-        operands.push(rhs.value); ops.push(op);
-        node = { t: 'bin', op: op, l: node, r: rhs.node };
+      while (peek()) {
+        var nx = peek();
+        if (nx.type === 'op' && (nx.op === '+' || nx.op === '-')) {
+          var oi = pos; var op = nx.op; pos++;
+          var rhs = parseMul();
+          if (rhs === null) { status[oi] = 'pending'; pos = oi; break; } // dangling operator
+          markUsed(oi);
+          operands.push(rhs.value); ops.push(op);
+          node = { t: 'bin', op: op, l: node, r: rhs.node };
+        } else if (finerSameSystem(operands[operands.length - 1], nx)) {
+          var rhs2 = parseMul();
+          if (rhs2 === null) break;
+          operands.push(rhs2.value); ops.push('+');
+          node = { t: 'bin', op: '+', l: node, r: rhs2.node };
+        } else break;
       }
       if (operands.length === 1) return first;
       return { value: applyAdd(operands, ops, defaultUnit), node: node };

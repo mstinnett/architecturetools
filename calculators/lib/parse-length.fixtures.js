@@ -89,6 +89,11 @@
     { input: "8-1/2\" + 11cm",     expect: { units: 17 * IN / 2 + 11 * CM, inferred: [false, false] }, gate: '1b' },
     { input: "8\"-1/2\"",          expect: { units: 8 * IN - IN / 2 }, gate: '1b' },   // unit on left → subtraction = 7½"
 
+    // space-separated descending same-system terms sum (metric analogue of ft-in)
+    { input: "24m 105mm",          expect: { units: 24 * M + 105 * MM }, gate: '1b' },
+    { input: "5cm 3mm",            expect: { units: 5 * CM + 3 * MM }, gate: '1b' },
+    { input: "3m 50cm 5mm",        expect: { units: 3 * M + 50 * CM + 5 * MM }, gate: '1b' },
+
     // ---- 1b  dimensional outcomes ----
     { input: "12\" * 3\"",           expect: { isNull: true },               gate: '1b' }, // area
     { input: "12\" / 3\"",           expect: { dim0: { count: 4, remainder_units: 0 } },     gate: '1b' },
