@@ -14,6 +14,7 @@ time (see `docs/HANDOFF.md` §2).
 
 ## Open — calculator engine (the active thread)
 
+- [ ] **Partition "solve for the boundary" mode (operator workflow).** Source: operator ask 2026-06-08; stories in `docs/partition-stories.md` (A1–A3). The inverse of the shipped tool: instead of reporting the residual for a fixed run, treat *whole tiles* as the constraint and solve for the free variable — the run length ("move the wall"), or the transition/expansion-joint position inside a fixed total ("where does the seam go"). Exact lattice search (whole-tile runs are `k·(tile+joint) − joint`); list candidates around a target with the distance to each, flag the half-tile "sliver" zone. Likely a forward⇄solve toggle on `partition.html`. **Priority TBD vs. slope — confirm with operator.**
 - [ ] **Slope tool on the engine.** Source: HANDOFF.md §5. Uses the parser's `ratio` kind (rise vs run / vs code limit). Then fold the legacy standalone `slope-calculator.html` and `stair-calculator.html` onto the engine and retire the standalones.
 - [ ] **Area + coverage tool on the engine.** Source: HANDOFF.md §5. Uses the parser's `area` kind (`makeArea`) — area, area ÷ coverage, sheet count. Then fold legacy `sheet-sizes.html` onto the engine.
 - [ ] **Scale converter (quick win).** Source: HANDOFF.md §5. Pure parse, no snap — can land anytime.
