@@ -52,8 +52,9 @@
   /* Answer surfaces (parsed output + the figure/rounding card + ratio/area)
      share ONE tone knob, --answer-surface. The figure's label halo reads it too
      (see svg.nl text), so the halo always matches the card — retint in one place
-     and nothing fringes. */
-  .echo, .answer-card, .ratio-box { --answer-surface: var(--card); }
+     and nothing fringes. Tone sits a half-step below the --card panel surface,
+     well short of the --paper field behind the calculator. */
+  .echo, .answer-card, .ratio-box { --answer-surface: color-mix(in srgb, var(--card) 50%, var(--card-2)); }
 
   /* echo — the parsed reading + exact conversion, a debossed well so the parsed
      output reads as a result recessed into the page */
