@@ -113,7 +113,7 @@
   .ratio-big { font-size: var(--text-xl); font-weight: 300; }
 
   @media (max-width: 480px) {
-    .field-mono { font-size: 1.1rem; }
+    #dimInput { font-size: 1.1rem; }
     .snap-name { width: 96px; }
     .snap-resid { width: 96px; }
   }
@@ -181,6 +181,11 @@
   var IN = 24384, MM = 960;
   var MAX_UNITS = 96000000000;          // 100 km — beyond this we don't snap/draw
   function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+  // areas come back as floating mm² and can blow past safe range (or go
+  // non-finite) from extreme inputs; cap at (100 km)² so we never render an
+  // exponent soup or Infinity. Parallels the length guard above.
+  var MAX_AREA_MM2 = 1e16;              // (100 km)² in mm² = 1e10 m²
+  function areaOutOfRange(mm2) { return !Number.isFinite(mm2) || Math.abs(mm2) > MAX_AREA_MM2; }
 
   var state = {
     text: '',
@@ -282,7 +287,8 @@
       var r = Math.round(result.ratio * 10000) / 10000;
       html += '<span class="eq">=</span><span class="result">' + r + '</span>';
     } else if (result.dimension === 2 && result.area_mm2 != null) {
-      html += '<span class="eq">=</span><span class="result">' + escapeHtml(sig(result.area_mm2 / 1e6) + ' m²') + '</span>';
+      if (areaOutOfRange(result.area_mm2)) html += '<span class="eq">=</span><span class="op">area out of range</span>';
+      else html += '<span class="eq">=</span><span class="result">' + escapeHtml(sig(result.area_mm2 / 1e6) + ' m²') + '</span>';
     } else if (result.note) {
       html += '<span class="eq">=</span><span class="op">' + escapeHtml(result.note) + '</span>';
     } else if (result.units == null) {
@@ -392,8 +398,8 @@
            + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(units, state.target, denom)) + decUnder(units) + '</div>'
            + '<div class="snap-resid">on grid</div></div>';
     } else {
-      [{ name: 'Round down', gloss: 'for a maximum', u: floorU },
-       { name: 'Round up', gloss: 'for a minimum', u: ceilU }].forEach(function (b) {
+      [{ name: 'Round down', gloss: 'use for a max — won\'t exceed', u: floorU },
+       { name: 'Round up', gloss: 'use for a min — won\'t fall below', u: ceilU }].forEach(function (b) {
         var near = b.u === nearU;
         var cls = 'snap-row' + (near ? ' is-primary' : '');
         html += '<div class="' + cls + '">' + nameCell(b.name + (near ? ' · nearest' : ''), b.gloss)
@@ -490,7 +496,17 @@
     renderBareAsk(result);
     renderEcho(result);
 
-    if (result && result.dimension === 2 && result.area_mm2 != null) { renderArea(result); return; }
+    if (result && result.dimension === 2 && result.area_mm2 != null) {
+      // out-of-range area: echo shows "area out of range", nothing else renders
+      if (areaOutOfRange(result.area_mm2)) {
+        els.lengthOut.style.display = 'none';
+        els.ratioOut.style.display = 'none';
+        els.areaOut.style.display = 'none';
+        els.mathNote.innerHTML = '';
+        return;
+      }
+      renderArea(result); return;
+    }
 
     // overflow guard: out-of-range lengths get the echo note above, but no
     // figure/snap (snap would throw on a non-safe integer)

@@ -79,9 +79,10 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
   kernel to `snap.js` (one source of truth, no duplicated `snapTriple`/`pick`);
   `numberline()` validates its public inputs; `partition` infeasibility carries
   stable `reason` codes; the `Number`-range bound is documented. Conventions
-  updated in `docs/HANDOFF.md` §3. Open follow-ups recorded in the backlog
-  (parser `reason` codes; convert.html UI: area-range guard, mobile-CSS
-  selector, Min/Max wording).
+  updated in `docs/HANDOFF.md` §3. Also fixed the flagged convert.html UI bugs
+  (mobile-CSS selector, area out-of-range guard, Min/Max row wording). Open
+  follow-ups in the backlog: parser `reason` codes, and convert.html
+  pending-span policy + area/ratio polish.
 - 2026-06-07 — `noindex` added to all 11 `dev` WIP pages (provenance §4).
 - 2026-06-07 — Precise Unit Converter shipped (frozen), and the calculator
   **engine** (`calculators/lib/`) established as the spine for the family. Build

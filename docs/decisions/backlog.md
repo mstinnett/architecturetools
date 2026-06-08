@@ -28,9 +28,6 @@ codes, range docs) are **done**; what remains is the converter UI and a parser
 extension. The converter is feature-frozen, so these are deliberate, not urgent.
 
 - [ ] **Parser: stable `reason`/`errorCode` for unresolved states.** Source: review #4. Distinguish division-by-zero, conflicting adjacent units, missing operand, mixed area/length, etc., so the UI renders copy from a code (mirrors what `partition` now does for infeasible layouts). Touches the frozen parser — scope carefully.
-- [ ] **convert.html: area-range / non-finite guard.** Source: review #2. Length results have an out-of-range guard before render; area results don't — cap or refuse non-finite `area_mm2` and show "out of range" in the echo.
-- [ ] **convert.html: fix the mobile input font selector.** Source: review usability #3. The `@media` rule styles `.field-mono`, but the input is `#dimInput`, so the smaller mobile font never applies. One-line fix.
-- [ ] **convert.html: clarify Min/Max row wording.** Source: review usability #1. "Round down · for a maximum" reads as "gives the maximum." Reword to "Use for max allowed / round down", "Use for min required / round up", "Nearest / least rounding error". Carry the clearer labels into the partition tool page too.
 - [ ] **convert.html: decide pending-span policy + area/ratio polish.** Source: review #3 / usability #5. Keep salvage-parse for the converter but make the "ignoring …" note prominent; consider a `strict` flag for future code/check calculators; either label area/ratio as bonus outputs or give them the length path's formatting.
 
 ## Open — provenance / hosting (loose ends from HANDOFF §4)
@@ -46,6 +43,7 @@ extension. The converter is feature-frozen, so these are deliberate, not urgent.
 
 ## Done
 
+- [x] **convert.html UI fixes from the review.** Source: review usability #1/#3, #2. Fixed the mobile input-font selector (`.field-mono` → `#dimInput`); added an area out-of-range / non-finite guard parallel to the length guard (echo shows "area out of range", render skipped); reworded the Min/Max rows ("use for a max — won't exceed" / "use for a min — won't fall below") so "for a maximum" can't be read as "gives the maximum". Carry the clearer Min/Max labels into the partition tool page.
 - [x] **Engine hardening from the convert.html review.** `numberline.js` + `partition.js` delegate the floor/nearest/ceil kernel to `snap.js` (one source of truth — removed the duplicated `snapTriple`/`pick`); `numberline()` validates its public inputs; `partition` infeasibility carries stable `reason` codes; range bound documented; conventions updated (HANDOFF §3). All three suites green (snap 19, numberline 12, partition 35).
 - [x] **`partition()` engine module.** Source: HANDOFF.md §5. `calculators/lib/partition.js` — the layout primitive (sibling to `snap.js`, delegates its rounding kernel). Four modes (sections / tiles / on-center / balusters) behind one dispatcher; pure, fails loud, 35 inline `node` tests passing. The four tool pages are now thin layers on it (tracked above).
 - [x] **Add `noindex` to the `dev` WIP pages.** Source: HANDOFF.md §4. `<meta name="robots" content="noindex, nofollow">` (with a "remove on promotion" comment) added to all 11 pages not yet on `main`: `components.html`, `site-screen.html`, and every `calculators/*.html`.
