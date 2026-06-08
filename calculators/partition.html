@@ -38,6 +38,13 @@
                       background: var(--selected-bg); color: var(--white); }
   .mode-pill.active .sub { color: rgba(255,255,255,0.6); }
 
+  /* direction toggle — forward (lay out) vs inverse (solve for whole) */
+  .dir-line { display: flex; gap: 0; margin-bottom: var(--space-lg); }
+  .dir-seg { padding: 0.55rem 1rem; border: 1px solid var(--gray-700); border-left-width: 0; cursor: pointer;
+             font-size: var(--text-sm); background: var(--white); user-select: none; }
+  .dir-seg:first-child { border-left-width: 1px; }
+  .dir-seg.active { background: var(--selected-bg); color: var(--white); border-color: var(--selected-bg); }
+
   /* per-mode parameter row */
   .params { display: none; flex-wrap: wrap; gap: 1.1rem; align-items: flex-end; margin-bottom: var(--space-lg); }
   .params.active { display: flex; }
@@ -124,13 +131,20 @@
        format: feet-inches, fractions, or metric.</p>
   </div>
 
-  <div class="section-label">Run</div>
+  <div class="dir-line" id="dirLine">
+    <span class="dir-seg active" data-dir="layout">Lay out a run</span>
+    <span class="dir-seg" data-dir="solve">Solve for whole tiles</span>
+  </div>
+
+  <div class="section-label" id="runLabel">Run</div>
   <div class="field-wrap">
     <input type="text" id="runInput" spellcheck="false" maxlength="80"
            autocomplete="off" autocapitalize="off" placeholder="e.g. 10'  ·  12'-1&quot;  ·  3.6m" autofocus>
     <div class="field-note" id="runNote"></div>
   </div>
 
+  <!-- LAY OUT direction: fixed run → report the residual -->
+  <div id="layoutDir">
   <div class="section-label">Lay out</div>
   <div class="mode-line" id="modeLine">
     <span class="mode-pill" data-mode="tiles">Tiles<span class="sub">module + joint</span></span>
@@ -160,6 +174,21 @@
   <div class="params" id="pBalusters">
     <div class="param"><label for="balWidth">Baluster</label><input type="text" id="balWidth" class="narrow" spellcheck="false" autocomplete="off"></div>
     <div class="param"><label for="balMaxGap">Max gap</label><input type="text" id="balMaxGap" class="narrow" spellcheck="false" autocomplete="off"></div>
+  </div>
+  </div><!-- /layoutDir -->
+
+  <!-- SOLVE direction: fix whole tiles → solve for the boundary (run / seam) -->
+  <div id="solveDir" style="display:none;">
+    <div class="section-label">Solve</div>
+    <div class="mode-line" id="solveModeLine">
+      <span class="mode-pill" data-solve="fit">Fit a run<span class="sub">whole tiles — move the wall</span></span>
+      <span class="mode-pill" data-solve="seam">Place a seam<span class="sub">fixed total — find the transition</span></span>
+    </div>
+    <div class="params active" id="pSolve">
+      <div class="param"><label for="solTile">Tile</label><input type="text" id="solTile" spellcheck="false" autocomplete="off"></div>
+      <div class="param"><label for="solJoint">Joint</label><input type="text" id="solJoint" class="narrow" spellcheck="false" autocomplete="off"></div>
+      <div class="param" id="seamNearWrap"><label for="solSeamNear">Seam near</label><input type="text" id="solSeamNear" spellcheck="false" autocomplete="off" placeholder="center"></div>
+    </div>
   </div>
 
   <div id="results">
@@ -196,7 +225,9 @@
     runText: "10'",
     runUnits: null,
     system: 'imperial',                                   // 'imperial' | 'metric'
+    direction: 'layout',                                  // 'layout' (forward) | 'solve' (inverse)
     mode: 'tiles',
+    solveMode: 'fit',                                     // 'fit' (find the run) | 'seam' (place a transition)
     ends: 'between',                                       // sections divider topology
     grid: { imperial: { denom: 16 }, metric: { mm: 1 } }, // remembered per system
     gridUiSystem: null,
@@ -204,13 +235,20 @@
       tile: '12"', joint: '1/4"',
       count: '5', divider: '',
       ocMax: '16"',
-      balWidth: '1 1/2"', balMaxGap: '4"'
+      balWidth: '1 1/2"', balMaxGap: '4"',
+      solTile: '12"', solJoint: '1/4"', solSeamNear: ''
     }
   };
 
   var els = {
     run: document.getElementById('runInput'),
     runNote: document.getElementById('runNote'),
+    runLabel: document.getElementById('runLabel'),
+    dirLine: document.getElementById('dirLine'),
+    layoutDir: document.getElementById('layoutDir'),
+    solveDir: document.getElementById('solveDir'),
+    solveModeLine: document.getElementById('solveModeLine'),
+    seamNearWrap: document.getElementById('seamNearWrap'),
     modeLine: document.getElementById('modeLine'),
     gridWrap: document.getElementById('gridWrap'),
     gridPresets: document.getElementById('gridPresets'),
@@ -232,7 +270,10 @@
       divider: document.getElementById('secDivider'),
       ocMax: document.getElementById('ocMax'),
       balWidth: document.getElementById('balWidth'),
-      balMaxGap: document.getElementById('balMaxGap')
+      balMaxGap: document.getElementById('balMaxGap'),
+      solTile: document.getElementById('solTile'),
+      solJoint: document.getElementById('solJoint'),
+      solSeamNear: document.getElementById('solSeamNear')
     }
   };
 
@@ -245,6 +286,11 @@
      "1'-2 1/2"". Metric is whole/decimal mm throughout. */
   function displayDenom() { return state.mode === 'tiles' ? 64 : (currentDenom() || 64); }
   function fmtLen(u) { return NumberLine.formatTrue(u, state.system); }
+  // solve candidates land on the module, so show feet-inches with a clean
+  // fraction (10'-2 1/4") rather than the true-value decimal (10'-2.25").
+  function fmtRun(u) {
+    return state.system === 'metric' ? NumberLine.metricDecimal(u, 1) : NumberLine.formatSnapped(u, 'imperial', 64);
+  }
   function fmtModule(u) {
     if (state.system === 'metric') return NumberLine.metricDecimal(u, 2);
     var f = NumberLine.imperialFraction(u, displayDenom());
@@ -584,12 +630,164 @@
     els.notice.innerHTML = html;
   }
 
+  // figure width — size to the container (never wider, so margins stay even)
+  function figW() {
+    var w = els.figure.clientWidth;
+    if (!w) w = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    return Math.min(w, 680);
+  }
+
+  /* ---- inverse direction: solve for the boundary that gives whole tiles ---
+     The forward tool fixes the run and reports the residual. Here whole tiles
+     is the constraint and the boundary is the unknown — the run length (move a
+     wall) or a transition position inside a fixed total (place a seam). It is an
+     exact lattice search: a whole-tile run is run_k = k·tile + (k−1)·joint. */
+  function wholeRunOf(tile, joint, k) { return k >= 1 ? k * tile + (k - 1) * joint : 0; }
+
+  function renderSolve() {
+    Array.prototype.forEach.call(els.solveModeLine.querySelectorAll('.mode-pill'), function (el) {
+      el.classList.toggle('active', el.dataset.solve === state.solveMode);
+    });
+    els.seamNearWrap.style.display = state.solveMode === 'seam' ? '' : 'none';
+    els.gridWrap.style.display = 'none';
+    els.runLabel.textContent = state.solveMode === 'seam' ? 'Total length' : 'Target run';
+
+    if (state.runUnits == null) { showNotice('Type a ' + (state.solveMode === 'seam' ? 'total length' : 'target run') + ' above to begin.'); return; }
+    var tile = parseParam(state.params.solTile), joint = parseGap(state.params.solJoint);
+    var need = [];
+    if (tile.units == null) need.push('a tile size');
+    if (joint.units == null) need.push('a valid joint');
+    if (need.length) { showNotice('Enter <strong>' + need.join('</strong> and <strong>') + '</strong> to solve.'); return; }
+    if (state.runUnits < tile.units) {
+      showNotice('<strong>Too short.</strong> The ' + (state.solveMode === 'seam' ? 'total' : 'target') + ' is smaller than a single ' + fmtModule(tile.units) + ' tile.');
+      return;
+    }
+    if (state.solveMode === 'fit') solveFit(state.runUnits, tile.units, joint.units);
+    else solveSeam(state.runUnits, tile.units, joint.units);
+  }
+
+  // A1 / A2 — nearest run lengths that lay out in whole tiles, and the move to each
+  function solveFit(target, tile, joint) {
+    var m = tile + joint;
+    var kLo = Math.floor((target + joint) / m);            // whole tiles that fit (the forward count)
+    var runLo = wholeRunOf(tile, joint, kLo), runHi = wholeRunOf(tile, joint, kLo + 1);
+    var cut = target - runLo, exact = cut === 0;
+    var sliver = !exact && cut * 2 < tile;                  // an edge piece under half a tile
+    var nearLo = (target - runLo) <= (runHi - target);
+
+    var layout = Partition.tiles(target, tile, joint);     // forward layout of the target — shows the cut
+    els.notice.style.display = 'none';
+    els.figure.style.display = '';
+    els.figure.innerHTML = layoutFigure(layout, figureDisplay(layout), figW());
+
+    var html = '';
+    if (exact) {
+      html += row('is-count', 'Whole now', kLo + ' tiles, no cut', fmtRun(target), '<span class="ok">✓</span>');
+      if (kLo >= 2) html += row('', 'One fewer', (kLo - 1) + ' tiles', fmtRun(runLo - m), 'shorter ' + fmtModule(m));
+      html += row('', 'One more', (kLo + 1) + ' tiles', fmtRun(runHi), 'longer ' + fmtModule(m));
+    } else {
+      html += row('is-ref', 'Your target', kLo + ' tiles + ' + (sliver ? 'sliver' : 'cut'), fmtRun(target),
+        sliver ? '<span class="bad">' + fmtModule(cut) + ' sliver</span>' : fmtModule(cut) + ' cut');
+      html += row(nearLo ? 'is-resid' : '', 'Shorten to', kLo + ' whole tiles', fmtRun(runLo), 'move −' + fmtModule(target - runLo));
+      html += row(!nearLo ? 'is-resid' : '', 'Lengthen to', (kLo + 1) + ' whole tiles', fmtRun(runHi), 'move +' + fmtModule(runHi - target));
+    }
+    els.outRows.innerHTML = html;
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + 'module = tile + joint = ' + m + ' units; a whole run for k tiles = k·tile + (k−1)·joint<br>'
+      + kLo + ' tiles = <b>' + runLo + '</b> units (' + fmtLen(runLo) + '); ' + (kLo + 1) + ' tiles = <b>' + runHi + '</b> units (' + fmtLen(runHi) + ')'
+      + '; target = ' + target + ' units → cut <b>' + cut + '</b> units (' + fmtModule(cut) + ').';
+  }
+
+  // A3 — place a transition in a fixed total so the left zone is whole tiles.
+  // The right end cut is invariant of WHERE the seam sits: it is (total + 2·joint)
+  // mod module — a property of the total, not the seam. Zero ⇒ both sides whole.
+  function solveSeam(total, tile, joint) {
+    var m = tile + joint;
+    var near = parseGap(state.params.solSeamNear).units;
+    if (near == null || near <= 0) near = Math.round(total / 2);
+    if (near > total) near = total;
+    var k = Math.max(1, Math.round((near + joint) / m));
+    while (wholeRunOf(tile, joint, k) > total && k > 1) k--;   // keep the left zone inside the total
+    var seam = wholeRunOf(tile, joint, k), right = total - seam;
+    var bothWhole = false, rightCut = 0, jR = 0;
+    if (right >= tile) {
+      rightCut = ((total + 2 * joint) % m + m) % m;
+      bothWhole = rightCut === 0;
+      jR = Math.floor((right + joint) / m);
+    } else if (right > 0) {
+      rightCut = right;                                        // less than one tile — the right is one offcut
+    }
+
+    els.notice.style.display = 'none';
+    els.figure.style.display = '';
+    els.figure.innerHTML = solveSeamFigure(total, tile, joint, seam, right, rightCut, bothWhole, figW());
+
+    var html = '';
+    html += row('is-count', 'Seam at', k + ' whole tiles from the left', fmtRun(seam), 'from start');
+    if (right <= 0) {
+      html += row('is-ref', 'Right zone', 'the seam lands at the far end', '—', '');
+    } else {
+      html += row('', 'Right zone', bothWhole ? jR + ' whole tiles' : 'takes the offcut', fmtRun(right),
+        bothWhole ? '<span class="ok">whole ✓</span>' : '<span class="bad">' + fmtModule(rightCut) + ' cut</span>');
+      html += row('is-resid', bothWhole ? 'Both sides whole' : 'Unavoidable cut',
+        bothWhole ? 'the seam can sit on any tile line' : 'fixed by the total — move the seam to hide it',
+        bothWhole ? 'yes' : fmtModule(rightCut), '');
+    }
+    els.outRows.innerHTML = html;
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + 'module = ' + m + ' units; left = ' + k + ' tiles = <b>' + seam + '</b> units (' + fmtLen(seam) + ')<br>'
+      + 'right = total − seam = <b>' + right + '</b> units; right cut = (total + 2·joint) mod module = <b>' + rightCut + '</b> units (' + fmtModule(rightCut) + ') — the same wherever the seam goes.';
+  }
+
+  function solveSeamFigure(total, tile, joint, seam, right, rightCut, bothWhole, W) {
+    var H = 138, x0 = 24, x1 = W - 24, axisW = x1 - x0;
+    function X(u) { return x0 + (u / total) * axisW; }
+    var yDim = 24, yTop = 54, yBot = 96, stripH = yBot - yTop;
+    function txt(x, y, cls, anchor, s) { return '<text x="' + x.toFixed(1) + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>'; }
+    function vline(x, ya, yb, c, w) { return '<line x1="' + x.toFixed(2) + '" y1="' + ya + '" x2="' + x.toFixed(2) + '" y2="' + yb + '" stroke="' + c + '" stroke-width="' + w + '"/>'; }
+    function field(aU, bU) { var a = X(aU), b = X(bU), w = Math.max(0.6, b - a); return '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#f4f4f3" stroke="#999" stroke-width="1"/>'; }
+    function jnt(aU, bU) { var a = X(aU), b = X(bU), w = Math.max(0.6, b - a); return '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#444"/>'; }
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="lf">';
+    svg += '<defs><pattern id="lfhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
+    svg += '<line x1="' + x0 + '" y1="' + yDim + '" x2="' + X(total).toFixed(2) + '" y2="' + yDim + '" stroke="#999" stroke-width="1"/>';
+    svg += vline(x0, yDim - 4, yDim + 4, '#999', 1) + vline(X(total), yDim - 4, yDim + 4, '#999', 1);
+    svg += txt((x0 + X(total)) / 2, yDim - 6, 'lf-run', 'middle', 'total  ' + fmtRun(total));
+    svg += '<line x1="' + x0 + '" y1="' + yBot + '" x2="' + X(total).toFixed(2) + '" y2="' + yBot + '" stroke="#0a0a0a" stroke-width="1"/>';
+
+    var L = Partition.tiles(seam, tile, joint), cellsL = cellList(L, 'between');
+    if (cellsL.length <= MAX_DRAW) cellsL.forEach(function (c) { svg += c[2] === 'item' ? field(c[0], c[1]) : jnt(c[0], c[1]); });
+    if (right > 0) {
+      var R = Partition.tiles(right, tile, joint), cellsR = cellList(R, 'between');
+      if (R.feasible && cellsR.length <= MAX_DRAW) cellsR.forEach(function (c) { svg += c[2] === 'item' ? field(seam + c[0], seam + c[1]) : jnt(seam + c[0], seam + c[1]); });
+      if (!bothWhole && rightCut > 0) {
+        var rA = X(total - rightCut), rB = X(total);
+        if (rB - rA < 1.5) { rA -= 1; rB += 1; }
+        svg += '<rect x="' + rA.toFixed(2) + '" y="' + yTop + '" width="' + (rB - rA).toFixed(2) + '" height="' + stripH + '" fill="url(#lfhatch)"/>';
+        svg += txt((rA + rB) / 2, yBot + 16, 'lf-resid', 'middle', 'cut ' + fmtModule(rightCut));
+      }
+    }
+    svg += vline(X(seam), yTop - 8, yBot + 8, '#0a0a0a', 2);
+    svg += txt(X(seam), yTop - 10, 'lf-end', 'middle', 'seam');
+    svg += '</svg>';
+    return svg;
+  }
+
   function render() {
     // parse the run, set the working system, sync the unit-dependent UI
     var r = parseLength(state.runText, { defaultUnit: state.system === 'metric' ? 'mm' : 'in' });
     state.runUnits = (r && r.dimension === 1 && r.units != null && !outOfRange(r.units)) ? r.units : null;
     if (r && (r.unitSystem === 'metric' || r.unitSystem === 'imperial')) state.system = r.unitSystem;
     renderRunNote(r);
+
+    // direction: lay out a run (forward) vs solve for whole tiles (inverse)
+    Array.prototype.forEach.call(els.dirLine.querySelectorAll('.dir-seg'), function (el) {
+      el.classList.toggle('active', el.dataset.dir === state.direction);
+    });
+    els.layoutDir.style.display = state.direction === 'layout' ? '' : 'none';
+    els.solveDir.style.display = state.direction === 'solve' ? '' : 'none';
+    if (state.direction === 'solve') { renderSolve(); return; }
+    els.runLabel.textContent = 'Run';
 
     // mode + parameter visibility
     Array.prototype.forEach.call(els.modeLine.querySelectorAll('.mode-pill'), function (el) {
@@ -613,12 +811,8 @@
     }
 
     els.notice.style.display = 'none';
-    // figure — size to the container (never wider, so margins stay even)
-    var width = els.figure.clientWidth;
-    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
-    width = Math.min(width, 680);
     els.figure.style.display = '';
-    els.figure.innerHTML = layoutFigure(layout, figureDisplay(layout), width);
+    els.figure.innerHTML = layoutFigure(layout, figureDisplay(layout), figW());
     renderRows(layout);
     renderMath(layout);
   }
@@ -630,6 +824,12 @@
   Array.prototype.forEach.call(els.modeLine.querySelectorAll('.mode-pill'), function (el) {
     el.addEventListener('click', function () { state.mode = el.dataset.mode; render(); });
   });
+  Array.prototype.forEach.call(els.dirLine.querySelectorAll('.dir-seg'), function (el) {
+    el.addEventListener('click', function () { state.direction = el.dataset.dir; render(); });
+  });
+  Array.prototype.forEach.call(els.solveModeLine.querySelectorAll('.mode-pill'), function (el) {
+    el.addEventListener('click', function () { state.solveMode = el.dataset.solve; render(); });
+  });
   Array.prototype.forEach.call(els.secEnds.querySelectorAll('.seg'), function (el) {
     el.addEventListener('click', function () {
       state.ends = el.dataset.ends;
@@ -640,7 +840,8 @@
 
   // parameter fields → state.params (keyed to match)
   var bind = [['tile', 'tile'], ['joint', 'joint'], ['count', 'count'], ['divider', 'divider'],
-              ['ocMax', 'ocMax'], ['balWidth', 'balWidth'], ['balMaxGap', 'balMaxGap']];
+              ['ocMax', 'ocMax'], ['balWidth', 'balWidth'], ['balMaxGap', 'balMaxGap'],
+              ['solTile', 'solTile'], ['solJoint', 'solJoint'], ['solSeamNear', 'solSeamNear']];
   bind.forEach(function (pair) {
     els.f[pair[0]].addEventListener('input', function () { state.params[pair[1]] = els.f[pair[0]].value; render(); });
   });
@@ -654,6 +855,9 @@
   els.f.ocMax.value = state.params.ocMax;
   els.f.balWidth.value = state.params.balWidth;
   els.f.balMaxGap.value = state.params.balMaxGap;
+  els.f.solTile.value = state.params.solTile;
+  els.f.solJoint.value = state.params.solJoint;
+  els.f.solSeamNear.value = state.params.solSeamNear;
   Array.prototype.forEach.call(els.secEnds.querySelectorAll('.seg'), function (s) { s.classList.toggle('active', s.dataset.ends === state.ends); });
   render();
 })();

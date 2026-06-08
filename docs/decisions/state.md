@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-08 (partition tool page shipped — `partition.html`)_
+_Last updated: 2026-06-08 (partition tool page + solve-for-the-boundary mode)_
 
 ## Live architectural picture
 
@@ -32,8 +32,10 @@ _Last updated: 2026-06-08 (partition tool page shipped — `partition.html`)_
   residual; reuses snap's integer division). Two **tool pages** are built on the
   engine: `convert.html` (Precise Unit Converter — **shipped and frozen**;
   parse/snap/numberline) and `partition.html` (Even Layout — wraps `partition.js`,
-  draws the layout + residual; reuses numberline's format helpers). Every other
-  `calculators/*.html` is older, standalone, and does **not** use the engine.
+  draws the layout + residual; reuses numberline's format helpers). `partition.html`
+  also has a **forward⇄solve toggle**: the inverse direction fixes *whole tiles*
+  and solves for the boundary (the run, or a seam inside a fixed total). Every
+  other `calculators/*.html` is older, standalone, and does **not** use the engine.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` (design tokens + reusable
@@ -69,6 +71,16 @@ _Last updated: 2026-06-08 (partition tool page shipped — `partition.html`)_
 
 ## Recent decisions
 
+- 2026-06-08 — **Partition solve-for-the-boundary mode** (operator-requested,
+  A1–A3 in `docs/partition-stories.md`). A forward⇄solve toggle on
+  `partition.html`: the inverse fixes *whole tiles* and solves for the boundary —
+  **Fit a run** (nearest whole-tile runs ± a target, the move to each, half-tile
+  sliver flagged) and **Place a seam** (a transition inside a fixed total; the
+  right end cut `(total + 2·joint) mod module` is invariant of seam position —
+  zero ⇒ both sides whole). Exact integer lattice search; reuses the format
+  helpers + figure. The broader story groups (A4/B/C/D/E/F) are queued in the
+  stories doc. The operator works this way ("find the length that gives whole
+  tiles"), so it leads the calculator thread's value even as slope stays next.
 - 2026-06-08 — **Partition tool page shipped** (`calculators/partition.html`,
   "Even Layout"): the second engine-backed tool page, wrapping `partition.js`.
   Parses a run with `parse-length`, dispatches to the chosen mode (tiles /
