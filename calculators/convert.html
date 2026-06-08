@@ -49,11 +49,11 @@
   .mini-pill.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
                       box-shadow: var(--shadow-press); transform: translateY(1px); }
 
-  /* echo — the parsed reading + exact conversion, raised as an elevated
-     answer box so the parsed output reads as a result, not a footnote */
+  /* echo — the parsed reading + exact conversion, set as a debossed paper well
+     so the parsed output reads as a result recessed into the page */
   .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.85rem 1.1rem; background: var(--paper);
           border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
-          box-shadow: var(--shadow-card); }
+          box-shadow: var(--shadow-well); }
   .echo-line { font-size: var(--text-base); font-weight: 300; line-height: 1.7; color: var(--gray-700); }
   .echo .tok { padding-bottom: 1px; }
   .echo .tok.stated   { border-bottom: 2px solid var(--black); color: var(--black); }      /* what you told me */
@@ -93,7 +93,7 @@
 
   .figure-wrap { margin: var(--space-lg) 0; overflow-x: auto; }
   svg.nl { display: block; max-width: 100%; }
-  svg.nl text { font-family: var(--font-body); }
+  svg.nl text { font-family: var(--font-body); stroke: var(--paper); }  /* halo matches the paper card — no white fringe */
   .nl-axis-label  { font-size: 10px; fill: var(--ink-2); letter-spacing: 0.06em; text-transform: uppercase; }
   .nl-snap-val    { font-size: 12px; fill: var(--black); font-weight: 400; }
   .nl-snap-role   { font-size: 9px;  fill: var(--ink-2); letter-spacing: 0.04em; text-transform: uppercase; }
@@ -103,12 +103,12 @@
   .nl-true-val    { font-size: 13px; fill: var(--black); font-weight: 400; }
   .nl-note        { font-size: 10px; fill: var(--ink-2); font-style: italic; }
 
-  /* figure + rounding table share ONE elevated .answer-card (card styling from
-     global2); the rows sit flat inside it, a hairline dividing them from the
-     figure so there's no box-in-a-box. Nearest leads (accent value). Tinted with
-     the soft paper tone so the answer reads as a sheet of paper lifted on the
-     brighter page surface. */
-  .answer-card { background: var(--paper); }
+  /* figure + rounding table share ONE .answer-card (base styling from global2),
+     re-cast as a DEBOSSED well: soft paper fill + inset shadow so the answer
+     reads as a panel recessed into the brighter page, not floating above it.
+     Rows sit flat inside, a hairline dividing them from the figure (no
+     box-in-a-box). Nearest leads (accent value). */
+  .answer-card { background: var(--paper); box-shadow: var(--shadow-well); }
   .answer-card .figure-wrap { margin: 0; }
   .snap-rows { margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--rule); }
   .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
@@ -129,7 +129,7 @@
 
   .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--paper);
                border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
-               box-shadow: var(--shadow-card); }
+               box-shadow: var(--shadow-well); }
   .ratio-big { font-size: var(--text-xl); font-weight: 300; }
 
   @media (max-width: 480px) {
