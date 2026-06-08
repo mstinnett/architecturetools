@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
+_Last updated: 2026-06-08 (partition tool page shipped — `partition.html`)_
 
 ## Live architectural picture
 
@@ -29,11 +29,11 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
   `snap.js` (fails loud, floor/nearest/ceil to a grid), `numberline.js` (pure
   SVG string), and `partition.js` (fails loud; divides a run into a whole number
   of equal parts — sections, tiles, on-center, balusters — and exposes the
-  residual; reuses snap's integer division). `convert.html`, the Precise Unit
-  Converter, is the only **tool page** yet built on the engine — **shipped and
-  frozen**; it uses parse/snap/numberline. `partition.js` is landed and tested
-  but has no tool page yet. Every other `calculators/*.html` is older,
-  standalone, and does **not** use the engine.
+  residual; reuses snap's integer division). Two **tool pages** are built on the
+  engine: `convert.html` (Precise Unit Converter — **shipped and frozen**;
+  parse/snap/numberline) and `partition.html` (Even Layout — wraps `partition.js`,
+  draws the layout + residual; reuses numberline's format helpers). Every other
+  `calculators/*.html` is older, standalone, and does **not** use the engine.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` (design tokens + reusable
@@ -69,6 +69,15 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 
 ## Recent decisions
 
+- 2026-06-08 — **Partition tool page shipped** (`calculators/partition.html`,
+  "Even Layout"): the second engine-backed tool page, wrapping `partition.js`.
+  Parses a run with `parse-length`, dispatches to the chosen mode (tiles /
+  sections / on-center / balusters), and draws the layout as an SVG strip with
+  the residual hatched — same "the figure is the product" idiom as the
+  converter's number line. Reuses `numberline`'s format helpers (overall lengths
+  as feet-inches, per-item modules as plain inches); infeasible layouts render
+  copy from the primitive's stable `reason` codes; `noindex` set. The engine now
+  powers two of the five planned tools. Next: slope.
 - 2026-06-07 — `partition.js` shipped: the layout primitive (sibling to
   `snap.js`) that divides a run into a whole number of equal parts and exposes
   the residual, unifying four tools (sections / tiles / on-center / balusters)
@@ -109,14 +118,16 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 
 ## Active concerns
 
-- **Next build:** a **tool page** on `partition.js` — a convert.html-style page
-  (figure + parsed input + residual) exposing tile cuts / n-sections / on-center
-  / balusters. The primitive is done; this is the UI layer. Then slope,
-  area+coverage, scale. See `docs/HANDOFF.md` §5 and the backlog.
-- **Provenance loose end:** `noindex` is now on all 11 `dev` WIP pages
-  (`components`, `site-screen`, every `calculators/*.html`) — remove on
-  promotion. Still open: no neutral preview host is configured, so WIP can only
-  be viewed locally until one is stood up.
+- **Next build:** the **slope tool** on the engine — uses the parser's `ratio`
+  kind (rise vs run / vs a code limit), then fold the legacy standalone
+  `slope-calculator.html` and `stair-calculator.html` onto the engine and retire
+  them. Then area+coverage, then scale. See `docs/HANDOFF.md` §5 and the backlog.
+  (The converter and the partition tool page — `convert.html`, `partition.html`
+  — are both done.)
+- **Provenance loose end:** `noindex` is now on all 12 `dev` WIP pages
+  (`components`, `site-screen`, every `calculators/*.html`, including the new
+  `partition.html`) — remove on promotion. Still open: no neutral preview host is
+  configured, so WIP can only be viewed locally until one is stood up.
 - **Legacy calculators are off-engine.** `slope`, `stair`, `sheet-sizes` get
   rebuilt onto the engine; `dimension-converter.html` is superseded by
   `convert.html` and should be retired, not ported. The code-compliance

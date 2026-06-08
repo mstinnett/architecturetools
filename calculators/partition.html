@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev work-in-progress: not yet promoted to main; remove on promotion -->
+<meta name="robots" content="noindex, nofollow">
+<title>Even Layout -- architecture.tools</title>
+<meta name="description" content="Fit a repeating part into a run — tiles with joints, equal sections, on-center spacing, or balusters — and see the residual: the cut, the slack, or the drift, drawn on the run and snapped to a grid.">
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only; the math lives in the imported modules ---- */
+
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  /* run field — a normal visible input, same family as the converter */
+  .field-wrap { margin-bottom: var(--space-lg); max-width: 100%; }
+  #runInput { font-family: 'SF Mono', 'DM Mono', ui-monospace, 'Menlo', monospace;
+              font-size: 1.35rem; font-weight: 400; line-height: 1.5;
+              color: var(--black); background: var(--white);
+              padding: 0.7rem 0.8rem; border: 1px solid var(--gray-300);
+              width: 100%; box-sizing: border-box;
+              outline: none; -webkit-appearance: none; appearance: none; border-radius: 0; }
+  #runInput:focus { border-color: var(--black); }
+
+  /* parsed run + anything ignored, shown quietly under the field */
+  .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-500); min-height: 1.1em; line-height: 1.5; }
+  .field-note .val { color: var(--gray-700); }
+  .field-note .pending { color: var(--gray-400); }
+  .field-note .why { color: var(--gray-400); font-style: italic; }
+
+  /* mode picker — what is being laid out */
+  .mode-line { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: var(--space-lg); }
+  .mode-pill { padding: 0.45rem 0.85rem; border: 1px solid var(--gray-700); cursor: pointer;
+               font-size: var(--text-sm); background: var(--white); user-select: none; }
+  .mode-pill .sub { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--gray-400); margin-top: 0.1rem; }
+  .mode-pill.active { border: 2px solid var(--selected-bg); padding: calc(0.45rem - 1px) calc(0.85rem - 1px);
+                      background: var(--selected-bg); color: var(--white); }
+  .mode-pill.active .sub { color: rgba(255,255,255,0.6); }
+
+  /* per-mode parameter row */
+  .params { display: none; flex-wrap: wrap; gap: 1.1rem; align-items: flex-end; margin-bottom: var(--space-lg); }
+  .params.active { display: flex; }
+  .param { display: flex; flex-direction: column; }
+  .param label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+                 color: var(--gray-500); margin-bottom: 0.25rem; }
+  .param input { font-family: 'SF Mono', 'DM Mono', ui-monospace, monospace; font-size: 16px; font-weight: 400;
+                 color: var(--black); background: var(--white); padding: 0.45rem 0.55rem;
+                 border: 1px solid var(--gray-300); width: 108px; box-sizing: border-box;
+                 outline: none; -webkit-appearance: none; appearance: none; border-radius: 0; }
+  .param input.narrow { width: 72px; }
+  .param input:focus { border-color: var(--black); }
+  .ends-toggle { display: flex; gap: 0; }
+  .ends-toggle .seg { padding: 0.45rem 0.7rem; border: 1px solid var(--gray-300); border-left-width: 0;
+                      font-size: var(--text-sm); background: var(--white); cursor: pointer; user-select: none; }
+  .ends-toggle .seg:first-child { border-left-width: 1px; }
+  .ends-toggle .seg.active { background: var(--selected-bg); color: var(--white); border-color: var(--selected-bg); }
+
+  /* precision dial (sections / on-center / balusters snap to a grid) */
+  .grid-presets { margin-bottom: var(--space-md); }
+  .grid-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+  .grid-box { padding: 0.45rem 0.7rem; border: 1px solid var(--gray-700); cursor: pointer;
+              font-size: var(--text-sm); background: var(--white); user-select: none; min-width: 2.4rem; text-align: center; }
+  .grid-box.active { border: 2px solid var(--selected-bg); padding: calc(0.45rem - 1px) calc(0.7rem - 1px);
+                     background: var(--selected-bg); color: var(--white); }
+  .grid-group-label { font-size: var(--text-xs); color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* the figure is the product */
+  .figure-wrap { margin: var(--space-lg) 0; overflow-x: auto; }
+  svg.lf { display: block; max-width: 100%; }
+  svg.lf text { font-family: var(--font-body); }
+  .lf-run     { font-size: 11px; fill: var(--gray-600); }
+  .lf-dim     { font-size: 10px; fill: var(--gray-500); }
+  .lf-resid   { font-size: 11px; fill: var(--black); }
+  .lf-end     { font-size: 9px;  fill: var(--gray-500); letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* readout rows — the count leads and is emphasised */
+  .out-rows { margin-top: var(--space-md); }
+  .out-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
+  .out-row:last-child { border-bottom: none; }
+  .out-name { width: 150px; flex-shrink: 0; font-size: var(--text-xs); font-weight: 400;
+              text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); }
+  .out-gloss { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--gray-400);
+               text-transform: none; letter-spacing: 0; }
+  .out-value { flex: 1; font-size: var(--text-md); font-weight: 300; }
+  .out-aside { width: 132px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
+  .out-row.is-count .out-name { color: var(--black); }
+  .out-row.is-count .out-value { font-size: var(--text-2xl); font-weight: 300; line-height: 1.1; }
+  .out-row.is-resid .out-name, .out-row.is-resid .out-value { color: var(--black); }
+  .out-row.is-resid .out-value { font-weight: 400; }
+  .out-row.is-ref { border-top: 1px solid var(--gray-200); }
+  .out-row.is-ref .out-name, .out-row.is-ref .out-value { color: var(--gray-500); }
+  .ok  { color: var(--gray-600); }
+  .bad { color: var(--black); font-weight: 400; }
+
+  /* infeasible / nothing-to-show notice */
+  .notice { margin: var(--space-lg) 0; padding: 0.85rem 1.1rem; background: var(--gray-50);
+            border: var(--border-light); font-size: var(--text-sm); font-weight: 300;
+            color: var(--gray-700); line-height: 1.6; }
+  .notice strong { font-weight: 500; color: var(--black); }
+
+  /* the engine's exact integer math, shown as a footnote */
+  .mathnote { margin-top: var(--space-xl); padding-top: var(--space-md); border-top: 1px solid var(--gray-100);
+              font-family: 'SF Mono', 'DM Mono', ui-monospace, monospace; font-size: var(--text-xs);
+              color: var(--gray-400); line-height: 1.7; }
+  .mathnote b { color: var(--gray-600); font-weight: 400; }
+  .mathnote:empty { display: none; }
+
+  @media (max-width: 480px) {
+    #runInput { font-size: 1.1rem; }
+    .out-name { width: 104px; }
+    .out-aside { width: 96px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Even Layout</h1>
+    <p>Fit a repeating part into a run and see the residual — the part that
+       won't divide evenly. Tiles leave an end cut, equal sections leave slack,
+       on-center spacing drifts, balusters close a gap. Type the run in any
+       format: feet-inches, fractions, or metric.</p>
+  </div>
+
+  <div class="section-label">Run</div>
+  <div class="field-wrap">
+    <input type="text" id="runInput" spellcheck="false" maxlength="80"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 10'  ·  12'-1&quot;  ·  3.6m" autofocus>
+    <div class="field-note" id="runNote"></div>
+  </div>
+
+  <div class="section-label">Lay out</div>
+  <div class="mode-line" id="modeLine">
+    <span class="mode-pill" data-mode="tiles">Tiles<span class="sub">module + joint</span></span>
+    <span class="mode-pill" data-mode="sections">Sections<span class="sub">n equal bays</span></span>
+    <span class="mode-pill" data-mode="onCenter">On-center<span class="sub">studs / joists</span></span>
+    <span class="mode-pill" data-mode="balusters">Balusters<span class="sub">max gap</span></span>
+  </div>
+
+  <!-- per-mode parameters -->
+  <div class="params" id="pTiles">
+    <div class="param"><label for="tileSize">Tile</label><input type="text" id="tileSize" spellcheck="false" autocomplete="off"></div>
+    <div class="param"><label for="tileJoint">Joint</label><input type="text" id="tileJoint" class="narrow" spellcheck="false" autocomplete="off"></div>
+  </div>
+  <div class="params" id="pSections">
+    <div class="param"><label for="secCount">Sections</label><input type="number" id="secCount" class="narrow" min="1" max="999" step="1" inputmode="numeric"></div>
+    <div class="param"><label for="secDivider">Divider</label><input type="text" id="secDivider" class="narrow" spellcheck="false" autocomplete="off" placeholder="0"></div>
+    <div class="param"><label>Dividers</label>
+      <div class="ends-toggle" id="secEnds">
+        <span class="seg" data-ends="between">interior</span>
+        <span class="seg" data-ends="around">+ ends</span>
+      </div>
+    </div>
+  </div>
+  <div class="params" id="pOnCenter">
+    <div class="param"><label for="ocMax">Max spacing</label><input type="text" id="ocMax" spellcheck="false" autocomplete="off"></div>
+  </div>
+  <div class="params" id="pBalusters">
+    <div class="param"><label for="balWidth">Baluster</label><input type="text" id="balWidth" class="narrow" spellcheck="false" autocomplete="off"></div>
+    <div class="param"><label for="balMaxGap">Max gap</label><input type="text" id="balMaxGap" class="narrow" spellcheck="false" autocomplete="off"></div>
+  </div>
+
+  <div id="results">
+    <div id="gridWrap" style="display:none;">
+      <div class="section-label">Snap to</div>
+      <div class="grid-presets" id="gridPresets"></div>
+    </div>
+
+    <div class="figure-wrap" id="figure" style="display:none;"></div>
+    <div class="out-rows" id="outRows"></div>
+    <div class="notice" id="notice" style="display:none;"></div>
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← all tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); snap must precede partition/numberline -->
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/partition.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;          // 100 km — beyond this we don't compute/draw
+  var MAX_DRAW = 400;                    // above this many parts, draw a summary, not each cell
+  function outOfRange(u) { return !Number.isSafeInteger(u) || u <= 0 || u > MAX_UNITS; }
+
+  var state = {
+    runText: "10'",
+    runUnits: null,
+    system: 'imperial',                                   // 'imperial' | 'metric'
+    mode: 'tiles',
+    ends: 'between',                                       // sections divider topology
+    grid: { imperial: { denom: 16 }, metric: { mm: 1 } }, // remembered per system
+    gridUiSystem: null,
+    params: {                                             // raw field text, parsed on render
+      tile: '12"', joint: '1/4"',
+      count: '5', divider: '',
+      ocMax: '16"',
+      balWidth: '1 1/2"', balMaxGap: '4"'
+    }
+  };
+
+  var els = {
+    run: document.getElementById('runInput'),
+    runNote: document.getElementById('runNote'),
+    modeLine: document.getElementById('modeLine'),
+    gridWrap: document.getElementById('gridWrap'),
+    gridPresets: document.getElementById('gridPresets'),
+    figure: document.getElementById('figure'),
+    outRows: document.getElementById('outRows'),
+    notice: document.getElementById('notice'),
+    mathNote: document.getElementById('mathNote'),
+    secEnds: document.getElementById('secEnds'),
+    p: {
+      tiles: document.getElementById('pTiles'),
+      sections: document.getElementById('pSections'),
+      onCenter: document.getElementById('pOnCenter'),
+      balusters: document.getElementById('pBalusters')
+    },
+    f: {
+      tile: document.getElementById('tileSize'),
+      joint: document.getElementById('tileJoint'),
+      count: document.getElementById('secCount'),
+      divider: document.getElementById('secDivider'),
+      ocMax: document.getElementById('ocMax'),
+      balWidth: document.getElementById('balWidth'),
+      balMaxGap: document.getElementById('balMaxGap')
+    }
+  };
+
+  function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  /* ---- display formatting (delegates to numberline's helpers) -----------
+     Overall lengths (run, used) read as feet-inches; per-item MODULES
+     (tile, spacing, gap, cut) read as plain inches — "14 1/2" o.c.", not
+     "1'-2 1/2"". Metric is whole/decimal mm throughout. */
+  function displayDenom() { return state.mode === 'tiles' ? 64 : (currentDenom() || 64); }
+  function fmtLen(u) { return NumberLine.formatTrue(u, state.system); }
+  function fmtModule(u) {
+    if (state.system === 'metric') return NumberLine.metricDecimal(u, 2);
+    var f = NumberLine.imperialFraction(u, displayDenom());
+    return f != null ? f : NumberLine.imperialDecimal(u, 4);
+  }
+  function fmtResid(d) { return NumberLine.formatResidual(d, state.system); }
+
+  /* ---- precision dial --------------------------------------------------- */
+  function gridUsesSnap() { return state.mode !== 'tiles'; }   // tiles is exact integer module math
+  function currentGridCount() {
+    return state.system === 'metric' ? Math.round(state.grid.metric.mm * MM)
+                                     : Math.round(IN / state.grid.imperial.denom);
+  }
+  function currentDenom() { return state.system === 'metric' ? null : state.grid.imperial.denom; }
+
+  function buildGridPresets() {
+    var html = '<div class="grid-row">';
+    function box(attr, v, label) { return '<span class="grid-box" data-' + attr + '="' + v + '">' + label + '</span>'; }
+    if (state.system === 'imperial') {
+      var labels = { 2: '½', 4: '¼', 8: '⅛', 16: '1/16', 32: '1/32' };
+      [2, 4, 8, 16, 32].forEach(function (d) { html += box('denom', d, labels[d]); });
+    } else {
+      html += '<span class="grid-group-label">mm</span>';
+      [1, 5, 10].forEach(function (m) { html += box('mm', m, m); });
+    }
+    html += '</div>';
+    els.gridPresets.innerHTML = html;
+    state.gridUiSystem = state.system;
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      box.addEventListener('click', function () {
+        if (box.dataset.denom) state.grid.imperial.denom = +box.dataset.denom;
+        if (box.dataset.mm) state.grid.metric.mm = +box.dataset.mm;
+        render();
+      });
+    });
+  }
+  function updateGridActive() {
+    var active = state.system === 'metric' ? state.grid.metric.mm : state.grid.imperial.denom;
+    var attr = state.system === 'metric' ? 'mm' : 'denom';
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      box.classList.toggle('active', +box.dataset[attr] === active);
+    });
+  }
+  function renderGridPresets() {
+    els.gridWrap.style.display = gridUsesSnap() ? '' : 'none';
+    if (!gridUsesSnap()) return;
+    if (state.gridUiSystem !== state.system) buildGridPresets();
+    updateGridActive();
+  }
+
+  /* ---- parsing ---------------------------------------------------------- */
+  // returns { units } for a positive length, or { units:null, why } otherwise.
+  function parseParam(text) {
+    var t = (text || '').trim();
+    if (!t) return { units: null, why: 'empty' };
+    var du = state.system === 'metric' ? 'mm' : 'in';
+    var r = parseLength(t, { defaultUnit: du });
+    if (!r || r.dimension !== 1 || r.units == null) return { units: null, why: 'not a length' };
+    if (r.units <= 0) return { units: null, why: 'must be positive' };
+    if (outOfRange(r.units)) return { units: null, why: 'out of range' };
+    return { units: r.units };
+  }
+  // joint / divider: a length OR zero; empty reads as zero.
+  function parseGap(text) {
+    var t = (text || '').trim();
+    if (!t || t === '0') return { units: 0 };
+    var du = state.system === 'metric' ? 'mm' : 'in';
+    var r = parseLength(t, { defaultUnit: du });
+    if (!r || r.dimension !== 1 || r.units == null || r.units < 0) return { units: null, why: 'not a length' };
+    if (outOfRange(r.units) && r.units !== 0) return { units: null, why: 'out of range' };
+    return { units: r.units };
+  }
+
+  function renderRunNote(result) {
+    if (!result || result.dimension !== 1 || result.units == null) {
+      els.runNote.innerHTML = state.runText.trim() ? '<span class="why">type a length — e.g. 10\', 12\'-1", 3.6m</span>' : '';
+      return;
+    }
+    if (outOfRange(result.units)) { els.runNote.innerHTML = '<span class="why">out of range (max ' + (MAX_UNITS / 960000) + ' m)</span>'; return; }
+    var other = state.system === 'metric' ? 'imperial' : 'metric';
+    var html = '<span class="val">= ' + escapeHtml(NumberLine.formatTrue(result.units, state.system))
+             + '  ·  ' + escapeHtml(NumberLine.formatTrue(result.units, other)) + '</span>';
+    // anything typed that didn't fold into the reading
+    (result.spans || []).forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = state.runText.slice(sp.start, sp.end).trim();
+      if (frag) html += '<br>ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : '');
+    });
+    els.runNote.innerHTML = html;
+  }
+
+  /* ---- compute: map the chosen mode onto partition() -------------------- */
+  // Guards every input so partition (which fails loud) is only ever called
+  // with valid integers; returns { layout } or { need:[…] } / { error }.
+  function compute() {
+    var run = state.runUnits;
+    if (run == null || outOfRange(run)) return { need: ['a run'] };
+    var grid = currentGridCount();
+    try {
+      if (state.mode === 'tiles') {
+        var tile = parseParam(state.params.tile), joint = parseGap(state.params.joint);
+        var need = [];
+        if (tile.units == null) need.push('a tile size');
+        if (joint.units == null) need.push('a valid joint');
+        if (need.length) return { need: need };
+        return { layout: Partition.tiles(run, tile.units, joint.units) };
+      }
+      if (state.mode === 'sections') {
+        var n = parseInt(state.params.count, 10);
+        var divider = parseGap(state.params.divider);
+        var need2 = [];
+        if (!(n >= 1)) need2.push('a section count');
+        if (divider.units == null) need2.push('a valid divider');
+        if (need2.length) return { need: need2 };
+        return { layout: Partition.sections(run, n, { gap: divider.units, ends: state.ends, grid: grid, dir: 'nearest' }) };
+      }
+      if (state.mode === 'onCenter') {
+        var mx = parseParam(state.params.ocMax);
+        if (mx.units == null) return { need: ['a max spacing'] };
+        return { layout: Partition.onCenter(run, mx.units, { grid: grid, dir: 'nearest' }) };
+      }
+      if (state.mode === 'balusters') {
+        var w = parseParam(state.params.balWidth), mg = parseParam(state.params.balMaxGap);
+        var need3 = [];
+        if (w.units == null) need3.push('a baluster width');
+        if (mg.units == null) need3.push('a max gap');
+        if (need3.length) return { need: need3 };
+        return { layout: Partition.balusters(run, w.units, mg.units, { grid: grid }) };
+      }
+    } catch (e) {
+      return { error: e.message || 'could not compute' };
+    }
+    return { need: ['a layout'] };
+  }
+
+  /* ---- the figure: run + parts + residual ------------------------------- */
+  // ends-aware cell list along [0, used] for fields/bars; on-center is drawn
+  // from its division points instead.
+  function cellList(layout, ends) {
+    var cells = [], x = 0, i, last, addGap;
+    if (ends === 'around' && layout.gap > 0) { cells.push([x, x + layout.gap, 'gap']); x += layout.gap; }
+    for (i = 0; i < layout.count; i++) {
+      cells.push([x, x + layout.item, 'item']); x += layout.item;
+      last = (i === layout.count - 1);
+      addGap = layout.gap > 0 && (ends === 'around' || ends === 'each' || (ends === 'between' && !last));
+      if (addGap) { cells.push([x, x + layout.gap, 'gap']); x += layout.gap; }
+    }
+    return cells;
+  }
+
+  function layoutFigure(layout, display, width) {
+    var W = width, H = 138, x0 = 24, x1 = W - 24, axisW = x1 - x0;
+    var run = layout.run, used = layout.used;
+    var axisMax = Math.max(run, used) || 1;
+    function X(u) { return x0 + (u / axisMax) * axisW; }
+    var yDim = 24, yTop = 54, yBot = 96, stripH = yBot - yTop;
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="lf">';
+    svg += '<defs><pattern id="lfhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         + '<line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
+    function txt(x, y, cls, anchor, s) {
+      return '<text x="' + x.toFixed(1) + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor
+           + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
+    }
+    function vline(x, ya, yb, color, w) {
+      return '<line x1="' + x.toFixed(2) + '" y1="' + ya + '" x2="' + x.toFixed(2) + '" y2="' + yb + '" stroke="' + color + '" stroke-width="' + w + '"/>';
+    }
+
+    // run dimension line on top (extension ticks + centred total)
+    var xRun = X(run);
+    svg += '<line x1="' + x0 + '" y1="' + yDim + '" x2="' + xRun.toFixed(2) + '" y2="' + yDim + '" stroke="#999" stroke-width="1"/>';
+    svg += vline(x0, yDim - 4, yDim + 4, '#999', 1) + vline(xRun, yDim - 4, yDim + 4, '#999', 1);
+    svg += txt((x0 + xRun) / 2, yDim - 6, 'lf-run', 'middle', 'run  ' + display.runLabel);
+
+    // strip baseline
+    svg += '<line x1="' + x0 + '" y1="' + yBot + '" x2="' + X(axisMax).toFixed(2) + '" y2="' + yBot + '" stroke="#0a0a0a" stroke-width="1"/>';
+
+    var firstItemMid = null, firstGapMid = null, drawn = 0;
+    if (display.kind === 'studs') {
+      // division points at 0, spacing, 2·spacing, … used
+      var k = layout.intervals;
+      if (k <= MAX_DRAW) {
+        for (var j = 0; j <= k; j++) {
+          var xu = X(j * layout.spacing);
+          svg += vline(xu, yTop, yBot, '#0a0a0a', 1.5);
+          if (j === 1) firstGapMid = X((j - 0.5) * layout.spacing);
+        }
+      }
+      drawn = k + 1;
+    } else {
+      // fields (tiles/sections) or bars (balusters)
+      var cells = cellList(layout, display.ends);
+      drawn = cells.length;
+      if (drawn <= MAX_DRAW) {
+        cells.forEach(function (c) {
+          var a = X(c[0]), b = X(c[1]), w = Math.max(0.6, b - a);
+          if (c[2] === 'item') {
+            if (display.kind === 'bars') svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#444"/>';
+            else svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#f4f4f3" stroke="#999" stroke-width="1"/>';
+            if (firstItemMid == null) firstItemMid = (a + b) / 2;
+          } else {
+            // gap: joint/divider drawn as a thin solid; opening (bars) left clear
+            if (display.kind !== 'bars') svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#444"/>';
+            if (firstGapMid == null) firstGapMid = (a + b) / 2;
+          }
+        });
+      }
+    }
+
+    // residual band between used and run (either sign), hatched
+    if (!layout.exact) {
+      var rA = X(Math.min(run, used)), rB = X(Math.max(run, used));
+      if (rB - rA < 1.5) { rA -= 1; rB += 1; }            // keep a sliver visible
+      svg += '<rect x="' + rA.toFixed(2) + '" y="' + yTop + '" width="' + (rB - rA).toFixed(2) + '" height="' + stripH + '" fill="url(#lfhatch)"/>';
+      svg += txt((rA + rB) / 2, yBot + 16, 'lf-resid', 'middle', display.residualLabel);
+    } else {
+      svg += txt(xRun, yBot + 16, 'lf-resid', 'middle', 'divides evenly');
+    }
+
+    // run-end marker (where the run actually stops)
+    svg += vline(xRun, yTop - 4, yBot + 4, '#0a0a0a', 1.5);
+
+    // representative module labels (skip if the cell is too narrow to read)
+    if (firstItemMid != null && display.itemLabel) svg += txt(firstItemMid, yBot + 16, 'lf-dim', 'middle', display.itemLabel);
+    if (firstGapMid != null && display.gapLabel) svg += txt(firstGapMid, yTop - 6, 'lf-dim', 'middle', display.gapLabel);
+
+    if (drawn > MAX_DRAW) svg += txt((x0 + xRun) / 2, (yTop + yBot) / 2 + 4, 'lf-dim', 'middle', drawn + ' parts — see the numbers below');
+
+    svg += '</svg>';
+    return svg;
+  }
+
+  /* ---- readout rows ----------------------------------------------------- */
+  function row(cls, name, gloss, value, aside) {
+    return '<div class="out-row ' + cls + '">'
+         + '<div class="out-name">' + name + (gloss ? '<span class="out-gloss">' + gloss + '</span>' : '') + '</div>'
+         + '<div class="out-value">' + value + '</div>'
+         + '<div class="out-aside">' + (aside || '') + '</div></div>';
+  }
+
+  // residual phrasing per mode (the product): cut / slack / drift / overrun
+  function residualInfo(layout) {
+    var r = layout.residual, over = r < 0;
+    if (layout.mode === 'tiles') return { name: 'End cut', gloss: 'flush from one end', text: fmtModule(r) };
+    if (layout.mode === 'onCenter') return { name: over ? 'Overrun' : 'Drift', gloss: 'accumulated across the run', text: fmtResid(r) };
+    if (layout.mode === 'balusters') return { name: 'Slack', gloss: 'from rounding the gap down', text: fmtResid(r) };
+    return { name: over ? 'Overrun' : 'Slack', gloss: over ? 'the bays exceed the run' : 'left over after the bays', text: fmtResid(r) };
+  }
+
+  function renderRows(layout) {
+    var html = '', ri = residualInfo(layout);
+    if (layout.mode === 'tiles') {
+      html += row('is-count', 'Tiles', fmtModule(layout.item) + ' + ' + fmtModule(layout.gap) + ' joint', String(layout.count), '');
+      html += row('is-resid', ri.name, layout.exact ? 'divides evenly' : ri.gloss, layout.exact ? 'none' : ri.text, '');
+      if (layout.balanced) {
+        html += row('', 'Balanced ends', layout.balanced.fullTiles + ' full tiles, both ends cut',
+          fmtModule(layout.balanced.endTile) + (layout.balanced.endTileAlt !== layout.balanced.endTile ? ' / ' + fmtModule(layout.balanced.endTileAlt) : ''), 'each end');
+      }
+      html += row('is-ref', 'Covered', 'tiles + joints', fmtLen(layout.used), '');
+    } else if (layout.mode === 'sections') {
+      html += row('is-count', 'Sections', 'equal bays' + (layout.gap > 0 ? ', ' + fmtModule(layout.gap) + ' dividers' : ''), String(layout.count), '');
+      html += row('', 'Each bay', layout.gap > 0 ? (layout.gapCount + ' divider' + (layout.gapCount === 1 ? '' : 's')) : 'no dividers', fmtModule(layout.item), '');
+      html += row('is-resid', ri.name, layout.exact ? 'divides evenly' : ri.gloss, layout.exact ? 'none' : ri.text, '');
+      html += row('is-ref', 'Covered', 'bays + dividers', fmtLen(layout.used), '');
+    } else if (layout.mode === 'onCenter') {
+      var ok = layout.spacing <= layout.maxStep;
+      html += row('is-count', 'Points', layout.intervals + ' spaces', String(layout.count), '');
+      html += row('', 'Spacing', 'on center', fmtModule(layout.spacing),
+        '<span class="' + (ok ? 'ok' : 'bad') + '">' + (ok ? '≤ ' : '> ') + fmtModule(layout.maxStep) + (ok ? ' ✓' : ' ✗') + '</span>');
+      html += row('is-resid', ri.name, layout.exact ? 'lands on the grid' : ri.gloss, layout.exact ? 'none' : ri.text,
+        layout.exact ? '' : '≈ ' + fmtResid(Math.round(layout.drift / layout.intervals)) + '/space');
+      html += row('is-ref', 'Covered', layout.intervals + ' × ' + fmtModule(layout.spacing), fmtLen(layout.used), '');
+    } else if (layout.mode === 'balusters') {
+      html += row('is-count', 'Balusters', fmtModule(layout.item) + ' wide', String(layout.count), '');
+      html += row('', 'Gap', layout.gapCount + ' openings', fmtModule(layout.gap),
+        '<span class="' + (layout.gapOk ? 'ok' : 'bad') + '">' + (layout.gapOk ? '≤ ' : '> ') + fmtModule(layout.maxGap) + (layout.gapOk ? ' ✓' : ' ✗') + '</span>');
+      html += row('is-resid', ri.name, layout.exact ? 'gap closes exactly' : ri.gloss, layout.exact ? 'none' : ri.text, '');
+      html += row('is-ref', 'Covered', 'balusters + gaps', fmtLen(layout.used), '');
+    }
+    els.outRows.innerHTML = html;
+  }
+
+  /* ---- display config per mode (for the figure) ------------------------- */
+  function figureDisplay(layout) {
+    var ri = residualInfo(layout);
+    var residualLabel = layout.exact ? '' : ri.name.toLowerCase() + ' ' + ri.text;
+    if (layout.mode === 'tiles')
+      return { kind: 'fields', ends: 'between', runLabel: fmtLen(layout.run), itemLabel: fmtModule(layout.item),
+               gapLabel: layout.gap > 0 ? fmtModule(layout.gap) : '', residualLabel: residualLabel };
+    if (layout.mode === 'sections')
+      return { kind: 'fields', ends: state.ends, runLabel: fmtLen(layout.run), itemLabel: fmtModule(layout.item),
+               gapLabel: layout.gap > 0 ? fmtModule(layout.gap) : '', residualLabel: residualLabel };
+    if (layout.mode === 'onCenter')
+      return { kind: 'studs', ends: 'between', runLabel: fmtLen(layout.run), itemLabel: '',
+               gapLabel: fmtModule(layout.spacing), residualLabel: residualLabel };
+    return { kind: 'bars', ends: 'around', runLabel: fmtLen(layout.run), itemLabel: fmtModule(layout.item),
+             gapLabel: layout.gap > 0 ? fmtModule(layout.gap) : '', residualLabel: residualLabel };
+  }
+
+  /* ---- math footnote: the exact integer identity ------------------------ */
+  var REASON = {
+    'gaps-exceed-run': 'The dividers alone are longer than the run. Use fewer sections or thinner dividers.',
+    'item-exceeds-run': 'A single tile plus its joint is longer than the run.',
+    'balusters-overfill': 'Balusters this wide fill the rail before any gap opens. Use thinner balusters or a larger max gap.'
+  };
+  function renderMath(layout) {
+    var mm = function (u) { return Math.round(u / 960 * 100) / 100; };
+    var head = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>';
+    var s = '';
+    if (layout.mode === 'tiles') {
+      var m = layout.item + layout.gap;
+      s = 'module = tile + joint = ' + m + ' units; count = ⌊(run + joint) / module⌋ = <b>' + layout.count + '</b><br>'
+        + 'used = ' + layout.used + ' units (' + mm(layout.used) + ' mm); end cut = run − used = <b>' + layout.residual + '</b> units (' + fmtModule(layout.residual) + ')';
+    } else if (layout.mode === 'sections') {
+      s = 'available = run − ' + layout.gapCount + '·divider = ' + (layout.run - layout.gapCount * layout.gap) + ' units; '
+        + 'bay = snap(available / ' + layout.count + ') = <b>' + layout.item + '</b> units (grid ' + layout.grid + ')<br>'
+        + 'used = ' + layout.used + ' units; residual = run − used = <b>' + layout.residual + '</b> units (' + fmtResid(layout.residual) + ')';
+    } else if (layout.mode === 'onCenter') {
+      s = 'intervals = ⌈run / max⌉ = <b>' + layout.intervals + '</b>; spacing = snap(run / ' + layout.intervals + ') = <b>' + layout.spacing + '</b> units (grid ' + layout.grid + ')<br>'
+        + 'used = ' + layout.used + ' units; drift = run − used = <b>' + layout.drift + '</b> units (' + fmtResid(layout.drift) + ')';
+    } else if (layout.mode === 'balusters') {
+      s = 'n = ⌈(rail − maxGap) / (width + maxGap)⌉ = <b>' + layout.count + '</b>; '
+        + 'gap = ⌊(rail − n·width) / (n + 1)⌋ = <b>' + layout.gap + '</b> units (' + fmtModule(layout.gap) + ')<br>'
+        + 'used = ' + layout.used + ' units; slack = rail − used = <b>' + layout.residual + '</b> units (' + fmtResid(layout.residual) + ')';
+    }
+    els.mathNote.innerHTML = head + s + '.';
+  }
+
+  /* ---- main render ------------------------------------------------------ */
+  function showNotice(html) {
+    els.figure.style.display = 'none';
+    els.figure.innerHTML = '';
+    els.outRows.innerHTML = '';
+    els.mathNote.innerHTML = '';
+    els.notice.style.display = '';
+    els.notice.innerHTML = html;
+  }
+
+  function render() {
+    // parse the run, set the working system, sync the unit-dependent UI
+    var r = parseLength(state.runText, { defaultUnit: state.system === 'metric' ? 'mm' : 'in' });
+    state.runUnits = (r && r.dimension === 1 && r.units != null && !outOfRange(r.units)) ? r.units : null;
+    if (r && (r.unitSystem === 'metric' || r.unitSystem === 'imperial')) state.system = r.unitSystem;
+    renderRunNote(r);
+
+    // mode + parameter visibility
+    Array.prototype.forEach.call(els.modeLine.querySelectorAll('.mode-pill'), function (el) {
+      el.classList.toggle('active', el.dataset.mode === state.mode);
+    });
+    Object.keys(els.p).forEach(function (m) { els.p[m].classList.toggle('active', m === state.mode); });
+    renderGridPresets();
+
+    var c = compute();
+    if (c.need) {
+      if (state.runUnits == null) showNotice('Type a run length above to begin.');
+      else showNotice('Enter <strong>' + c.need.join('</strong> and <strong>') + '</strong> to lay out the run.');
+      return;
+    }
+    if (c.error) { showNotice('Could not compute this layout.'); return; }
+
+    var layout = c.layout;
+    if (!layout.feasible) {
+      showNotice('<strong>Doesn’t fit.</strong> ' + (REASON[layout.reason] || 'This layout is infeasible for these numbers.'));
+      return;
+    }
+
+    els.notice.style.display = 'none';
+    // figure — size to the container (never wider, so margins stay even)
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.style.display = '';
+    els.figure.innerHTML = layoutFigure(layout, figureDisplay(layout), width);
+    renderRows(layout);
+    renderMath(layout);
+  }
+
+  /* ---- wiring ----------------------------------------------------------- */
+  els.run.addEventListener('input', function () { state.runText = els.run.value; render(); });
+  els.run.addEventListener('focus', function () { setTimeout(function () { els.run.select(); }, 0); });
+
+  Array.prototype.forEach.call(els.modeLine.querySelectorAll('.mode-pill'), function (el) {
+    el.addEventListener('click', function () { state.mode = el.dataset.mode; render(); });
+  });
+  Array.prototype.forEach.call(els.secEnds.querySelectorAll('.seg'), function (el) {
+    el.addEventListener('click', function () {
+      state.ends = el.dataset.ends;
+      Array.prototype.forEach.call(els.secEnds.querySelectorAll('.seg'), function (s) { s.classList.toggle('active', s === el); });
+      render();
+    });
+  });
+
+  // parameter fields → state.params (keyed to match)
+  var bind = [['tile', 'tile'], ['joint', 'joint'], ['count', 'count'], ['divider', 'divider'],
+              ['ocMax', 'ocMax'], ['balWidth', 'balWidth'], ['balMaxGap', 'balMaxGap']];
+  bind.forEach(function (pair) {
+    els.f[pair[0]].addEventListener('input', function () { state.params[pair[1]] = els.f[pair[0]].value; render(); });
+  });
+
+  /* ---- initial state ---------------------------------------------------- */
+  els.run.value = state.runText;
+  els.f.tile.value = state.params.tile;
+  els.f.joint.value = state.params.joint;
+  els.f.count.value = state.params.count;
+  els.f.divider.value = state.params.divider;
+  els.f.ocMax.value = state.params.ocMax;
+  els.f.balWidth.value = state.params.balWidth;
+  els.f.balMaxGap.value = state.params.balMaxGap;
+  Array.prototype.forEach.call(els.secEnds.querySelectorAll('.seg'), function (s) { s.classList.toggle('active', s.dataset.ends === state.ends); });
+  render();
+})();
+</script>
+</body>
+</html>
