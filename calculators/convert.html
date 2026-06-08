@@ -12,6 +12,7 @@
   /* ---- page-specific only; all behaviour lives in the imported modules ---- */
 
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+  body { background-color: var(--gray-100); }   /* a step darker than --paper so the bright panel reads as a distinct sheet (grain from global2 persists) */
 
   /* Plain, robust entry field — a normal visible input (the overlay-mirror
      trick broke on mobile: invisible text + lost focus). Parsed/pending
@@ -41,6 +42,7 @@
   .opt-line { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: var(--space-lg); }
   .opt-cluster { display: flex; align-items: center; gap: 0.5rem; }
   .opt-cluster .section-label { margin-bottom: 0; }
+  .section-label { color: var(--ink-2); }   /* darker than the global --ink-3: the small labels read too light on the bright panel */
   .mini-pill { padding: 0.3rem 0.7rem; border: 1px solid var(--rule-2); cursor: pointer;
                font-size: var(--text-sm); background: var(--card); color: var(--ink); user-select: none;
                box-shadow: var(--shadow-key); border-radius: var(--radius);
@@ -64,7 +66,7 @@
   .echo-line { font-size: var(--text-base); font-weight: 300; line-height: 1.7; color: var(--gray-700); }
   .echo .tok { padding-bottom: 1px; }
   .echo .tok.stated   { border-bottom: 2px solid var(--black); color: var(--black); }      /* what you told me */
-  .echo .tok.inferred { border-bottom: 1px solid var(--ink-3); color: var(--gray-600); } /* what I assumed */
+  .echo .tok.inferred { border-bottom: 1px solid var(--ink-3); color: var(--ink-2); } /* what I assumed */
   .echo .op { color: var(--ink-2); padding: 0 0.15em; }
   .echo .eq { color: var(--ink-2); padding: 0 0.2em; }
   .echo .result { font-weight: 400; color: var(--black); }
@@ -126,7 +128,7 @@
                 text-transform: none; letter-spacing: 0; }
   .snap-value { flex: 1; font-size: var(--text-md); font-weight: 300; }
   .snap-dec { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--ink-2); }
-  .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
+  .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--ink-2); }
   .snap-row.is-exact .snap-resid { color: var(--black); }
   .snap-row.is-primary .snap-name { color: var(--black); }     /* the nearer bound */
   .snap-row.is-primary .snap-value { font-size: var(--text-lg); font-weight: 400; color: var(--accent); } /* blue = the answer */
@@ -457,7 +459,7 @@
     var mm2 = result.area_mm2, neg = mm2 < 0 ? '−' : '';
     var a = Math.abs(mm2), m2 = a / 1e6, in2 = a / 645.16, ft2 = in2 / 144;
     els.areaOut.innerHTML =
-      '<div class="section-label">Area <span style="color:var(--ink-3);text-transform:none;letter-spacing:0;">— length × length</span></div>'
+      '<div class="section-label">Area <span style="color:var(--ink-2);text-transform:none;letter-spacing:0;">— length × length</span></div>'
       + '<div class="ratio-big">' + neg + sig(m2) + ' m²</div>'
       + '<div style="margin-top:.4rem;color:var(--gray-700);font-size:var(--text-sm);">'
       + neg + sig(in2) + ' in²  ·  ' + neg + sig(ft2) + ' ft²  ·  ' + neg + sig(a) + ' mm²</div>';
