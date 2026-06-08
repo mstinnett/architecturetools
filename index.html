@@ -20,9 +20,9 @@
 
   /* global2 supplies the warm token ramp; index references one extra step,
      --gray-800, that the shared sheet doesn't define — map it onto the ramp. */
-  :root{--gray-800:var(--gray-900);}
+  :root{--gray-800:var(--gray-900);--answer-surface:color-mix(in srgb, var(--card) 50%, var(--card-2));}
   html{font-size:18px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
-  body{overflow-anchor:none;}   /* warm paper, grain, font + ink inherit from global2 */
+  body{overflow-anchor:none;background-color:var(--gray-100);}   /* font + ink + grain inherit from global2; desk stepped a shade darker than the panel */
   .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--card);border:1px solid color-mix(in srgb, var(--rule) 60%, transparent);box-shadow:var(--shadow-card);display:flex;flex-direction:column;}
   /* Page order: hero, then the heading, then the picker controls, then the results, then prebuilts/footer. */
   .picker>.desk-hero{order:1;} .picker-header{order:2;} .picker>.controls-cluster{order:3;} .picker>.mon-drawer{order:4;} .picker>.input-section{order:5;} .picker>.divider{order:6;} .picker>#panelsWrapper{order:7;} .picker>.picker-footer{order:8;}
@@ -154,7 +154,7 @@
   .card-link:hover{opacity:0.6;}
   .purchase-paths{margin-bottom:1rem;}
 
-  .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--gray-50);border:1px solid var(--gray-100);}
+  .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--answer-surface);border:1px solid var(--rule);box-shadow:var(--shadow-well);}
   .priority-box-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-700);margin-bottom:0.35rem;}
   .priority-box p{font-size:0.88rem;font-weight:300;color:var(--gray-800);line-height:1.6;}
   .desktop-prebuilts{margin-top:1.5rem;}
@@ -192,7 +192,7 @@
   .laptop-meta{display:flex;gap:1rem;flex-shrink:0;align-items:baseline;}
   .laptop-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);white-space:nowrap;}
   .laptop-list-note{margin-top:0.75rem;font-size:0.72rem;font-weight:300;color:var(--gray-700);line-height:1.6;font-style:italic;}
-  .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.78rem;font-weight:300;color:var(--gray-800);line-height:1.5;}
+  .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--answer-surface);border:1px solid var(--rule);box-shadow:var(--shadow-well);font-size:0.78rem;font-weight:300;color:var(--gray-800);line-height:1.5;}
 
   /* Progressive disclosure — featured recommendation */
   .laptop-rec-featured{padding-bottom:1.25rem;margin-bottom:1rem;border-bottom:1px solid var(--gray-200);}
