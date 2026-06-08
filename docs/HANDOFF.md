@@ -1,8 +1,22 @@
 # Handoff — architecture.tools
 
-_Written 2026-06-07. Hand-off point: the **Precise Unit Converter is frozen
-("done for now")**. This doc is for the next context picking up the calculator
+_Written 2026-06-07; updated 2026-06-08. Hand-off point: the **Precise Unit
+Converter is frozen ("done for now")**, the **engine has been hardened** (one
+source of truth for the rounding kernel; modules validate their own inputs),
+and the **`partition.js` layout primitive has shipped** — tested, but with **no
+tool page yet**. This doc is for the next context picking up the calculator
 work. It is self-contained; read it before touching `calculators/`._
+
+**Progress since the original handoff (all on `dev`, see `state.md` for detail):**
+- `partition.js` shipped — the layout primitive (sections / tiles / on-center /
+  balusters), 35 inline tests. Its tool page is the next build.
+- Engine hardened after a review: `numberline` + `partition` now delegate the
+  rounding kernel to `snap.js`; `numberline()` validates its inputs; infeasible
+  layouts carry stable `reason` codes.
+- `convert.html` UI fixes (mobile-CSS selector, area out-of-range guard, Min/Max
+  wording).
+- `noindex` added to all 11 `dev` WIP pages; agent docs (`state.md`,
+  `backlog.md`, `PROJECT.md`) reconciled with reality.
 
 ---
 
@@ -10,10 +24,12 @@ work. It is self-contained; read it before touching `calculators/`._
 
 `architecture.tools` is a public, no-build static site (vanilla HTML/CSS/JS).
 The **live site is the picker only**. A shared calculation **engine**
-(`calculators/lib/`) now exists and powers exactly one tool, the converter.
-Everything else in `calculators/` is older, standalone, and does **not** use the
-engine. The next phase is extending the engine into a family of dimensional
-calculators. The converter itself needs no further work right now.
+(`calculators/lib/`) now exists; it powers one shipped tool — the converter —
+and holds a second primitive, `partition.js`, that is built and tested but has
+**no tool page yet**. Everything else in `calculators/` is older, standalone,
+and does **not** use the engine. The next concrete step is the **partition tool
+page** (a `convert.html`-style UI over `partition.js`); after that, slope /
+area+coverage / scale. The converter itself needs no further work right now.
 
 ---
 
@@ -98,8 +114,10 @@ as, or get indexed as part of `architecture.tools`.
   (off-brand, relative paths resolve) but is **not** noindexed — fine for a
   glance, not a standing preview.
 
-**Not yet done (loose ends):** the `noindex` meta tag has **not** been added to
-the dev WIP pages; no `docs/staging.md` exists yet; no preview host is configured.
+**Status:** `noindex` is now on all 11 `dev` WIP pages (`components.html`,
+`site-screen.html`, every `calculators/*.html`) — remove on promotion. Still
+open: no `docs/staging.md`, and no neutral preview host is configured, so WIP can
+only be viewed locally for now.
 
 ---
 
@@ -110,7 +128,7 @@ The calculator family, grouped by the engine primitive each reuses:
 | Constraint | Residual shown | Tools |
 |---|---|---|
 | Continuous grid | snap error | **Converter** ✅ done |
-| Finite module (size + gap) | the cut / leftover | **tile cuts**, **n sections with gaps**, on-center layout, baluster spacing |
+| Finite module (size + gap) | the cut / leftover | `partition.js` ✅ primitive done (**tool page next**) — tile cuts, n sections with gaps, on-center layout, baluster spacing |
 | Ratio of two lengths | rise vs run / vs code limit | **slope**, ramp & drainage, stair risers |
 | Product of two lengths | area, area ÷ coverage | **area**, coverage/quantity, sheet count |
 | (none — pure parse) | — | **scale converter** |
@@ -119,18 +137,23 @@ The calculator family, grouped by the engine primitive each reuses:
 `ratio` kind — so **area** and **slope** are thin layers, and **scale** needs no
 snap at all.
 
-**Highest-leverage next build:** a `partition()` module, sibling to `snap.js`,
-reusing `snap` + `numberline`. One primitive unlocks four tools:
+**`partition.js` (shipped) — what each mode computes,** for the tool page that
+will wrap it. Exports `partition(spec)` plus `sections` / `tiles` / `onCenter` /
+`balusters`; every mode returns the same Layout shape (`count`, `item`, `gap`,
+`used`, `residual`, `exact`, `positions`, `feasible`/`reason`):
 - **n sections + gaps:** `section = (L − (n−1)·g) / n`, snapped; residual = what
   won't divide evenly.
 - **tile run + joint:** module `m = tile + joint`; full count `= floor((L+j)/m)`;
-  residual = end cut (split for a balanced layout).
+  residual = end cut (the Layout also returns the balanced two-end split).
 - **on-center (studs/joists/pickets):** intervals `k = ceil(L / s_max)`; actual
   spacing `= L/k`, snapped; residual = drift across the run.
-- **baluster gap:** smallest _n_ where `gap = (R − n·w)/(n+1) ≤ 4″`.
+- **baluster gap:** smallest _n_ where `gap = (R − n·w)/(n+1) ≤ maxGap`.
 
 **Suggested order:**
-1. `partition()` primitive → ships tile cuts + n-sections + on-center + balusters.
+1. ~~`partition()` primitive~~ ✅ **done** — `calculators/lib/partition.js`,
+   35 inline tests. **Next: its tool page** (parse a run with `parse-length`,
+   run `partition`, draw the layout + residual reusing `numberline`'s format
+   helpers; add `noindex`; clearer Min/Max-style labels per the review).
 2. **slope** (then fold legacy `slope`/`stair` onto the engine).
 3. **area + coverage** (then fold legacy `sheet-sizes`).
 4. **scale** — quick win anytime.
