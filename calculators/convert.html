@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Precise Unit Converter -- architecture.tools</title>
 <meta name="description" content="A length converter that shows the cost of rounding: free-text dimension in, snapped to a grid, with Min / Nearest / Max and their signed residuals drawn on a dual-scale number line.">
-<link rel="stylesheet" href="../assets/css/global.css">
+<link rel="stylesheet" href="../assets/css/global2.css">
 <style>
   /* ---- page-specific only; all behaviour lives in the imported modules ---- */
 
@@ -19,11 +19,12 @@
   .field-wrap { margin-bottom: var(--space-lg); max-width: 100%; }
   #dimInput { font-family: 'SF Mono', 'DM Mono', ui-monospace, 'Menlo', monospace;
               font-size: 1.35rem; font-weight: 400; line-height: 1.5;
-              color: var(--black); background: var(--white);
-              padding: 0.7rem 0.8rem; border: 1px solid var(--gray-300);
+              color: var(--ink); background: var(--card);
+              padding: 0.7rem 0.8rem; border: 1px solid var(--rule-2);
+              box-shadow: var(--shadow-well);
               width: 100%; box-sizing: border-box;
-              outline: none; -webkit-appearance: none; appearance: none; border-radius: 0; }
-  #dimInput:focus { border-color: var(--black); }
+              outline: none; -webkit-appearance: none; appearance: none; border-radius: var(--radius); }
+  #dimInput:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
 
   /* anything typed that didn't parse, shown quietly under the field */
   .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-400); min-height: 1.1em; line-height: 1.5; }
@@ -40,9 +41,13 @@
   .opt-line { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: var(--space-lg); }
   .opt-cluster { display: flex; align-items: center; gap: 0.5rem; }
   .opt-cluster .section-label { margin-bottom: 0; }
-  .mini-pill { padding: 0.3rem 0.7rem; border: 1px solid var(--gray-300); cursor: pointer;
-               font-size: var(--text-sm); background: var(--white); user-select: none; }
-  .mini-pill.active { background: var(--selected-bg); color: var(--white); border-color: var(--selected-bg); }
+  .mini-pill { padding: 0.3rem 0.7rem; border: 1px solid var(--rule-2); cursor: pointer;
+               font-size: var(--text-sm); background: var(--card); color: var(--ink); user-select: none;
+               box-shadow: var(--shadow-key); border-radius: var(--radius);
+               transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.12s; }
+  .mini-pill:hover { border-color: var(--ink-3); box-shadow: var(--shadow-key-hover); }
+  .mini-pill.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+                      box-shadow: var(--shadow-press); transform: translateY(1px); }
 
   /* echo — the reading + exact conversion, kept quiet so the snapped readout
      and figure carry the weight (no heavy box, modest type) */
@@ -59,14 +64,19 @@
 
   /* grid presets = a precision dial */
   .grid-presets { margin-bottom: var(--space-md); }
-  .grid-box { padding: 0.45rem 0.7rem; border: 1px solid var(--gray-700); cursor: pointer;
-              font-size: var(--text-sm); background: var(--white); user-select: none; min-width: 2.4rem; text-align: center; }
-  .grid-box.active { border: 2px solid var(--selected-bg); padding: calc(0.45rem - 1px) calc(0.7rem - 1px);
-                     background: var(--selected-bg); color: var(--white); }
-  .grid-sep { width: 1px; align-self: stretch; background: var(--gray-200); margin: 0 0.3rem; }
+  .grid-box { padding: 0.45rem 0.7rem; border: 1px solid var(--rule-2); cursor: pointer;
+              font-size: var(--text-sm); background: var(--card); color: var(--ink); user-select: none;
+              min-width: 2.4rem; text-align: center; box-shadow: var(--shadow-key); border-radius: var(--radius);
+              transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.12s; }
+  .grid-box:hover { border-color: var(--ink-3); box-shadow: var(--shadow-key-hover); }
+  .grid-box.active { border-color: var(--accent); background: var(--accent); color: var(--accent-ink);
+                     box-shadow: var(--shadow-press); transform: translateY(1px); }
+  .grid-sep { width: 1px; align-self: stretch; background: var(--rule); margin: 0 0.3rem; }
   .grid-custom { width: 84px; font-family: inherit; font-size: 16px; padding: 0.35rem 0.5rem;
-                 border: 1px solid var(--gray-300); outline: none; -webkit-appearance: none; appearance: none; }
-  .grid-custom:focus { border-color: var(--black); }
+                 color: var(--ink); background: var(--card); box-shadow: var(--shadow-well);
+                 border: 1px solid var(--rule-2); border-radius: var(--radius);
+                 outline: none; -webkit-appearance: none; appearance: none; }
+  .grid-custom:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
   .grid-group-label { font-size: var(--text-xs); color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; }
   /* metric presets group on their own rows so modular doesn't break awkwardly */
   .grid-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
@@ -104,7 +114,7 @@
   .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
   .snap-row.is-exact .snap-resid { color: var(--black); }
   .snap-row.is-primary .snap-name { color: var(--black); }     /* the nearer bound */
-  .snap-row.is-primary .snap-value { font-size: var(--text-lg); font-weight: 400; }
+  .snap-row.is-primary .snap-value { font-size: var(--text-lg); font-weight: 400; color: var(--accent); } /* blue = the answer */
   .snap-row.is-ref { border-top: 1px solid var(--gray-200); }
   .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--gray-500); }
   .nl-nearest { font-weight: 600; }
