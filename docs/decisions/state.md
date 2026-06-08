@@ -60,7 +60,10 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
   rebuilds it on push. Full contract in `data/README.md`.
 - The engine conventions (`calculators/lib/`): UMD wrapper (browser + node),
   pure functions, an inline test block per module, **relative asset paths
-  only**. New tools follow them.
+  only**, **one source of truth per primitive** (the rounding kernel lives only
+  in `snap.js`; others delegate), shared modules **validate their own public
+  inputs**, and unresolved/infeasible states carry a **stable `reason` code**.
+  New tools follow them (`docs/HANDOFF.md` §3).
 - The provenance rule: never serve WIP on `architecture.tools` or a subdomain
   of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
 
@@ -69,8 +72,16 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 - 2026-06-07 — `partition.js` shipped: the layout primitive (sibling to
   `snap.js`) that divides a run into a whole number of equal parts and exposes
   the residual, unifying four tools (sections / tiles / on-center / balusters)
-  behind one module. Pure integer math, fails loud, 34 inline `node` tests
+  behind one module. Pure integer math, fails loud, 35 inline `node` tests
   passing. No tool page consumes it yet — that is the next build.
+- 2026-06-07 — Engine hardened after a review of `convert.html` + the lib:
+  `numberline.js` and `partition.js` now **delegate** the floor/nearest/ceil
+  kernel to `snap.js` (one source of truth, no duplicated `snapTriple`/`pick`);
+  `numberline()` validates its public inputs; `partition` infeasibility carries
+  stable `reason` codes; the `Number`-range bound is documented. Conventions
+  updated in `docs/HANDOFF.md` §3. Open follow-ups recorded in the backlog
+  (parser `reason` codes; convert.html UI: area-range guard, mobile-CSS
+  selector, Min/Max wording).
 - 2026-06-07 — `noindex` added to all 11 `dev` WIP pages (provenance §4).
 - 2026-06-07 — Precise Unit Converter shipped (frozen), and the calculator
   **engine** (`calculators/lib/`) established as the spine for the family. Build

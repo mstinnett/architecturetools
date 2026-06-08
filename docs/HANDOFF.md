@@ -51,15 +51,29 @@ Every planned tool is the same operation with a different constraint.
 |---|---|---|
 | `parse-length.js` | Expression evaluator over dimensioned quantities | kinds: `length`, `area`, `bare`, `scalar`, `ratio`. Handles feet-inches, fractions, metric, mixed units, `+` and `*`, unit inference. **Never throws.** |
 | `snap.js` | Integer-exact snap of a length to a grid | `floor`/`ceil`/`nearest` = **Max ≤ / Min ≥ / Nearest**. **Fails loud** on programmer error. Has an inline test block at the bottom. |
-| `numberline.js` | Pure SVG-string figure (no DOM) | true-value tick + 3 snaps + residual hatch bands + dual source/target scale. "The figure is the product." |
+| `numberline.js` | Pure SVG-string figure (no DOM) | true-value tick + 3 snaps + residual hatch bands + dual source/target scale. "The figure is the product." **Delegates the rounding kernel to `snap.js`** (see conventions). |
+| `partition.js` | Run → whole-number layout + residual | one primitive, four modes (`sections`/`tiles`/`onCenter`/`balusters`). **Fails loud** on programmer error; **flags** infeasible layouts with a stable `reason` code. Delegates rounding to `snap.js`. Inline test block. |
 | `parse-length.fixtures.js` | Parser test fixtures | — |
 
 **Conventions any new module/tool must follow:**
 - UMD-style wrapper (`(function(root,factory){…})`) so modules load in the
   browser **and** under node for tests.
-- Pure functions. `numberline` returns a string; `snap` fails loud on misuse;
-  the parser never throws. Keep that split.
+- Pure functions. `numberline` returns a string; `snap` / `partition` fail loud
+  on misuse; the parser never throws. Keep that split.
+- **One source of truth per primitive.** The floor/nearest/ceil rounding policy
+  lives ONLY in `snap.js`; `numberline` and `partition` call it rather than
+  re-implement it (resolved lazily so page `<script>` order doesn't matter).
+  Don't clone a kernel to dodge load order — delegate. (Hardened after review.)
+- **Shared modules validate their own public inputs.** A module reused by more
+  than one page can't assume a disciplined caller — `snap`, `partition`, and
+  `numberline` all reject unsafe units / grids at the boundary.
+- **Unresolved/infeasible states carry a stable `reason` code**, not just prose,
+  so each tool page renders its own copy. (Converter's parser is the next place
+  to extend this; see the review notes.)
 - Ship an inline test block (`eq`/`threw` helpers) like `snap.js`.
+- **Range:** `Number` integer math on the 1/960 mm lattice, exact within
+  `MAX_SAFE_INTEGER` only. A precise engine within that bound, not an
+  arbitrary-precision one; cap inputs at the UI as the converter does.
 - **Relative asset paths only** (`../assets/...`, `lib/...`). Absolute `/...`
   paths break githack / pages.dev previews. (All current files comply.)
 - Add `<meta name="robots" content="noindex, nofollow">` to any page not yet on

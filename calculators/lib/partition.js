@@ -5,8 +5,9 @@
    units, glyphs, or the DOM — the architect-facing language ("tiles", "studs",
    "balusters") is a label applied by the tool page; this module only divides a
    run into a whole number of equal parts and exposes what does not divide
-   evenly. Sibling to snap.js; it reuses snap's floor/nearest/ceil idea as
-   exact integer division, so a snapped layout is exact, never an approximation.
+   evenly. Sibling to snap.js, whose floor/nearest/ceil kernel it DELEGATES to
+   (one source of truth for the rounding policy — it never re-implements it), so
+   a snapped layout is exact, never an approximation.
 
    THE PRIMITIVE
      A run L is filled by `count` items of width `item`, separated/bordered by
@@ -33,16 +34,38 @@
 
    Like snap, this is a low-level primitive: it FAILS LOUD on programmer error
    (non-integer units, bad mode) but FLAGS — never throws on — a layout that is
-   merely infeasible for the given numbers (`feasible: false`), the way the
-   parser never throws on bad user text.
+   merely infeasible for the given numbers. An infeasible result carries
+   `feasible: false` plus a STABLE `reason` code (e.g. 'gaps-exceed-run') and a
+   human `note`, so a tool page renders its own copy from the code rather than
+   matching prose — the way the parser never throws on bad user text.
+
+   RANGE — this is JS-`Number` integer math on the 1/960 mm lattice, exact only
+   within Number.MAX_SAFE_INTEGER. snap's safe-integer checks are the backstop;
+   it is a precise layout engine within that bound, not an arbitrary-precision
+   one. (Callers that already cap inputs, like the converter UI, stay well under.)
    ========================================================================= */
 
 (function (root, factory) {
   var mod = factory();
   if (typeof module !== 'undefined' && module.exports) module.exports = mod;
   else { root.Partition = mod; root.partition = mod.partition; }
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
+
+  // Single source of truth for the rounding kernel: the floor/nearest/ceil
+  // policy lives ONLY in snap.js — this module delegates to it (it does NOT
+  // re-implement the kernel) so the two can never diverge. Resolved lazily so
+  // page <script> load order doesn't matter; require() works headless.
+  var _snap = null;
+  function snapLib() {
+    if (_snap) return _snap;
+    if (typeof require === 'function' && typeof module !== 'undefined') {
+      try { _snap = require('./snap.js'); } catch (e) { /* browser */ }
+    }
+    if (!_snap) _snap = root && root.Snap;
+    if (!_snap) throw new Error('partition: snap.js must be loaded before partition.js');
+    return _snap;
+  }
 
   /* ---- validation: programmer errors throw, like snap.js ----------------- */
 
@@ -53,27 +76,21 @@
     return v;
   }
 
-  /* ---- the shared integer-division kernel (snap's floor/nearest/ceil) -----
-     pick(num, den, dir) chooses how many whole `den`s fit in `num`, exactly,
-     no float. equalDivide then lays `total` across `n` cells on a `grid`,
-     reusing pick — this is the same operation snap(total, n·grid, dir) performs,
-     inlined here (numberline.js inlines snapTriple the same way, to avoid
-     browser load-order coupling between the lib files). */
+  /* ---- the shared integer-division kernel -------------------------------
+     equalDivide lays `total` across `n` cells on a `grid` by calling
+     snap(total, n·grid, dir) and dividing by n: snap returns a multiple of
+     n·grid, so each cell is an exact multiple of grid. The rounding policy
+     (and its validation of dir/units/grid) is snap's, not ours. */
 
-  function pick(num, den, dir) {
-    var div = Math.floor(num / den), rem = num % den;
-    if (dir === 'floor') return div;
-    if (dir === 'ceil') return rem === 0 ? div : div + 1;
-    if (dir === 'nearest') return (rem * 2 >= den) ? div + 1 : div;
-    throw new TypeError('partition: dir must be "floor" | "nearest" | "ceil", got ' + dir);
-  }
-
-  // divide `total` across `n` equal cells, each a whole multiple of `grid`
   function equalDivide(total, n, grid, dir) {
-    var each = pick(total, n * grid, dir) * grid;   // snap(total, n·grid, dir) / n
+    var each = snapLib().snap(total, n * grid, dir) / n;
     var used = n * each;
     return { each: each, used: used, residual: total - used };
   }
+
+  // plain integer floor-division by a small constant — NOT a grid-rounding
+  // policy (that is snap's job), just halving/distributing an exact count.
+  function floorDiv(num, den) { return Math.floor(num / den); }
 
   function gapCountFor(ends, n) {
     if (ends === 'between') return n - 1;
@@ -96,9 +113,12 @@
     return pos;
   }
 
-  function infeasible(mode, run, note) {
+  // an infeasible layout: flagged, never thrown. `reason` is a stable code the
+  // tool page can switch on; `note` is the default human gloss.
+  function infeasible(mode, run, reason, note) {
     return { mode: mode, run: run, count: 0, item: 0, gap: 0, gapCount: 0,
-             used: 0, residual: run, exact: false, positions: [], feasible: false, note: note };
+             used: 0, residual: run, exact: false, positions: [],
+             feasible: false, reason: reason, note: note };
   }
 
   /* ---- mode: sections — n given, solve the item width -------------------- */
@@ -113,7 +133,7 @@
     var dir = opts.dir || 'nearest';
     var gc = gapCountFor(ends, count);
     var avail = run - gc * gap;                         // total item length
-    if (avail <= 0) return infeasible('sections', run, count + ' sections plus their gaps exceed the run');
+    if (avail <= 0) return infeasible('sections', run, 'gaps-exceed-run', count + ' sections plus their gaps exceed the run');
     var d = equalDivide(avail, count, grid, dir);
     var used = d.used + gc * gap;
     return {
@@ -134,12 +154,12 @@
     reqInt('run', run, 'pos'); reqInt('tile', tile, 'pos'); reqInt('joint', joint, 'nonneg');
     var m = tile + joint;
     var count = Math.floor((run + joint) / m);
-    if (count <= 0) return infeasible('tiles', run, 'a single tile plus joint exceeds the run');
+    if (count <= 0) return infeasible('tiles', run, 'item-exceeds-run', 'a single tile plus joint exceeds the run');
     var used = count * tile + (count - 1) * joint;
     var residual = run - used;                          // flush end strip (≥ 0)
     // balanced: drop one full tile, share (tile − joint + residual) across two ends
     var endTwice = tile - joint + residual;
-    var endTile = pick(endTwice, 2, 'floor');
+    var endTile = floorDiv(endTwice, 2);
     var balanced = (count >= 2 && endTile > 0)
       ? { fullTiles: count - 1, endTile: endTile, endTileAlt: endTwice - endTile }
       : null;
@@ -180,10 +200,10 @@
     reqInt('rail', rail, 'pos'); reqInt('width', width, 'pos'); reqInt('maxGap', maxGap, 'pos');
     var grid = reqInt('grid', opts.grid || 1, 'pos');
     var n = Math.max(0, Math.ceil((rail - maxGap) / (width + maxGap)));
-    if (n * width >= rail) return infeasible('balusters', rail, 'balusters at this width overfill the rail before the gap closes');
-    // equal gap across n+1 openings, snapped DOWN so it never exceeds maxGap
-    var gap = pick(rail - n * width, n + 1, 'floor');
-    gap = Math.floor(gap / grid) * grid;
+    if (n * width >= rail) return infeasible('balusters', rail, 'balusters-overfill', 'balusters at this width overfill the rail before the gap closes');
+    // equal gap across n+1 openings, snapped DOWN (via snap's kernel) so it
+    // lands on the grid and never exceeds maxGap
+    var gap = equalDivide(rail - n * width, n + 1, grid, 'floor').each;
     var used = n * width + (n + 1) * gap;
     return {
       mode: 'balusters', run: rail, count: n, item: width, gap: gap,
@@ -211,8 +231,9 @@
     partition: partition,
     sections: sections, tiles: tiles, onCenter: onCenter, balusters: balusters,
     TOPOLOGY: TOPOLOGY,
-    // low-level helpers, exported so the figure/tests share the exact math
-    pick: pick, equalDivide: equalDivide, gapCountFor: gapCountFor
+    // low-level helpers, exported so the figure/tests share the exact math.
+    // equalDivide delegates to snap.js; the rounding kernel is NOT duplicated here.
+    equalDivide: equalDivide, gapCountFor: gapCountFor, floorDiv: floorDiv
   };
 });
 
@@ -274,8 +295,10 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   ok('sections floor leaves slack ≥ 0', sF.residual >= 0);
   // 'around' adds the two end gaps: 5 items need 6 gaps
   eq('sections around gapCount', P.sections(inch(36), 5, { ends: 'around' }).gapCount, 6);
-  // too many sections to fit → flagged, not thrown
-  ok('sections infeasible flagged', P.sections(inch(10), 30, { gap: IN }).feasible === false);
+  // too many sections to fit → flagged, not thrown, with a stable reason code
+  var sBad = P.sections(inch(10), 30, { gap: IN });
+  ok('sections infeasible flagged', sBad.feasible === false);
+  eq('sections infeasible reason code', sBad.reason, 'gaps-exceed-run');
 
   /* --- balusters: 36" rail, 1 1/2" balusters, 4" max gap -----------------
      n = ceil((36 − 4)/(1.5 + 4)) = ceil(32/5.5) = 6; gap = (36 − 9)/7 = 27/7

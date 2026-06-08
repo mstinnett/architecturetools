@@ -27,8 +27,25 @@
   var mod = factory();
   if (typeof module !== 'undefined' && module.exports) module.exports = mod;
   else { root.NumberLine = mod; root.numberline = mod.numberline; }
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
+
+  // Single source of truth for the rounding kernel: the floor/nearest/ceil
+  // policy (tie-breaking, negative handling, validation) lives ONLY in snap.js.
+  // This module delegates to it rather than re-implementing it, so the policy
+  // can never diverge. Resolved lazily — by require() headless, or the global
+  // Snap in the browser — so page <script> load order doesn't matter (every
+  // call happens after all libs are loaded).
+  var _snap = null;
+  function snapLib() {
+    if (_snap) return _snap;
+    if (typeof require === 'function' && typeof module !== 'undefined') {
+      try { _snap = require('./snap.js'); } catch (e) { /* browser */ }
+    }
+    if (!_snap) _snap = root && root.Snap;
+    if (!_snap) throw new Error('numberline: snap.js must be loaded before numberline.js');
+    return _snap;
+  }
 
   var MM = 960, IN = 24384, FT = 12 * 24384;
 
@@ -117,27 +134,23 @@
     return sign + trim(inch.toFixed(5)) + '"';
   }
 
-  /* ---- snap geometry (shared by the figure and headless tests) ----------- */
+  /* ---- snap geometry (shared by the figure and headless tests) -----------
+     The three snaps come straight from snap.js — one source of truth for the
+     rounding policy AND its validation (snap throws on unsafe units / grid).
+     This module only adds the figure-facing coincidence flags. */
 
   function snapTriple(units, gridCount) {
-    var abs = Math.abs(units);
-    var div = Math.floor(abs / gridCount);
-    var rem = abs % gridCount;
-    var floorAbs = div * gridCount;
-    var ceilAbs = rem === 0 ? floorAbs : floorAbs + gridCount;
-    var nearAbs = (rem * 2 >= gridCount) ? ceilAbs : floorAbs;
-    var sgn = units < 0 ? -1 : 1;
-    // floor ≤ units ≤ ceil on the signed axis
-    var floorU = units >= 0 ? floorAbs : -ceilAbs;
-    var ceilU = units >= 0 ? ceilAbs : -floorAbs;
-    var nearU = sgn * nearAbs;
+    var S = snapLib();
+    var maxU = S.snap(units, gridCount, 'floor');   // Max ≤  = floor
+    var minU = S.snap(units, gridCount, 'ceil');    // Min ≥  = ceil
+    var nearU = S.snap(units, gridCount, 'nearest');
     return {
-      maxU: floorU,             // Max ≤  = floor
-      minU: ceilU,              // Min ≥  = ceil
+      maxU: maxU,
+      minU: minU,
       nearU: nearU,
-      onGrid: rem === 0,
-      nearIsMax: nearU === floorU,
-      nearIsMin: nearU === ceilU
+      onGrid: S.onGrid(units, gridCount),
+      nearIsMax: nearU === maxU,
+      nearIsMin: nearU === minU
     };
   }
 
@@ -146,13 +159,21 @@
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
   // opts: { units, gridCount, targetSystem, sourceSystem, width, height }
+  // Defends its own public inputs: this is a shared engine module reused by
+  // more calculators, so it fails loud on bad geometry rather than trusting the
+  // caller (snapTriple/snap also re-validate units + grid downstream).
   function numberline(opts) {
+    opts = opts || {};
     var units = opts.units;
     var g = opts.gridCount;
-    var target = opts.targetSystem || 'imperial';
-    var source = opts.sourceSystem || target;
-    var W = opts.width || 680;
-    var H = opts.height || 160;
+    if (!Number.isSafeInteger(units)) throw new TypeError('numberline: units must be a safe integer, got ' + units);
+    if (!Number.isSafeInteger(g) || g <= 0) throw new TypeError('numberline: gridCount must be a positive safe integer, got ' + g);
+    // systems are a closed enum; anything else falls back rather than leaking through
+    var target = opts.targetSystem === 'metric' ? 'metric' : 'imperial';
+    var source = opts.sourceSystem === 'metric' ? 'metric'
+               : opts.sourceSystem === 'imperial' ? 'imperial' : target;
+    var W = (Number.isFinite(opts.width) && opts.width > 0) ? opts.width : 680;
+    var H = (Number.isFinite(opts.height) && opts.height > 0) ? opts.height : 160;
 
     var denom = target === 'imperial' ? Math.round(IN / g) : null;
     var t = snapTriple(units, g);
