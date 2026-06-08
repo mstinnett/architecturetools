@@ -51,7 +51,7 @@
 
   /* echo — the parsed reading + exact conversion, raised as an elevated
      answer box so the parsed output reads as a result, not a footnote */
-  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.85rem 1.1rem; background: var(--card);
+  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.85rem 1.1rem; background: var(--paper);
           border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
           box-shadow: var(--shadow-card); }
   .echo-line { font-size: var(--text-base); font-weight: 300; line-height: 1.7; color: var(--gray-700); }
@@ -105,7 +105,10 @@
 
   /* figure + rounding table share ONE elevated .answer-card (card styling from
      global2); the rows sit flat inside it, a hairline dividing them from the
-     figure so there's no box-in-a-box. Nearest leads (accent value). */
+     figure so there's no box-in-a-box. Nearest leads (accent value). Tinted with
+     the soft paper tone so the answer reads as a sheet of paper lifted on the
+     brighter page surface. */
+  .answer-card { background: var(--paper); }
   .answer-card .figure-wrap { margin: 0; }
   .snap-rows { margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--rule); }
   .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
@@ -124,7 +127,7 @@
   .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--ink-2); }
   .nl-nearest { font-weight: 600; }
 
-  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--card);
+  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--paper);
                border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
                box-shadow: var(--shadow-card); }
   .ratio-big { font-size: var(--text-xl); font-weight: 300; }
