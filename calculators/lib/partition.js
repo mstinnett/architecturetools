@@ -46,7 +46,7 @@
    ========================================================================= */
 
 (function (root, factory) {
-  var mod = factory();
+  var mod = factory(root);
   if (typeof module !== 'undefined' && module.exports) module.exports = mod;
   else { root.Partition = mod; root.partition = mod.partition; }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {

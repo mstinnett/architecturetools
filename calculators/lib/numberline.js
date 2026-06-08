@@ -24,7 +24,7 @@
    ========================================================================= */
 
 (function (root, factory) {
-  var mod = factory();
+  var mod = factory(root);
   if (typeof module !== 'undefined' && module.exports) module.exports = mod;
   else { root.NumberLine = mod; root.numberline = mod.numberline; }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
