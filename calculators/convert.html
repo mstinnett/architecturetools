@@ -49,9 +49,15 @@
   .mini-pill.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
                       box-shadow: var(--shadow-press); transform: translateY(1px); }
 
-  /* echo — the parsed reading + exact conversion, set as a debossed paper well
-     so the parsed output reads as a result recessed into the page */
-  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.85rem 1.1rem; background: var(--paper);
+  /* Answer surfaces (parsed output + the figure/rounding card + ratio/area)
+     share ONE tone knob, --answer-surface. The figure's label halo reads it too
+     (see svg.nl text), so the halo always matches the card — retint in one place
+     and nothing fringes. */
+  .echo, .answer-card, .ratio-box { --answer-surface: var(--card-2); }
+
+  /* echo — the parsed reading + exact conversion, a debossed well so the parsed
+     output reads as a result recessed into the page */
+  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.85rem 1.1rem; background: var(--answer-surface);
           border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
           box-shadow: var(--shadow-well); }
   .echo-line { font-size: var(--text-base); font-weight: 300; line-height: 1.7; color: var(--gray-700); }
@@ -93,7 +99,7 @@
 
   .figure-wrap { margin: var(--space-lg) 0; overflow-x: auto; }
   svg.nl { display: block; max-width: 100%; }
-  svg.nl text { font-family: var(--font-body); stroke: var(--paper); }  /* halo matches the paper card — no white fringe */
+  svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }  /* halo tracks the card tone — no fringe */
   .nl-axis-label  { font-size: 10px; fill: var(--ink-2); letter-spacing: 0.06em; text-transform: uppercase; }
   .nl-snap-val    { font-size: 12px; fill: var(--black); font-weight: 400; }
   .nl-snap-role   { font-size: 9px;  fill: var(--ink-2); letter-spacing: 0.04em; text-transform: uppercase; }
@@ -108,7 +114,7 @@
      reads as a panel recessed into the brighter page, not floating above it.
      Rows sit flat inside, a hairline dividing them from the figure (no
      box-in-a-box). Nearest leads (accent value). */
-  .answer-card { background: var(--paper); box-shadow: var(--shadow-well); }
+  .answer-card { background: var(--answer-surface); box-shadow: var(--shadow-well); }
   .answer-card .figure-wrap { margin: 0; }
   .snap-rows { margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--rule); }
   .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
@@ -127,7 +133,7 @@
   .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--ink-2); }
   .nl-nearest { font-weight: 600; }
 
-  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--paper);
+  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--answer-surface);
                border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
                box-shadow: var(--shadow-well); }
   .ratio-big { font-size: var(--text-xl); font-weight: 300; }
