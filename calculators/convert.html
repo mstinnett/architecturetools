@@ -103,11 +103,11 @@
   .nl-true-val    { font-size: 13px; fill: var(--black); font-weight: 400; }
   .nl-note        { font-size: 10px; fill: var(--ink-2); font-style: italic; }
 
-  /* snap readout rows — the rounding table, raised as an elevated answer box;
-     Nearest leads (accent value), the others sit secondary */
-  .snap-rows { margin-top: var(--space-lg); padding: 0.35rem 1.1rem; background: var(--card);
-               border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
-               box-shadow: var(--shadow-card); }
+  /* figure + rounding table share ONE elevated .answer-card (card styling from
+     global2); the rows sit flat inside it, a hairline dividing them from the
+     figure so there's no box-in-a-box. Nearest leads (accent value). */
+  .answer-card .figure-wrap { margin: 0; }
+  .snap-rows { margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--rule); }
   .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
   .snap-row:last-child { border-bottom: none; }
   .snap-name { width: 150px; flex-shrink: 0; font-size: var(--text-xs); font-weight: 400;
@@ -172,9 +172,10 @@
       <div class="section-label">Snap tolerance</div>
       <div class="grid-presets" id="gridPresets"></div>
 
-      <div class="figure-wrap" id="figure"></div>
-
-      <div class="snap-rows" id="snapRows"></div>
+      <div class="answer-card">
+        <div class="figure-wrap" id="figure"></div>
+        <div class="snap-rows" id="snapRows"></div>
+      </div>
     </div>
 
     <div class="ratio-box" id="ratioOut" style="display:none;"></div>
