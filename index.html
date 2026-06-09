@@ -11,6 +11,15 @@
 <meta property="og:title" content="What computer should I buy for architecture?">
 <meta property="og:description" content="A live, opinionated hardware picker for architects — specific CPU, GPU, RAM, monitor, and laptop picks for your software and project scale.">
 <meta name="twitter:card" content="summary">
+<!-- Theme: ?theme=light|dark (or #light|#dark) forces it; else saved pref; else OS.
+     Set before paint to avoid a flash. -->
+<script>
+(function(){var u=new URLSearchParams(location.search).get('theme'),
+  h=location.hash.replace(/^#/,''),s=null;try{s=localStorage.getItem('theme');}catch(e){}
+  var t=u||h||s||(matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  if(t!=='dark'&&t!=='light')t='light';
+  document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -243,17 +252,17 @@
           presentation attribute, so we repoint them to the (now light) ink;
        2) the desk hero is a raster PNG that can't be themed, so we frame it on
           a paper panel in dark mode rather than let it glare or vanish. */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --black:#E8E4DB; --ink:#E8E4DB; --white:#1B1D22; --page-bg:#141519;
-      --gray-800:#A8A49C; --gray-700:#B7B1A6; --gray-400:#8F897F;
-      --gray-300:#4C5058; --gray-200:#3B3E45; --gray-100:#33363C; --gray-50:#212329;
-      --accent:#A8A49C;
-    }
-    svg[aria-hidden="true"] rect { stroke: var(--ink); }
-    svg[aria-hidden="true"] line { stroke: var(--gray-700); }
-    .desk-hero { background:#FBFAF7; padding:1rem; border-radius:6px; }
+  /* Applied via [data-theme="dark"] (set by the head script from ?theme=, a
+     saved preference, or the OS) so the theme is forceable per URL. */
+  :root[data-theme="dark"] {
+    --black:#E8E4DB; --ink:#E8E4DB; --white:#1B1D22; --page-bg:#141519;
+    --gray-800:#A8A49C; --gray-700:#B7B1A6; --gray-400:#8F897F;
+    --gray-300:#4C5058; --gray-200:#3B3E45; --gray-100:#33363C; --gray-50:#212329;
+    --accent:#A8A49C;
   }
+  [data-theme="dark"] svg[aria-hidden="true"] rect { stroke: var(--ink); }
+  [data-theme="dark"] svg[aria-hidden="true"] line { stroke: var(--gray-700); }
+  [data-theme="dark"] .desk-hero { background:#FBFAF7; padding:1rem; border-radius:6px; }
 </style>
 </head>
 <body>

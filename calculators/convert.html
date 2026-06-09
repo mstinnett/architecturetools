@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- dev work-in-progress: not yet promoted to main; remove on promotion -->
 <meta name="robots" content="noindex, nofollow">
+<!-- Theme: ?theme=light|dark (or #light|#dark) forces it; else saved pref; else OS.
+     Set before paint to avoid a flash. The page needs JS anyway. -->
+<script>
+(function(){var u=new URLSearchParams(location.search).get('theme'),
+  h=location.hash.replace(/^#/,''),s=null;try{s=localStorage.getItem('theme');}catch(e){}
+  var t=u||h||s||(matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  if(t!=='dark'&&t!=='light')t='light';
+  document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <title>Precise Unit Converter -- architecture.tools</title>
 <meta name="description" content="A length converter that shows the cost of rounding: free-text dimension in, snapped to a grid, with Min / Nearest / Max and their signed residuals drawn on a dual-scale number line.">
 <link rel="stylesheet" href="../assets/css/global.css">
@@ -120,19 +129,19 @@
 
   /* Dark-mode equivalent — Drafting (Prussian) family. Inverts the warm ramp's
      lightness and switches the accent to its dark-mode variant (#6BAAE5). Token
-     names are unchanged, so the figure + chrome follow automatically. Scoped to
-     this page; --white flips to the dark surface, so "text on accent" stays
-     correct (dark text on the light-blue accent). */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #1B1D22; --white: #1B1D22; --page-bg: #141519;
-      --ink: #E8E4DB; --black: #E8E4DB; --secondary: #A29C92; --hairline: #33363C;
-      --gray-900: #F1EDE5; --gray-700: #B7B1A6; --gray-600: #A29C92;
-      --gray-500: #8F897F; --gray-400: #74787F; --gray-300: #4C5058;
-      --gray-200: #3B3E45; --gray-100: #33363C; --gray-50: #212329;
-      --accent: #6BAAE5; --accent-hover: #8FC0EE; --accent-tint: #13314A;
-      --accent-light: rgba(107,170,229,0.12); --selected-bg: var(--accent);
-    }
+     names are unchanged, so the figure + chrome follow automatically. --white
+     flips to the dark surface, so "text on accent" stays correct (dark text on
+     the light-blue accent). Applied via [data-theme="dark"], which the head
+     script sets from ?theme=, a saved preference, or the OS — so the theme is
+     forceable per URL (?theme=light / ?theme=dark). */
+  :root[data-theme="dark"] {
+    --paper: #1B1D22; --white: #1B1D22; --page-bg: #141519;
+    --ink: #E8E4DB; --black: #E8E4DB; --secondary: #A29C92; --hairline: #33363C;
+    --gray-900: #F1EDE5; --gray-700: #B7B1A6; --gray-600: #A29C92;
+    --gray-500: #8F897F; --gray-400: #74787F; --gray-300: #4C5058;
+    --gray-200: #3B3E45; --gray-100: #33363C; --gray-50: #212329;
+    --accent: #6BAAE5; --accent-hover: #8FC0EE; --accent-tint: #13314A;
+    --accent-light: rgba(107,170,229,0.12); --selected-bg: var(--accent);
   }
 </style>
 </head>
