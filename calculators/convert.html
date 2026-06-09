@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Precise Unit Converter -- architecture.tools</title>
+<meta name="description" content="A length converter that shows the cost of rounding: free-text dimension in, snapped to a grid, with Min / Nearest / Max and their signed residuals drawn on a dual-scale number line.">
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     Everything else is shared: the canonical palette (assets/css/tokens.css),
+     the family accent (drafting = blueprint blue, via data-family on <html>),
+     the dark scheme, and the whole calculator shell — input well, echo,
+     constraint dial, answer card, snap rows, figure text, mathnote — live in
+     global.css. Behaviour lives in the imported lib/ modules. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <h1>Precise Unit Converter</h1>
+    <p>Type a dimension in any format — feet-inches, fractions, metric. You can
+       include +, &minus;, /, x, *, and ().</p>
+  </div>
+
+  <!-- CALC SHELL — the shared anatomy every engine tool repeats
+       (see global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3):
+       input → echo → constraint → answer card → bonus outputs → footnote. -->
+
+  <!-- slot 1 · INPUT: the parser-fed dimension field -->
+  <div class="section-label">Dimension</div>
+  <div class="field-wrap">
+    <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="120"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 1m  ·  3'-4 1/2&quot;  ·  8' + 3 1/2&quot;" autofocus>
+    <div class="field-note" id="fieldNote"></div>
+    <!-- appears only when a number has no unit and nothing to inherit from -->
+    <div class="bare-ask" id="bareAsk"></div>
+  </div>
+
+  <!-- slot 2 · tool controls (here: the target system) -->
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Convert to</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-target="imperial">imperial</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-target="metric">metric</button>
+    </div>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO: the parsed reading (stated vs inferred) + exact result.
+         The true value appears here, on the figure, and in the rows — three
+         deliberate registers (confirmation / spatial / tabular), kept. -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 4 · CONSTRAINT: this tool's dial is the snap grid -->
+    <div id="lengthOut" style="display:none;">
+      <div class="section-label">Snap tolerance</div>
+      <div class="grid-presets" id="gridPresets"></div>
+
+      <!-- slot 5 · ANSWER CARD: figure + rows -->
+      <div class="answer-card">
+        <div class="figure-wrap" id="figure"></div>
+        <div class="snap-rows" id="snapRows"></div>
+      </div>
+    </div>
+
+    <!-- slot 6 · bonus outputs -->
+    <div class="ratio-box" id="ratioOut" style="display:none;"></div>
+    <div class="ratio-box" id="areaOut" style="display:none;"></div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <!-- interim nav (SITE_FRAMEWORK "Hierarchy"): one back-link home, no more -->
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;          // 100 km — beyond this we don't snap/draw
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+  // areas come back as floating mm² and can blow past safe range (or go
+  // non-finite) from extreme inputs; cap at (100 km)² so we never render an
+  // exponent soup or Infinity. Parallels the length guard above.
+  var MAX_AREA_MM2 = 1e16;              // (100 km)² in mm² = 1e10 m²
+  function areaOutOfRange(mm2) { return !Number.isFinite(mm2) || Math.abs(mm2) > MAX_AREA_MM2; }
+
+  var state = {
+    text: '',
+    defaultUnit: 'in',
+    target: 'imperial',
+    targetPinned: false,                                  // true once the user taps the target
+    urlPinned: false,                                     // the pin came from ?t= (survives the first source detection)
+    autoTargetNote: null,                                 // why the target moved (auto-flip), echoed with assumptions
+    lastSource: null,                                     // last detected source system
+    gridUiSystem: null,                                   // which system the grid UI is built for
+    grid: { imperial: { denom: 8 }, metric: { mm: 5 } }   // remembered per system
+  };
+
+  var els = {
+    input: document.getElementById('dimInput'),
+    fieldNote: document.getElementById('fieldNote'),
+    bareAsk: document.getElementById('bareAsk'),
+    echo: document.getElementById('echo'),
+    echoLine: document.getElementById('echoLine'),
+    echoAssume: document.getElementById('echoAssume'),
+    lengthOut: document.getElementById('lengthOut'),
+    gridPresets: document.getElementById('gridPresets'),
+    figure: document.getElementById('figure'),
+    snapRows: document.getElementById('snapRows'),
+    ratioOut: document.getElementById('ratioOut'),
+    areaOut: document.getElementById('areaOut'),
+    mathNote: document.getElementById('mathNote')
+  };
+
+  var escapeHtml = UI.esc;     // shared page util (assets/js/ui.js)
+  function sig(n) {                                  // ≤4 significant figures, trimmed
+    if (n === 0) return '0';
+    var d = Math.max(0, 4 - Math.floor(Math.log(Math.abs(n)) / Math.LN10) - 1);
+    return String(parseFloat(n.toFixed(Math.min(6, d))));
+  }
+
+  function currentGridCount() {
+    if (state.target === 'imperial') return Math.round(IN / state.grid.imperial.denom);
+    return Math.round(state.grid.metric.mm * MM);
+  }
+  function currentDenom() {
+    return state.target === 'imperial' ? state.grid.imperial.denom : null;
+  }
+
+  /* ---- pending hint: anything typed that didn't parse, shown under field -- */
+  function renderFieldNote(result) {
+    var text = state.text;
+    if (!text || !result || !result.spans) { els.fieldNote.innerHTML = ''; return; }
+    var lines = [];
+    result.spans.forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = text.slice(sp.start, sp.end).trim();
+      if (!frag) return;
+      lines.push('ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : ''));
+    });
+    els.fieldNote.innerHTML = lines.join('<br>');
+  }
+
+  /* ---- contextual bare-unit choice -------------------------------------- */
+  // Only when a number has no unit and nothing to inherit from (i.e. the
+  // default governs the whole reading) does the inches/mm choice actually
+  // matter — so it appears just then, and changes the reading, not the text.
+  function renderBareAsk(result) {
+    els.bareAsk.innerHTML = '';
+    if (!result || result.dimension !== 1 || result.units == null) return;
+    var terms = result.interpretation.terms || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;          // a unit was typed → nothing to ask
+    function pick(u, label) {
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+    Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+    });
+  }
+
+  /* ---- interpretation echo (primary result surface) --------------------- */
+  var OP_GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+
+  function renderEcho(result) {
+    if (!result) { els.echo.style.display = 'none'; return; }
+    var parts = result.interpretation.parts || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op') html += '<span class="op">' + (OP_GLYPH[p.text] || escapeHtml(p.text)) + '</span>';
+      else if (p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+
+    if (result.dimension === 1 && result.units != null && outOfRange(result.units)) {
+      html += '<span class="eq">=</span><span class="op">out of range (max ' + (MAX_UNITS / 960000) + ' m)</span>';
+    } else if (result.dimension === 1 && result.units != null) {
+      var conv = NumberLine.formatTrue(result.units, state.target);
+      html += '<span class="eq">=</span><span class="result">' + escapeHtml(conv) + '</span>';
+    } else if (result.dimension === 0) {
+      var r = Math.round(result.ratio * 10000) / 10000;
+      html += '<span class="eq">=</span><span class="result">' + r + '</span>';
+    } else if (result.dimension === 2 && result.area_mm2 != null) {
+      if (areaOutOfRange(result.area_mm2)) html += '<span class="eq">=</span><span class="op">area out of range</span>';
+      else html += '<span class="eq">=</span><span class="result">' + escapeHtml(sig(result.area_mm2 / 1e6) + ' m²') + '</span>';
+    } else if (result.note) {
+      html += '<span class="eq">=</span><span class="op">' + escapeHtml(result.note) + '</span>';
+    } else if (result.units == null) {
+      html += '<span class="eq">—</span><span class="op">unresolved</span>';
+    }
+
+    els.echoLine.innerHTML = html;
+    var asm = result.interpretation.assumptions || [];
+    if (state.autoTargetNote) asm = asm.concat([state.autoTargetNote]);
+    if (result.units == null && result.dimension === 1) asm = asm.concat(['this term could not be resolved — see the grayed text above']);
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- grid preset control --------------------------------------------- */
+  // Built once per target SYSTEM, then only the active highlight is updated —
+  // rebuilding the innerHTML on every keystroke was destroying the custom
+  // <input> mid-type (lost focus, blanked text).
+  function buildGridPresets() {
+    var html = '';
+    function box(attr, v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-' + attr + '="' + v + '">' + label + '</button>'; }
+    if (state.target === 'imperial') {
+      var labels = { 2: '½', 4: '¼', 8: '⅛', 16: '1/16', 32: '1/32', 64: '1/64' };
+      html += '<div class="grid-row">';
+      [2, 4, 8, 16, 32, 64].forEach(function (d) { html += box('denom', d, labels[d]); });
+      html += '<span class="grid-group-label" style="margin-left:.3rem;">custom 1/</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="numeric" min="1" max="256" step="1" placeholder="n">';
+      html += '</div>';
+    } else {
+      // whole numbers, then custom, then modular on its own row
+      html += '<div class="grid-row"><span class="grid-group-label">mm</span>';
+      [1, 5, 10].forEach(function (m) { html += box('mm', m, m); });
+      html += '<span class="grid-group-label" style="margin-left:.3rem;">custom</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="decimal" min="0.2" step="any" placeholder="mm">';
+      html += '</div>';
+      html += '<div class="grid-row"><span class="grid-group-label">modular mm</span>';
+      [100, 300, 600].forEach(function (m) { html += box('mm', m, m); });
+      html += '</div>';
+    }
+    els.gridPresets.innerHTML = html;
+    state.gridUiSystem = state.target;
+
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      box.addEventListener('click', function () {
+        if (box.dataset.denom) state.grid.imperial.denom = +box.dataset.denom;
+        if (box.dataset.mm) state.grid.metric.mm = +box.dataset.mm;
+        render();
+      });
+    });
+    var custom = document.getElementById('gridCustom');
+    if (custom) custom.addEventListener('input', function () {
+      var v = parseFloat(custom.value);
+      if (!(v > 0)) return;
+      // clamp so the grid can't be absurdly fine (it would draw a runaway ruler)
+      if (state.target === 'imperial') state.grid.imperial.denom = Math.min(256, Math.max(1, Math.round(v)));
+      else state.grid.metric.mm = Math.min(100000, Math.max(0.2, v));
+      render();
+    });
+  }
+  function updateGridActive() {
+    var active = state.target === 'imperial' ? state.grid.imperial.denom : state.grid.metric.mm;
+    var attr = state.target === 'imperial' ? 'denom' : 'mm';
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      UI.press(box, +box.dataset[attr] === active);
+    });
+  }
+  function renderGridPresets() {
+    if (state.gridUiSystem !== state.target) buildGridPresets();   // only on system change
+    updateGridActive();
+  }
+
+  /* ---- snap readout rows + figure --------------------------------------- */
+  function renderLength(result) {
+    els.lengthOut.style.display = '';
+    els.ratioOut.style.display = 'none';
+    renderGridPresets();
+
+    var units = result.units;
+    var g = currentGridCount();
+    var denom = currentDenom();
+    var source = result.unitSystem === 'metric' ? 'metric'
+               : result.unitSystem === 'imperial' ? 'imperial' : 'mixed';
+
+    // figure — size to the actual container (never wider, so margins stay even)
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.innerHTML = NumberLine.numberline({
+      units: units, gridCount: g, targetSystem: state.target,
+      sourceSystem: source, width: width
+    });
+
+    // Only two grid values bracket the true value: round down (smaller) and
+    // round up (larger). Nearest is whichever is closer — a flag, not a third
+    // row. Each imperial value reveals its decimal under the fraction, so the
+    // decimals line up against the exact value. Snapping uses snap.js.
+    function nameCell(name, gloss) {
+      return '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>';
+    }
+    function decUnder(u) {
+      return state.target === 'imperial' ? '<span class="snap-dec">' + escapeHtml(NumberLine.imperialDecimal(u, 4)) + '</span>' : '';
+    }
+    var floorU = snap(units, g, 'floor'), ceilU = snap(units, g, 'ceil'), nearU = snap(units, g, 'nearest');
+    var truePrec = state.target === 'imperial' ? '0.0001″' : '0.01 mm';
+    var html = '';
+    if (floorU === ceilU) {                               // on grid — one value, exact
+      html = '<div class="snap-row is-primary is-exact">' + nameCell('On grid', 'exact — no rounding')
+           + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(units, state.target, denom)) + decUnder(units) + '</div>'
+           + '<div class="snap-resid">on grid</div></div>';
+    } else {
+      [{ name: 'Round down', gloss: 'use for a max — won\'t exceed', u: floorU },
+       { name: 'Round up', gloss: 'use for a min — won\'t fall below', u: ceilU }].forEach(function (b) {
+        var near = b.u === nearU;
+        var cls = 'snap-row' + (near ? ' is-primary' : '');
+        html += '<div class="' + cls + '">' + nameCell(b.name + (near ? ' · nearest' : ''), b.gloss)
+              + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(b.u, state.target, denom)) + decUnder(b.u) + '</div>'
+              + '<div class="snap-resid">' + escapeHtml(NumberLine.formatResidual(b.u - units, state.target)) + '</div></div>';
+      });
+      html += '<div class="snap-row is-ref">' + nameCell('True value', 'to the nearest ' + truePrec)
+            + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(units, state.target)) + decUnder(units) + '</div>'
+            + '<div class="snap-resid">—</div></div>';
+    }
+    els.snapRows.innerHTML = html;
+
+    // footnote: the engine's exact integer arithmetic on the 1/960 mm lattice,
+    // shown so it can be audited by hand
+    var work = result.interpretation.work;
+    els.mathNote.innerHTML =
+      '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + escapeHtml(work) + ' = <b>' + units + '</b> units = ' + (Math.round(units / 960 * 10000) / 10000) + ' mm<br>'
+      + 'snap ' + g + ' units: nearest <b>' + nearU + '</b> · residual <b>' + (nearU - units) + '</b> units ('
+      + escapeHtml(NumberLine.formatResidual(nearU - units, state.target)) + ').';
+  }
+
+  function renderArea(result) {
+    els.lengthOut.style.display = 'none';
+    els.ratioOut.style.display = 'none';
+    els.areaOut.style.display = '';
+    var mm2 = result.area_mm2, neg = mm2 < 0 ? '−' : '';
+    var a = Math.abs(mm2), m2 = a / 1e6, in2 = a / 645.16, ft2 = in2 / 144;
+    els.areaOut.innerHTML =
+      '<div class="section-label">Area <span style="color:var(--ink-2);text-transform:none;letter-spacing:0;">— length × length</span></div>'
+      + '<div class="ratio-big">' + neg + sig(m2) + ' m²</div>'
+      + '<div style="margin-top:.4rem;color:var(--gray-700);font-size:var(--text-sm);">'
+      + neg + sig(in2) + ' in²  ·  ' + neg + sig(ft2) + ' ft²  ·  ' + neg + sig(a) + ' mm²</div>';
+    // footnote shows the factor arithmetic in units
+    els.mathNote.innerHTML =
+      '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + escapeHtml(result.interpretation.work) + ' (unit²) = ' + neg + sig(a) + ' mm² = ' + neg + sig(m2) + ' m².';
+  }
+
+  function renderRatio(result) {
+    els.lengthOut.style.display = 'none';
+    els.areaOut.style.display = 'none';
+    els.ratioOut.style.display = '';
+    els.mathNote.innerHTML = '';
+    var r = Math.round(result.ratio * 10000) / 10000;
+    var html = '<div class="section-label">Ratio — how many fit</div>'
+             + '<div class="ratio-big">' + r + '</div>';
+    if (Math.abs(result.ratio) >= 1) {
+      var rem = result.remainder_units;
+      var remTxt = rem === 0 ? 'remainder 0'
+        : 'remainder ' + NumberLine.formatTrue(rem, result.unitSystem === 'metric' ? 'metric' : 'imperial');
+      html += '<div style="margin-top:.4rem;color:var(--gray-700);font-size:var(--text-sm);">'
+            + result.count + (Math.abs(result.count) === 1 ? ' fits' : ' fit') + ', ' + remTxt + '</div>';
+    }
+    els.ratioOut.innerHTML = html;
+  }
+
+  /* ---- main render ------------------------------------------------------ */
+  // When the input states a system (an explicit unit somewhere): flip the
+  // bare-number default toggle to match the source, and — since this is a
+  // converter — switch the target to the OPPOSITE system so you see the other
+  // units by default. Every time a NEW source system is detected the target
+  // re-flips (and any manual pin is cleared), so it always keeps up; while you
+  // stay in one system a manual target choice holds (that's how you get
+  // same-system: grid snap + ft-in reformatting). A pure bare number states
+  // nothing, so nothing moves.
+  function syncDetected(result) {
+    state.autoTargetNote = null;                              // set below when the target is ours, not the user's
+    if (!result || !result.interpretation) return;
+    var sys = result.unitSystem;
+    if (sys !== 'imperial' && sys !== 'metric') return;       // ambiguous/mixed → leave it
+    var stated = (result.interpretation.terms || []).some(function (t) {
+      return t.role === 'length' && !t.inferred;              // an explicit unit was typed
+    });
+    if (!stated) return;
+
+    state.defaultUnit = sys === 'metric' ? 'mm' : 'in';      // keep bare default sticky to source
+    if (sys !== state.lastSource) {                           // a new system → re-flip target
+      // …except on the very first parse of a ?t=-pinned URL: that pin IS the
+      // shared state, so seeing the source for the first time must not undo it
+      var pinnedByURL = state.lastSource === null && state.urlPinned;
+      state.lastSource = sys;
+      if (!pinnedByURL) state.targetPinned = false;
+    }
+    state.urlPinned = false;
+    if (!state.targetPinned) {
+      var opp = sys === 'metric' ? 'imperial' : 'metric';
+      if (state.target !== opp) {
+        state.target = opp;
+        setActive('[data-target]', 'target', state.target);
+      }
+      // the flip is silent in the pills — say it where assumptions live
+      state.autoTargetNote = sys + ' stated — showing ' + state.target;
+    }
+  }
+
+  function render() {
+    var result = parseLength(state.text, { defaultUnit: state.defaultUnit });
+    syncDetected(result);
+    syncURL();                       // every render leaves the URL linkable
+    renderFieldNote(result);
+    renderBareAsk(result);
+    renderEcho(result);
+
+    if (result && result.dimension === 2 && result.area_mm2 != null) {
+      // out-of-range area: echo shows "area out of range", nothing else renders
+      if (areaOutOfRange(result.area_mm2)) {
+        els.lengthOut.style.display = 'none';
+        els.ratioOut.style.display = 'none';
+        els.areaOut.style.display = 'none';
+        els.mathNote.innerHTML = '';
+        return;
+      }
+      renderArea(result); return;
+    }
+
+    // overflow guard: out-of-range lengths get the echo note above, but no
+    // figure/snap (snap would throw on a non-safe integer)
+    if (result && result.dimension === 1 && result.units != null && outOfRange(result.units)) {
+      els.lengthOut.style.display = 'none';
+      els.ratioOut.style.display = 'none';
+      els.areaOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+
+    if (!result || (result.units == null && result.dimension !== 0)) {
+      els.lengthOut.style.display = 'none';
+      els.ratioOut.style.display = 'none';
+      els.areaOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    if (result.dimension === 0) { renderRatio(result); return; }
+    els.areaOut.style.display = 'none';
+    renderLength(result);
+  }
+
+  /* ---- shareable URL ----------------------------------------------------- */
+  // The current reading is always linkable: ?d=<dimension>&t=imperial|metric
+  // &g=<denom | Nmm>. Only non-default state is written, so a fresh page keeps
+  // a clean URL. Debounced — Safari rate-limits replaceState.
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.text && state.text !== '1m') params.set('d', state.text);
+      if (state.targetPinned) params.set('t', state.target);
+      if (state.target === 'imperial' ? state.grid.imperial.denom !== 8 : state.grid.metric.mm !== 5) {
+        params.set('g', state.target === 'imperial' ? String(state.grid.imperial.denom) : state.grid.metric.mm + 'mm');
+      }
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var d = params.get('d'), t = params.get('t'), g = params.get('g');
+    if (t === 'imperial' || t === 'metric') { state.target = t; state.targetPinned = true; state.urlPinned = true; }
+    if (g) {
+      var mm = /^([\d.]+)mm$/.exec(g);
+      if (mm && +mm[1] > 0) state.grid.metric.mm = Math.min(100000, Math.max(0.2, +mm[1]));
+      else if (/^\d+$/.test(g)) state.grid.imperial.denom = Math.min(256, Math.max(1, +g));
+    }
+    return d != null ? d.slice(0, 120) : null;
+  }
+
+  /* ---- wiring ----------------------------------------------------------- */
+  function setActive(selector, attr, value) {
+    Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
+      UI.press(el, el.dataset[attr] === value);
+    });
+  }
+
+  els.input.addEventListener('input', function () { state.text = els.input.value; render(); });
+  // selecting the field selects its text, so a new entry overwrites the old one
+  // (deferred to the next tick so iOS doesn't collapse the selection on tap)
+  els.input.addEventListener('focus', function () { setTimeout(function () { els.input.select(); }, 0); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-target]'), function (el) {
+    el.addEventListener('click', function () {
+      state.target = el.dataset.target; state.targetPinned = true;
+      setActive('[data-target]', 'target', state.target); render();
+    });
+  });
+
+  // initial state — URL params override the worked-example default (1 m → 1/8")
+  var urlDim = initFromURL();
+  setActive('[data-target]', 'target', state.target);
+  els.input.value = urlDim != null ? urlDim : '1m';
+  state.text = els.input.value;
+  render();
+})();
+</script>
+</body>
+</html>

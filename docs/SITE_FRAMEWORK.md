@@ -225,6 +225,12 @@ The C-series is a set, not an afterthought.
 
 These pages can be more interactive than the A-series, but they should still feel disciplined, diagram-led, and architecturally framed.
 
+> **Status (2026-06-07):** the C-series is being rebuilt on a shared **engine**
+> (`calculators/lib/`) rather than as independent pages — see `docs/HANDOFF.md`.
+> The Precise Unit Converter (`calculators/convert.html`) ships first; the
+> legacy pages below are standalone and are being folded onto the engine or
+> retired. All of this lives on `dev`; only the picker is live on `main`.
+
 ### C-0 — Calculators Cover
 
 **Purpose:**
@@ -277,8 +283,13 @@ The L-series matters now because the site should be organized so these can be ad
 
 These remain important and should stay prominent even though they are not yet numbered.
 
+> **Status (2026-06-07):** only the picker is live on `main` (as `index.html`).
+> `components.html` and `site-screen.html` are full pages on `dev`, awaiting
+> promotion. See `docs/PROJECT.md`.
+
 ### picker.html
-The main live hardware recommendation page.
+The main live hardware recommendation page. Ships as `index.html` (the home
+page), with `picker.html` redirecting to `/`.
 
 ### components.html
 The live current-picks companion page.
@@ -302,6 +313,17 @@ Instead, the hierarchy is:
 4. named flagship live pages linked prominently from the cover structure
 
 This is still simple. It is just no longer artificially flat.
+
+**Interim navigation — nailed down (2026-06-09).** The covers above are
+structure, not yet pages. Until they exist, live-page navigation is exactly
+two cross-links and nothing more:
+
+- the picker (the home page) lists each live tool in its footer;
+- every tool page carries one back-link home, labeled `← architecture.tools`
+  (not "all tools" — there is no tools index to promise yet).
+
+When AT-0 / C-0 land they replace this rule; until then no page invents
+other nav (no header bars, no breadcrumbs).
 
 ---
 
