@@ -156,7 +156,7 @@ if (problems.length) {
 // file). The picker footer renders it as "Updated <month year>".
 function dataUpdated() {
   try {
-    const d = execSync('git log -1 --format=%cs -- data/', { cwd: ROOT }).toString().trim();
+    const d = execSync('git log -1 --format=%cs -- data/ ":(exclude)data/README.md"', { cwd: ROOT }).toString().trim();
     if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
   } catch (e) { /* no git (tarball build) — fall through */ }
   return new Date().toISOString().slice(0, 10);
