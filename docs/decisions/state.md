@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-09 (shared CSS: tokens.css promoted, global2.css owns the family accents + dark scheme)_
+_Last updated: 2026-06-09 (shared CSS consolidated: one global.css importing tokens.css; --paper defined once)_
 
 ## Live architectural picture
 
@@ -36,12 +36,13 @@ _Last updated: 2026-06-09 (shared CSS: tokens.css promoted, global2.css owns the
   standalone, and does **not** use the engine.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
-- **Shared assets:** `assets/css/tokens.css` (the canonical color palette —
-  family accents + dark anchors) and `assets/css/global2.css` (the warm sheet
-  theme; imports tokens.css, owns the per-family accent system selected via
-  `data-family` on `<html>`, and the one shared dark scheme) — used by the
-  picker and converter; `assets/css/global.css` (the older token/component
-  sheet, still used by the legacy pages); `assets/data/hardware-data.json`
+- **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
+  warm sheet theme; imports `assets/css/tokens.css`, the canonical color
+  palette; owns the per-family accent system selected via `data-family` on
+  `<html>` and the one shared dark scheme). The picker and converter use it
+  fully; `components.html` and `dimension-converter.html` link it and inherit
+  the theme (the old cool-neutral sheet of the same name was replaced —
+  same class/token vocabulary, re-valued). `assets/data/hardware-data.json`
   (the picker's runtime data, generated from the `data/` CSV tables — see the
   pipeline contract below).
 - **Verification gate:** `.claude/gate/run.sh` — htmlhint + stylelint +
@@ -56,10 +57,10 @@ _Last updated: 2026-06-09 (shared CSS: tokens.css promoted, global2.css owns the
 - `docs/HANDOFF.md` — the calculator-engine charter: the engine model, the
   build plan, and the provenance rule.
 - The "no build tools / no framework / no backend" rule for the site itself.
-- The shared-CSS vocabulary: `assets/css/tokens.css` (canonical palette) +
-  `assets/css/global2.css` (theme + components, family accents via
-  `data-family`), and the older `assets/css/global.css` still under the
-  legacy pages.
+- The shared-CSS vocabulary: `assets/css/tokens.css` (canonical palette;
+  the only definer of `--paper` and the other ground anchors) +
+  `assets/css/global.css` (theme + components, family accents via
+  `data-family`).
 - The hardware-data pipeline: the CSV tables under `data/` (`cpus.csv`,
   `gpus.csv`, `chips.csv`, `specs-win.csv`, `specs-mac.csv`, `priorities.csv`,
   `extras.json`) are the single source of truth. `tools/build-data.mjs`
@@ -77,6 +78,15 @@ _Last updated: 2026-06-09 (shared CSS: tokens.css promoted, global2.css owns the
 
 ## Recent decisions
 
+- 2026-06-09 — Shared CSS consolidated to one sheet (operator-directed).
+  `global2.css` renamed over `assets/css/global.css`, replacing the old
+  cool-neutral sheet (same class/token vocabulary, so its two consumers —
+  `components.html`, `dimension-converter.html` — re-theme without edits).
+  The `--paper` repetition resolved: tokens.css is its only definer (the
+  brand's warm-white anchor, like `--lightbox` for dark); the theme's grounds
+  are `--card` (the sheet) and `--gray-100` (the field behind it), and the
+  unused `--page-bg` alias was dropped. Picker + converter verified
+  computed-style identical in both schemes.
 - 2026-06-09 — Shared CSS refactor (operator-directed). The canonical palette
   graduated from `docs/In Progress/tokens.css` to `assets/css/tokens.css`;
   `global2.css` imports it and now owns the family-accent system (pages

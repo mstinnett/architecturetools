@@ -7,13 +7,13 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Precise Unit Converter -- architecture.tools</title>
 <meta name="description" content="A length converter that shows the cost of rounding: free-text dimension in, snapped to a grid, with Min / Nearest / Max and their signed residuals drawn on a dual-scale number line.">
-<link rel="stylesheet" href="../assets/css/global2.css">
+<link rel="stylesheet" href="../assets/css/global.css">
 <style>
   /* ---- page-specific only; all behaviour lives in the imported modules ----
      The canonical palette (assets/css/tokens.css), the family accent
      (drafting = blueprint blue, selected by data-family on <html>), the
      shared dark scheme, and the --nl-* number-line strokes all come from
-     global2.css (linked above). Rules here are converter-only. */
+     global.css (linked above). Rules here are converter-only. */
 
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
 
@@ -55,7 +55,7 @@
                       box-shadow: var(--shadow-press); transform: translateY(1px); }
 
   /* Answer surfaces (parsed output + the figure/rounding card + ratio/area)
-     all read --answer-surface, the shared tone knob from global2. The
+     all read --answer-surface, the shared tone knob from global.css. The
      figure's label halo reads it too (see svg.nl text), so the halo always
      matches the card — retint in one place and nothing fringes. */
 
@@ -113,7 +113,7 @@
   .nl-true-val    { font-size: 13px; fill: var(--black); font-weight: 400; }
   .nl-note        { font-size: 10px; fill: var(--ink-2); font-style: italic; }
 
-  /* figure + rounding table share ONE .answer-card (base styling from global2),
+  /* figure + rounding table share ONE .answer-card (base styling from global.css),
      re-cast as a DEBOSSED well: soft paper fill + inset shadow so the answer
      reads as a panel recessed into the brighter page, not floating above it.
      Rows sit flat inside, a hairline dividing them from the figure (no

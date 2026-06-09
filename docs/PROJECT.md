@@ -82,7 +82,8 @@ They are part of the site structure, but they do not need premature renaming or 
 │   └── index.html                  # L-0 library/reference cover (future)
 ├── assets/
 │   ├── css/
-│   │   └── global.css              # Shared design tokens and component styles
+│   │   ├── global.css              # Shared theme + components (imports tokens.css)
+│   │   └── tokens.css              # Canonical color palette (family accents + grounds)
 │   └── data/
 │       └── hardware-data.json      # GENERATED from data/*.csv — do not hand-edit
 ├── data/                           # Hardware data source (edit in Numbers; see data/README.md)
@@ -198,11 +199,16 @@ Pages inside `calculators/` should import it via:
 ```
 
 Contains:
-- design tokens (colors, type scale, spacing) in CSS custom properties
+- the warm sheet theme: design tokens (type scale, spacing, surfaces, shadows)
+  in CSS custom properties, plus the one shared dark scheme
+  (`prefers-color-scheme`)
+- an `@import` of `assets/css/tokens.css` — the canonical color palette (the
+  seven family accents and the fixed grounds, e.g. `--paper`, `--lightbox`).
+  Pages pick their accent family with `data-family` on `<html>`
+  (e.g. `data-family="drafting"`); a page that declares nothing gets drafting
 - reset
 - layout classes: `.page` (720px), `.page-wide` (1080px), `.page-full`
-- reusable components such as `.section-label`, `.input-group`, `.option-pill`, `.app-toggle`, `.result-row`, `.output-row`, `.field-row`, `.note-box`, `.priority-box`, `.card-link`, `.page-footer`, `.spec-block`, `.purchase-path`, `.pick`, `.ref-table`, `.scale-table`
-- higher-contrast palette than the first iteration
+- reusable components such as `.section-label`, `.input-group`, `.option-pill`, `.app-toggle`, `.result-row`, `.output-row`, `.field-row`, `.note-box`, `.priority-box`, `.answer-card`, `.card-link`, `.page-footer`, `.spec-block`, `.purchase-path`, `.pick`, `.ref-table`, `.scale-table`
 - type scale from `--text-xs` through `--text-2xl`
 
 **Status:** created but not yet applied everywhere. Continue migrating pages toward shared styles rather than inventing a larger system.
@@ -405,8 +411,9 @@ The backlog leads with the calculator-engine thread (HANDOFF §5).
 2. Close the provenance loose ends (noindex on dev WIP, a neutral preview host)
 3. Grow `index.html` toward a fuller **AT-0** cover; add a **C-0** calculator
    index once the engine tools settle
-4. Bring pages onto `global.css` as they're touched (the picker still uses
-   inline styles)
+4. Bring the remaining pages onto `global.css` as they're touched (the picker
+   and converter are on it; the legacy calculators and `site-screen.html`
+   still carry their own inline styles)
 5. Add thin A-series pages gradually rather than waiting for a complete set
 
 ---
