@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-family="picker">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,62 +13,18 @@
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="assets/css/global2.css">
 <style>
-  /* Page-specific layout + controls only. Shared tokens, the sheet-on-paper
-     surface, the key/well material and the base component looks all come from
-     global2.css (linked above). Rules here are index-only, or deliberate
-     overrides of the shared sheet. */
-
-  /* global2 supplies the warm token ramp; index references one extra step,
-     --gray-800, that the shared sheet doesn't define — map it onto the ramp. */
-  /* ============================================================
-     Shipped palette — canonical tokens (docs/In Progress/tokens.css).
-     Picker = "Ink" family, light + dark. Same shared dark surfaces,
-     gray ramp and shadows as the converter; only the accent family
-     differs. The desk line-art PNGs are inverted in dark so they read
-     on the dark field. Named tokens for readability.
-     ============================================================ */
-  :root{
-    /* canonical palette tokens — the families this page uses */
-    --picker:#211E18; --picker-tint:#EFEBE2; --picker-dark:#A8A49C;
-    --ink-text:#211E18; --hairline:#E4DFD5; --lightbox:#16181C; --text-on-dark:#E8E4DB;
-    /* engine shims kept from before */
-    --gray-800:var(--gray-900);
-    --answer-surface:color-mix(in srgb, var(--card) 50%, var(--card-2));
-    /* map the engine tokens onto the palette — light (Ink) */
-    --accent: var(--picker);
-    --accent-soft: var(--picker-tint);
-    --accent-ink:#FFFFFF;
-    --selected-bg: var(--accent);
-    --ink: var(--ink-text);
-    --rule: var(--hairline);
-  }
+  /* Page-specific layout + controls only. The canonical palette
+     (assets/css/tokens.css), the family accent (picker = "Ink", selected by
+     data-family on <html>), the shared dark scheme, the sheet-on-paper
+     surface and the key/well material all come from global2.css (linked
+     above). Rules here are index-only, or deliberate overrides of the
+     shared sheet. */
   @media (prefers-color-scheme: dark){
-    :root{
-      /* surfaces — derived from --lightbox: backdrop darkest, sheet lifts */
-      --paper:#0F1115; --page-bg:#0F1115; --gray-100:#0F1115; --gray-50: var(--lightbox);
-      --card:#181B21; --white:#181B21; --card-2:#20242B;
-      /* text — palette text-on-dark */
-      --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2:#ADA89F; --ink-3:#7E7A72;
-      --gray-700:#B8B4AB; --gray-900:#D8D4CB; --gray-400:#6A665F;
-      /* lines */
-      --rule:#2E323A; --rule-2:#3C414B; --gray-200:#2A2E36; --gray-300:#383D46;
-      /* Ink · dark (a lifted warm gray) */
-      --accent: var(--picker-dark);
-      --accent-ink: var(--lightbox);
-      --accent-soft:color-mix(in srgb, var(--accent) 18%, transparent);
-      --selected-bg: var(--accent);
-      /* shadows recut for a dark field */
-      --shadow-card:0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
-      --shadow-key:inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
-      --shadow-key-hover:inset 0 1px 0 rgba(255,255,255,.06), 0 3px 7px rgba(0,0,0,.6);
-      --shadow-press:inset 0 2px 5px rgba(0,0,0,.65);
-      --shadow-well:inset 0 2px 4px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04);
-    }
     /* desk line-art (transparent PNGs) → invert so dark lines read light on the dark field */
     img[src*="desk-images"]{ filter: invert(0.9); }
   }
   html{font-size:18px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
-  body{overflow-anchor:none;background-color:var(--gray-100);}   /* font + ink + grain inherit from global2; desk stepped a shade darker than the panel */
+  body{overflow-anchor:none;}   /* font + ink + grain + desk tone inherit from global2 */
   .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--card);border:1px solid color-mix(in srgb, var(--rule) 60%, transparent);box-shadow:var(--shadow-card);display:flex;flex-direction:column;}
   /* Page order: hero, then the heading, then the picker controls, then the results, then prebuilts/footer. */
   .picker>.desk-hero{order:1;} .picker-header{order:2;} .picker>.controls-cluster{order:3;} .picker>.mon-drawer{order:4;} .picker>.input-section{order:5;} .picker>.divider{order:6;} .picker>#panelsWrapper{order:7;} .picker>.picker-footer{order:8;}

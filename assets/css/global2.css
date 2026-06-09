@@ -2,35 +2,57 @@
    All pages import this. Override locally only when necessary.
 
    THEME, in one breath: warm paper instead of cool white; each page is a sheet
-   lifted on that paper; controls are raised "keys" that depress to a blueprint-
-   blue fill when chosen; the fields you type into are recessed wells; structural
-   lines are soft warm hairlines; blue is reserved for selection + the answer,
-   black for everything secondary.
+   lifted on that paper; controls are raised "keys" that depress to the family
+   accent when chosen; the fields you type into are recessed wells; structural
+   lines are soft warm hairlines; the accent is reserved for selection + the
+   answer, black for everything secondary.
 
-   Drop-in: class names + token names are unchanged from the prior sheet, only
-   re-valued — existing pages inherit the new look untouched. New optional
-   helpers (.answer-card, --accent on diagrams) are documented where they live.
+   PALETTE: the canonical color tokens (family accents, ink, hairline, the
+   dark anchors) live in tokens.css, imported below. Each page declares its
+   tool family on the root element — <html data-family="drafting"> — and the
+   accent system follows in both schemes; a page that declares nothing gets
+   drafting (the blueprint anchor). The dark scheme at the end of this sheet
+   recuts surfaces, text, lines and shadows once for every page; only the
+   family accent differs per page.
    ========================================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
+@import url('tokens.css');   /* canonical palette — resolves relative to this file */
 
 /* A static preview loader here can drop the first rule after @import; this
    harmless guard absorbs it. Safe to keep in production. */
 .theme-guard { color: inherit; }
 
+/* ---- FAMILY SELECTION ----
+   tokens.css defines one accent family per tool genre (see
+   docs/In Progress/calculator-suite-map.md). --family / --family-tint /
+   --family-dark are the three hooks the engine tokens below consume; pages
+   pick a family with data-family on <html>. */
+:root,
+[data-family="drafting"]      { --family: var(--drafting);      --family-tint: var(--drafting-tint);      --family-dark: var(--drafting-dark); }
+[data-family="picker"]        { --family: var(--picker);        --family-tint: var(--picker-tint);        --family-dark: var(--picker-dark); }
+[data-family="egress"]        { --family: var(--egress);        --family-tint: var(--egress-tint);        --family-dark: var(--egress-dark); }
+[data-family="building"]      { --family: var(--building);      --family-tint: var(--building-tint);      --family-dark: var(--building-dark); }
+[data-family="envelope"]      { --family: var(--envelope);      --family-tint: var(--envelope-tint);      --family-dark: var(--envelope-dark); }
+[data-family="accessibility"] { --family: var(--accessibility); --family-tint: var(--accessibility-tint); --family-dark: var(--accessibility-dark); }
+[data-family="material"]      { --family: var(--material);      --family-tint: var(--material-tint);      --family-dark: var(--material-dark); }
+
 /* ---- TOKENS ---- */
 :root {
-  /* Warm neutral foundation */
-  --paper:  #efece4;   /* the page field, behind the sheet */
-  --card:   #fbfaf6;   /* the sheet / input / control surface */
-  --card-2: #f2efe7;   /* inset boxes (priority / note) */
-  --ink:    #15120d;   /* primary text + heavy rules */
-  --ink-2:  #5b5346;   /* secondary text */
-  --ink-3:  #8a8170;   /* micro-labels */
+  /* Warm neutral foundation. Text + hairlines come from the canonical palette
+     (tokens.css); the surfaces stay this sheet's warm ground — its --paper
+     deliberately wins the one name collision with tokens.css. */
+  --paper:  #efece4;             /* the page field, behind the sheet */
+  --card:   #fbfaf6;             /* the sheet / input / control surface */
+  --card-2: #f2efe7;             /* inset boxes (priority / note) */
+  --ink:    var(--ink-text);     /* primary text + heavy rules */
+  --ink-2:  #5b5346;             /* secondary text */
+  --ink-3:  #8a8170;             /* micro-labels */
 
   /* Legacy names, re-valued warm (existing rules keep working) */
   --black: var(--ink);
   --gray-900: #2a241c;
+  --gray-800: var(--gray-900);
   --gray-700: #5b5346;
   --gray-600: #6b6354;
   --gray-500: #8a8170;
@@ -42,12 +64,22 @@
   --white:   var(--card);
   --page-bg: var(--paper);
 
-  /* Blueprint accent — cyanotype blue, not SaaS blue. Selection + the answer. */
-  --accent:      oklch(0.50 0.11 233);
-  --accent-ink:  #f1f5f8;                                   /* text on accent */
-  --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  /* Family accent — selection + the answer (see FAMILY SELECTION above) */
+  --accent:      var(--family);
+  --accent-ink:  #fff;                                      /* text on accent */
+  --accent-soft: var(--family-tint);
   --selected-bg: var(--accent);
   --accent-light: var(--accent-soft);
+
+  /* Answer surfaces (result wells) share ONE tone knob — a half-step below
+     the sheet, well short of the page field. Diagram label halos read it too
+     (e.g. svg.nl text), so a retint never fringes. */
+  --answer-surface: color-mix(in srgb, var(--card) 50%, var(--card-2));
+
+  /* Number-line figure strokes — numberline.js routes its SVG through these
+     so the figure inverts with the scheme. Unused (harmless) off the
+     calculator pages. */
+  --nl-ink: #0a0a0a; --nl-hatch: #0a0a0a; --nl-tick: #bbb; --nl-axis: #999;
 
   /* Type */
   --font-body: 'Verlag', 'Jost', 'Futura PT', sans-serif;
@@ -60,8 +92,9 @@
   --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 0.75rem;
   --space-lg: 1.25rem; --space-xl: 2rem;   --space-2xl: 3rem;
 
-  /* Soft warm hairlines (was hard near-black) */
-  --rule:   #cfc8bb;
+  /* Soft warm hairlines (was hard near-black); --rule is the palette's
+     canonical hairline */
+  --rule:   var(--hairline);
   --rule-2: #bbb2a2;
   --border-light: 1px solid var(--rule);
   --border-mid:   1px solid var(--rule-2);
@@ -83,7 +116,9 @@ body {
   font-family: var(--font-body);
   font-weight: 300;
   color: var(--ink);
-  background-color: var(--paper);
+  /* the field behind the sheet, stepped a shade darker than --paper so the
+     bright panel reads as a distinct sheet */
+  background-color: var(--gray-100);
   /* faint paper grain — shows in the margins around the sheet */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
   line-height: 1.55;
@@ -244,3 +279,31 @@ body {
 /* ---- RESPONSIVE ---- */
 @media (max-width: 820px) { .page-wide { padding: var(--space-xl) var(--space-lg) var(--space-2xl); } .spec-block { gap: 1rem 2rem; } }
 @media (max-width: 480px) { .page { padding: var(--space-xl) var(--space-lg) var(--space-2xl); } .input-row { flex-direction: column; } .result-label { width: 110px; } }
+
+/* ---- DARK — one shared scheme for every page; only the family accent
+   differs (it swaps to its lifted dark variant via --family-dark). ---- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* surfaces — derived from --lightbox: backdrop darkest, sheet lifts */
+    --paper: #0F1115; --page-bg: #0F1115; --gray-100: #0F1115; --gray-50: var(--lightbox);
+    --card: #181B21; --white: #181B21; --card-2: #20242B;
+    /* text — palette text-on-dark */
+    --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2: #ADA89F; --ink-3: #7E7A72;
+    --gray-700: #B8B4AB; --gray-900: #D8D4CB; --gray-400: #6A665F;
+    /* lines */
+    --rule: #2E323A; --rule-2: #3C414B; --gray-200: #2A2E36; --gray-300: #383D46;
+    /* family accent — the lifted dark variant */
+    --accent: var(--family-dark);
+    --accent-ink: var(--lightbox);
+    --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+    --selected-bg: var(--accent);
+    /* number-line strokes — inverted for the dark field */
+    --nl-ink: #CBC8C2; --nl-hatch: #6E727C; --nl-tick: #3F434B; --nl-axis: #6E727B;
+    /* shadows recut for a dark field (warm browns -> deep blacks) */
+    --shadow-card: 0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
+    --shadow-key: inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
+    --shadow-key-hover: inset 0 1px 0 rgba(255,255,255,.06), 0 3px 7px rgba(0,0,0,.6);
+    --shadow-press: inset 0 2px 5px rgba(0,0,0,.65);
+    --shadow-well: inset 0 2px 4px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04);
+  }
+}

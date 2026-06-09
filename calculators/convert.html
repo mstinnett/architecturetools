@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-family="drafting">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,60 +9,13 @@
 <meta name="description" content="A length converter that shows the cost of rounding: free-text dimension in, snapped to a grid, with Min / Nearest / Max and their signed residuals drawn on a dual-scale number line.">
 <link rel="stylesheet" href="../assets/css/global2.css">
 <style>
-  /* ---- page-specific only; all behaviour lives in the imported modules ---- */
-
-  /* ============================================================
-     Shipped palette — docs/In Progress/palette-shipped.html
-     Converter = "Drafting" family (blue), light + dark mode.
-     The accent is the only page-specific token; the neutrals,
-     surfaces and shadows below are the shared dark theme that the
-     picker mirrors (only its accent differs). The number-line SVG
-     (numberline.js) routes its strokes through --nl-* tokens too, so
-     its hatch and rules invert in dark as well.
-     Canonical names + values: docs/In Progress/tokens.css.
-     ============================================================ */
-  :root{
-    /* canonical palette tokens — mirror of tokens.css (the families this page uses) */
-    --drafting:#004C80; --drafting-tint:#D7EEFF; --drafting-dark:#6BAAE5;
-    --ink-text:#211E18; --hairline:#E4DFD5; --lightbox:#16181C; --text-on-dark:#E8E4DB;
-    /* map the engine's tokens onto the palette — light */
-    --accent: var(--drafting);
-    --accent-soft: var(--drafting-tint);
-    --accent-ink:#FFFFFF;
-    --selected-bg: var(--accent);
-    --ink: var(--ink-text);
-    --rule: var(--hairline);
-    /* number-line strokes — light = numberline.js originals */
-    --nl-ink:#0a0a0a; --nl-hatch:#0a0a0a; --nl-tick:#bbb; --nl-axis:#999;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      /* surfaces — derived around --lightbox #16181C: backdrop darkest, sheet lifts */
-      --paper:#0F1115; --page-bg:#0F1115; --gray-100:#0F1115; --gray-50: var(--lightbox);
-      --card:#181B21; --white:#181B21; --card-2:#20242B;
-      /* text — palette text-on-dark */
-      --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2:#ADA89F; --ink-3:#7E7A72;
-      --gray-700:#B8B4AB; --gray-900:#D8D4CB; --gray-400:#6A665F;
-      /* lines */
-      --rule:#2E323A; --rule-2:#3C414B; --gray-200:#2A2E36; --gray-300:#383D46;
-      /* Drafting · dark */
-      --accent: var(--drafting-dark);
-      --accent-ink: var(--lightbox);
-      --accent-soft:color-mix(in srgb, var(--accent) 18%, transparent);
-      --selected-bg: var(--accent);
-      /* number-line strokes — inverted for dark */
-      --nl-ink:#CBC8C2; --nl-hatch:#6E727C; --nl-tick:#3F434B; --nl-axis:#6E727B;
-      /* shadows recut for a dark field (warm browns -> deep blacks) */
-      --shadow-card:0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
-      --shadow-key:inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
-      --shadow-key-hover:inset 0 1px 0 rgba(255,255,255,.06), 0 3px 7px rgba(0,0,0,.6);
-      --shadow-press:inset 0 2px 5px rgba(0,0,0,.65);
-      --shadow-well:inset 0 2px 4px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04);
-    }
-  }
+  /* ---- page-specific only; all behaviour lives in the imported modules ----
+     The canonical palette (assets/css/tokens.css), the family accent
+     (drafting = blueprint blue, selected by data-family on <html>), the
+     shared dark scheme, and the --nl-* number-line strokes all come from
+     global2.css (linked above). Rules here are converter-only. */
 
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
-  body { background-color: var(--gray-100); }   /* a step darker than --paper so the bright panel reads as a distinct sheet (grain from global2 persists) */
 
   /* Plain, robust entry field — a normal visible input (the overlay-mirror
      trick broke on mobile: invisible text + lost focus). Parsed/pending
@@ -102,11 +55,9 @@
                       box-shadow: var(--shadow-press); transform: translateY(1px); }
 
   /* Answer surfaces (parsed output + the figure/rounding card + ratio/area)
-     share ONE tone knob, --answer-surface. The figure's label halo reads it too
-     (see svg.nl text), so the halo always matches the card — retint in one place
-     and nothing fringes. Tone sits a half-step below the --card panel surface,
-     well short of the --paper field behind the calculator. */
-  .echo, .answer-card, .ratio-box { --answer-surface: color-mix(in srgb, var(--card) 50%, var(--card-2)); }
+     all read --answer-surface, the shared tone knob from global2. The
+     figure's label halo reads it too (see svg.nl text), so the halo always
+     matches the card — retint in one place and nothing fringes. */
 
   /* echo — the parsed reading + exact conversion, a debossed well so the parsed
      output reads as a result recessed into the page */

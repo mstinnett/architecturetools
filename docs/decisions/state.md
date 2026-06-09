@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
+_Last updated: 2026-06-09 (shared CSS: tokens.css promoted, global2.css owns the family accents + dark scheme)_
 
 ## Live architectural picture
 
@@ -36,9 +36,14 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
   standalone, and does **not** use the engine.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
-- **Shared assets:** `assets/css/global.css` (design tokens + reusable
-  components); `assets/data/hardware-data.json` (the picker's runtime data,
-  generated from the `data/` CSV tables — see the pipeline contract below).
+- **Shared assets:** `assets/css/tokens.css` (the canonical color palette —
+  family accents + dark anchors) and `assets/css/global2.css` (the warm sheet
+  theme; imports tokens.css, owns the per-family accent system selected via
+  `data-family` on `<html>`, and the one shared dark scheme) — used by the
+  picker and converter; `assets/css/global.css` (the older token/component
+  sheet, still used by the legacy pages); `assets/data/hardware-data.json`
+  (the picker's runtime data, generated from the `data/` CSV tables — see the
+  pipeline contract below).
 - **Verification gate:** `.claude/gate/run.sh` — htmlhint + stylelint +
   internal-link check. A dependency carve-out under `.claude/gate/`; not
   shipped with the site.
@@ -51,7 +56,10 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 - `docs/HANDOFF.md` — the calculator-engine charter: the engine model, the
   build plan, and the provenance rule.
 - The "no build tools / no framework / no backend" rule for the site itself.
-- The `assets/css/global.css` token and component vocabulary.
+- The shared-CSS vocabulary: `assets/css/tokens.css` (canonical palette) +
+  `assets/css/global2.css` (theme + components, family accents via
+  `data-family`), and the older `assets/css/global.css` still under the
+  legacy pages.
 - The hardware-data pipeline: the CSV tables under `data/` (`cpus.csv`,
   `gpus.csv`, `chips.csv`, `specs-win.csv`, `specs-mac.csv`, `priorities.csv`,
   `extras.json`) are the single source of truth. `tools/build-data.mjs`
@@ -69,6 +77,14 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 
 ## Recent decisions
 
+- 2026-06-09 — Shared CSS refactor (operator-directed). The canonical palette
+  graduated from `docs/In Progress/tokens.css` to `assets/css/tokens.css`;
+  `global2.css` imports it and now owns the family-accent system (pages
+  declare `<html data-family="picker|drafting|…">`) plus the single shared
+  dark scheme that `index.html` and `convert.html` had each been carrying
+  inline. Both pages' duplicated `:root` mirrors and dark blocks were
+  deleted; rendering verified pixel-identical (computed-style diff, both
+  schemes). Future tool pages adopt the look with one link + one attribute.
 - 2026-06-07 — `partition.js` shipped: the layout primitive (sibling to
   `snap.js`) that divides a run into a whole number of equal parts and exposes
   the residual, unifying four tools (sections / tiles / on-center / balusters)
