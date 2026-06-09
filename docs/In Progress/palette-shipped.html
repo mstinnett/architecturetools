@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shipped palette — architecture.tools / DocCheck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FBFAF7;--fg:#211E18;--line:#E4DFD5;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--fg);font-family:'DM Sans',system-ui,sans-serif;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:26px 22px 60px}
+  header{border-bottom:2px solid var(--fg);padding-bottom:14px}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;font-weight:600}
+  h1{font-size:24px;font-weight:700;margin:5px 0 0;letter-spacing:-.01em}
+  .rule{font-size:12.5px;opacity:.7;margin:14px 0 4px;line-height:1.5;max-width:66ch}
+  h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55;font-weight:700;margin:28px 0 8px}
+  .grid{display:grid;grid-template-columns:118px 1fr;gap:10px 14px;align-items:center}
+  .nm{font-size:13px;font-weight:600}.sub{font-size:11px;opacity:.55}
+  .ramp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .ramp.two{grid-template-columns:repeat(2,1fr);max-width:50%}
+  .sw{border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .col{height:42px;display:flex;align-items:flex-end;padding:5px 7px}
+  .col .h{font-size:10px;font-weight:600}
+  .cap{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.5;padding:3px 7px 4px}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}.ramp.two{max-width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="eyebrow">shipped · canonical tokens</div><h1>Color system</h1></header>
+<p class="rule">Family tier anchored to Prussian's own lightness (L 0.41), per-hue chroma — serious, rich, AAA on paper. Two documented exceptions: <b>Ink</b> (achromatic anchor) and <b>ochre</b> (lifted, because yellow can't be dark and vivid in sRGB). Marks tier runs hotter on purpose. Identity colors never render a verdict — that's DocCheck's red, applied by an accountable human. Columns: <b>base · hover · tint · dark-mode</b>.</p>
+
+<h2>Calculator families</h2>
+<div class="grid" id="fam"></div>
+
+<h2>DocCheck marks &amp; state — base · dark-mode</h2>
+<div class="grid" id="marks"></div>
+
+<h2>Neutrals</h2>
+<div class="grid" id="neu"></div>
+</div>
+<script>
+function chip(hex,cap){
+  const dark=['#FBFAF7','#E4DFD5','#E8E4DB','#D7EEFF','#EFEBE2','#FFE1EF','#FAE9CE','#D7F4E0','#CEF3FA','#FFE3D7','#FFEE83','#DEC358'].includes(hex);
+  const tc=dark?'#211E18':'#FFFFFF';
+  return `<div class="sw"><div class="col" style="background:${hex}"><span class="h" style="color:${tc}">${hex}</span></div><div class="cap">${cap}</div></div>`;
+}
+const FAM=[
+ ["Drafting","--drafting",["#004C80","#003B6E","#D7EEFF","#6BAAE5"]],
+ ["Picker · Ink","--picker",["#211E18","#13100B","#EFEBE2","#A8A49C"]],
+ ["Egress","--egress",["#732C52","#601A41","#FFE1EF","#D887AE"]],
+ ["Building type","--building",["#9A6500","#885400","#FAE9CE","#D19936"]],
+ ["Envelope","--envelope",["#00592F","#00481F","#D7F4E0","#6BB888"]],
+ ["Accessibility","--accessibility",["#005564","#004553","#CEF3FA","#58B4C4"]],
+ ["Material","--material",["#7C2C03","#691A00","#FFE3D7","#E38A67"]],
+];
+const MARKS=[
+ ["Correction","--correction",["#AF3D34","#F47C6E"]],
+ ["Query","--query",["#166DAF","#5CABF2"]],
+ ["Provisional","--provisional",["#7652AC","#B28FEF"]],
+ ["Working state","--working",["#AC4785","#F084C4"]],
+ ["Highlighter","--highlighter",["#DEC358","#FFEE83"]],
+];
+const NEU=[
+ ["Paper","--paper",["#FBFAF7"]],["Ink text","--ink-text",["#211E18"]],
+ ["Secondary","--secondary",["#6B6B6B"]],["Hairline","--hairline",["#E4DFD5"]],
+ ["Lightbox","--lightbox",["#16181C"]],["Text on dark","--text-on-dark",["#E8E4DB"]],
+];
+const caps4=["base","hover","tint","dark"],caps2=["base","dark"];
+document.getElementById('fam').innerHTML=FAM.map(([n,k,a])=>
+ `<div><div class="nm">${n}</div><div class="sub">${k}</div></div><div class="ramp">${a.map((h,i)=>chip(h,caps4[i])).join('')}</div>`).join('');
+document.getElementById('marks').innerHTML=MARKS.map(([n,k,a])=>
+ `<div><div class="nm">${n}</div><div class="sub">${k}</div></div><div class="ramp two">${a.map((h,i)=>chip(h,caps2[i])).join('')}</div>`).join('');
+document.getElementById('neu').innerHTML=NEU.map(([n,k,a])=>
+ `<div><div class="nm">${n}</div><div class="sub">${k}</div></div><div class="ramp two">${a.map(h=>chip(h,'')).join('')}</div>`).join('');
+</script>
+</body>
+</html>

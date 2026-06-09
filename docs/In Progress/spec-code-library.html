@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spec &amp; Code Library — architecture.tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF7; --ink:#1A1A1A; --muted:#6B6B6B; --line:#E4DFD5;
+    --prussian:#004C80; --prussian-deep:#003153;
+    --G:#44607A;   /* General — code / verification */
+    --A:#004C80;   /* Architectural — building fabric */
+    --C:#6E7B52;   /* Civil — site */
+    --AT:#8A6D3B;  /* Tools — conventions / theory */
+    --free:#3E7C4F; --gov:#1F6FB0; --pub:#8A6D3B; --pay:#A6532E;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'DM Sans',system-ui,-apple-system,sans-serif;
+    font-optical-sizing:auto;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  /* ---- title block / masthead ---- */
+  header{border-bottom:2px solid var(--prussian-deep);padding:28px 22px 18px;max-width:1040px;margin:0 auto}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--prussian);font-weight:600}
+  h1{font-size:26px;font-weight:700;margin:6px 0 4px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:14px;max-width:60ch}
+  .sub b{color:var(--ink);font-weight:500}
+
+  /* ---- controls ---- */
+  .controls{position:sticky;top:0;z-index:5;background:var(--paper);
+    border-bottom:1px solid var(--line);padding:12px 22px;max-width:1040px;margin:0 auto;
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  #q{flex:1;min-width:180px;font-family:inherit;font-size:14px;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:6px;padding:9px 12px}
+  #q:focus{outline:2px solid var(--prussian);outline-offset:1px;border-color:var(--prussian)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.02em;
+    border:1px solid var(--line);background:#fff;color:var(--muted);
+    border-radius:20px;padding:6px 12px;cursor:pointer;transition:.12s}
+  .chip[aria-pressed="true"]{color:#fff}
+  .chip:focus-visible{outline:2px solid var(--prussian);outline-offset:1px}
+  .chip[data-s="all"][aria-pressed="true"]{background:var(--ink);border-color:var(--ink)}
+  .chip[data-s="G"][aria-pressed="true"]{background:var(--G);border-color:var(--G)}
+  .chip[data-s="A"][aria-pressed="true"]{background:var(--A);border-color:var(--A)}
+  .chip[data-s="C"][aria-pressed="true"]{background:var(--C);border-color:var(--C)}
+  .chip[data-s="AT"][aria-pressed="true"]{background:var(--AT);border-color:var(--AT)}
+  .count{font-size:12px;color:var(--muted);margin-left:auto}
+
+  main{max-width:1040px;margin:0 auto;padding:8px 22px 60px}
+
+  /* ---- series section ---- */
+  .series{margin-top:30px}
+  .series-head{display:flex;align-items:baseline;gap:10px;padding-bottom:8px;
+    border-bottom:1px solid var(--line);margin-bottom:4px}
+  .series-tag{font-size:13px;font-weight:700;color:#fff;border-radius:4px;padding:2px 8px;letter-spacing:.04em}
+  .series-name{font-weight:600;font-size:15px}
+  .series-note{color:var(--muted);font-size:12.5px;margin-left:auto;text-align:right;max-width:42ch}
+
+  /* ---- entry ---- */
+  .entry{padding:15px 4px;border-bottom:1px solid var(--line);display:grid;
+    grid-template-columns:1fr auto;gap:4px 16px;align-items:start}
+  .entry:last-child{border-bottom:none}
+  .id-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .sid{font-weight:700;font-size:15px;letter-spacing:-.005em}
+  .pill{font-size:10.5px;font-weight:600;letter-spacing:.03em;border:1px solid var(--prussian);
+    color:var(--prussian);border-radius:3px;padding:1px 6px;white-space:nowrap}
+  .pill.alt{border-color:var(--muted);color:var(--muted)}
+  .title{font-size:13.5px;color:var(--ink);margin:3px 0 0}
+  .governs{font-size:13px;color:var(--muted);margin:5px 0 0;max-width:68ch}
+  .governs .calc{color:var(--ink);font-weight:500}
+  .right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;white-space:nowrap}
+  .access{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .access.free{color:var(--free)} .access.gov{color:var(--gov)}
+  .access.pub{color:var(--pub)} .access.pay{color:var(--pay)}
+  .go{font-size:12.5px;font-weight:600;color:var(--prussian);text-decoration:none;
+    border-bottom:1px solid transparent;transition:.12s}
+  .go:hover{border-bottom-color:var(--prussian)}
+  .go:focus-visible{outline:2px solid var(--prussian);outline-offset:2px}
+  .go::after{content:" \2197"}
+
+  .empty{padding:40px 4px;color:var(--muted);font-size:14px;display:none}
+  footer{max-width:1040px;margin:0 auto;padding:0 22px 60px;color:var(--muted);font-size:12px;line-height:1.6}
+  footer b{color:var(--ink);font-weight:500}
+  @media(max-width:620px){
+    .entry{grid-template-columns:1fr}
+    .right{flex-direction:row;align-items:center;gap:14px;margin-top:6px}
+    .series-note{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">architecture.tools · builder reference</div>
+  <h1>Spec &amp; Code Library</h1>
+  <p class="sub">Every standard behind the calculator suite, with edition pills and a link to the authoritative source. Organized on the <b>NCS sheet-series</b> backbone. Editions are model-code baselines — <b>your jurisdiction's adopted edition and amendments govern.</b></p>
+</header>
+
+<div class="controls">
+  <input id="q" type="search" placeholder="Search standards, sections, calculators…" aria-label="Search the library">
+  <div class="chips" role="group" aria-label="Filter by sheet series">
+    <button class="chip" data-s="all" aria-pressed="true">All</button>
+    <button class="chip" data-s="G" aria-pressed="false">G · Code</button>
+    <button class="chip" data-s="A" aria-pressed="false">A · Fabric</button>
+    <button class="chip" data-s="C" aria-pressed="false">C · Site</button>
+    <button class="chip" data-s="AT" aria-pressed="false">AT · Tools</button>
+  </div>
+  <span class="count" id="count"></span>
+</div>
+
+<main id="list"></main>
+<div class="empty" id="empty">No standards match that filter.</div>
+
+<footer>
+  <p><b>Access:</b> <span style="color:var(--free)">FREE READ</span> = readable online at no cost ·
+  <span style="color:var(--gov)">GOV</span> = free federal source ·
+  <span style="color:var(--pub)">PUBLIC DOMAIN</span> ·
+  <span style="color:var(--pay)">PAYWALLED</span> = purchase or library; link goes to the authoritative index/citation.</p>
+  <p>Zoning (FAR, setback, coverage) is deliberately excluded — there is no single national code, so each is jurisdiction-specific. Journal links resolve to a scholar search, not a fixed DOI.</p>
+</footer>
+
+<script>
+/* ---- DATA: one source of truth, separate from render ---- */
+const SERIES = {
+  G:{name:"General — code &amp; verification", note:"Where code summaries and life-safety plans live on a real set"},
+  A:{name:"Architectural — building fabric", note:"The tools that shape the building itself"},
+  C:{name:"Civil — site", note:"Site feasibility; zoning held out by design"},
+  AT:{name:"Tools — conventions &amp; theory", note:"Cross-discipline primitives, drawing standards, source literature"}
+};
+
+const DATA = [
+  // ---------- A : building fabric ----------
+  {s:"A", id:"ANSI A108 / A118 / A136.1", ed:["2024","2020"], title:"American National Specifications for the Installation of Ceramic Tile",
+   governs:"Setting, coverage (80% dry / 95% wet), and §A108.02-4.3 cutting, fitting &amp; balanced layout. → <span class='calc'>Tile: run, sliver, grout-relax</span>",
+   url:"https://tcnatile.com/resource-center/ansi-standards/", access:"pay"},
+  {s:"A", id:"ANSI A108.01", ed:["2024"], title:"General Requirements — Subsurfaces &amp; Preparations",
+   governs:"Lippage limits (1/32&quot; under 15&quot;; 1/16&quot; LFT) and substrate flatness (1/4&quot; / 1/8&quot; LFT in 10&#39;). → <span class='calc'>Tile sliver &amp; flatness</span>",
+   url:"https://tcnatile.com/resource-center/ansi-standards/", access:"pay"},
+  {s:"A", id:"ANSI A137.1", ed:["2024","2017"], title:"Specifications for Ceramic Tile",
+   governs:"Tile lot dimensional variance and the minimum grout joint relative to that variance (the 3× rule). → <span class='calc'>Tile grout-relax spec check</span>",
+   url:"https://tcnatile.com/resource-center/ansi-standards/", access:"pay"},
+  {s:"A", id:"TCNA Handbook", ed:["2024"], title:"Handbook for Ceramic, Glass, and Stone Tile Installation",
+   governs:"Illustrated installation methods; movement-joint method EJ171. → <span class='calc'>Tile (method context)</span>",
+   url:"https://tcnatile.com/", access:"pay"},
+  {s:"A", id:"IBC §1011", ed:["2024","2021"], title:"Means of Egress — Stairways",
+   governs:"Riser/tread limits, width, headroom, the basis for the 2R+T check. → <span class='calc'>Stairs</span>",
+   url:"https://codes.iccsafe.org/codes/IBC/2021", access:"free"},
+  {s:"A", id:"IRC §R311.7", ed:["2024","2021"], title:"Means of Egress — Stairways (residential)",
+   governs:"Residential stair geometry — 7-3/4&quot; max riser, 10&quot; min tread, nosing. → <span class='calc'>Stairs (residential mode)</span>",
+   url:"https://codes.iccsafe.org/codes/IRC/2021", access:"free"},
+  {s:"A", id:"IECC §C402 / §R402", ed:["2024","2021"], title:"International Energy Conservation Code — Building Envelope",
+   governs:"Prescriptive R-value / U-factor by climate zone; assembly buildups. → <span class='calc'>Envelope R/U, prescriptive lookup</span>",
+   url:"https://codes.iccsafe.org/codes/IECC/2021", access:"free"},
+  {s:"A", id:"ASHRAE 90.1", ed:["2022","2019"], title:"Energy Standard for Buildings Except Low-Rise Residential",
+   governs:"Alternative commercial envelope/energy path referenced by IECC. → <span class='calc'>Envelope (alt path)</span>",
+   url:"https://www.ashrae.org/technical-resources/bookstore/standard-90-1", access:"pay"},
+
+  // ---------- G : code / verification ----------
+  {s:"G", id:"IBC §1004 + Table 1004.5", ed:["2024","2021"], title:"Occupant Load",
+   governs:"Occupant load factors by use; area ÷ factor. → <span class='calc'>Occupant load</span> (feeds egress &amp; plumbing)",
+   url:"https://codes.iccsafe.org/codes/IBC/2021", access:"free"},
+  {s:"G", id:"IBC §1005–§1017", ed:["2024","2021"], title:"Egress Sizing &amp; Arrangement",
+   governs:"Required width (§1005), exits/separation (§1007), travel distance, common path, dead-end. → <span class='calc'>Egress width &amp; arrangement</span>",
+   url:"https://codes.iccsafe.org/codes/IBC/2021", access:"free"},
+  {s:"G", id:"IBC §504 / §506 + Table 506.2", ed:["2024","2021"], title:"Allowable Height &amp; Area",
+   governs:"Allowable area with frontage and sprinkler increases; height/stories. → <span class='calc'>Building size</span>",
+   url:"https://codes.iccsafe.org/codes/IBC/2021", access:"free"},
+  {s:"G", id:"IBC Chapter 6", ed:["2021"], title:"Types of Construction",
+   governs:"Type I–V classification and fire-resistance basis. → <span class='calc'>Construction type</span>",
+   url:"https://codes.iccsafe.org/content/IBC2021P2/chapter-6-types-of-construction", access:"free"},
+  {s:"G", id:"IBC §2902 / IPC Table 403.1", ed:["2024","2021"], title:"Minimum Plumbing Fixtures",
+   governs:"Required fixture counts by occupancy and load. → <span class='calc'>Plumbing fixtures</span>",
+   url:"https://codes.iccsafe.org/codes/IBC/2021", access:"free"},
+  {s:"G", id:"IBC Chapter 11", ed:["2021"], title:"Accessibility (scoping)",
+   governs:"Where accessibility applies and how many — accessible counts. → <span class='calc'>Accessible counts</span>",
+   url:"https://codes.iccsafe.org/content/IBC2021P1/chapter-11-accessibility", access:"free"},
+  {s:"G", id:"2010 ADA Standards", ed:["2010"], title:"ADA Standards for Accessible Design",
+   governs:"Federal enforceable accessibility — ramps, clearances, reach ranges. → <span class='calc'>Ramp, clearances</span>",
+   url:"https://www.access-board.gov/ada/", access:"gov"},
+  {s:"G", id:"ICC A117.1", ed:["2017","2009"], title:"Accessible and Usable Buildings and Facilities",
+   governs:"Technical accessibility criteria referenced by IBC (turning space, clear width). 2009 is free-read on ICC. → <span class='calc'>Clearances &amp; turning</span>",
+   url:"https://codes.iccsafe.org/content/icca117-12009", access:"free"},
+
+  // ---------- C : site ----------
+  {s:"C", id:"APWA Uniform Color Code", ed:["current"], title:"Utility Marking Colors (811 / Common Ground Alliance)",
+   governs:"Red=electric, yellow=gas, orange=comms, blue=water, green=sewer, purple=reclaimed, pink=survey, white=excavation. → <span class='calc'>Site feasibility (color caution)</span>",
+   url:"https://call811.com/Faqs-Detail/marking-flags-paint-colors", access:"gov"},
+
+  // ---------- AT : conventions & theory ----------
+  {s:"AT", id:"US National CAD Standard", ed:["v6","v5"], title:"Uniform Drawing System — Sheet Identification &amp; Discipline Designators",
+   governs:"The G/A/C/L sheet-series logic this whole suite is organized on. Free UDS sample PDFs. → <span class='calc'>Suite structure</span>",
+   url:"https://www.nationalcadstandard.org/ncs5/pdfs/ncs5_uds1.pdf", access:"pay"},
+  {s:"AT", id:"OSHA 29 CFR 1910.144/.145", ed:["current"], title:"Safety Color Code &amp; Accident Prevention Signs",
+   governs:"Free federal basis for red=danger, etc. → <span class='calc'>Affordance-color caution</span>",
+   url:"https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.145", access:"gov"},
+  {s:"AT", id:"ANSI Z535", ed:["2017"], title:"Safety Colors, Signs, Symbols &amp; Labels",
+   governs:"The codified verdict-color system to avoid clashing with. → <span class='calc'>Color identity</span>",
+   url:"https://webstore.ansi.org/search/find?searchText=Z535", access:"pay"},
+  {s:"AT", id:"ISO 7010", ed:["current"], title:"Graphical Symbols — Safety Signs (incl. green egress)",
+   governs:"Green-as-safe-egress convention; international counterpart to Z535. → <span class='calc'>Egress color tension</span>",
+   url:"https://www.iso.org/obp/ui/#search/std/ISO%207010", access:"pay"},
+  {s:"AT", id:"ITU-R BS.1116", ed:["-3"], title:"Methods for Subjective Assessment — Reference Listening Room",
+   governs:"Standardized listening-room proportions and conditions. → <span class='calc'>Room ratio (acoustic)</span>",
+   url:"https://www.itu.int/rec/R-REC-BS.1116", access:"free"},
+  {s:"AT", id:"IEC 60268-13", ed:["1998"], title:"Sound System Equipment — Listening Tests on Loudspeakers",
+   governs:"Listening-room dimension ratio recommendation (≈1:1.4:1.9). → <span class='calc'>Room ratio (acoustic)</span>",
+   url:"https://webstore.iec.ch/searchkey?searchKey=60268-13", access:"pay"},
+  {s:"AT", id:"Bolt 1946", ed:["JASA 18(1)"], title:"Note on Normal Frequency Statistics in Rectangular Rooms",
+   governs:"Origin of the Bolt area — the L/H vs W/H smooth-mode region. → <span class='calc'>Room ratio (Bolt area)</span>",
+   url:"https://scholar.google.com/scholar?q=Bolt+1946+normal+frequency+statistics+rectangular+rooms", access:"pay"},
+  {s:"AT", id:"Sepmeyer 1965", ed:["JASA 37"], title:"Computed Distribution of Normal Modes in Rectangular Rooms",
+   governs:"The Sepmeyer preferred ratios (e.g. 1:1.14:1.39). → <span class='calc'>Room ratio (Sepmeyer)</span>",
+   url:"https://scholar.google.com/scholar?q=Sepmeyer+1965+normal+modes+rectangular+rooms", access:"pay"},
+  {s:"AT", id:"Louden 1971", ed:["Acustica 24"], title:"Dimension Ratios of Rectangular Rooms with Good Distribution of Eigentones",
+   governs:"The Louden ratios (e.g. 1:1.4:1.9). → <span class='calc'>Room ratio (Louden)</span>",
+   url:"https://scholar.google.com/scholar?q=Louden+1971+dimension+ratios+rectangular+rooms+eigentones", access:"pay"},
+  {s:"AT", id:"Bonello 1981", ed:["JAES 29(9)"], title:"A New Criterion for the Distribution of Normal Room Modes",
+   governs:"The Bonello criterion — monotonic 1/3-octave modal density. → <span class='calc'>Room ratio (Bonello check)</span>",
+   url:"https://scholar.google.com/scholar?q=Bonello+1981+criterion+distribution+normal+room+modes", access:"pay"},
+  {s:"AT", id:"Palladio 1570", ed:["Book I"], title:"I Quattro Libri dell&#39;Architettura — Seven Room Proportions",
+   governs:"1:1, 1:√2, 3:4, 2:3, 3:5, 1:2 and the mean-derived height. → <span class='calc'>Room ratio (feel)</span>",
+   url:"https://archive.org/search?query=quattro+libri+palladio", access:"pub"}
+];
+
+/* ---- RENDER ---- */
+const list=document.getElementById('list'), empty=document.getElementById('empty'),
+      countEl=document.getElementById('count'), q=document.getElementById('q');
+let activeS='all', term='';
+
+function pillHtml(eds){return eds.map((e,i)=>`<span class="pill${i?' alt':''}">${e}</span>`).join('')}
+function entryHtml(d){
+  return `<article class="entry" data-s="${d.s}" data-text="${(d.id+' '+d.title+' '+d.governs).replace(/<[^>]+>/g,'').toLowerCase()}">
+    <div>
+      <div class="id-row"><span class="sid">${d.id}</span>${pillHtml(d.ed)}</div>
+      <p class="title">${d.title}</p>
+      <p class="governs">${d.governs}</p>
+    </div>
+    <div class="right">
+      <span class="access ${d.access}">${({free:'free read',gov:'gov',pub:'public domain',pay:'paywalled'})[d.access]}</span>
+      <a class="go" href="${d.url}" target="_blank" rel="noopener">source</a>
+    </div>
+  </article>`;
+}
+function render(){
+  let shown=0; list.innerHTML='';
+  for(const key of ['G','A','C','AT']){
+    const items=DATA.filter(d=>d.s===key
+      && (activeS==='all'||activeS===key)
+      && (!term || (d.id+' '+d.title+' '+d.governs).replace(/<[^>]+>/g,'').toLowerCase().includes(term)));
+    if(!items.length) continue;
+    shown+=items.length;
+    const sec=document.createElement('section'); sec.className='series';
+    sec.innerHTML=`<div class="series-head">
+        <span class="series-tag" style="background:var(--${key})">${key}</span>
+        <span class="series-name">${SERIES[key].name}</span>
+        <span class="series-note">${SERIES[key].note}</span>
+      </div>${items.map(entryHtml).join('')}`;
+    list.appendChild(sec);
+  }
+  countEl.textContent=shown+' of '+DATA.length;
+  empty.style.display=shown?'none':'block';
+}
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed','false'));
+  c.setAttribute('aria-pressed','true'); activeS=c.dataset.s; render();
+}));
+q.addEventListener('input',()=>{term=q.value.trim().toLowerCase();render();});
+render();
+</script>
+</body>
+</html>
