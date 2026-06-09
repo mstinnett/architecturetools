@@ -217,10 +217,12 @@
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl">';
     svg += '<defs><pattern id="nlhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
-         + '<line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
+         + '<line x1="0" y1="0" x2="0" y2="6" stroke-width="0.6" style="stroke:var(--ink,#0a0a0a)"/></pattern></defs>';
 
     function txt(x, y, cls, anchor, s) {
-      return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
+      // halo = the surface colour so labels stay legible over the rules; themed
+      // via --paper so it tracks light/dark instead of fringing white on dark.
+      return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" style="paint-order:stroke;stroke:var(--paper,#fff);stroke-width:3">' + esc(s) + '</text>';
     }
 
     // hierarchical ruler: taller ticks for coarser units (a ruler look), denser
@@ -245,15 +247,15 @@
           x = X(u); key = Math.round(x * 2);
           if (seen[key]) continue; seen[key] = 1;
           y2 = up ? baseY - levels[k].h : baseY + levels[k].h;
-          out += '<line x1="' + x.toFixed(2) + '" y1="' + baseY + '" x2="' + x.toFixed(2) + '" y2="' + y2 + '" stroke="#bbb" stroke-width="1"/>';
+          out += '<line x1="' + x.toFixed(2) + '" y1="' + baseY + '" x2="' + x.toFixed(2) + '" y2="' + y2 + '" stroke-width="1" style="stroke:var(--gray-300,#bbb)"/>';
         }
       }
       return out;
     }
 
     // two scale lines + dual hierarchical rulers (source on top, target below)
-    svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke="#999" stroke-width="1"/>';
-    svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="1"/>';
+    svg += '<line x1="' + x0 + '" y1="' + ySrc + '" x2="' + x1 + '" y2="' + ySrc + '" stroke-width="1" style="stroke:var(--gray-400,#999)"/>';
+    svg += '<line x1="' + x0 + '" y1="' + yTgt + '" x2="' + x1 + '" y2="' + yTgt + '" stroke-width="1" style="stroke:var(--ink,#0a0a0a)"/>';
     svg += ruler(target, yTgt, false, g);
     svg += ruler(source, ySrc, true, 0);
 
@@ -268,8 +270,8 @@
     if (!t.onGrid) {
       // active cell: hatched, framed by its two grid edges (nearer one heavier)
       svg += '<rect x="' + xL + '" y="' + ySrc + '" width="' + (xR - xL) + '" height="' + (yTgt - ySrc) + '" fill="url(#nlhatch)" stroke="none"/>';
-      svg += '<line x1="' + xL + '" y1="' + ySrc + '" x2="' + xL + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMax ? 2 : 1) + '"/>';
-      svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" stroke="#0a0a0a" stroke-width="' + (t.nearIsMin ? 2 : 1) + '"/>';
+      svg += '<line x1="' + xL + '" y1="' + ySrc + '" x2="' + xL + '" y2="' + yTgt + '" stroke-width="' + (t.nearIsMax ? 2 : 1) + '" style="stroke:var(--ink,#0a0a0a)"/>';
+      svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" stroke-width="' + (t.nearIsMin ? 2 : 1) + '" style="stroke:var(--ink,#0a0a0a)"/>';
 
       // bound values hug the hatch edges, mirrored; decimal under each
       function boundBlock(snapU, atLeft, isNearest) {
@@ -289,7 +291,7 @@
 
     // true tick — from the hatch top extending only DOWNWARD (not up through the
     // source ruler), pointing at the exact value placed below the number line
-    svg += '<line x1="' + tx + '" y1="' + ySrc + '" x2="' + tx + '" y2="' + (yTgt + 24) + '" stroke="#0a0a0a" stroke-width="2"/>';
+    svg += '<line x1="' + tx + '" y1="' + ySrc + '" x2="' + tx + '" y2="' + (yTgt + 24) + '" stroke-width="2" style="stroke:var(--ink,#0a0a0a)"/>';
     svg += txt(tx, yTgt + 32, 'nl-true-val', 'middle', formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''));
     if (source !== target) svg += txt(tx, yTgt + 44, 'nl-src-val', 'middle', formatTrue(units, source));
 
