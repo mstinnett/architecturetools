@@ -11,7 +11,58 @@
 <style>
   /* ---- page-specific only; all behaviour lives in the imported modules ---- */
 
+  /* ============================================================
+     Shipped palette — docs/In Progress/palette-shipped.html
+     Converter = "Drafting" family (blue), light + dark mode.
+     The accent is the only page-specific token; the neutrals,
+     surfaces and shadows below are the shared dark theme that the
+     picker mirrors (only its accent differs). The number-line SVG
+     (numberline.js) routes its strokes through --nl-* tokens too, so
+     its hatch and rules invert in dark as well.
+     Canonical names + values: docs/In Progress/tokens.css.
+     ============================================================ */
+  :root{
+    /* canonical palette tokens — mirror of tokens.css (the families this page uses) */
+    --drafting:#004C80; --drafting-tint:#D7EEFF; --drafting-dark:#6BAAE5;
+    --ink-text:#211E18; --hairline:#E4DFD5; --lightbox:#16181C; --text-on-dark:#E8E4DB;
+    /* map the engine's tokens onto the palette — light */
+    --accent: var(--drafting);
+    --accent-soft: var(--drafting-tint);
+    --accent-ink:#FFFFFF;
+    --selected-bg: var(--accent);
+    --ink: var(--ink-text);
+    --rule: var(--hairline);
+    /* number-line strokes — light = numberline.js originals */
+    --nl-ink:#0a0a0a; --nl-hatch:#0a0a0a; --nl-tick:#bbb; --nl-axis:#999;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      /* surfaces — derived around --lightbox #16181C: backdrop darkest, sheet lifts */
+      --paper:#0F1115; --page-bg:#0F1115; --gray-100:#0F1115; --gray-50: var(--lightbox);
+      --card:#181B21; --white:#181B21; --card-2:#20242B;
+      /* text — palette text-on-dark */
+      --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2:#ADA89F; --ink-3:#7E7A72;
+      --gray-700:#B8B4AB; --gray-900:#D8D4CB; --gray-400:#6A665F;
+      /* lines */
+      --rule:#2E323A; --rule-2:#3C414B; --gray-200:#2A2E36; --gray-300:#383D46;
+      /* Drafting · dark */
+      --accent: var(--drafting-dark);
+      --accent-ink: var(--lightbox);
+      --accent-soft:color-mix(in srgb, var(--accent) 18%, transparent);
+      --selected-bg: var(--accent);
+      /* number-line strokes — inverted for dark */
+      --nl-ink:#CBC8C2; --nl-hatch:#6E727C; --nl-tick:#3F434B; --nl-axis:#6E727B;
+      /* shadows recut for a dark field (warm browns -> deep blacks) */
+      --shadow-card:0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
+      --shadow-key:inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
+      --shadow-key-hover:inset 0 1px 0 rgba(255,255,255,.06), 0 3px 7px rgba(0,0,0,.6);
+      --shadow-press:inset 0 2px 5px rgba(0,0,0,.65);
+      --shadow-well:inset 0 2px 4px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04);
+    }
+  }
+
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+  body { background-color: var(--gray-100); }   /* a step darker than --paper so the bright panel reads as a distinct sheet (grain from global2 persists) */
 
   /* Plain, robust entry field — a normal visible input (the overlay-mirror
      trick broke on mobile: invisible text + lost focus). Parsed/pending
@@ -27,12 +78,12 @@
   #dimInput:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
 
   /* anything typed that didn't parse, shown quietly under the field */
-  .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-400); min-height: 1.1em; line-height: 1.5; }
-  .field-note .pending { color: var(--gray-500); }
-  .field-note .why { color: var(--gray-400); font-style: italic; }
+  .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--ink-2); min-height: 1.1em; line-height: 1.5; }
+  .field-note .pending { color: var(--ink-2); }
+  .field-note .why { color: var(--ink-2); font-style: italic; }
 
   /* contextual bare-number unit choice — only when a number has no unit */
-  .bare-ask { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--gray-500); }
+  .bare-ask { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--ink-2); }
   .bare-ask:empty { display: none; }
   .bare-ask .pick { cursor: pointer; padding: 0.1rem 0.45rem; border: 1px solid var(--gray-300);
                     margin-left: 0.3rem; user-select: none; }
@@ -41,6 +92,7 @@
   .opt-line { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: var(--space-lg); }
   .opt-cluster { display: flex; align-items: center; gap: 0.5rem; }
   .opt-cluster .section-label { margin-bottom: 0; }
+  .section-label { color: var(--ink-2); }   /* darker than the global --ink-3: the small labels read too light on the bright panel */
   .mini-pill { padding: 0.3rem 0.7rem; border: 1px solid var(--rule-2); cursor: pointer;
                font-size: var(--text-sm); background: var(--card); color: var(--ink); user-select: none;
                box-shadow: var(--shadow-key); border-radius: var(--radius);
@@ -49,18 +101,27 @@
   .mini-pill.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
                       box-shadow: var(--shadow-press); transform: translateY(1px); }
 
-  /* echo — the reading + exact conversion, kept quiet so the snapped readout
-     and figure carry the weight (no heavy box, modest type) */
-  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.6rem 0.85rem; background: var(--gray-50); }
+  /* Answer surfaces (parsed output + the figure/rounding card + ratio/area)
+     share ONE tone knob, --answer-surface. The figure's label halo reads it too
+     (see svg.nl text), so the halo always matches the card — retint in one place
+     and nothing fringes. Tone sits a half-step below the --card panel surface,
+     well short of the --paper field behind the calculator. */
+  .echo, .answer-card, .ratio-box { --answer-surface: color-mix(in srgb, var(--card) 50%, var(--card-2)); }
+
+  /* echo — the parsed reading + exact conversion, a debossed well so the parsed
+     output reads as a result recessed into the page */
+  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.85rem 1.1rem; background: var(--answer-surface);
+          border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
+          box-shadow: var(--shadow-well); }
   .echo-line { font-size: var(--text-base); font-weight: 300; line-height: 1.7; color: var(--gray-700); }
   .echo .tok { padding-bottom: 1px; }
   .echo .tok.stated   { border-bottom: 2px solid var(--black); color: var(--black); }      /* what you told me */
-  .echo .tok.inferred { border-bottom: 1px solid var(--gray-400); color: var(--gray-600); } /* what I assumed */
-  .echo .op { color: var(--gray-400); padding: 0 0.15em; }
-  .echo .eq { color: var(--gray-400); padding: 0 0.2em; }
+  .echo .tok.inferred { border-bottom: 1px solid var(--ink-3); color: var(--ink-2); } /* what I assumed */
+  .echo .op { color: var(--ink-2); padding: 0 0.15em; }
+  .echo .eq { color: var(--ink-2); padding: 0 0.2em; }
   .echo .result { font-weight: 400; color: var(--black); }
-  .echo-assumptions { margin-top: 0.45rem; font-size: var(--text-sm); color: var(--gray-500); }
-  .echo-assumptions div::before { content: '— '; color: var(--gray-400); }
+  .echo-assumptions { margin-top: 0.45rem; font-size: var(--text-sm); color: var(--ink-2); }
+  .echo-assumptions div::before { content: '— '; color: var(--ink-2); }
 
   /* grid presets = a precision dial */
   .grid-presets { margin-bottom: var(--space-md); }
@@ -77,7 +138,7 @@
                  border: 1px solid var(--rule-2); border-radius: var(--radius);
                  outline: none; -webkit-appearance: none; appearance: none; }
   .grid-custom:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
-  .grid-group-label { font-size: var(--text-xs); color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; }
+  .grid-group-label { font-size: var(--text-xs); color: var(--ink-2); letter-spacing: 0.08em; text-transform: uppercase; }
   /* metric presets group on their own rows so modular doesn't break awkwardly */
   .grid-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
   .grid-row:last-child { margin-bottom: 0; }
@@ -91,35 +152,43 @@
 
   .figure-wrap { margin: var(--space-lg) 0; overflow-x: auto; }
   svg.nl { display: block; max-width: 100%; }
-  svg.nl text { font-family: var(--font-body); }
-  .nl-axis-label  { font-size: 10px; fill: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; }
+  svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }  /* halo tracks the card tone — no fringe */
+  .nl-axis-label  { font-size: 10px; fill: var(--ink-2); letter-spacing: 0.06em; text-transform: uppercase; }
   .nl-snap-val    { font-size: 12px; fill: var(--black); font-weight: 400; }
-  .nl-snap-role   { font-size: 9px;  fill: var(--gray-500); letter-spacing: 0.04em; text-transform: uppercase; }
-  .nl-src-val     { font-size: 10px; fill: var(--gray-500); }
+  .nl-snap-role   { font-size: 9px;  fill: var(--ink-2); letter-spacing: 0.04em; text-transform: uppercase; }
+  .nl-src-val     { font-size: 10px; fill: var(--ink-2); }
   .nl-residual    { font-size: 10px; fill: var(--gray-700); }
   .nl-true-role   { font-size: 10px; fill: var(--black); letter-spacing: 0.06em; text-transform: uppercase; }
   .nl-true-val    { font-size: 13px; fill: var(--black); font-weight: 400; }
-  .nl-note        { font-size: 10px; fill: var(--gray-500); font-style: italic; }
+  .nl-note        { font-size: 10px; fill: var(--ink-2); font-style: italic; }
 
-  /* snap readout rows — Nearest leads and is emphasised */
-  .snap-rows { margin-top: var(--space-md); }
+  /* figure + rounding table share ONE .answer-card (base styling from global2),
+     re-cast as a DEBOSSED well: soft paper fill + inset shadow so the answer
+     reads as a panel recessed into the brighter page, not floating above it.
+     Rows sit flat inside, a hairline dividing them from the figure (no
+     box-in-a-box). Nearest leads (accent value). */
+  .answer-card { background: var(--answer-surface); box-shadow: var(--shadow-well); }
+  .answer-card .figure-wrap { margin: 0; }
+  .snap-rows { margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--rule); }
   .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
   .snap-row:last-child { border-bottom: none; }
   .snap-name { width: 150px; flex-shrink: 0; font-size: var(--text-xs); font-weight: 400;
-               text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); }
-  .snap-gloss { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--gray-400);
+               text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); }
+  .snap-gloss { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--ink-2);
                 text-transform: none; letter-spacing: 0; }
   .snap-value { flex: 1; font-size: var(--text-md); font-weight: 300; }
-  .snap-dec { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--gray-400); }
-  .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--gray-600); }
+  .snap-dec { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--ink-2); }
+  .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--ink-2); }
   .snap-row.is-exact .snap-resid { color: var(--black); }
   .snap-row.is-primary .snap-name { color: var(--black); }     /* the nearer bound */
   .snap-row.is-primary .snap-value { font-size: var(--text-lg); font-weight: 400; color: var(--accent); } /* blue = the answer */
   .snap-row.is-ref { border-top: 1px solid var(--gray-200); }
-  .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--gray-500); }
+  .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--ink-2); }
   .nl-nearest { font-weight: 600; }
 
-  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--gray-50); border: var(--border-light); }
+  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--answer-surface);
+               border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
+               box-shadow: var(--shadow-well); }
   .ratio-big { font-size: var(--text-xl); font-weight: 300; }
 
   @media (max-width: 480px) {
@@ -165,9 +234,10 @@
       <div class="section-label">Snap tolerance</div>
       <div class="grid-presets" id="gridPresets"></div>
 
-      <div class="figure-wrap" id="figure"></div>
-
-      <div class="snap-rows" id="snapRows"></div>
+      <div class="answer-card">
+        <div class="figure-wrap" id="figure"></div>
+        <div class="snap-rows" id="snapRows"></div>
+      </div>
     </div>
 
     <div class="ratio-box" id="ratioOut" style="display:none;"></div>
@@ -439,7 +509,7 @@
     var mm2 = result.area_mm2, neg = mm2 < 0 ? '−' : '';
     var a = Math.abs(mm2), m2 = a / 1e6, in2 = a / 645.16, ft2 = in2 / 144;
     els.areaOut.innerHTML =
-      '<div class="section-label">Area <span style="color:var(--gray-400);text-transform:none;letter-spacing:0;">— length × length</span></div>'
+      '<div class="section-label">Area <span style="color:var(--ink-2);text-transform:none;letter-spacing:0;">— length × length</span></div>'
       + '<div class="ratio-big">' + neg + sig(m2) + ' m²</div>'
       + '<div style="margin-top:.4rem;color:var(--gray-700);font-size:var(--text-sm);">'
       + neg + sig(in2) + ' in²  ·  ' + neg + sig(ft2) + ' ft²  ·  ' + neg + sig(a) + ' mm²</div>';
