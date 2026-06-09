@@ -21,9 +21,12 @@ Edit the files here instead.
 A Windows cell's `cpu` column references a `cpus.csv` key; the picker shows it as
 "*intel* or *amd*". Its `gpu` column references a `gpus.csv` key.
 
-The build also stamps `Meta.dataUpdated` — the date (`YYYY-MM-DD`) of the last
-commit that touched `data/`, not the build date, so a no-op rebuild never
-changes the output. The picker footer renders it as "Updated *month year*".
+The build also stamps `Meta.dataUpdated` (`YYYY-MM-DD`) — when the
+recommendations last *changed*, not when the build ran: if a rebuild produces
+the same content as the committed JSON, the previous stamp carries forward;
+only a real data change stamps today. `DATA_UPDATED=YYYY-MM-DD node
+tools/build-data.mjs` overrides it for manual corrections. The picker footer
+renders it as "Updated *month year*".
 
 ## Editing in Numbers
 
