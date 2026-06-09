@@ -11,6 +11,15 @@
 <style>
   /* ---- page-specific only; the math lives in the imported modules ---- */
 
+  /* Family hue: Material (rust). Overrides global.css's default Drafting
+     accent; --selected-bg inherits var(--accent), so pills/toggles follow. */
+  :root {
+    --accent: #7C2C03;
+    --accent-hover: #691A00;
+    --accent-tint: #FFE3D7;
+    --accent-dark: #E38A67;
+  }
+
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
 
   /* run field — a normal visible input, same family as the converter */
@@ -451,10 +460,10 @@
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="lf">';
     svg += '<defs><pattern id="lfhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
-         + '<line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
+         + '<line x1="0" y1="0" x2="0" y2="6" stroke="#211E18" stroke-width="0.6"/></pattern></defs>';
     function txt(x, y, cls, anchor, s) {
       return '<text x="' + x.toFixed(1) + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor
-           + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
+           + '" stroke="#FBFAF7" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
     }
     function vline(x, ya, yb, color, w) {
       return '<line x1="' + x.toFixed(2) + '" y1="' + ya + '" x2="' + x.toFixed(2) + '" y2="' + yb + '" stroke="' + color + '" stroke-width="' + w + '"/>';
@@ -462,12 +471,12 @@
 
     // run dimension line on top (extension ticks + centred total)
     var xRun = X(run);
-    svg += '<line x1="' + x0 + '" y1="' + yDim + '" x2="' + xRun.toFixed(2) + '" y2="' + yDim + '" stroke="#999" stroke-width="1"/>';
-    svg += vline(x0, yDim - 4, yDim + 4, '#999', 1) + vline(xRun, yDim - 4, yDim + 4, '#999', 1);
+    svg += '<line x1="' + x0 + '" y1="' + yDim + '" x2="' + xRun.toFixed(2) + '" y2="' + yDim + '" stroke="#A39C90" stroke-width="1"/>';
+    svg += vline(x0, yDim - 4, yDim + 4, '#A39C90', 1) + vline(xRun, yDim - 4, yDim + 4, '#A39C90', 1);
     svg += txt((x0 + xRun) / 2, yDim - 6, 'lf-run', 'middle', 'run  ' + display.runLabel);
 
     // strip baseline
-    svg += '<line x1="' + x0 + '" y1="' + yBot + '" x2="' + X(axisMax).toFixed(2) + '" y2="' + yBot + '" stroke="#0a0a0a" stroke-width="1"/>';
+    svg += '<line x1="' + x0 + '" y1="' + yBot + '" x2="' + X(axisMax).toFixed(2) + '" y2="' + yBot + '" stroke="#211E18" stroke-width="1"/>';
 
     var firstItemMid = null, firstGapMid = null, drawn = 0;
     if (display.kind === 'studs') {
@@ -476,7 +485,7 @@
       if (k <= MAX_DRAW) {
         for (var j = 0; j <= k; j++) {
           var xu = X(j * layout.spacing);
-          svg += vline(xu, yTop, yBot, '#0a0a0a', 1.5);
+          svg += vline(xu, yTop, yBot, '#211E18', 1.5);
           if (j === 1) firstGapMid = X((j - 0.5) * layout.spacing);
         }
       }
@@ -489,12 +498,12 @@
         cells.forEach(function (c) {
           var a = X(c[0]), b = X(c[1]), w = Math.max(0.6, b - a);
           if (c[2] === 'item') {
-            if (display.kind === 'bars') svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#444"/>';
-            else svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#f4f4f3" stroke="#999" stroke-width="1"/>';
+            if (display.kind === 'bars') svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#4D483F"/>';
+            else svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#F2EFE8" stroke="#A39C90" stroke-width="1"/>';
             if (firstItemMid == null) firstItemMid = (a + b) / 2;
           } else {
             // gap: joint/divider drawn as a thin solid; opening (bars) left clear
-            if (display.kind !== 'bars') svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#444"/>';
+            if (display.kind !== 'bars') svg += '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#4D483F"/>';
             if (firstGapMid == null) firstGapMid = (a + b) / 2;
           }
         });
@@ -512,7 +521,7 @@
     }
 
     // run-end marker (where the run actually stops)
-    svg += vline(xRun, yTop - 4, yBot + 4, '#0a0a0a', 1.5);
+    svg += vline(xRun, yTop - 4, yBot + 4, '#211E18', 1.5);
 
     // representative module labels (skip if the cell is too narrow to read)
     if (firstItemMid != null && display.itemLabel) svg += txt(firstItemMid, yBot + 16, 'lf-dim', 'middle', display.itemLabel);
@@ -743,17 +752,17 @@
     var H = 138, x0 = 24, x1 = W - 24, axisW = x1 - x0;
     function X(u) { return x0 + (u / total) * axisW; }
     var yDim = 24, yTop = 54, yBot = 96, stripH = yBot - yTop;
-    function txt(x, y, cls, anchor, s) { return '<text x="' + x.toFixed(1) + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>'; }
+    function txt(x, y, cls, anchor, s) { return '<text x="' + x.toFixed(1) + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#FBFAF7" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>'; }
     function vline(x, ya, yb, c, w) { return '<line x1="' + x.toFixed(2) + '" y1="' + ya + '" x2="' + x.toFixed(2) + '" y2="' + yb + '" stroke="' + c + '" stroke-width="' + w + '"/>'; }
-    function field(aU, bU) { var a = X(aU), b = X(bU), w = Math.max(0.6, b - a); return '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#f4f4f3" stroke="#999" stroke-width="1"/>'; }
-    function jnt(aU, bU) { var a = X(aU), b = X(bU), w = Math.max(0.6, b - a); return '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#444"/>'; }
+    function field(aU, bU) { var a = X(aU), b = X(bU), w = Math.max(0.6, b - a); return '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#F2EFE8" stroke="#A39C90" stroke-width="1"/>'; }
+    function jnt(aU, bU) { var a = X(aU), b = X(bU), w = Math.max(0.6, b - a); return '<rect x="' + a.toFixed(2) + '" y="' + yTop + '" width="' + w.toFixed(2) + '" height="' + stripH + '" fill="#4D483F"/>'; }
 
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="lf">';
-    svg += '<defs><pattern id="lfhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#0a0a0a" stroke-width="0.6"/></pattern></defs>';
-    svg += '<line x1="' + x0 + '" y1="' + yDim + '" x2="' + X(total).toFixed(2) + '" y2="' + yDim + '" stroke="#999" stroke-width="1"/>';
-    svg += vline(x0, yDim - 4, yDim + 4, '#999', 1) + vline(X(total), yDim - 4, yDim + 4, '#999', 1);
+    svg += '<defs><pattern id="lfhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#211E18" stroke-width="0.6"/></pattern></defs>';
+    svg += '<line x1="' + x0 + '" y1="' + yDim + '" x2="' + X(total).toFixed(2) + '" y2="' + yDim + '" stroke="#A39C90" stroke-width="1"/>';
+    svg += vline(x0, yDim - 4, yDim + 4, '#A39C90', 1) + vline(X(total), yDim - 4, yDim + 4, '#A39C90', 1);
     svg += txt((x0 + X(total)) / 2, yDim - 6, 'lf-run', 'middle', 'total  ' + fmtRun(total));
-    svg += '<line x1="' + x0 + '" y1="' + yBot + '" x2="' + X(total).toFixed(2) + '" y2="' + yBot + '" stroke="#0a0a0a" stroke-width="1"/>';
+    svg += '<line x1="' + x0 + '" y1="' + yBot + '" x2="' + X(total).toFixed(2) + '" y2="' + yBot + '" stroke="#211E18" stroke-width="1"/>';
 
     var L = Partition.tiles(seam, tile, joint), cellsL = cellList(L, 'between');
     if (cellsL.length <= MAX_DRAW) cellsL.forEach(function (c) { svg += c[2] === 'item' ? field(c[0], c[1]) : jnt(c[0], c[1]); });
@@ -767,7 +776,7 @@
         svg += txt((rA + rB) / 2, yBot + 16, 'lf-resid', 'middle', 'cut ' + fmtModule(rightCut));
       }
     }
-    svg += vline(X(seam), yTop - 8, yBot + 8, '#0a0a0a', 2);
+    svg += vline(X(seam), yTop - 8, yBot + 8, '#211E18', 2);
     svg += txt(X(seam), yTop - 10, 'lf-end', 'middle', 'seam');
     svg += '</svg>';
     return svg;

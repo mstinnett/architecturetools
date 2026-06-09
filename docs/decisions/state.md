@@ -71,6 +71,18 @@ _Last updated: 2026-06-08 (partition tool page + solve-for-the-boundary mode)_
 
 ## Recent decisions
 
+- 2026-06-09 — **Adopted the "shipped" warm palette** (from `palette-shipped.html`)
+  on the engine calculators + picker. Foundation = warm paper/ink on a
+  warm-shifted gray ramp; **per-family accent** via `--accent` (Drafting blue
+  default; partition = Material rust; picker + components = Ink). Kept **Jost**
+  (colors only, per operator) and preserved the high-contrast line-work (didn't
+  lighten borders to the spec's hairline wholesale). Token *names* unchanged so
+  classes inherit; only `:root` values changed (one file, `global.css`, drives
+  convert/partition/dimension-converter/components), plus partition's hardcoded
+  figure literals and the picker's self-contained `:root` + 2 SVG strokes. The
+  DocCheck mark colors and dark-mode ramp are deferred (marks aren't these tools'
+  to render — "identity never renders a verdict"). The 7 legacy standalone
+  calculators are unchanged (they'll inherit when folded onto the engine).
 - 2026-06-08 — **Partition solve-for-the-boundary mode** (operator-requested,
   A1–A3 in `docs/partition-stories.md`). A forward⇄solve toggle on
   `partition.html`: the inverse fixes *whole tiles* and solves for the boundary —

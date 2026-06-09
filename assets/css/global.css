@@ -6,22 +6,35 @@
 
 /* ---- TOKENS ---- */
 :root {
-  /* Color — higher contrast than before */
-  --black: #0a0a0a;
-  --gray-900: #1a1a1a;
-  --gray-700: #444;
-  --gray-600: #666;
-  --gray-500: #777;
-  --gray-400: #999;
-  --gray-300: #bbb;
-  --gray-200: #d4d4d4;
-  --gray-100: #e8e8e8;
-  --gray-50: #f4f4f3;
-  --white: #fff;
-  --page-bg: #f9f9f8;
-  --selected-bg: #333;
-  --accent: #2563eb;
-  --accent-light: rgba(37,99,235,0.08);
+  /* Color — "shipped" warm palette: paper + ink foundation, per-family accent.
+     Token NAMES are unchanged so every existing class inherits the new values.
+     The gray ramp is warm-shifted but keeps its lightness order (so the
+     deliberate high-contrast line-work survives). --accent carries the
+     calculator family's hue; the default is Drafting and pages override it. */
+  --paper: #FBFAF7;          /* surface */
+  --ink: #211E18;            /* text anchor */
+  --secondary: #6B6B6B;      /* muted text */
+  --hairline: #E4DFD5;       /* light warm divider */
+
+  --black: #211E18;          /* → ink */
+  --gray-900: #2A2620;
+  --gray-700: #4D483F;       /* warm dark — strong borders + secondary text */
+  --gray-600: #6B6B6B;
+  --gray-500: #7E776C;
+  --gray-400: #A39C90;
+  --gray-300: #C4BDB0;
+  --gray-200: #D8D2C6;
+  --gray-100: #E4DFD5;       /* = hairline */
+  --gray-50: #F2EFE8;
+  --white: #FBFAF7;          /* → paper */
+  --page-bg: #F4F1EA;        /* warm, a step below paper */
+
+  --accent: #004C80;         /* Drafting — default family */
+  --accent-hover: #003B6E;
+  --accent-tint: #D7EEFF;
+  --accent-dark: #6BAAE5;    /* dark-mode variant (reserved) */
+  --accent-light: rgba(0,76,128,0.07);
+  --selected-bg: var(--accent);   /* active pills/toggles take the family hue */
 
   /* Type */
   --font-body: 'Verlag', 'Jost', 'Futura PT', sans-serif;

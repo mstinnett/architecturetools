@@ -202,7 +202,7 @@ Contains:
 - reset
 - layout classes: `.page` (720px), `.page-wide` (1080px), `.page-full`
 - reusable components such as `.section-label`, `.input-group`, `.option-pill`, `.app-toggle`, `.result-row`, `.output-row`, `.field-row`, `.note-box`, `.priority-box`, `.card-link`, `.page-footer`, `.spec-block`, `.purchase-path`, `.pick`, `.ref-table`, `.scale-table`
-- higher-contrast palette than the first iteration
+- the "shipped" warm palette: paper (`#FBFAF7`) + ink (`#211E18`) foundation on a warm-shifted gray ramp, with a per-family accent carried by `--accent` (default Drafting blue; pages override — partition = Material, picker/components = Ink). `--selected-bg` references `--accent`, so active pills/toggles take the family hue. Token *names* are unchanged from the prior grayscale set, so classes inherit the new values.
 - type scale from `--text-xs` through `--text-2xl`
 
 **Status:** created but not yet applied everywhere. Continue migrating pages toward shared styles rather than inventing a larger system.
