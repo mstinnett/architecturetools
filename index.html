@@ -235,6 +235,25 @@
   .gloss-pop{position:fixed;z-index:200;max-width:19rem;background:var(--black);color:var(--white);font-family:var(--font-body);font-weight:300;font-size:0.78rem;line-height:1.5;padding:0.6rem 0.75rem;box-shadow:0 6px 20px rgba(0,0,0,0.22);pointer-events:none;opacity:0;transform:translateY(2px);transition:opacity 0.12s,transform 0.12s;}
   .gloss-pop.is-open{opacity:1;transform:translateY(0);}
   .gloss-pop-term{display:block;font-weight:500;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.25rem;color:var(--gray-400);}
+
+  /* Dark-mode equivalent — Ink family. Inverts the ramp's lightness; active
+     states use the Ink dark variant (#A8A49C). Names unchanged, so chrome
+     follows. Two graphics need help a token swap can't give:
+       1) the monitor SVG hard-codes strokes — CSS `stroke` overrides the
+          presentation attribute, so we repoint them to the (now light) ink;
+       2) the desk hero is a raster PNG that can't be themed, so we frame it on
+          a paper panel in dark mode rather than let it glare or vanish. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --black:#E8E4DB; --ink:#E8E4DB; --white:#1B1D22; --page-bg:#141519;
+      --gray-800:#A8A49C; --gray-700:#B7B1A6; --gray-400:#8F897F;
+      --gray-300:#4C5058; --gray-200:#3B3E45; --gray-100:#33363C; --gray-50:#212329;
+      --accent:#A8A49C;
+    }
+    svg[aria-hidden="true"] rect { stroke: var(--ink); }
+    svg[aria-hidden="true"] line { stroke: var(--gray-700); }
+    .desk-hero { background:#FBFAF7; padding:1rem; border-radius:6px; }
+  }
 </style>
 </head>
 <body>
