@@ -16,31 +16,42 @@
      Converter = "Drafting" family (blue), light + dark mode.
      The accent is the only page-specific token; the neutrals,
      surfaces and shadows below are the shared dark theme that the
-     picker mirrors (only its accent differs). No hard-coded colors
-     anywhere on the page, so retinting the tokens retints all of it.
+     picker mirrors (only its accent differs). The number-line SVG
+     (numberline.js) routes its strokes through --nl-* tokens too, so
+     its hatch and rules invert in dark as well.
+     Canonical names + values: docs/In Progress/tokens.css.
      ============================================================ */
   :root{
-    --accent:#004C80;                 /* Drafting · base */
-    --accent-soft:#D7EEFF;            /* Drafting · tint (focus halo) */
-    --accent-ink:#FFFFFF;             /* text on accent */
-    --selected-bg:var(--accent);
-    --ink:#211E18;                    /* palette ink-text */
-    --rule:#E4DFD5;                   /* palette hairline */
+    /* canonical palette tokens — mirror of tokens.css (the families this page uses) */
+    --drafting:#004C80; --drafting-tint:#D7EEFF; --drafting-dark:#6BAAE5;
+    --ink-text:#211E18; --hairline:#E4DFD5; --lightbox:#16181C; --text-on-dark:#E8E4DB;
+    /* map the engine's tokens onto the palette — light */
+    --accent: var(--drafting);
+    --accent-soft: var(--drafting-tint);
+    --accent-ink:#FFFFFF;
+    --selected-bg: var(--accent);
+    --ink: var(--ink-text);
+    --rule: var(--hairline);
+    /* number-line strokes — light = numberline.js originals */
+    --nl-ink:#0a0a0a; --nl-hatch:#0a0a0a; --nl-tick:#bbb; --nl-axis:#999;
   }
   @media (prefers-color-scheme: dark){
     :root{
       /* surfaces — derived around --lightbox #16181C: backdrop darkest, sheet lifts */
-      --paper:#0F1115; --page-bg:#0F1115; --gray-100:#0F1115; --gray-50:#16181C;
+      --paper:#0F1115; --page-bg:#0F1115; --gray-100:#0F1115; --gray-50: var(--lightbox);
       --card:#181B21; --white:#181B21; --card-2:#20242B;
       /* text — palette text-on-dark */
-      --ink:#E8E4DB; --black:#E8E4DB; --ink-2:#ADA89F; --ink-3:#7E7A72;
+      --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2:#ADA89F; --ink-3:#7E7A72;
       --gray-700:#B8B4AB; --gray-900:#D8D4CB; --gray-400:#6A665F;
       /* lines */
       --rule:#2E323A; --rule-2:#3C414B; --gray-200:#2A2E36; --gray-300:#383D46;
       /* Drafting · dark */
-      --accent:#6BAAE5; --accent-ink:#14171C;
+      --accent: var(--drafting-dark);
+      --accent-ink: var(--lightbox);
       --accent-soft:color-mix(in srgb, var(--accent) 18%, transparent);
-      --selected-bg:var(--accent);
+      --selected-bg: var(--accent);
+      /* number-line strokes — inverted for dark */
+      --nl-ink:#CBC8C2; --nl-hatch:#6E727C; --nl-tick:#3F434B; --nl-axis:#6E727B;
       /* shadows recut for a dark field (warm browns -> deep blacks) */
       --shadow-card:0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
       --shadow-key:inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
