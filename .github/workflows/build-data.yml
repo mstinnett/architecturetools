@@ -20,10 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # full history — build-data stamps Meta.dataUpdated from the last
-          # commit touching data/; a shallow clone would stamp today's date
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'

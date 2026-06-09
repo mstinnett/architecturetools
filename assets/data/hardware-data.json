@@ -1,6 +1,6 @@
 {
   "_comment": "GENERATED -- do not edit by hand. Source: data/*.csv (+ data/extras.json). Edit in Numbers, export CSV, commit; CI rebuilds. Local: node tools/build-data.mjs. See data/README.md.",
-  "Meta": { "dataUpdated": "2026-06-05" },
+  "Meta": { "dataUpdated": "2026-06-06" },
   "CPUs": {
     "entry": { "intel": "Intel Core Ultra 5 245K", "amd": "AMD Ryzen 5 9600X", "note": "" },
     "standard": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 7 9700X", "note": "" },

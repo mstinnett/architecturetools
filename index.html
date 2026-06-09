@@ -24,7 +24,9 @@
     img[src*="desk-images"]{ filter: invert(0.9); }
   }
   body{overflow-anchor:none;}   /* font + base size + ink + grain + desk tone inherit from global.css */
-  .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--card);border:1px solid color-mix(in srgb, var(--rule) 60%, transparent);box-shadow:var(--shadow-card);display:flex;flex-direction:column;}
+  /* the sheet itself comes from the shared .page-wide; the picker only widens
+     it and stacks its sections (the @580 padding tweak below stays its own) */
+  .picker{max-width:1120px;display:flex;flex-direction:column;}
   .picker-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
   .picker-header h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.2rem;}
   .picker-header p{font-size:0.82rem;color:var(--gray-700);font-weight:300;max-width:44em;}
@@ -200,7 +202,6 @@
     .controls-row{grid-template-columns:1fr;}
   }
   @media(max-width:820px){
-    .picker{padding:2rem 1.25rem 3rem;}
     .picker-header{margin-bottom:2rem;padding-bottom:1.5rem;}
     .divider{margin:2rem 0;}
     .result-columns{flex-direction:column;align-items:stretch;}
@@ -225,7 +226,7 @@
 </style>
 </head>
 <body>
-<div class="picker">
+<div class="page-wide picker">
   <!-- Markup order = visual order (no CSS reordering, so tab order matches
        what's on screen): hero leads, then the heading, the inputs, and below
        the rule the full recommendation. -->
