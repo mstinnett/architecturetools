@@ -21,6 +21,10 @@ Edit the files here instead.
 A Windows cell's `cpu` column references a `cpus.csv` key; the picker shows it as
 "*intel* or *amd*". Its `gpu` column references a `gpus.csv` key.
 
+The build also stamps `Meta.dataUpdated` — the date (`YYYY-MM-DD`) of the last
+commit that touched `data/`, not the build date, so a no-op rebuild never
+changes the output. The picker footer renders it as "Updated *month year*".
+
 ## Editing in Numbers
 
 1. Open the `.csv` in Numbers (double-click, or File → Open). It imports as a grid.

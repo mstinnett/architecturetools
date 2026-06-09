@@ -314,6 +314,17 @@ Instead, the hierarchy is:
 
 This is still simple. It is just no longer artificially flat.
 
+**Interim navigation — nailed down (2026-06-09).** The covers above are
+structure, not yet pages. Until they exist, live-page navigation is exactly
+two cross-links and nothing more:
+
+- the picker (the home page) lists each live tool in its footer;
+- every tool page carries one back-link home, labeled `← architecture.tools`
+  (not "all tools" — there is no tools index to promise yet).
+
+When AT-0 / C-0 land they replace this rule; until then no page invents
+other nav (no header bars, no breadcrumbs).
+
 ---
 
 ## Build order

@@ -19,6 +19,7 @@
 // inherit the catalog note, plain text to replace it, or "+ text" to add a line
 // on top of it — resolved in the browser by hydrateSpecs() in index.html.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -150,9 +151,21 @@ if (problems.length) {
   process.exit(1);
 }
 
+// When the recommendations were last touched: the date of the last commit that
+// changed data/ (NOT the build date, so a no-op rebuild never churns the output
+// file). The picker footer renders it as "Updated <month year>".
+function dataUpdated() {
+  try {
+    const d = execSync('git log -1 --format=%cs -- data/', { cwd: ROOT }).toString().trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  } catch (e) { /* no git (tarball build) — fall through */ }
+  return new Date().toISOString().slice(0, 10);
+}
+
 const data = {
   _comment: 'GENERATED -- do not edit by hand. Source: data/*.csv (+ data/extras.json). '
     + 'Edit in Numbers, export CSV, commit; CI rebuilds. Local: node tools/build-data.mjs. See data/README.md.',
+  Meta: { dataUpdated: dataUpdated() },
   CPUs, GPUs, Chips,
   Apps: extras.Apps,
   PickerOptions: extras.PickerOptions,

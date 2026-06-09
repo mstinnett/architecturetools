@@ -94,6 +94,14 @@ Every planned tool is the same operation with a different constraint.
   paths break githack / pages.dev previews. (All current files comply.)
 - Add `<meta name="robots" content="noindex, nofollow">` to any page not yet on
   `main`; remove it as part of promotion (see §4).
+- **The calc shell.** Tool pages share one anatomy — input field → echo (the
+  parsed reading, stated vs inferred) → constraint control → answer card
+  (figure + rows) → bonus outputs → engine footnote. The styles live in
+  `assets/css/global.css` ("CALCULATOR SHELL" section) and the page-glue
+  helpers in `assets/js/ui.js`; `convert.html` labels the slots in its markup.
+  A new tool page fills the slots (its constraint dial, its figure) — it does
+  not restyle them. Interactive controls are `<button type="button">` with
+  `aria-pressed` kept in sync via `UI.press` — keep that for anything new.
 
 ---
 

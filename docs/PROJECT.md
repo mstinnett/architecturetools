@@ -98,8 +98,8 @@ They are part of the site structure, but they do not need premature renaming or 
 ├── tools/
 │   ├── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
 │   └── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
-├── calculators/                    # NOTE: deferred off main; lives on dev
-│   ├── convert.html                # Precise Unit Converter — engine-powered, SHIPPED
+├── calculators/                    # convert.html + the 3 lib modules it uses are LIVE on main; the rest is dev-only
+│   ├── convert.html                # Precise Unit Converter — engine-powered, LIVE
 │   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)
 │   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
 │   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)
@@ -388,9 +388,12 @@ them all at once.
 ### Live now (`main`)
 - `index.html` — the picker, doubling as the home page (a fuller **AT-0** cover
   is deferred behind the picker-only launch).
+- `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
+- Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): the picker footer
+  links each live tool; each tool's back-link returns home. The AT-0/C-0
+  covers replace this when they land.
 
 ### Promote from `dev` as ready
-- `calculators/convert.html` — already engine-complete; a strong first promotion
 - `components.html`, `site-screen.html`
 - the next engine-based calculators (HANDOFF §5)
 - a `calculators/index.html` as **C-0**

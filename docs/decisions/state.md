@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-09 (shared CSS consolidated: one global.css importing tokens.css; --paper defined once)_
+_Last updated: 2026-06-09 (UI review pass landed; converter promoted to main — the live site is now picker + converter)_
 
 ## Live architectural picture
 
@@ -12,11 +12,13 @@ _Last updated: 2026-06-09 (shared CSS consolidated: one global.css importing tok
   Vanilla HTML/CSS/JS. No framework, no build step, no backend
   (`docs/PROJECT.md`).
 - **Two branches (read `docs/HANDOFF.md` first):**
-  - **`main` — the live site, picker-only.** `index.html` is the picker (the
-    home page); `picker.html` redirects to `/`. Plus `assets/`, `data/`,
-    `tools/`, `docs/`, the `build-data` workflow, `CNAME`, `.nojekyll`. Trimmed
-    to this in commit `f01b200` (removed `components.html`, `site-screen.html`,
-    and `calculators/`). The picker links to no deferred page, so nothing 404s.
+  - **`main` — the live site: the picker (home) + the Precise Unit Converter**
+    (`calculators/convert.html` + the three lib modules it loads — promoted
+    2026-06-09). `picker.html` redirects to `/`. Plus `assets/`, `data/`,
+    `tools/`, `docs/`, the `build-data` workflow, `CNAME`, `.nojekyll`.
+    Interim nav (SITE_FRAMEWORK "Hierarchy"): picker footer links each live
+    tool; each tool back-links home. Nothing links a deferred page, so
+    nothing 404s.
   - **`dev` — the workbench (this branch).** The full prior site
     (`components.html`, `site-screen.html`, `calculators/`) **plus** the new
     calculator engine and converter. All work-in-progress lives here.
@@ -78,6 +80,21 @@ _Last updated: 2026-06-09 (shared CSS consolidated: one global.css importing tok
 
 ## Recent decisions
 
+- 2026-06-09 — UI review pass (operator-directed, "act on all of them"), then
+  the converter promoted to `main`. One base font size site-wide (18px, the
+  picker's iterated scale, set once in global.css). The calculator shell
+  graduated into global.css ("CALCULATOR SHELL": input well, echo, constraint
+  dial, debossed answer card, snap rows, figure text classes, mathnote) with
+  the slots labeled in convert.html and the convention recorded in HANDOFF §3.
+  All interactive pills on both pages are now real `<button>`s with
+  `aria-pressed` (synced via the new shared `assets/js/ui.js`, which also owns
+  `esc()`), one focus-visible ring, and coarse-pointer hit-height bumps; the
+  picker's markup order now matches its visual order (CSS `order` removed) and
+  ~10 dead inline CSS classes from earlier iterations were trimmed. Converter
+  gained a shareable URL (`?d=&t=&g=`) and an echo assumption line announcing
+  the auto-flipped target; the picker footer date now derives from
+  `Meta.dataUpdated` (build-data stamps the last data/ commit date). Interim
+  nav nailed down in SITE_FRAMEWORK and wired (footer link ↔ back-link).
 - 2026-06-09 — Shared CSS consolidated to one sheet (operator-directed).
   `global2.css` renamed over `assets/css/global.css`, replacing the old
   cool-neutral sheet (same class/token vocabulary, so its two consumers —

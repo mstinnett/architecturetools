@@ -3,150 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- dev work-in-progress: not yet promoted to main; remove on promotion -->
-<meta name="robots" content="noindex, nofollow">
 <title>Precise Unit Converter -- architecture.tools</title>
 <meta name="description" content="A length converter that shows the cost of rounding: free-text dimension in, snapped to a grid, with Min / Nearest / Max and their signed residuals drawn on a dual-scale number line.">
 <link rel="stylesheet" href="../assets/css/global.css">
 <style>
-  /* ---- page-specific only; all behaviour lives in the imported modules ----
-     The canonical palette (assets/css/tokens.css), the family accent
-     (drafting = blueprint blue, selected by data-family on <html>), the
-     shared dark scheme, and the --nl-* number-line strokes all come from
-     global.css (linked above). Rules here are converter-only. */
-
+  /* ---- page-specific only ----
+     Everything else is shared: the canonical palette (assets/css/tokens.css),
+     the family accent (drafting = blueprint blue, via data-family on <html>),
+     the dark scheme, and the whole calculator shell — input well, echo,
+     constraint dial, answer card, snap rows, figure text, mathnote — live in
+     global.css. Behaviour lives in the imported lib/ modules. */
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
-
-  /* Plain, robust entry field — a normal visible input (the overlay-mirror
-     trick broke on mobile: invisible text + lost focus). Parsed/pending
-     feedback lives in the echo below instead of in the field. */
-  .field-wrap { margin-bottom: var(--space-lg); max-width: 100%; }
-  #dimInput { font-family: 'SF Mono', 'DM Mono', ui-monospace, 'Menlo', monospace;
-              font-size: 1.35rem; font-weight: 400; line-height: 1.5;
-              color: var(--ink); background: var(--card);
-              padding: 0.7rem 0.8rem; border: 1px solid var(--rule-2);
-              box-shadow: var(--shadow-well);
-              width: 100%; box-sizing: border-box;
-              outline: none; -webkit-appearance: none; appearance: none; border-radius: var(--radius); }
-  #dimInput:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
-
-  /* anything typed that didn't parse, shown quietly under the field */
-  .field-note { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--ink-2); min-height: 1.1em; line-height: 1.5; }
-  .field-note .pending { color: var(--ink-2); }
-  .field-note .why { color: var(--ink-2); font-style: italic; }
-
-  /* contextual bare-number unit choice — only when a number has no unit */
-  .bare-ask { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--ink-2); }
-  .bare-ask:empty { display: none; }
-  .bare-ask .pick { cursor: pointer; padding: 0.1rem 0.45rem; border: 1px solid var(--gray-300);
-                    margin-left: 0.3rem; user-select: none; }
-  .bare-ask .pick.active { background: var(--selected-bg); color: var(--white); border-color: var(--selected-bg); }
-
-  .opt-line { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: var(--space-lg); }
-  .opt-cluster { display: flex; align-items: center; gap: 0.5rem; }
-  .opt-cluster .section-label { margin-bottom: 0; }
-  .section-label { color: var(--ink-2); }   /* darker than the global --ink-3: the small labels read too light on the bright panel */
-  .mini-pill { padding: 0.3rem 0.7rem; border: 1px solid var(--rule-2); cursor: pointer;
-               font-size: var(--text-sm); background: var(--card); color: var(--ink); user-select: none;
-               box-shadow: var(--shadow-key); border-radius: var(--radius);
-               transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.12s; }
-  .mini-pill:hover { border-color: var(--ink-3); box-shadow: var(--shadow-key-hover); }
-  .mini-pill.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
-                      box-shadow: var(--shadow-press); transform: translateY(1px); }
-
-  /* Answer surfaces (parsed output + the figure/rounding card + ratio/area)
-     all read --answer-surface, the shared tone knob from global.css. The
-     figure's label halo reads it too (see svg.nl text), so the halo always
-     matches the card — retint in one place and nothing fringes. */
-
-  /* echo — the parsed reading + exact conversion, a debossed well so the parsed
-     output reads as a result recessed into the page */
-  .echo { margin: var(--space-md) 0 var(--space-lg); padding: 0.85rem 1.1rem; background: var(--answer-surface);
-          border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
-          box-shadow: var(--shadow-well); }
-  .echo-line { font-size: var(--text-base); font-weight: 300; line-height: 1.7; color: var(--gray-700); }
-  .echo .tok { padding-bottom: 1px; }
-  .echo .tok.stated   { border-bottom: 2px solid var(--black); color: var(--black); }      /* what you told me */
-  .echo .tok.inferred { border-bottom: 1px solid var(--ink-3); color: var(--ink-2); } /* what I assumed */
-  .echo .op { color: var(--ink-2); padding: 0 0.15em; }
-  .echo .eq { color: var(--ink-2); padding: 0 0.2em; }
-  .echo .result { font-weight: 400; color: var(--black); }
-  .echo-assumptions { margin-top: 0.45rem; font-size: var(--text-sm); color: var(--ink-2); }
-  .echo-assumptions div::before { content: '— '; color: var(--ink-2); }
-
-  /* grid presets = a precision dial */
-  .grid-presets { margin-bottom: var(--space-md); }
-  .grid-box { padding: 0.45rem 0.7rem; border: 1px solid var(--rule-2); cursor: pointer;
-              font-size: var(--text-sm); background: var(--card); color: var(--ink); user-select: none;
-              min-width: 2.4rem; text-align: center; box-shadow: var(--shadow-key); border-radius: var(--radius);
-              transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.12s; }
-  .grid-box:hover { border-color: var(--ink-3); box-shadow: var(--shadow-key-hover); }
-  .grid-box.active { border-color: var(--accent); background: var(--accent); color: var(--accent-ink);
-                     box-shadow: var(--shadow-press); transform: translateY(1px); }
-  .grid-sep { width: 1px; align-self: stretch; background: var(--rule); margin: 0 0.3rem; }
-  .grid-custom { width: 84px; font-family: inherit; font-size: 16px; padding: 0.35rem 0.5rem;
-                 color: var(--ink); background: var(--card); box-shadow: var(--shadow-well);
-                 border: 1px solid var(--rule-2); border-radius: var(--radius);
-                 outline: none; -webkit-appearance: none; appearance: none; }
-  .grid-custom:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
-  .grid-group-label { font-size: var(--text-xs); color: var(--ink-2); letter-spacing: 0.08em; text-transform: uppercase; }
-  /* metric presets group on their own rows so modular doesn't break awkwardly */
-  .grid-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
-  .grid-row:last-child { margin-bottom: 0; }
-
-  /* the engine's exact integer math, shown as a footnote (proves the lattice) */
-  .mathnote { margin-top: var(--space-xl); padding-top: var(--space-md); border-top: 1px solid var(--gray-100);
-              font-family: 'SF Mono', 'DM Mono', ui-monospace, monospace; font-size: var(--text-xs);
-              color: var(--ink-2); line-height: 1.7; }
-  .mathnote b { color: var(--ink); font-weight: 400; }
-  .mathnote:empty { display: none; }
-
-  .figure-wrap { margin: var(--space-lg) 0; overflow-x: auto; }
-  svg.nl { display: block; max-width: 100%; }
-  svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }  /* halo tracks the card tone — no fringe */
-  .nl-axis-label  { font-size: 10px; fill: var(--ink-2); letter-spacing: 0.06em; text-transform: uppercase; }
-  .nl-snap-val    { font-size: 12px; fill: var(--black); font-weight: 400; }
-  .nl-snap-role   { font-size: 9px;  fill: var(--ink-2); letter-spacing: 0.04em; text-transform: uppercase; }
-  .nl-src-val     { font-size: 10px; fill: var(--ink-2); }
-  .nl-residual    { font-size: 10px; fill: var(--gray-700); }
-  .nl-true-role   { font-size: 10px; fill: var(--black); letter-spacing: 0.06em; text-transform: uppercase; }
-  .nl-true-val    { font-size: 13px; fill: var(--black); font-weight: 400; }
-  .nl-note        { font-size: 10px; fill: var(--ink-2); font-style: italic; }
-
-  /* figure + rounding table share ONE .answer-card (base styling from global.css),
-     re-cast as a DEBOSSED well: soft paper fill + inset shadow so the answer
-     reads as a panel recessed into the brighter page, not floating above it.
-     Rows sit flat inside, a hairline dividing them from the figure (no
-     box-in-a-box). Nearest leads (accent value). */
-  .answer-card { background: var(--answer-surface); box-shadow: var(--shadow-well); }
-  .answer-card .figure-wrap { margin: 0; }
-  .snap-rows { margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid var(--rule); }
-  .snap-row { display: flex; align-items: baseline; padding: 0.5rem 0; border-bottom: var(--border-light); }
-  .snap-row:last-child { border-bottom: none; }
-  .snap-name { width: 150px; flex-shrink: 0; font-size: var(--text-xs); font-weight: 400;
-               text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); }
-  .snap-gloss { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--ink-2);
-                text-transform: none; letter-spacing: 0; }
-  .snap-value { flex: 1; font-size: var(--text-md); font-weight: 300; }
-  .snap-dec { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--ink-2); }
-  .snap-resid { width: 120px; text-align: right; flex-shrink: 0; font-size: var(--text-sm); color: var(--ink-2); }
-  .snap-row.is-exact .snap-resid { color: var(--black); }
-  .snap-row.is-primary .snap-name { color: var(--black); }     /* the nearer bound */
-  .snap-row.is-primary .snap-value { font-size: var(--text-lg); font-weight: 400; color: var(--accent); } /* blue = the answer */
-  .snap-row.is-ref { border-top: 1px solid var(--gray-200); }
-  .snap-row.is-ref .snap-name, .snap-row.is-ref .snap-value { color: var(--ink-2); }
-  .nl-nearest { font-weight: 600; }
-
-  .ratio-box { margin: var(--space-lg) 0; padding: 1rem 1.2rem; background: var(--answer-surface);
-               border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); border-radius: var(--radius);
-               box-shadow: var(--shadow-well); }
-  .ratio-big { font-size: var(--text-xl); font-weight: 300; }
-
-  @media (max-width: 480px) {
-    #dimInput { font-size: 1.1rem; }
-    .snap-name { width: 96px; }
-    .snap-resid { width: 96px; }
-  }
 </style>
 </head>
 <body>
@@ -158,51 +25,66 @@
        include +, &minus;, /, x, *, and ().</p>
   </div>
 
+  <!-- CALC SHELL — the shared anatomy every engine tool repeats
+       (see global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3):
+       input → echo → constraint → answer card → bonus outputs → footnote. -->
+
+  <!-- slot 1 · INPUT: the parser-fed dimension field -->
   <div class="section-label">Dimension</div>
   <div class="field-wrap">
-    <input type="text" id="dimInput" spellcheck="false" maxlength="120"
+    <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="120"
            autocomplete="off" autocapitalize="off" placeholder="e.g. 1m  ·  3'-4 1/2&quot;  ·  8' + 3 1/2&quot;" autofocus>
     <div class="field-note" id="fieldNote"></div>
     <!-- appears only when a number has no unit and nothing to inherit from -->
     <div class="bare-ask" id="bareAsk"></div>
   </div>
 
+  <!-- slot 2 · tool controls (here: the target system) -->
   <div class="opt-line">
     <div class="opt-cluster">
       <span class="section-label">Convert to</span>
-      <span class="mini-pill" data-target="imperial">imperial</span>
-      <span class="mini-pill" data-target="metric">metric</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-target="imperial">imperial</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-target="metric">metric</button>
     </div>
   </div>
 
   <div id="results">
+    <!-- slot 3 · ECHO: the parsed reading (stated vs inferred) + exact result.
+         The true value appears here, on the figure, and in the rows — three
+         deliberate registers (confirmation / spatial / tabular), kept. -->
     <div class="echo" id="echo" style="display:none;">
       <div class="echo-line" id="echoLine"></div>
       <div class="echo-assumptions" id="echoAssume"></div>
     </div>
 
+    <!-- slot 4 · CONSTRAINT: this tool's dial is the snap grid -->
     <div id="lengthOut" style="display:none;">
       <div class="section-label">Snap tolerance</div>
       <div class="grid-presets" id="gridPresets"></div>
 
+      <!-- slot 5 · ANSWER CARD: figure + rows -->
       <div class="answer-card">
         <div class="figure-wrap" id="figure"></div>
         <div class="snap-rows" id="snapRows"></div>
       </div>
     </div>
 
+    <!-- slot 6 · bonus outputs -->
     <div class="ratio-box" id="ratioOut" style="display:none;"></div>
     <div class="ratio-box" id="areaOut" style="display:none;"></div>
 
+    <!-- slot 7 · the engine's auditable footnote -->
     <div class="mathnote" id="mathNote"></div>
   </div>
 
+  <!-- interim nav (SITE_FRAMEWORK "Hierarchy"): one back-link home, no more -->
   <div class="page-footer">
-    <a class="back-link" href="../index.html">← all tools</a>
+    <a class="back-link" href="../index.html">← architecture.tools</a>
   </div>
 </div>
 
 <!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
 <script src="lib/parse-length.js"></script>
 <script src="lib/snap.js"></script>
 <script src="lib/numberline.js"></script>
@@ -223,6 +105,8 @@
     defaultUnit: 'in',
     target: 'imperial',
     targetPinned: false,                                  // true once the user taps the target
+    urlPinned: false,                                     // the pin came from ?t= (survives the first source detection)
+    autoTargetNote: null,                                 // why the target moved (auto-flip), echoed with assumptions
     lastSource: null,                                     // last detected source system
     gridUiSystem: null,                                   // which system the grid UI is built for
     grid: { imperial: { denom: 8 }, metric: { mm: 5 } }   // remembered per system
@@ -244,9 +128,7 @@
     mathNote: document.getElementById('mathNote')
   };
 
-  function escapeHtml(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
+  var escapeHtml = UI.esc;     // shared page util (assets/js/ui.js)
   function sig(n) {                                  // ≤4 significant figures, trimmed
     if (n === 0) return '0';
     var d = Math.max(0, 4 - Math.floor(Math.log(Math.abs(n)) / Math.LN10) - 1);
@@ -288,7 +170,8 @@
     var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
     if (!hasLength || anyStated) return;          // a unit was typed → nothing to ask
     function pick(u, label) {
-      return '<span class="pick' + (state.defaultUnit === u ? ' active' : '') + '" data-bare="' + u + '">' + label + '</span>';
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
     }
     els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
     Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
@@ -328,6 +211,7 @@
 
     els.echoLine.innerHTML = html;
     var asm = result.interpretation.assumptions || [];
+    if (state.autoTargetNote) asm = asm.concat([state.autoTargetNote]);
     if (result.units == null && result.dimension === 1) asm = asm.concat(['this term could not be resolved — see the grayed text above']);
     els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
     els.echo.style.display = '';
@@ -339,7 +223,7 @@
   // <input> mid-type (lost focus, blanked text).
   function buildGridPresets() {
     var html = '';
-    function box(attr, v, label) { return '<span class="grid-box" data-' + attr + '="' + v + '">' + label + '</span>'; }
+    function box(attr, v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-' + attr + '="' + v + '">' + label + '</button>'; }
     if (state.target === 'imperial') {
       var labels = { 2: '½', 4: '¼', 8: '⅛', 16: '1/16', 32: '1/32', 64: '1/64' };
       html += '<div class="grid-row">';
@@ -382,7 +266,7 @@
     var active = state.target === 'imperial' ? state.grid.imperial.denom : state.grid.metric.mm;
     var attr = state.target === 'imperial' ? 'denom' : 'mm';
     Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
-      box.classList.toggle('active', +box.dataset[attr] === active);
+      UI.press(box, +box.dataset[attr] === active);
     });
   }
   function renderGridPresets() {
@@ -498,6 +382,7 @@
   // same-system: grid snap + ft-in reformatting). A pure bare number states
   // nothing, so nothing moves.
   function syncDetected(result) {
+    state.autoTargetNote = null;                              // set below when the target is ours, not the user's
     if (!result || !result.interpretation) return;
     var sys = result.unitSystem;
     if (sys !== 'imperial' && sys !== 'metric') return;       // ambiguous/mixed → leave it
@@ -508,21 +393,28 @@
 
     state.defaultUnit = sys === 'metric' ? 'mm' : 'in';      // keep bare default sticky to source
     if (sys !== state.lastSource) {                           // a new system → re-flip target
+      // …except on the very first parse of a ?t=-pinned URL: that pin IS the
+      // shared state, so seeing the source for the first time must not undo it
+      var pinnedByURL = state.lastSource === null && state.urlPinned;
       state.lastSource = sys;
-      state.targetPinned = false;
+      if (!pinnedByURL) state.targetPinned = false;
     }
+    state.urlPinned = false;
     if (!state.targetPinned) {
       var opp = sys === 'metric' ? 'imperial' : 'metric';
       if (state.target !== opp) {
         state.target = opp;
         setActive('[data-target]', 'target', state.target);
       }
+      // the flip is silent in the pills — say it where assumptions live
+      state.autoTargetNote = sys + ' stated — showing ' + state.target;
     }
   }
 
   function render() {
     var result = parseLength(state.text, { defaultUnit: state.defaultUnit });
     syncDetected(result);
+    syncURL();                       // every render leaves the URL linkable
     renderFieldNote(result);
     renderBareAsk(result);
     renderEcho(result);
@@ -561,10 +453,41 @@
     renderLength(result);
   }
 
+  /* ---- shareable URL ----------------------------------------------------- */
+  // The current reading is always linkable: ?d=<dimension>&t=imperial|metric
+  // &g=<denom | Nmm>. Only non-default state is written, so a fresh page keeps
+  // a clean URL. Debounced — Safari rate-limits replaceState.
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.text && state.text !== '1m') params.set('d', state.text);
+      if (state.targetPinned) params.set('t', state.target);
+      if (state.target === 'imperial' ? state.grid.imperial.denom !== 8 : state.grid.metric.mm !== 5) {
+        params.set('g', state.target === 'imperial' ? String(state.grid.imperial.denom) : state.grid.metric.mm + 'mm');
+      }
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var d = params.get('d'), t = params.get('t'), g = params.get('g');
+    if (t === 'imperial' || t === 'metric') { state.target = t; state.targetPinned = true; state.urlPinned = true; }
+    if (g) {
+      var mm = /^([\d.]+)mm$/.exec(g);
+      if (mm && +mm[1] > 0) state.grid.metric.mm = Math.min(100000, Math.max(0.2, +mm[1]));
+      else if (/^\d+$/.test(g)) state.grid.imperial.denom = Math.min(256, Math.max(1, +g));
+    }
+    return d != null ? d.slice(0, 120) : null;
+  }
+
   /* ---- wiring ----------------------------------------------------------- */
   function setActive(selector, attr, value) {
     Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
-      el.classList.toggle('active', el.dataset[attr] === value);
+      UI.press(el, el.dataset[attr] === value);
     });
   }
 
@@ -580,10 +503,11 @@
     });
   });
 
-  // initial state — defaults reproduce worked example 1 (1 m → 1/8")
+  // initial state — URL params override the worked-example default (1 m → 1/8")
+  var urlDim = initFromURL();
   setActive('[data-target]', 'target', state.target);
-  els.input.value = '1m';
-  state.text = '1m';
+  els.input.value = urlDim != null ? urlDim : '1m';
+  state.text = els.input.value;
   render();
 })();
 </script>
