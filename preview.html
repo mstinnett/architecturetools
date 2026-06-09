@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev preview tool: never promote to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Preview</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; }
+  iframe { display: block; width: 100%; height: 100%; border: 0; }
+</style>
+</head>
+<body>
+<script>
+// Forced-scheme previewer. The site's dark mode rides on
+// `prefers-color-scheme`, which follows the device setting — this wrapper
+// pins it either way so a single link shows a specific state on any device.
+// It loads the page in a same-origin iframe and rewrites every
+// `prefers-color-scheme: dark` media condition in the framed document:
+// 'all' forces dark on, 'not all' forces it off. No style values are
+// duplicated here, so it can never drift from the real sheets.
+//
+//   preview.html?page=picker|convert&scheme=light|dark
+(function () {
+  var params = new URLSearchParams(location.search);
+  var pages = { picker: 'index.html', convert: 'calculators/convert.html' };
+  var page = pages[params.get('page')] || pages.picker;
+  var scheme = params.get('scheme') === 'dark' ? 'dark' : 'light';
+  document.title = 'Preview — ' + (params.get('page') || 'picker') + ' · ' + scheme;
+
+  var frame = document.createElement('iframe');
+  frame.src = page;
+  // re-apply after every load so in-page navigation stays forced
+  frame.addEventListener('load', function () {
+    var doc = frame.contentDocument;
+    if (!doc) return;
+    var condition = scheme === 'dark' ? 'all' : 'not all';
+    for (var s = 0; s < doc.styleSheets.length; s++) {
+      var rules;
+      try { rules = doc.styleSheets[s].cssRules; }   // cross-origin (fonts) throws
+      catch (e) { continue; }
+      if (!rules) continue;
+      for (var i = 0; i < rules.length; i++) {
+        var rule = rules[i];
+        if (rule.media && /prefers-color-scheme/i.test(rule.media.mediaText)) {
+          rule.media.mediaText = condition;
+        }
+      }
+    }
+  });
+  document.body.appendChild(frame);
+})();
+</script>
+</body>
+</html>
