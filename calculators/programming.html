@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-family="building">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Homeowner Questionnaire -- architecture.tools</title>
+<meta name="description" content="A programming questionnaire for homeowners — fill it in before the first working session with your architect. Answers save in your browser; print it or copy a summary to send back.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The shell is shared via global.css. Local rules cover the question
+     blocks, the need/want/dream list, and the print layout. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .qmodule { margin: var(--space-xl) 0; }
+  .qmodule > .section-label { border-bottom: 1px solid var(--ink-2); padding-bottom: 0.35rem; }
+  .qwhy { font-size: var(--text-sm); color: var(--ink-2); max-width: 46em; margin-bottom: var(--space-md); line-height: 1.6; }
+
+  .q { margin-bottom: var(--space-lg); }
+  .q label, .q .qlabel { display: block; font-size: var(--text-base); color: var(--ink); font-weight: 400; margin-bottom: 0.15rem; }
+  .q .hint { display: block; font-size: var(--text-sm); color: var(--ink-2); margin-bottom: 0.4rem; max-width: 44em; line-height: 1.55; }
+  .q input[type="text"], .q textarea {
+    font-family: var(--font-body); font-weight: 300; font-size: var(--text-base);
+    color: var(--ink); background: var(--card); width: 100%; max-width: 44em;
+    padding: 0.5rem 0.65rem; border: 1px solid var(--rule-2); border-radius: var(--radius);
+    box-shadow: var(--shadow-well); outline: none; -webkit-appearance: none; appearance: none;
+    resize: none; overflow: hidden; line-height: 1.55;
+  }
+  .q input[type="text"]:focus, .q textarea:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .q textarea { min-height: 3.2em; }
+  .q.short input { max-width: 22em; }
+
+  /* the need / want / dream list */
+  .nwd-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.45rem; max-width: 44em; }
+  .nwd-row input { flex: 1; font-family: var(--font-body); font-weight: 300; font-size: var(--text-base);
+    color: var(--ink); background: var(--card); padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+    border-radius: var(--radius); box-shadow: var(--shadow-well); outline: none; min-width: 0; }
+  .nwd-row input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .nwd-row .mini-pill { padding: 0.25rem 0.55rem; }
+  .nwd-del { border: none; background: none; color: var(--ink-3); cursor: pointer; font-size: var(--text-md); padding: 0 0.3rem; }
+  .nwd-del:hover { color: var(--ink); }
+  .nwd-add { margin-top: 0.4rem; }
+
+  .check-row { display: flex; align-items: baseline; gap: 0.55rem; margin-bottom: 0.45rem; font-size: var(--text-base); max-width: 44em; }
+  .check-row input[type="checkbox"] { width: 1rem; height: 1rem; accent-color: var(--accent); flex-shrink: 0; position: relative; top: 2px; }
+  .check-row .ck-hint { color: var(--ink-2); font-size: var(--text-sm); }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin: var(--space-xl) 0 0; }
+  .saved-note { font-size: var(--text-xs); color: var(--ink-3); }
+
+  /* ---- print: a clean instrument — chrome off, wells become ruled lines ---- */
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; border: none; max-width: none; padding: 0; }
+    .page-crumb, .actions, .page-footer, .nwd-del, .nwd-add, .no-print { display: none !important; }
+    .qmodule { break-inside: avoid-page; margin: 1.2rem 0; }
+    .q input[type="text"], .q textarea, .nwd-row input {
+      box-shadow: none; border: none; border-bottom: 1px solid #999; border-radius: 0; background: none;
+    }
+    .q textarea { min-height: 4.5em; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Homeowner Questionnaire</span>
+    </nav>
+    <h1>Homeowner Questionnaire</h1>
+    <p>For the start of a residential project — fill this in before the first
+       working session with your architect. There are no wrong answers, and
+       nothing here commits you to anything. Where two of your answers pull
+       against each other, leave them both: <strong>the collisions are the most
+       useful thing you can hand your architect.</strong></p>
+    <p class="no-print" style="margin-top:0.5rem;">Answers save in this browser
+       as you type. When you're done, print this page to PDF or copy a text
+       summary to email back.</p>
+  </div>
+
+  <!-- 0 · the project in your words -->
+  <div class="qmodule">
+    <div class="section-label">1 · The project, in your words</div>
+    <div class="q">
+      <label for="q_what">What do you want to do, in one or two sentences?</label>
+      <span class="hint">Your words, not drawing words. "Make the back of the house work for a family that lives in the kitchen" beats "addition."</span>
+      <textarea id="q_what" rows="2"></textarea>
+    </div>
+    <div class="q">
+      <label for="q_why">Why now?</label>
+      <span class="hint">A baby, a sale, working from home, a retirement, a repair that grew. Whatever set this in motion shapes the priorities more than any wishlist.</span>
+      <textarea id="q_why" rows="2"></textarea>
+    </div>
+    <div class="q">
+      <label for="q_who">Who makes the decisions — and who else has a real say?</label>
+      <span class="hint">A spouse or partner, kids, a parent helping fund it, an HOA board. List everyone whose yes matters, even informally.</span>
+      <textarea id="q_who" rows="2"></textarea>
+    </div>
+  </div>
+
+  <!-- 1 · the practical frame -->
+  <div class="qmodule">
+    <div class="section-label">2 · The practical frame</div>
+    <p class="qwhy">These set the box the design lives inside. It can feel
+       backwards to talk numbers before rooms — it isn't. Knowing the box
+       first is what lets the design spend your money where you care most.</p>
+    <div class="q short">
+      <label for="q_budget">What's the budget you're actually comfortable with?</label>
+      <span class="hint">A range is fine. Construction almost always needs a contingency on top — typically 10–20% held in reserve — so a number with that already in mind is worth more than a hopeful one.</span>
+      <input type="text" id="q_budget" autocomplete="off">
+    </div>
+    <div class="q short">
+      <label for="q_dates">Any hard dates?</label>
+      <span class="hint">A lease ending, a school year, a wedding, a birth. "Soon" is fine too — just say which kind of soon.</span>
+      <input type="text" id="q_dates" autocomplete="off">
+    </div>
+    <div class="q">
+      <span class="qlabel">What do you already have or know? Check what applies:</span>
+      <div class="check-row"><input type="checkbox" id="ck_own"><label for="ck_own" style="display:inline;">We own the property</label></div>
+      <div class="check-row"><input type="checkbox" id="ck_survey"><label for="ck_survey" style="display:inline;">We have a survey</label> <span class="ck-hint">— the drawing that shows your legal lot lines</span></div>
+      <div class="check-row"><input type="checkbox" id="ck_drawings"><label for="ck_drawings" style="display:inline;">We have drawings of the existing house</label></div>
+      <div class="check-row"><input type="checkbox" id="ck_hoa"><label for="ck_hoa" style="display:inline;">There's an HOA or deed restrictions</label></div>
+      <div class="check-row"><input type="checkbox" id="ck_septic"><label for="ck_septic" style="display:inline;">We're on septic (not city sewer)</label> <span class="ck-hint">— matters early if bathrooms or bedrooms are involved</span></div>
+    </div>
+    <div class="q">
+      <label for="q_givens">Anything else fixed about the site or house we should know?</label>
+      <span class="hint">A tree you'd never remove, a view you bought the house for, a neighbor situation, known problems (water, settling, knob-and-tube).</span>
+      <textarea id="q_givens" rows="2"></textarea>
+    </div>
+  </div>
+
+  <!-- 2 · how you live -->
+  <div class="qmodule">
+    <div class="section-label">3 · How you live</div>
+    <p class="qwhy">Describe activities, not rooms. "We host twelve for dinner
+       a few times a year" tells your architect more than "big dining room" —
+       it might not even be a dining room that solves it.</p>
+    <div class="q">
+      <label for="q_activities">What actually happens in this place — and who does it?</label>
+      <span class="hint">Cooking together or one cook? Homework at the counter? Two people on video calls at once? Instruments, gear, a dog that needs washing?</span>
+      <textarea id="q_activities" rows="3"></textarea>
+    </div>
+    <div class="q short">
+      <label for="q_people">How many people, day to day — and at the peak?</label>
+      <span class="hint">"Four daily, ten at Thanksgiving, kids' friends most Fridays."</span>
+      <input type="text" id="q_people" autocomplete="off">
+    </div>
+    <div class="q">
+      <label for="q_adjacent">What needs to be near what? What needs to be far apart?</label>
+      <span class="hint">Bedroom away from the street side; laundry near bedrooms; office where the doorbell can't end a meeting.</span>
+      <textarea id="q_adjacent" rows="2"></textarea>
+    </div>
+    <div class="q">
+      <label for="q_day">Walk through a normal day — morning and evening.</label>
+      <span class="hint">Where do shoes, bags, mail, and the dog leash actually land? Where does the day bottleneck? This finds the rooms no one thinks to ask for.</span>
+      <textarea id="q_day" rows="3"></textarea>
+    </div>
+  </div>
+
+  <!-- 3 · need / want / dream -->
+  <div class="qmodule">
+    <div class="section-label">4 · Need · want · dream</div>
+    <p class="qwhy">List everything, then mark each one. <strong>Need</strong> —
+       the project fails without it. <strong>Want</strong> — real, but you'd
+       trade it. <strong>Dream</strong> — if the budget smiles. Be stingy with
+       Need: when everything is a need, nothing is. And don't pre-trim the
+       dreams — they tell your architect what the project is really about.</p>
+    <div id="nwdList"></div>
+    <button type="button" class="mini-pill nwd-add no-print" id="nwdAdd">+ add an item</button>
+  </div>
+
+  <!-- 4 · comfort, character, longevity -->
+  <div class="qmodule">
+    <div class="section-label">5 · Comfort, character, and the long run</div>
+    <div class="q">
+      <label for="q_comfort">Comfort and energy — what do you care about?</label>
+      <span class="hint">Drafty-room grudges, a too-hot bedroom, utility bills, solar someday, quiet. Say it even if you don't know the technical name for it.</span>
+      <textarea id="q_comfort" rows="2"></textarea>
+    </div>
+    <div class="q">
+      <label for="q_longrun">Should this house work for someone with stairs trouble — now or someday?</label>
+      <span class="hint">A bedroom and full bath that could live on the main floor, wider doorways, a step-free way in. Planning this now is cheap; retrofitting it isn't.</span>
+      <textarea id="q_longrun" rows="2"></textarea>
+    </div>
+    <div class="q short">
+      <label for="q_maintain">How much upkeep are you honestly willing to do?</label>
+      <span class="hint">"We'll oil the deck every year" and "we never will" are both fine answers — they lead to different materials.</span>
+      <input type="text" id="q_maintain" autocomplete="off">
+    </div>
+    <div class="q">
+      <label for="q_images">Three images you love, one you hate.</label>
+      <span class="hint">Links, magazine pages, photos of places you've been. The one you hate is as useful as the three you love. A sentence on why, for each, if you can.</span>
+      <textarea id="q_images" rows="3"></textarea>
+    </div>
+  </div>
+
+  <!-- 5 · homework -->
+  <div class="qmodule">
+    <div class="section-label">6 · Before the next session</div>
+    <p class="qwhy">Things worth gathering now — each one saves a week later.
+       Check what you can bring; note what you can't find.</p>
+    <div class="check-row"><input type="checkbox" id="hw_deed"><label for="hw_deed" style="display:inline;">Deed, and any HOA covenants or easement documents</label></div>
+    <div class="check-row"><input type="checkbox" id="hw_survey"><label for="hw_survey" style="display:inline;">The survey, if one exists</label></div>
+    <div class="check-row"><input type="checkbox" id="hw_drawings"><label for="hw_drawings" style="display:inline;">Any existing drawings — even old permit sets or the realtor floor plan</label></div>
+    <div class="check-row"><input type="checkbox" id="hw_budget"><label for="hw_budget" style="display:inline;">Budget confirmed with whoever shares the decision</label></div>
+    <div class="check-row"><input type="checkbox" id="hw_septic"><label for="hw_septic" style="display:inline;">If on septic: the system's location and last inspection, if known</label></div>
+    <div class="q" style="margin-top: var(--space-md);">
+      <label for="q_questions">And the questions you want to ask us.</label>
+      <span class="hint">Write them down now — first meetings eat memory.</span>
+      <textarea id="q_questions" rows="2"></textarea>
+    </div>
+  </div>
+
+  <div class="actions no-print">
+    <button type="button" class="option-pill" id="copyBtn">copy a text summary</button>
+    <button type="button" class="option-pill" id="printBtn">print / save as PDF</button>
+    <button type="button" class="mini-pill" id="clearBtn">clear all answers</button>
+    <span class="saved-note" id="savedNote"></span>
+  </div>
+
+  <div class="page-footer">
+    <p>Prepared for your architect — your answers guide the first working
+       session and the program that comes out of it. Nothing here is a
+       contract or a design decision.</p>
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<script src="../assets/js/ui.js"></script>
+<script>
+(function () {
+  'use strict';
+  var esc = UI.esc;
+  var KEY = 'homeowner-questionnaire-v1';
+
+  /* The questions, as data — the save/summary logic never has to be edited
+     when a question is. Sections mirror the on-page modules. */
+  var TEXT_FIELDS = [
+    ['q_what', 'The project, in their words'], ['q_why', 'Why now'], ['q_who', 'Decision-makers'],
+    ['q_budget', 'Budget'], ['q_dates', 'Hard dates'], ['q_givens', 'Site / house givens'],
+    ['q_activities', 'Activities'], ['q_people', 'People, typical and peak'],
+    ['q_adjacent', 'Adjacencies'], ['q_day', 'A normal day'],
+    ['q_comfort', 'Comfort & energy'], ['q_longrun', 'Aging in place'],
+    ['q_maintain', 'Upkeep tolerance'], ['q_images', 'Reference images'],
+    ['q_questions', 'Their questions']
+  ];
+  var CHECKS = [
+    ['ck_own', 'Owns the property'], ['ck_survey', 'Has a survey'],
+    ['ck_drawings', 'Has existing drawings'], ['ck_hoa', 'HOA / deed restrictions'],
+    ['ck_septic', 'On septic'],
+    ['hw_deed', 'Homework: deed / HOA docs'], ['hw_survey', 'Homework: survey'],
+    ['hw_drawings', 'Homework: existing drawings'], ['hw_budget', 'Homework: budget confirmed'],
+    ['hw_septic', 'Homework: septic records']
+  ];
+  var NWD_KINDS = ['need', 'want', 'dream'];
+
+  var nwdItems = [];          // [{ text, kind }]
+  var savedNote = document.getElementById('savedNote');
+
+  /* ---- autosize textareas so print shows everything ----------------------- */
+  function autosize(el) {
+    if (el.tagName !== 'TEXTAREA') return;
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight + 2) + 'px';
+  }
+
+  /* ---- persistence: one localStorage blob, debounced ----------------------- */
+  var saveTimer = null;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      var data = { fields: {}, checks: {}, nwd: nwdItems };
+      TEXT_FIELDS.forEach(function (f) { data.fields[f[0]] = document.getElementById(f[0]).value; });
+      CHECKS.forEach(function (c) { data.checks[c[0]] = document.getElementById(c[0]).checked; });
+      try {
+        localStorage.setItem(KEY, JSON.stringify(data));
+        savedNote.textContent = 'saved in this browser';
+      } catch (e) { savedNote.textContent = 'couldn’t save — private window?'; }
+    }, 300);
+  }
+  function load() {
+    var data = null;
+    try { data = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    if (!data) return;
+    TEXT_FIELDS.forEach(function (f) {
+      var el = document.getElementById(f[0]);
+      if (data.fields && data.fields[f[0]] != null) { el.value = data.fields[f[0]]; autosize(el); }
+    });
+    CHECKS.forEach(function (c) {
+      if (data.checks && data.checks[c[0]] != null) document.getElementById(c[0]).checked = data.checks[c[0]];
+    });
+    if (Array.isArray(data.nwd)) nwdItems = data.nwd.filter(function (i) {
+      return i && typeof i.text === 'string' && NWD_KINDS.indexOf(i.kind) !== -1;
+    });
+  }
+
+  /* ---- the need / want / dream list ---------------------------------------- */
+  var nwdList = document.getElementById('nwdList');
+  function renderNwd() {
+    var html = '';
+    nwdItems.forEach(function (item, i) {
+      html += '<div class="nwd-row" data-i="' + i + '">'
+        + '<input type="text" value="' + esc(item.text).replace(/"/g, '&quot;') + '" placeholder="e.g. a mudroom that eats the chaos" maxlength="120" aria-label="item ' + (i + 1) + '">';
+      NWD_KINDS.forEach(function (k) {
+        html += '<button type="button" class="mini-pill" data-kind="' + k + '" aria-pressed="' + (item.kind === k) + '"' + (item.kind === k ? ' style="background:var(--accent);color:var(--accent-ink);"' : '') + '>' + k + '</button>';
+      });
+      html += '<button type="button" class="nwd-del no-print" aria-label="remove item ' + (i + 1) + '">×</button></div>';
+    });
+    nwdList.innerHTML = html;
+    Array.prototype.forEach.call(nwdList.querySelectorAll('.nwd-row'), function (row) {
+      var i = +row.dataset.i;
+      row.querySelector('input').addEventListener('input', function (e) { nwdItems[i].text = e.target.value; save(); });
+      Array.prototype.forEach.call(row.querySelectorAll('[data-kind]'), function (b) {
+        b.addEventListener('click', function () { nwdItems[i].kind = b.dataset.kind; renderNwd(); save(); });
+      });
+      row.querySelector('.nwd-del').addEventListener('click', function () { nwdItems.splice(i, 1); renderNwd(); save(); });
+    });
+  }
+  document.getElementById('nwdAdd').addEventListener('click', function () {
+    nwdItems.push({ text: '', kind: 'want' });
+    renderNwd();
+    var rows = nwdList.querySelectorAll('.nwd-row input');
+    if (rows.length) rows[rows.length - 1].focus();
+    save();
+  });
+
+  /* ---- the summary: structured text for an email --------------------------- */
+  function summary() {
+    var out = ['HOMEOWNER QUESTIONNAIRE — SUMMARY', ''];
+    TEXT_FIELDS.forEach(function (f) {
+      var v = document.getElementById(f[0]).value.trim();
+      if (v) out.push(f[1] + ':', '  ' + v.replace(/\n/g, '\n  '), '');
+    });
+    var checked = CHECKS.filter(function (c) { return document.getElementById(c[0]).checked; });
+    if (checked.length) {
+      out.push('Checked:');
+      checked.forEach(function (c) { out.push('  · ' + c[1]); });
+      out.push('');
+    }
+    var named = nwdItems.filter(function (i) { return i.text.trim(); });
+    if (named.length) {
+      NWD_KINDS.forEach(function (k) {
+        var of = named.filter(function (i) { return i.kind === k; });
+        if (!of.length) return;
+        out.push(k.toUpperCase() + ':');
+        of.forEach(function (i) { out.push('  · ' + i.text.trim()); });
+        out.push('');
+      });
+    }
+    return out.join('\n').trim() + '\n';
+  }
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    var text = summary();
+    function done(ok) { savedNote.textContent = ok ? 'summary copied — paste it into an email' : 'couldn’t copy — select and copy by hand'; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+    } else { done(false); }
+  });
+  document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+  document.getElementById('clearBtn').addEventListener('click', function () {
+    if (!window.confirm('Clear every answer on this page?')) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    TEXT_FIELDS.forEach(function (f) { var el = document.getElementById(f[0]); el.value = ''; autosize(el); });
+    CHECKS.forEach(function (c) { document.getElementById(c[0]).checked = false; });
+    nwdItems = [];
+    renderNwd();
+    savedNote.textContent = 'cleared';
+  });
+
+  /* ---- wiring ---------------------------------------------------------------- */
+  TEXT_FIELDS.forEach(function (f) {
+    var el = document.getElementById(f[0]);
+    el.addEventListener('input', function () { autosize(el); save(); });
+  });
+  CHECKS.forEach(function (c) {
+    document.getElementById(c[0]).addEventListener('change', save);
+  });
+
+  load();
+  if (!nwdItems.length) nwdItems = [{ text: '', kind: 'need' }, { text: '', kind: 'want' }, { text: '', kind: 'dream' }];
+  renderNwd();
+  Array.prototype.forEach.call(document.querySelectorAll('textarea'), autosize);
+})();
+</script>
+</body>
+</html>
