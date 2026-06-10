@@ -229,7 +229,9 @@
     var html = '';
     function box(attr, v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-' + attr + '="' + v + '">' + label + '</button>'; }
     if (state.target === 'imperial') {
-      var labels = { 2: '½', 4: '¼', 8: '⅛', 16: '1/16', 32: '1/32', 64: '1/64' };
+      // plain composed fractions throughout — the precomposed glyphs (⅛ etc.)
+      // aren't all in Jost, so single chips fell back to a heavier system font
+      var labels = { 2: '1/2', 4: '1/4', 8: '1/8', 16: '1/16', 32: '1/32', 64: '1/64' };
       html += '<div class="grid-row">';
       [2, 4, 8, 16, 32, 64].forEach(function (d) { html += box('denom', d, labels[d]); });
       html += '<span class="grid-group-label" style="margin-left:.3rem;">custom 1/</span>';
