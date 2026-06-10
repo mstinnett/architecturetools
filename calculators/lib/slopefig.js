@@ -103,6 +103,15 @@
     svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
     svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="2"/>';
 
+    // the slope length (the projected/true length, e.g. a rafter) — labelled
+    // at the hypotenuse midpoint, offset perpendicular to sit above the line
+    if (opts.hypoLabel) {
+      var angH = Math.atan2(py, px), off = 11;
+      var hx = (x0 + xT) / 2 - off * Math.sin(angH);
+      var hy = (y0 + yT) / 2 - off * Math.cos(angH);
+      svg += txt(hx, hy, 'nl-snap-val', 'middle', opts.hypoLabel);
+    }
+
     // the angle arc + label at the toe
     var ang = Math.atan2(py, px);
     var aR = Math.min(46, px * 0.5, 120);
@@ -135,11 +144,13 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   }
 
   var svg = SF.slopefig({ rise: 7 * FT, run: 22 * FT, riseLabel: "7'", runLabel: "22'",
-    angleLabel: '17.65°', refLo: 3 / 12, refHi: 4 / 12, refLoLabel: '3:12', refHiLabel: '4:12' });
+    angleLabel: '17.65°', hypoLabel: "23'-1.09\"",
+    refLo: 3 / 12, refHi: 4 / 12, refLoLabel: '3:12', refHiLabel: '4:12' });
   ok('returns an <svg>', svg.indexOf('<svg') === 0 && svg.indexOf('</svg>') > 0);
   ok('hatched wedge present', svg.indexOf('url(#sfhatch)') > 0);
   ok('two dashed reference rays', (svg.match(/stroke-dasharray/g) || []).length === 2);
   ok('labels drawn', svg.indexOf('>3:12</text>') > 0 && svg.indexOf('>4:12</text>') > 0 && svg.indexOf('>17.65°</text>') > 0);
+  ok('slope-length label drawn', svg.indexOf('23&#39;-1.09&quot;') > 0 || svg.indexOf("23'-1.09") > 0);
   ok('angle arc drawn', svg.indexOf('<path d="M') > 0);
 
   // exact refs accepted as {p,q}; no wedge when the slope IS the reference

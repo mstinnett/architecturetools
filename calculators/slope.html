@@ -6,7 +6,7 @@
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
 <title>Slope Calculator -- architecture.tools</title>
-<meta name="description" content="Rise, run, and slope — give any two. Percent, ratio, roof pitch, and degrees from exact engine math, drawn to true angle against the nearest standard pitches.">
+<meta name="description" content="Rise, run, and slope — give any two. Percent, ratio, roof pitch, and degrees from exact engine math, with projected lengths — a plan run becomes a height in elevation, plus the true length along the slope — drawn to true angle against the nearest standard pitches.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -56,8 +56,10 @@
     </nav>
     <h1>Slope</h1>
     <p>Give any two of rise, run, and slope. Every expression of the answer —
-       percent, ratio, roof pitch, degrees — from one exact calculation, drawn
-       to true angle, located against the slopes drawings usually call out.</p>
+       percent, ratio, roof pitch, degrees — from one exact calculation, plus
+       the projected lengths: a plan run at 8:12 becomes a height in elevation,
+       and the true length along the slope. Drawn to true angle, located
+       against the slopes drawings usually call out.</p>
   </div>
 
   <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
@@ -226,17 +228,18 @@
     var runU = run && !run.error ? run.units : null;
     var ratio = slope && !slope.error ? slope.ratio : null;
 
-    // solve the third — and SAY which two governed
+    // solve the third — and SAY which two governed (solved.leg marks the
+    // projected leg, so the answer rows can lead with it)
     var solved = null, derivedNote = null, quant = null;
     if (riseU != null && runU != null) {
-      solved = { rise: riseU, run: runU };
+      solved = { rise: riseU, run: runU, leg: null };
       if (ratio != null) derivedNote = 'rise and run define the slope — the slope field is ignored';
     } else if (riseU != null && ratio != null) {
       var runX = riseU / ratio;
-      if (!outOfRange(Math.round(runX))) { solved = { rise: riseU, run: Math.round(runX) }; quant = runX - solved.run; derivedNote = 'run solved from rise and slope'; }
+      if (!outOfRange(Math.round(runX))) { solved = { rise: riseU, run: Math.round(runX), leg: 'run' }; quant = runX - solved.run; derivedNote = 'run solved from rise and slope'; }
     } else if (runU != null && ratio != null) {
       var riseX = runU * ratio;
-      if (!outOfRange(Math.round(riseX))) { solved = { rise: Math.round(riseX), run: runU }; quant = riseX - solved.rise; derivedNote = 'rise solved from run and slope'; }
+      if (!outOfRange(Math.round(riseX))) { solved = { rise: Math.round(riseX), run: runU, leg: 'rise' }; quant = riseX - solved.rise; derivedNote = 'rise solved from run and slope'; }
     }
 
     renderEcho(rise, run, slope, solved, derivedNote);
@@ -331,6 +334,9 @@
     var pc = 100 * s;
     var pitch = 12 * s;
     var overOne = s > 1;
+    // the true length along the slope (a rafter, a ramp surface) — the one
+    // value here that is Pythagorean, not rational; quantized for display
+    var hypU = Math.round(Math.sqrt(riseU * riseU + runU * runU));
 
     Array.prototype.forEach.call(els.exprRow.querySelectorAll('[data-expr]'), function (b) {
       UI.press(b, b.dataset.expr === state.expr);
@@ -344,17 +350,29 @@
       rise: riseU, run: runU,
       riseLabel: fmtLen(riseU), runLabel: fmtLen(runU),
       angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
+      hypoLabel: fmtLen(hypU),
       refLo: br.exact ? null : br.lo, refHi: br.exact ? null : br.hi,
       refLoLabel: br.exact ? null : br.loL, refHiLabel: br.exact ? null : br.hiL,
       width: width, height: 200
     });
 
-    // every expression of the one slope — exact where the lattice allows
+    // every expression of the one slope — exact where the lattice allows.
+    // A solved (projected) leg leads; otherwise percent does.
     var html = '';
-    html += rowHtml('Percent', 'rise over run × 100', '<span class="fact">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>', '—', true);
+    html += rowHtml('Percent', 'rise over run × 100', '<span class="fact">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>', '—', solved.leg == null);
     html += rowHtml('Ratio', 'reduced exactly from the lattice', '1 : ' + escapeHtml(sig(q / p, q / p >= 100 ? 1 : 2)) + (q % p === 0 ? '' : ' (' + p + '/' + q + ' exact)'), '—', false);
     html += rowHtml('Pitch', 'per 12 of run', escapeHtml(sig(pitch, 2)) + ' : 12', '—', false);
     html += rowHtml('Angle', '', escapeHtml(sig(deg, deg < 1 ? 3 : 2)) + '°', '—', false);
+
+    // projected lengths — the triangle's three sides as plan / elevation /
+    // along-the-slope readings (a plan run at 8:12 projects to a height in
+    // elevation; the hypotenuse is what the rafter or ramp surface measures)
+    html += rowHtml('In plan · run', solved.leg === 'run' ? 'projected from the rise at this slope' : 'the horizontal projection',
+                    escapeHtml(fmtLen(runU)), '—', solved.leg === 'run');
+    html += rowHtml('In elevation · rise', solved.leg === 'rise' ? 'projected from the plan run at this slope' : 'the vertical projection',
+                    escapeHtml(fmtLen(riseU)), '—', solved.leg === 'rise');
+    html += rowHtml('Along the slope', '√(rise² + run²) — the true length: a rafter, a ramp surface',
+                    escapeHtml(fmtLen(hypU)), '—', false);
 
     // the brackets, with what each would mean in RISE over this run
     if (!br.exact) {
@@ -386,7 +404,8 @@
     var lines = [
       'rise = <b>' + riseU + '</b> units · run = <b>' + runU + '</b> units (1 unit = 1/960 mm)',
       'gcd ' + g + ' → slope = ' + p + '/' + q + ' exactly = ' + sig(s, 6),
-      'percent = 100·' + p + '/' + q + ' = ' + sig(pc, 4) + '% · pitch = 12·' + p + '/' + q + ' = ' + sig(pitch, 4) + ':12'
+      'percent = 100·' + p + '/' + q + ' = ' + sig(pc, 4) + '% · pitch = 12·' + p + '/' + q + ' = ' + sig(pitch, 4) + ':12',
+      'slope length = √(' + riseU + '² + ' + runU + '²) ≈ <b>' + hypU + '</b> units — Pythagorean, floating point, quantized to the lattice for display'
     ];
     if (quant) lines.push('solved leg quantized to the lattice (true value off by ' + escapeHtml(NumberLine.formatResidual(quant, state.target)) + ')');
     els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
