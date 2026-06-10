@@ -63,11 +63,11 @@
   .desk-hero img{width:100%;height:auto;display:block;}
 
   /* Software nav + scroll */
-  .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
+  .sw-nav{display:flex;justify-content:space-between;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
   .sw-nav-item{background:none;border:0;padding:0;font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;position:relative;z-index:1;}
   .sw-nav-item:hover{color:var(--black);}
   .sw-nav-item.sw-active{color:var(--black);}
-  .sw-nav-indicator{position:absolute;border:1px solid var(--accent);background:var(--accent-soft);top:-2px;bottom:-1px;pointer-events:none;cursor:grab;}
+  .sw-nav-indicator{position:absolute;border:1px solid var(--accent);background:var(--accent-soft);top:-1px;bottom:-2px;pointer-events:none;cursor:grab;}
   .sw-nav.is-scrubbing{cursor:grabbing;}
   .sw-nav.is-scrubbing .sw-nav-indicator{cursor:grabbing;}
   .sw-scroll-wrap{display:flex;align-items:stretch;gap:0.5rem;}
@@ -243,14 +243,6 @@
 
   <div class="input-section">
     <div class="section-label">Software -- select all you use</div>
-    <div class="sw-nav" id="swNav">
-      <span class="sw-nav-indicator" id="swNavIndicator" hidden></span>
-      <button type="button" class="sw-nav-item" data-target="grp-modeling">Modeling / BIM</button>
-      <button type="button" class="sw-nav-item" data-target="grp-drafting">Drafting</button>
-      <button type="button" class="sw-nav-item" data-target="grp-viz">Real-Time Visualization</button>
-      <button type="button" class="sw-nav-item" data-target="grp-render">Production Rendering</button>
-      <button type="button" class="sw-nav-item" data-target="grp-baseline">Baseline</button>
-    </div>
     <div class="sw-scroll-wrap">
     <button class="sw-chevron" id="swChevLeft" hidden type="button">&#8249;</button>
     <div class="sw-scroll" id="swScroll">
@@ -293,6 +285,14 @@
       </div>
     </div>
     <button class="sw-chevron" id="swChevRight" type="button">&#8250;</button>
+    </div>
+    <div class="sw-nav" id="swNav">
+      <span class="sw-nav-indicator" id="swNavIndicator" hidden></span>
+      <button type="button" class="sw-nav-item" data-target="grp-modeling">Modeling / BIM</button>
+      <button type="button" class="sw-nav-item" data-target="grp-drafting">Drafting</button>
+      <button type="button" class="sw-nav-item" data-target="grp-viz">Real-Time Visualization</button>
+      <button type="button" class="sw-nav-item" data-target="grp-render">Production Rendering</button>
+      <button type="button" class="sw-nav-item" data-target="grp-baseline">Baseline</button>
     </div>
   </div>
 
