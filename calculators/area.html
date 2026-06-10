@@ -250,6 +250,9 @@
     var lead = areaBoth(mm2);
     rows += rowHtml('Area', '', '<span class="fact">' + escapeHtml(neg + lead.lead) + '</span>', '—', true);
     rows += rowHtml('Also', '', escapeHtml(neg + lead.alt + '  ·  ' + neg + sig(in2) + ' in²  ·  ' + neg + sig(a) + ' mm²'), '—', false, 'is-ref');
+    // carry the same takeoff expression into the occupant load calc
+    if (mm2 > 0) rows += '<div style="margin-top:var(--space-sm);font-size:var(--text-sm);">Carry it forward: '
+      + '<a class="card-link" href="occupant-load.html?d=' + encodeURIComponent(state.text) + '">occupant load for this area →</a></div>';
     els.areaRows.innerHTML = rows;
   }
 
