@@ -186,5 +186,28 @@ function fmt(v, indent = 0) {
   return JSON.stringify(v);
 }
 
-writeFileSync(join(ROOT, 'assets/data/hardware-data.json'), fmt(data) + '\n');
-console.log(`build-data: wrote assets/data/hardware-data.json (${Object.keys(CPUs).length} CPUs, ${Object.keys(GPUs).length} GPUs, ${Object.keys(Chips).length} Chips, 72 spec cells)`);
+// Meta.dataUpdated — when the recommendations last changed, NOT when the build
+// ran. Self-referential so it's deterministic in any environment (no git, no
+// clock dependence): if this rebuild's content matches the committed file
+// (Meta aside), the previous stamp carries forward; only a real data change
+// stamps today. DATA_UPDATED=YYYY-MM-DD overrides for manual corrections.
+// The picker footer renders it as "Updated <month year>".
+const OUT = join(ROOT, 'assets/data/hardware-data.json');
+function dataUpdated(bodyNow) {
+  const override = process.env.DATA_UPDATED;
+  if (override && /^\d{4}-\d{2}-\d{2}$/.test(override)) return override;
+  try {
+    const prev = JSON.parse(readFileSync(OUT, 'utf8'));
+    const prevStamp = prev.Meta && prev.Meta.dataUpdated;
+    delete prev.Meta;
+    if (prevStamp && /^\d{4}-\d{2}-\d{2}$/.test(prevStamp) && fmt(prev) === bodyNow) return prevStamp;
+  } catch (e) { /* first build — fall through */ }
+  return new Date().toISOString().slice(0, 10);
+}
+
+const body = fmt(data);
+const stamp = dataUpdated(body);
+const ordered = { _comment: data._comment, Meta: { dataUpdated: stamp } };
+for (const k of Object.keys(data)) if (k !== '_comment') ordered[k] = data[k];
+writeFileSync(OUT, fmt(ordered) + '\n');
+console.log(`build-data: wrote assets/data/hardware-data.json (${Object.keys(CPUs).length} CPUs, ${Object.keys(GPUs).length} GPUs, ${Object.keys(Chips).length} Chips, 72 spec cells, data updated ${stamp})`);

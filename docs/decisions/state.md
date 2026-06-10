@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
+_Last updated: 2026-06-09 (UI review pass landed; converter promoted to main — the live site is now picker + converter)_
 
 ## Live architectural picture
 
@@ -12,11 +12,14 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
   Vanilla HTML/CSS/JS. No framework, no build step, no backend
   (`docs/PROJECT.md`).
 - **Two branches (read `docs/HANDOFF.md` first):**
-  - **`main` — the live site, picker-only.** `index.html` is the picker (the
-    home page); `picker.html` redirects to `/`. Plus `assets/`, `data/`,
-    `tools/`, `docs/`, the `build-data` workflow, `CNAME`, `.nojekyll`. Trimmed
-    to this in commit `f01b200` (removed `components.html`, `site-screen.html`,
-    and `calculators/`). The picker links to no deferred page, so nothing 404s.
+  - **`main` — the live site: the picker (home) + the Precise Unit Converter**
+    (`calculators/convert.html` + the three lib modules it loads — promoted
+    2026-06-09). `picker.html` redirects to `/`. Plus `assets/`, `data/`,
+    `tools/`, `docs/`, the `build-data` workflow, `CNAME`, `.nojekyll`.
+    Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb (site title
+    home link + set-trail label) on every page; picker footer links each live
+    tool; each tool back-links home. Nothing links a deferred page, so
+    nothing 404s.
   - **`dev` — the workbench (this branch).** The full prior site
     (`components.html`, `site-screen.html`, `calculators/`) **plus** the new
     calculator engine and converter. All work-in-progress lives here.
@@ -36,9 +39,15 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
   standalone, and does **not** use the engine.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
-- **Shared assets:** `assets/css/global.css` (design tokens + reusable
-  components); `assets/data/hardware-data.json` (the picker's runtime data,
-  generated from the `data/` CSV tables — see the pipeline contract below).
+- **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
+  warm sheet theme; imports `assets/css/tokens.css`, the canonical color
+  palette; owns the per-family accent system selected via `data-family` on
+  `<html>` and the one shared dark scheme). The picker and converter use it
+  fully; `components.html` and `dimension-converter.html` link it and inherit
+  the theme (the old cool-neutral sheet of the same name was replaced —
+  same class/token vocabulary, re-valued). `assets/data/hardware-data.json`
+  (the picker's runtime data, generated from the `data/` CSV tables — see the
+  pipeline contract below).
 - **Verification gate:** `.claude/gate/run.sh` — htmlhint + stylelint +
   internal-link check. A dependency carve-out under `.claude/gate/`; not
   shipped with the site.
@@ -51,7 +60,10 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 - `docs/HANDOFF.md` — the calculator-engine charter: the engine model, the
   build plan, and the provenance rule.
 - The "no build tools / no framework / no backend" rule for the site itself.
-- The `assets/css/global.css` token and component vocabulary.
+- The shared-CSS vocabulary: `assets/css/tokens.css` (canonical palette;
+  the only definer of `--paper` and the other ground anchors) +
+  `assets/css/global.css` (theme + components, family accents via
+  `data-family`).
 - The hardware-data pipeline: the CSV tables under `data/` (`cpus.csv`,
   `gpus.csv`, `chips.csv`, `specs-win.csv`, `specs-mac.csv`, `priorities.csv`,
   `extras.json`) are the single source of truth. `tools/build-data.mjs`
@@ -69,6 +81,44 @@ _Last updated: 2026-06-07 (dev reconciliation — engine + converter folded in)_
 
 ## Recent decisions
 
+- 2026-06-09 — Interim nav revised after operator review: every title block
+  opens with a breadcrumb (site title linking home + the set trail as a
+  label — "Calculators → Precise Unit Converter"), in place of routing the
+  two live pages through a C-0 cover. C-0 deferred until the set has a
+  second shipped tool (a one-item index is less deliberate than a labeled
+  trail); footer cross-links kept. Rule in SITE_FRAMEWORK "Hierarchy".
+- 2026-06-09 — UI review pass (operator-directed, "act on all of them"), then
+  the converter promoted to `main`. One base font size site-wide (18px, the
+  picker's iterated scale, set once in global.css). The calculator shell
+  graduated into global.css ("CALCULATOR SHELL": input well, echo, constraint
+  dial, debossed answer card, snap rows, figure text classes, mathnote) with
+  the slots labeled in convert.html and the convention recorded in HANDOFF §3.
+  All interactive pills on both pages are now real `<button>`s with
+  `aria-pressed` (synced via the new shared `assets/js/ui.js`, which also owns
+  `esc()`), one focus-visible ring, and coarse-pointer hit-height bumps; the
+  picker's markup order now matches its visual order (CSS `order` removed) and
+  ~10 dead inline CSS classes from earlier iterations were trimmed. Converter
+  gained a shareable URL (`?d=&t=&g=`) and an echo assumption line announcing
+  the auto-flipped target; the picker footer date now derives from
+  `Meta.dataUpdated` (build-data stamps the last data/ commit date). Interim
+  nav nailed down in SITE_FRAMEWORK and wired (footer link ↔ back-link).
+- 2026-06-09 — Shared CSS consolidated to one sheet (operator-directed).
+  `global2.css` renamed over `assets/css/global.css`, replacing the old
+  cool-neutral sheet (same class/token vocabulary, so its two consumers —
+  `components.html`, `dimension-converter.html` — re-theme without edits).
+  The `--paper` repetition resolved: tokens.css is its only definer (the
+  brand's warm-white anchor, like `--lightbox` for dark); the theme's grounds
+  are `--card` (the sheet) and `--gray-100` (the field behind it), and the
+  unused `--page-bg` alias was dropped. Picker + converter verified
+  computed-style identical in both schemes.
+- 2026-06-09 — Shared CSS refactor (operator-directed). The canonical palette
+  graduated from `docs/In Progress/tokens.css` to `assets/css/tokens.css`;
+  `global2.css` imports it and now owns the family-accent system (pages
+  declare `<html data-family="picker|drafting|…">`) plus the single shared
+  dark scheme that `index.html` and `convert.html` had each been carrying
+  inline. Both pages' duplicated `:root` mirrors and dark blocks were
+  deleted; rendering verified pixel-identical (computed-style diff, both
+  schemes). Future tool pages adopt the look with one link + one attribute.
 - 2026-06-07 — `partition.js` shipped: the layout primitive (sibling to
   `snap.js`) that divides a run into a whole number of equal parts and exposes
   the residual, unifying four tools (sections / tiles / on-center / balusters)

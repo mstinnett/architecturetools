@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-family="picker">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,68 +11,36 @@
 <meta property="og:title" content="What computer should I buy for architecture?">
 <meta property="og:description" content="A live, opinionated hardware picker for architects — specific CPU, GPU, RAM, monitor, and laptop picks for your software and project scale.">
 <meta name="twitter:card" content="summary">
-<link rel="stylesheet" href="assets/css/global2.css">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
 <style>
-  /* Page-specific layout + controls only. Shared tokens, the sheet-on-paper
-     surface, the key/well material and the base component looks all come from
-     global2.css (linked above). Rules here are index-only, or deliberate
-     overrides of the shared sheet. */
-
-  /* global2 supplies the warm token ramp; index references one extra step,
-     --gray-800, that the shared sheet doesn't define — map it onto the ramp. */
-  /* ============================================================
-     Shipped palette — canonical tokens (docs/In Progress/tokens.css).
-     Picker = "Ink" family, light + dark. Same shared dark surfaces,
-     gray ramp and shadows as the converter; only the accent family
-     differs. The desk line-art PNGs are inverted in dark so they read
-     on the dark field. Named tokens for readability.
-     ============================================================ */
-  :root{
-    /* canonical palette tokens — the families this page uses */
-    --picker:#211E18; --picker-tint:#EFEBE2; --picker-dark:#A8A49C;
-    --ink-text:#211E18; --hairline:#E4DFD5; --lightbox:#16181C; --text-on-dark:#E8E4DB;
-    /* engine shims kept from before */
-    --gray-800:var(--gray-900);
-    --answer-surface:color-mix(in srgb, var(--card) 50%, var(--card-2));
-    /* map the engine tokens onto the palette — light (Ink) */
-    --accent: var(--picker);
-    --accent-soft: var(--picker-tint);
-    --accent-ink:#FFFFFF;
-    --selected-bg: var(--accent);
-    --ink: var(--ink-text);
-    --rule: var(--hairline);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      /* surfaces — derived from --lightbox: backdrop darkest, sheet lifts */
-      --paper:#0F1115; --page-bg:#0F1115; --gray-100:#0F1115; --gray-50: var(--lightbox);
-      --card:#181B21; --white:#181B21; --card-2:#20242B;
-      /* text — palette text-on-dark */
-      --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2:#ADA89F; --ink-3:#7E7A72;
-      --gray-700:#B8B4AB; --gray-900:#D8D4CB; --gray-400:#6A665F;
-      /* lines */
-      --rule:#2E323A; --rule-2:#3C414B; --gray-200:#2A2E36; --gray-300:#383D46;
-      /* Ink · dark (a lifted warm gray) */
-      --accent: var(--picker-dark);
-      --accent-ink: var(--lightbox);
-      --accent-soft:color-mix(in srgb, var(--accent) 18%, transparent);
-      --selected-bg: var(--accent);
-      /* shadows recut for a dark field */
-      --shadow-card:0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
-      --shadow-key:inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
-      --shadow-key-hover:inset 0 1px 0 rgba(255,255,255,.06), 0 3px 7px rgba(0,0,0,.6);
-      --shadow-press:inset 0 2px 5px rgba(0,0,0,.65);
-      --shadow-well:inset 0 2px 4px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04);
-    }
-    /* desk line-art (transparent PNGs) → invert so dark lines read light on the dark field */
-    img[src*="desk-images"]{ filter: invert(0.9); }
-  }
-  html{font-size:18px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
-  body{overflow-anchor:none;background-color:var(--gray-100);}   /* font + ink + grain inherit from global2; desk stepped a shade darker than the panel */
-  .picker{max-width:1120px;margin:0 auto;padding:3rem 2rem 5rem;background:var(--card);border:1px solid color-mix(in srgb, var(--rule) 60%, transparent);box-shadow:var(--shadow-card);display:flex;flex-direction:column;}
-  /* Page order: hero, then the heading, then the picker controls, then the results, then prebuilts/footer. */
-  .picker>.desk-hero{order:1;} .picker-header{order:2;} .picker>.controls-cluster{order:3;} .picker>.mon-drawer{order:4;} .picker>.input-section{order:5;} .picker>.divider{order:6;} .picker>#panelsWrapper{order:7;} .picker>.picker-footer{order:8;}
-  .picker-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
+  /* Page-specific layout + controls only. The canonical palette
+     (assets/css/tokens.css), the family accent (picker = "Ink", selected by
+     data-family on <html>), the shared dark scheme, the sheet-on-paper
+     surface and the key/well material all come from global.css (linked
+     above). Rules here are index-only, or deliberate overrides of the
+     shared sheet. */
+  body{overflow-anchor:none;}   /* font + base size + ink + grain + desk tone inherit from global.css */
+  /* the sheet itself comes from the shared .page-wide; the picker only widens
+     it and stacks its sections (the @580 padding tweak below stays its own) */
+  .picker{max-width:1120px;display:flex;flex-direction:column;}
+  .picker-header{position:relative;margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
+  /* Scheme toggle — sun/moon key in the header corner. Moon shows in light
+     mode (tap for dark), sun in dark; CSS picks the icon off html[data-scheme]. */
+  .scheme-toggle{position:absolute;top:0;right:0;width:2.25rem;height:2.25rem;border:1px solid var(--rule-2);background:var(--card);box-shadow:var(--shadow-key);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-2);padding:0;transition:border-color 0.15s,color 0.15s,box-shadow 0.15s;}
+  .scheme-toggle:hover{border-color:var(--ink-3);color:var(--ink);box-shadow:var(--shadow-key-hover);}
+  .scheme-toggle .icon-sun{display:none;}
+  html[data-scheme="dark"] .scheme-toggle .icon-sun{display:block;}
+  html[data-scheme="dark"] .scheme-toggle .icon-moon{display:none;}
   .picker-header h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.2rem;}
   .picker-header p{font-size:0.82rem;color:var(--gray-700);font-weight:300;max-width:44em;}
   .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-700);margin-bottom:0.75rem;}
@@ -98,20 +66,32 @@
   .mon-drawer-body{display:none;padding:0.5rem 1rem 1.1rem;border-top:1px solid var(--gray-200);}
   .mon-drawer.is-open .mon-drawer-body{display:block;}
 
-  /* Machine type strip (below divider) — full-width tabs */
-
   /* make2d desk illustration hero */
   /* Hero fills its width; the make2d images are a uniform canvas now, so no
      fixed slot is needed. */
-  .desk-hero{max-width:880px;margin:0 auto 1.5rem;}
-  .desk-hero img{width:100%;height:auto;display:block;}
+  /* width is explicit: the auto margins opt out of flex stretching, and the
+     masked div below has no intrinsic size to shrink-to-fit around */
+  .desk-hero{width:100%;max-width:880px;margin:0 auto 1.5rem;}
+  /* The line art ships as plain transparent PNGs in BOTH schemes — a light
+     original and a pre-rendered dark recolor. No filter, no mask: both tricks
+     rasterized as opaque slabs somewhere (filter on iOS, mask in other
+     engines). Plain images render everywhere. The manual scheme toggle means
+     <picture media> can't pick the file — deskHeroHTML() reads
+     html[data-scheme] and update() re-renders on schemechange.
+     Dark variants: tools/recolor-desk-dark.mjs. */
+  /* every export shares one 2843x2221 make2d canvas — reserving the ratio
+     keeps the page from collapsing and shifting under the pointer while a
+     scheme swap loads the other variant */
+  .desk-hero img{width:100%;height:auto;display:block;aspect-ratio:2843/2221;}
 
   /* Software nav + scroll */
-  .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
-  .sw-nav-item{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;position:relative;z-index:1;}
+  /* the heavy rule closes the software band: thin track line above the
+     scrubber, 2px black below it (the indicator overhangs both by design) */
+  .sw-nav{display:flex;justify-content:space-between;margin-top:0.5rem;padding:0.5rem 0;border-top:1px solid var(--gray-700);border-bottom:2px solid var(--black);position:relative;cursor:pointer;touch-action:none;user-select:none;}
+  .sw-nav-item{background:none;border:0;padding:0;font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;position:relative;z-index:1;}
   .sw-nav-item:hover{color:var(--black);}
   .sw-nav-item.sw-active{color:var(--black);}
-  .sw-nav-indicator{position:absolute;border:1px solid var(--accent);background:var(--accent-soft);top:-2px;bottom:-1px;pointer-events:none;cursor:grab;}
+  .sw-nav-indicator{position:absolute;border:1px solid var(--accent);background:var(--accent-soft);top:-1px;bottom:-2px;pointer-events:none;cursor:grab;}
   .sw-nav.is-scrubbing{cursor:grabbing;}
   .sw-nav.is-scrubbing .sw-nav-indicator{cursor:grabbing;}
   .sw-scroll-wrap{display:flex;align-items:stretch;gap:0.5rem;}
@@ -139,19 +119,6 @@
   .option-pill .pill-detail{font-size:0.68rem;font-weight:300;opacity:0.7;margin-top:0.1rem;}
   .option-pill.active .pill-detail{opacity:0.7;}
 
-  .divider{border:none;border-top:2px solid var(--black);margin:3rem 0;}
-
-  /* Results bar */
-  .results-bar{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--black);margin-bottom:0;}
-  .results-tabs{display:flex;gap:0;}
-  .results-tab{padding:0.65rem 1.5rem;font-size:0.85rem;font-weight:400;cursor:pointer;border:1px solid transparent;border-bottom:none;background:none;color:var(--gray-400);font-family:var(--font-body);transition:all 0.15s ease;position:relative;bottom:-2px;}
-  .results-tab:hover{color:var(--black);}
-  .results-tab.active{color:var(--black);font-weight:500;border:2px solid var(--black);border-bottom:2px solid var(--white);padding:calc(0.65rem - 1px) calc(1.5rem - 1px);background:var(--white);}
-  .plat-area{padding-bottom:0.65rem;display:flex;align-items:center;gap:0.5rem;}
-  .plat-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);}
-  .plat-opt{padding:0.25rem 0.55rem;font-size:0.65rem;font-weight:400;cursor:pointer;border:1px solid var(--rule-2);background:var(--card);color:var(--ink);box-shadow:var(--shadow-key);border-radius:var(--radius);transition:border-color 0.15s,background 0.15s,box-shadow 0.15s,transform 0.12s;user-select:none;}
-  .plat-opt:hover{border-color:var(--ink-3);box-shadow:var(--shadow-key-hover);}
-  .plat-opt.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:var(--shadow-press);transform:translateY(1px);}
   .plat-forced{font-size:0.6rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);letter-spacing:0.1em;text-transform:uppercase;}
   .hidden{display:none !important;}
 
@@ -189,16 +156,10 @@
   .result-main{flex:1;min-width:0;}
   .result-side{width:320px;flex-shrink:0;}
 
-  .card-illustration{background:var(--gray-50);border:1px solid var(--gray-700);height:160px;display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:0.72rem;font-family:var(--font-body);font-weight:300;margin-bottom:1.5rem;}
-
   .spec-block{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:1.5rem;}
   .spec-item-label{font-size:0.64rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-700);margin-bottom:0.25rem;}
   .spec-item-value{font-size:0.88rem;font-weight:400;}
   .spec-item-note{font-size:0.82rem;color:var(--gray-800);font-weight:300;margin-top:0.2rem;max-width:24em;line-height:1.5;}
-
-  .card-link{display:inline-block;font-size:0.75rem;font-weight:400;color:var(--black);border-bottom:1px solid var(--black);text-decoration:none;padding-bottom:1px;transition:opacity 0.15s;margin-right:1.5rem;}
-  .card-link:hover{opacity:0.6;}
-  .purchase-paths{margin-bottom:1rem;}
 
   .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--answer-surface);border:1px solid color-mix(in srgb, var(--rule) 58%, transparent);box-shadow:var(--shadow-well);}
   .priority-box-label{font-size:0.6rem;font-family:var(--font-body);font-weight:400;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray-700);margin-bottom:0.35rem;}
@@ -254,8 +215,10 @@
   .laptop-all-list{display:none;margin-top:1rem;}
   .laptop-all-list.is-open{display:block;}
 
-  .strategy-row{margin-bottom:1.5rem;}
   .picker-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-700);font-size:0.68rem;color:var(--gray-700);font-weight:300;line-height:1.7;}
+  .footer-tools{margin-bottom:0.35rem;}
+  .picker-footer a{color:inherit;text-decoration:none;border-bottom:1px solid var(--gray-300);transition:border-color 0.15s;}
+  .picker-footer a:hover{border-bottom-color:var(--black);}
 
   @media(max-width:980px){
     .controls-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem 2rem;}
@@ -264,9 +227,7 @@
     .controls-row{grid-template-columns:1fr;}
   }
   @media(max-width:820px){
-    .picker{padding:2rem 1.25rem 3rem;}
     .picker-header{margin-bottom:2rem;padding-bottom:1.5rem;}
-    .divider{margin:2rem 0;}
     .result-columns{flex-direction:column;align-items:stretch;}
     .result-side{width:100%;}
     .spec-block{gap:1rem 2rem;}
@@ -289,14 +250,122 @@
 </style>
 </head>
 <body>
-<div class="picker">
+<div class="page-wide picker">
+  <!-- Markup order = visual order (no CSS reordering, so tab order matches
+       what's on screen): hero leads, then the heading, the inputs (software
+       closes with the heavy rule), and then the full recommendation. -->
+  <div class="desk-hero" id="deskHero"></div>
+
   <div class="picker-header">
+    <div class="page-crumb">architecture.tools</div>
     <h1>What computer should I buy for architecture?</h1>
     <p>Live recommendation. Tweak the inputs below.</p>
+    <button type="button" class="scheme-toggle" id="schemeToggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
   </div>
 
-  <!-- Answer first: hero illustration, then the recommendation panels. -->
-  <div class="desk-hero" id="deskHero"></div>
+  <div class="input-section">
+    <div class="section-label">Software -- select all you use</div>
+    <div class="sw-scroll-wrap">
+    <button class="sw-chevron" id="swChevLeft" hidden type="button">&#8249;</button>
+    <div class="sw-scroll" id="swScroll">
+      <div class="sw-strip">
+        <div class="sw-group" id="grp-modeling">
+          <div class="sw-group-label">Modeling / BIM</div>
+          <div class="sw-group-apps">
+            <button type="button" class="app-toggle win-only" aria-pressed="false" data-app="revit">Revit</button>
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="archicad">ArchiCAD</button>
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="vectorworks">Vectorworks</button>
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="sketchup">SketchUp</button>
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="rhino">Rhino</button>
+          </div>
+        </div>
+        <div class="sw-group" id="grp-drafting">
+          <div class="sw-group-label">Drafting</div>
+          <div class="sw-group-apps"><button type="button" class="app-toggle win-only" aria-pressed="false" data-app="autocad">AutoCAD</button></div>
+        </div>
+        <div class="sw-group" id="grp-viz">
+          <div class="sw-group-label">Real-Time Visualization</div>
+          <div class="sw-group-apps">
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="enscape">Enscape</button>
+            <button type="button" class="app-toggle win-only" aria-pressed="false" data-app="lumion">Lumion</button>
+            <button type="button" class="app-toggle win-only" aria-pressed="false" data-app="d5">D5 Render</button>
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="twinmotion">TwinMotion</button>
+            <button type="button" class="app-toggle win-only" aria-pressed="false" data-app="unreal">Unreal Engine</button>
+          </div>
+        </div>
+        <div class="sw-group" id="grp-render">
+          <div class="sw-group-label">Production Rendering</div>
+          <div class="sw-group-apps">
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="vray">V-Ray</button>
+            <button type="button" class="app-toggle" aria-pressed="false" data-app="corona">Corona</button>
+          </div>
+        </div>
+        <div class="sw-group" id="grp-baseline">
+          <div class="sw-group-label">Baseline</div>
+          <div class="sw-group-apps"><div class="app-toggle baseline">Office / Bluebeam / PM -- minimum system</div></div>
+        </div>
+      </div>
+    </div>
+    <button class="sw-chevron" id="swChevRight" type="button">&#8250;</button>
+    </div>
+    <div class="sw-nav" id="swNav">
+      <span class="sw-nav-indicator" id="swNavIndicator" hidden></span>
+      <button type="button" class="sw-nav-item" data-target="grp-modeling">Modeling / BIM</button>
+      <button type="button" class="sw-nav-item" data-target="grp-drafting">Drafting</button>
+      <button type="button" class="sw-nav-item" data-target="grp-viz">Real-Time Visualization</button>
+      <button type="button" class="sw-nav-item" data-target="grp-render">Production Rendering</button>
+      <button type="button" class="sw-nav-item" data-target="grp-baseline">Baseline</button>
+    </div>
+  </div>
+
+  <div class="controls-cluster">
+    <div class="controls-row">
+      <div class="control-group">
+        <div class="section-label">Budget</div>
+        <div class="option-row" id="budgetOptions"></div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Project Scale</div>
+        <div class="option-row" id="scaleOptions">
+          <button type="button" class="option-pill active" aria-pressed="true" data-scale="small">Small / Medium<span class="pill-detail">SFR, small office, single models</span></button>
+          <button type="button" class="option-pill" aria-pressed="false" data-scale="large">Large / Complex<span class="pill-detail">Large buildings, multiple linked files</span></button>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Setup</div>
+        <div class="option-row" id="machineTypeOptions">
+          <button type="button" class="option-pill active" aria-pressed="true" data-machinetype="desktop">Desktop</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="laptop">Laptop</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="desktop_travel">Desktop + Travel Laptop</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="desktop_workstation">Desktop + Powerful Laptop</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Platform</div>
+        <div class="option-row" id="platArea">
+          <button type="button" class="option-pill active" aria-pressed="true" data-platform="win">Windows</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-platform="mac">Mac</button>
+        </div>
+        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
+          <span class="plat-forced">Windows -- required by selected apps</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitors: one collapsible drawer, grouped with the setup inputs above.
+       Closed by default (shows the current pick); opening it reveals the tiered
+       configs. Picking one redraws the hero. -->
+  <div class="mon-drawer" id="monDrawer">
+    <button class="mon-drawer-toggle" id="monDrawerToggle" type="button" aria-expanded="false" aria-controls="monDrawerBody">
+      <span class="mon-drawer-label">Monitors</span>
+      <span class="mon-drawer-summary" id="monDrawerSummary"></span>
+    </button>
+    <div class="mon-drawer-body" id="monDrawerBody"></div>
+  </div>
 
   <div id="panelsWrapper">
   <!-- Desktop -->
@@ -323,112 +392,14 @@
   </div>
   </div>
 
-  <!-- Heavy rule separates the answer above from the tweakable inputs below. -->
-  <hr class="divider">
-
-  <div class="input-section">
-    <div class="sw-nav" id="swNav">
-      <span class="sw-nav-indicator" id="swNavIndicator" hidden></span>
-      <span class="sw-nav-item" data-target="grp-modeling">Modeling / BIM</span>
-      <span class="sw-nav-item" data-target="grp-drafting">Drafting</span>
-      <span class="sw-nav-item" data-target="grp-viz">Real-Time Visualization</span>
-      <span class="sw-nav-item" data-target="grp-render">Production Rendering</span>
-      <span class="sw-nav-item" data-target="grp-baseline">Baseline</span>
-    </div>
-    <div class="sw-scroll-wrap">
-    <button class="sw-chevron" id="swChevLeft" hidden type="button">&#8249;</button>
-    <div class="sw-scroll" id="swScroll">
-      <div class="sw-strip">
-        <div class="sw-group" id="grp-modeling">
-          <div class="sw-group-label">Modeling / BIM</div>
-          <div class="sw-group-apps">
-            <div class="app-toggle win-only" data-app="revit">Revit</div>
-            <div class="app-toggle" data-app="archicad">ArchiCAD</div>
-            <div class="app-toggle" data-app="vectorworks">Vectorworks</div>
-            <div class="app-toggle" data-app="sketchup">SketchUp</div>
-            <div class="app-toggle" data-app="rhino">Rhino</div>
-          </div>
-        </div>
-        <div class="sw-group" id="grp-drafting">
-          <div class="sw-group-label">Drafting</div>
-          <div class="sw-group-apps"><div class="app-toggle win-only" data-app="autocad">AutoCAD</div></div>
-        </div>
-        <div class="sw-group" id="grp-viz">
-          <div class="sw-group-label">Real-Time Visualization</div>
-          <div class="sw-group-apps">
-            <div class="app-toggle" data-app="enscape">Enscape</div>
-            <div class="app-toggle win-only" data-app="lumion">Lumion</div>
-            <div class="app-toggle win-only" data-app="d5">D5 Render</div>
-            <div class="app-toggle" data-app="twinmotion">TwinMotion</div>
-            <div class="app-toggle win-only" data-app="unreal">Unreal Engine</div>
-          </div>
-        </div>
-        <div class="sw-group" id="grp-render">
-          <div class="sw-group-label">Production Rendering</div>
-          <div class="sw-group-apps">
-            <div class="app-toggle" data-app="vray">V-Ray</div>
-            <div class="app-toggle" data-app="corona">Corona</div>
-          </div>
-        </div>
-        <div class="sw-group" id="grp-baseline">
-          <div class="sw-group-label">Baseline</div>
-          <div class="sw-group-apps"><div class="app-toggle baseline">Office / Bluebeam / PM -- minimum system</div></div>
-        </div>
-      </div>
-    </div>
-    <button class="sw-chevron" id="swChevRight" type="button">&#8250;</button>
-    </div>
+  <!-- interim nav (SITE_FRAMEWORK "Hierarchy"): the home footer lists each live tool -->
+  <div class="picker-footer">
+    <div class="footer-tools">Tools: <a href="calculators/convert.html">Precise Unit Converter</a> &mdash; exact conversions, with the cost of rounding shown.</div>
+    <span id="dataUpdated">Updated March 2026.</span> Independent recommendations &mdash; no affiliate commissions.
   </div>
-
-  <div class="controls-cluster">
-    <div class="controls-row">
-      <div class="control-group">
-        <div class="section-label">Budget</div>
-        <div class="option-row" id="budgetOptions"></div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Project Scale</div>
-        <div class="option-row" id="scaleOptions">
-          <div class="option-pill active" data-scale="small"><div>Small / Medium</div><div class="pill-detail">SFR, small office, single models</div></div>
-          <div class="option-pill" data-scale="large"><div>Large / Complex</div><div class="pill-detail">Large buildings, multiple linked files</div></div>
-        </div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Setup</div>
-        <div class="option-row" id="machineTypeOptions">
-          <div class="option-pill active" data-machinetype="desktop"><div>Desktop</div></div>
-          <div class="option-pill" data-machinetype="laptop"><div>Laptop</div></div>
-          <div class="option-pill" data-machinetype="desktop_travel"><div>Desktop + Travel Laptop</div></div>
-          <div class="option-pill" data-machinetype="desktop_workstation"><div>Desktop + Powerful Laptop</div></div>
-        </div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Platform</div>
-        <div class="option-row" id="platArea">
-          <div class="option-pill active" data-platform="win"><div>Windows</div></div>
-          <div class="option-pill" data-platform="mac"><div>Mac</div></div>
-        </div>
-        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
-          <span class="plat-forced">Windows -- required by selected apps</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Monitors: one collapsible drawer, grouped with the setup inputs above.
-       Closed by default (shows the current pick); opening it reveals the tiered
-       configs. Picking one redraws the hero. -->
-  <div class="mon-drawer" id="monDrawer">
-    <button class="mon-drawer-toggle" id="monDrawerToggle" type="button" aria-expanded="false" aria-controls="monDrawerBody">
-      <span class="mon-drawer-label">Monitors</span>
-      <span class="mon-drawer-summary" id="monDrawerSummary"></span>
-    </button>
-    <div class="mon-drawer-body" id="monDrawerBody"></div>
-  </div>
-
-  <div class="picker-footer">Updated March 2026. Independent recommendations &mdash; no affiliate commissions.</div>
 </div>
 
+<script src="assets/js/ui.js"></script>
 <script>
 // Hardware data lives in assets/data/hardware-data.json — the single source of
 // truth, editable in Pages CMS (see .pages.yml). We fetch it, expose it as the
@@ -488,37 +459,30 @@ function runPicker(){
     laptopSeeAllOpen: false
   };
 
-  // Escape a CMS-supplied string before it goes into innerHTML, so a stray
-  // <, >, &, or " in the data (CSV/JSON) renders as literal text instead of
-  // breaking the page or injecting markup. Used only at innerHTML sites; values
-  // placed via textContent/setAttribute already escape themselves.
-  function esc(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  // innerHTML escaping + pressed-state sync come from the shared page util
+  // (assets/js/ui.js) — one copy across the picker, converter, and future tools.
+  var esc = UI.esc;
 
   function renderBudgetOptions() {
     var budgetOptionsContainer = document.getElementById('budgetOptions');
     var budgetOptionsMarkup = '';
     for (var budgetIndex = 0; budgetIndex < Data.PickerOptions.budgetOptions.length; budgetIndex++) {
       var budgetOption = Data.PickerOptions.budgetOptions[budgetIndex];
-      budgetOptionsMarkup += '<div class="option-pill' + (State.budget === budgetOption.id ? ' active' : '') + '" data-budget="' + budgetOption.id + '"><div>' + esc(budgetOption.label) + '</div><div class="pill-detail">' + esc(budgetOption.detail) + '</div></div>';
+      var isCurrentBudget = State.budget === budgetOption.id;
+      budgetOptionsMarkup += '<button type="button" class="option-pill' + (isCurrentBudget ? ' active' : '') + '" aria-pressed="' + isCurrentBudget + '" data-budget="' + budgetOption.id + '">' + esc(budgetOption.label) + '<span class="pill-detail">' + esc(budgetOption.detail) + '</span></button>';
     }
     budgetOptionsContainer.innerHTML = budgetOptionsMarkup;
   }
 
   function syncStaticOptionSelections() {
     document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) {
-      optionElement.classList.toggle('active', optionElement.dataset.platform === State.platform);
+      UI.press(optionElement, optionElement.dataset.platform === State.platform);
     });
     document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) {
-      optionElement.classList.toggle('active', optionElement.dataset.scale === State.scale);
+      UI.press(optionElement, optionElement.dataset.scale === State.scale);
     });
     document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) {
-      optionElement.classList.toggle('active', optionElement.dataset.machinetype === State.machineType);
+      UI.press(optionElement, optionElement.dataset.machinetype === State.machineType);
     });
   }
 
@@ -600,9 +564,10 @@ function runPicker(){
         if (c.tier !== tiers[t][0] || !configAvailable(c, platform)) continue;
         var visual = '';
         for (var j = 0; j < c.monitors.length; j++) { var mon = findMonitor(c.monitors[j]); if (mon) visual += monitorSVG(mon, 0.36); }
-        row += '<div class="mon-config' + (i === State.monitorConfig ? ' selected' : '') + (c.rec ? ' recommended' : '') +
-          '" data-config="' + i + '"><div class="mon-config-visual">' + visual +
-          '</div><span class="mbadge">rec</span><div class="mon-config-name">' + esc(c.name) + '</div></div>';
+        var isSelectedConfig = i === State.monitorConfig;
+        row += '<button type="button" class="mon-config' + (isSelectedConfig ? ' selected' : '') + (c.rec ? ' recommended' : '') +
+          '" aria-pressed="' + isSelectedConfig + '" data-config="' + i + '"><span class="mon-config-visual">' + visual +
+          '</span><span class="mbadge">rec</span><span class="mon-config-name">' + esc(c.name) + '</span></button>';
       }
       if (row) markup += '<div class="mon-tier"><div class="mon-tier-label">' + tiers[t][1] + '</div><div class="mon-tier-row">' + row + '</div></div>';
     }
@@ -652,7 +617,11 @@ function runPicker(){
   function deskHeroHTML(role, deskIds, platform) {
     var filename = deskImageFilename(role, deskIds, platform);
     if (!filename) return '';
-    return '<img src="assets/desk-images/' + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout" loading="eager" onerror="this.onerror=null;this.src=\'assets/desk-images/NorthXL_2x27.png\';">';
+    var dir = document.documentElement.dataset.scheme === 'dark' ? 'assets/desk-images-dark/' : 'assets/desk-images/';
+    // on a missing export, fall back to the stock dual-27 desk in the same scheme
+    var onerror = "this.onerror=null;this.src='" + dir + "NorthXL_2x27.png';";
+    return '<img src="' + dir + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout"' +
+      ' loading="eager" onerror="' + onerror + '">';
   }
 
   function bindMonitorConfigEvents(containerId) {
@@ -868,7 +837,7 @@ function runPicker(){
     document.getElementById('panel-mobile').classList.toggle('active', showLaptop);
     document.getElementById('panelsWrapper').classList.toggle('panels-split', isSplit);
 
-    // Hero desk illustration -- one big image that swaps with state.
+    // Hero desk illustration -- one big drawing that swaps with state.
     var heroRole = isSplit ? 'combo' : (State.machineType === 'laptop' ? 'laptop' : 'desktop');
     document.getElementById('deskHero').innerHTML = deskHeroHTML(heroRole, State.desk, activePlatform);
 
@@ -960,7 +929,7 @@ function runPicker(){
       mobileMarkup += '<div class="laptop-rec-featured-note">' + esc(recLaptop.note) + '</div>';
       mobileMarkup += '</div>';
       if (allLaptopMatches.length > 1) {
-        mobileMarkup += '<button class="laptop-see-all-btn' + (State.laptopSeeAllOpen ? ' is-open' : '') + '" type="button">' + (State.laptopSeeAllOpen ? 'Hide options' : 'See all options (' + allLaptopMatches.length + ')') + '</button>';
+        mobileMarkup += '<button class="laptop-see-all-btn' + (State.laptopSeeAllOpen ? ' is-open' : '') + '" type="button" aria-expanded="' + State.laptopSeeAllOpen + '">' + (State.laptopSeeAllOpen ? 'Hide options' : 'See all options (' + allLaptopMatches.length + ')') + '</button>';
         mobileMarkup += '<div class="laptop-all-list' + (State.laptopSeeAllOpen ? ' is-open' : '') + '">' + fullListMarkup + '</div>';
       }
     } else {
@@ -983,6 +952,7 @@ function runPicker(){
         State.laptopSeeAllOpen = opening;
         allList.classList.toggle('is-open', opening);
         seeAllBtn.classList.toggle('is-open', opening);
+        seeAllBtn.setAttribute('aria-expanded', opening ? 'true' : 'false');
         seeAllBtn.textContent = opening ? 'Hide options' : 'See all options (' + totalCount + ')';
       });
     }
@@ -992,10 +962,10 @@ function runPicker(){
       ? 'The Mac does the demanding work at the desk, and the laptop just travels. A MacBook Air weighs under 3 lbs and lasts all day.'
       : 'The desktop does the demanding work, and the laptop just travels. Light, long battery, and one cable docks it at your desk.';
     else if (mobileStrategy === 'workstation') mobilePriorityNote = isMacPlatform
-      ? 'A second full machine for working anywhere. A MacBook Pro with the M4 Pro or Max handles modeling on the road, with the desktop for the longest jobs.'
+      ? 'A second full machine for working anywhere. A MacBook Pro with the M5 Pro or Max handles modeling on the road, with the desktop for the longest jobs.'
       : 'A second full machine for working anywhere. It runs your software away from the desk, though the longest renders still belong at the desktop.';
     else mobilePriorityNote = isMacPlatform
-      ? 'Every MacBook drives your monitors over one cable. A MacBook Pro with the M4 Pro or Max can be your only machine.'
+      ? 'Every MacBook drives your monitors over one cable. A MacBook Pro with the M5 Pro or Max can be your only machine.'
       : 'One laptop, one set of files. Dock it at your desk, unplug and go. It won\'t hold up to long renders like a desktop, so leave those at the desk.';
     document.getElementById('m-priority').innerHTML = '<div class="priority-box-label">The mobile tradeoff</div><p>' + mobilePriorityNote + '</p>';
 
@@ -1013,12 +983,14 @@ function runPicker(){
   // ---- EVENTS ----
   document.querySelectorAll('.app-toggle:not(.baseline)').forEach(function(appToggle) {
     appToggle.addEventListener('click', function() {
-      appToggle.classList.toggle('active');
-      State.apps[appToggle.dataset.app] = appToggle.classList.contains('active');
+      var isOn = !appToggle.classList.contains('active');
+      UI.press(appToggle, isOn);
+      State.apps[appToggle.dataset.app] = isOn;
       if (availablePlatforms() === 'win') {
         State.platform = 'win';
-        document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) { platformOption.classList.remove('active'); });
-        document.querySelector('#platArea .option-pill[data-platform="win"]').classList.add('active');
+        document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) {
+          UI.press(platformOption, platformOption.dataset.platform === 'win');
+        });
       }
       update();
     });
@@ -1031,32 +1003,28 @@ function runPicker(){
   });
   document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) {
     platformOption.addEventListener('click', function() {
-      document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      platformOption.classList.add('active');
+      document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === platformOption); });
       State.platform = platformOption.dataset.platform;
       update();
     });
   });
   document.querySelectorAll('#budgetOptions .option-pill').forEach(function(budgetOption) {
     budgetOption.addEventListener('click', function() {
-      document.querySelectorAll('#budgetOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      budgetOption.classList.add('active');
+      document.querySelectorAll('#budgetOptions .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === budgetOption); });
       State.budget = budgetOption.dataset.budget;
       update();
     });
   });
   document.querySelectorAll('#scaleOptions .option-pill').forEach(function(scaleOption) {
     scaleOption.addEventListener('click', function() {
-      document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      scaleOption.classList.add('active');
+      document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === scaleOption); });
       State.scale = scaleOption.dataset.scale;
       update();
     });
   });
   document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(machineTypeOption) {
     machineTypeOption.addEventListener('click', function() {
-      document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) { optionElement.classList.remove('active'); });
-      machineTypeOption.classList.add('active');
+      document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === machineTypeOption); });
       State.machineType = machineTypeOption.dataset.machinetype;
       update();
     });
@@ -1072,6 +1040,10 @@ function runPicker(){
       monDrawerToggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
     });
   }
+
+  // Repaint when the scheme toggle (or the OS) flips the page scheme — the
+  // desk art is scheme-specific and chosen in JS, not by <picture media>.
+  document.addEventListener('schemechange', updatePreservingScroll);
 
   update();
 
@@ -1121,7 +1093,17 @@ function runPicker(){
   var swScrubScrollPerPixel = 1;
   swNavEl.addEventListener('pointerdown', function(e) {
     if (e.button !== undefined && e.button !== 0) return;
-    if (e.target.closest('.sw-nav-item')) return;  // let the nav-item click jump
+    // A press inside the indicator is a thumb grab and always scrubs — even
+    // where the thumb overlaps a label (the indicator is pointer-events:none,
+    // so the label underneath is the event target). Only an exposed label
+    // keeps its jump-to-group click.
+    var overThumb = false;
+    if (!swNavIndicator.hidden) {
+      var thumbRect = swNavIndicator.getBoundingClientRect();
+      overThumb = e.clientX >= thumbRect.left && e.clientX <= thumbRect.right &&
+                  e.clientY >= thumbRect.top && e.clientY <= thumbRect.bottom;
+    }
+    if (!overThumb && e.target.closest('.sw-nav-item')) return;  // let the nav-item click jump
     var maxScroll = swScroll.scrollWidth - swScroll.clientWidth;
     if (maxScroll <= 0) return;
     var navWidth = swNavEl.offsetWidth;
@@ -1144,14 +1126,43 @@ function runPicker(){
   function endScrub(e) {
     if (!swScrubbing) return;
     swScrubbing = false;
+    swSuppressClick = true;   // a scrub press releasing over a label isn't a click
     swNavEl.classList.remove('is-scrubbing');
     try { swNavEl.releasePointerCapture(e.pointerId); } catch (err) {}
   }
   swNavEl.addEventListener('pointerup', endScrub);
   swNavEl.addEventListener('pointercancel', endScrub);
+  var swSuppressClick = false;
+  swNavEl.addEventListener('click', function(e) {
+    if (swSuppressClick) { swSuppressClick = false; e.stopPropagation(); e.preventDefault(); }
+  }, true);
   updateSwControls();
 })();
 }
+
+// Scheme toggle (header sun/moon): flips html[data-scheme], persists the
+// choice, and notifies the picker so the desk art re-renders. With no stored
+// choice the page follows the system scheme live.
+(function(){
+  var btn = document.getElementById('schemeToggle');
+  function label() {
+    if (btn) btn.setAttribute('aria-label', document.documentElement.dataset.scheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  function apply(scheme, persist) {
+    document.documentElement.dataset.scheme = scheme;
+    if (persist) { try { localStorage.setItem('scheme', scheme); } catch (e) {} }
+    label();
+    document.dispatchEvent(new Event('schemechange'));
+  }
+  label();
+  if (btn) btn.addEventListener('click', function(){
+    apply(document.documentElement.dataset.scheme === 'dark' ? 'light' : 'dark', true);
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+    var stored = null; try { stored = localStorage.getItem('scheme'); } catch (err) {}
+    if (!stored) apply(e.matches ? 'dark' : 'light', false);
+  });
+})();
 
 // hardware-data.json is generated from the CSV tables in data/ (see
 // data/README.md). It keeps each CPU/GPU/Mac chip (its name and standard note)
@@ -1200,9 +1211,20 @@ function hydrateSpecs(data) {
   return data;
 }
 
+// "Updated <month year>" tracks the data, not the page: build-data.mjs stamps
+// Meta.dataUpdated with the last commit date touching data/ (see data/README.md).
+function renderDataUpdated(meta) {
+  var stamp = meta && meta.dataUpdated;          // YYYY-MM-DD
+  var el = document.getElementById('dataUpdated');
+  if (!el || !stamp || !/^\d{4}-\d{2}-\d{2}$/.test(stamp)) return;
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var parts = stamp.split('-');
+  el.textContent = 'Updated ' + months[+parts[1] - 1] + ' ' + parts[0] + '.';
+}
+
 fetch('assets/data/hardware-data.json', { cache: 'no-cache' })
   .then(function(response){ if (!response.ok) throw new Error('hardware-data.json HTTP ' + response.status); return response.json(); })
-  .then(function(loadedData){ window.Data = hydrateSpecs(loadedData); runPicker(); })
+  .then(function(loadedData){ window.Data = hydrateSpecs(loadedData); renderDataUpdated(loadedData.Meta); runPicker(); })
   .catch(function(error){
     var note = document.querySelector('.picker-header p');
     if (note) note.textContent = 'Recommendation data failed to load — please refresh the page.';

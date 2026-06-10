@@ -1,0 +1,62 @@
+/* architecture.tools + DocCheck — canonical color tokens
+   System: family tier anchored to Prussian's lightness (L 0.41), per-hue chroma.
+   Exceptions: --ink (achromatic anchor), --building/ochre (lifted; yellow can't be dark & vivid in sRGB).
+   Marks tier runs hotter on purpose. Values are sRGB hex (universal); OKLCH spec in comments documents the rule.
+   Ramps derived by transform: hover = L-0.06; tint = L 0.94 / low C; dark = lifted L. */
+:root{
+  /* ground & neutrals */
+  --paper:#FBFAF7;
+  --ink-text:#211E18;
+  --secondary:#6B6B6B;
+  --hairline:#E4DFD5;
+  --lightbox:#16181C;          /* dark-mode ground */
+  --text-on-dark:#E8E4DB;
+
+  /* family identity — base */
+  --drafting:#004C80;            /* oklch(0.41 0.108 248) — 8.6:1 on paper */
+  --picker:#211E18;            /* oklch(0.24 0.012 85) — 15.9:1 on paper */
+  --egress:#732C52;            /* oklch(0.41 0.110 350) — 9.1:1 on paper */
+  --building:#9A6500;            /* oklch(0.55 0.130 78) — 4.8:1 on paper */
+  --envelope:#00592F;            /* oklch(0.41 0.105 155) — 8.1:1 on paper */
+  --accessibility:#005564;            /* oklch(0.41 0.090 210) — 8.1:1 on paper */
+  --material:#7C2C03;            /* oklch(0.41 0.120 42) — 9.1:1 on paper */
+
+  /* family — hover (darker) */
+  --drafting-hover:#003B6E;
+  --picker-hover:#13100B;
+  --egress-hover:#601A41;
+  --building-hover:#885400;
+  --envelope-hover:#00481F;
+  --accessibility-hover:#004553;
+  --material-hover:#691A00;
+
+  /* family — tint (pale pill/background wash) */
+  --drafting-tint:#D7EEFF;
+  --picker-tint:#EFEBE2;
+  --egress-tint:#FFE1EF;
+  --building-tint:#FAE9CE;
+  --envelope-tint:#D7F4E0;
+  --accessibility-tint:#CEF3FA;
+  --material-tint:#FFE3D7;
+
+  /* family — dark-mode variant (lifted) */
+  --drafting-dark:#6BAAE5;
+  --picker-dark:#A8A49C;
+  --egress-dark:#D887AE;
+  --building-dark:#D19936;
+  --envelope-dark:#6BB888;
+  --accessibility-dark:#58B4C4;
+  --material-dark:#E38A67;
+
+  /* DocCheck marks — base / dark-mode */
+  --correction:#AF3D34;            /* oklch(0.52 0.150 28) */
+  --query:#166DAF;            /* oklch(0.52 0.130 248) */
+  --provisional:#7652AC;            /* oklch(0.52 0.140 300) */
+  --working:#AC4785;            /* oklch(0.55 0.150 345) */
+  --highlighter:#DEC358;            /* oklch(0.82 0.130 95) */
+  --correction-dark:#F47C6E;
+  --query-dark:#5CABF2;
+  --provisional-dark:#B28FEF;
+  --working-dark:#F084C4;
+  --highlighter-dark:#FFEE83;
+}

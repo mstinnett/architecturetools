@@ -158,6 +158,12 @@
 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+  // Conservative glyph-width estimate for a label (pure module — no DOM to
+  // measure). Per-char advances sit ~15–30% above what the page fonts render,
+  // so clearance errs on the visible side: small uppercase+tracked labels
+  // (role/axis) ≈ 0.78 em/char, numeric readouts ≈ 0.62 em/char.
+  function estLabelW(s, fs, upper) { return s.length * fs * (upper ? 0.78 : 0.62); }
+
   // opts: { units, gridCount, targetSystem, sourceSystem, width, height }
   // Defends its own public inputs: this is a shared engine module reused by
   // more calculators, so it fails loud on bad geometry rather than trusting the
@@ -207,6 +213,50 @@
       : Math.max(0, Math.min(1, (Math.log(g / MM) / Math.LN10) / 3));    // 1mm→0 … 1000mm→1
     var cellW = (0.22 + c * 0.20) * axisW;       // fine ≈0.22·W … coarse ≈0.42·W
     var xA = x0 + (axisW - cellW) / 2, xB = xA + cellW;
+
+    // the stacked lines of one bound block, built once so the clearance
+    // reservation and the rendering can never disagree
+    function boundLines(snapU, atLeft, isNearest) {
+      var lines = [
+        { s: (atLeft ? 'round down' : 'round up') + (isNearest ? ' · nearest' : ''),
+          cls: 'nl-snap-role', fs: 9, up: true, dy: -15 },
+        { s: formatSnapped(snapU, target, denom),
+          cls: 'nl-snap-val' + (isNearest ? ' nl-nearest' : ''), fs: 12, dy: 1 }
+      ];
+      if (target === 'imperial') lines.push({ s: formatTrue(snapU, target), cls: 'nl-src-val', fs: 10, dy: 15 });
+      lines.push({ s: formatResidual(snapU - units, target), cls: 'nl-residual', fs: 10,
+                   dy: target === 'imperial' ? 28 : 15 });
+      return lines;
+    }
+    function widest(lines) {
+      var w = 0;
+      for (var i = 0; i < lines.length; i++) w = Math.max(w, estLabelW(lines[i].s, lines[i].fs, lines[i].up));
+      return w;
+    }
+
+    // Label clearance: the bound blocks hug the hatch edges and extend OUTWARD,
+    // so each side margin must hold its block's widest line or the text runs
+    // off the canvas (it did, at phone widths — 'round down · nearest', 1 m,
+    // coarse imperial grids). Reserve the room by shrinking the magnified cell;
+    // in pathologically narrow cases keep a sliver of cell and let the per-label
+    // clamp in txtAt() guarantee visibility.
+    var GAP = 8, PAD = 4;    // text gap off the hatch edge / min pad to the viewBox edge
+    var leftLines = null, rightLines = null;
+    if (!t.onGrid) {
+      leftLines = boundLines(floorU, true, t.nearIsMax);
+      rightLines = boundLines(ceilU, false, t.nearIsMin);
+      var needL = widest(leftLines) + GAP + PAD;
+      var needR = widest(rightLines) + GAP + PAD;
+      var MIN_CELL = 28;
+      if (xA < needL) xA = needL;
+      if (xB > W - needR) xB = W - needR;
+      if (xB - xA < MIN_CELL) {
+        var mid = Math.max(x0 + MIN_CELL, Math.min(x1 - MIN_CELL, (needL + (W - needR)) / 2));
+        xA = mid - MIN_CELL / 2;
+        xB = mid + MIN_CELL / 2;
+      }
+    }
+
     function X(u) {
       if (t.onGrid) return x0 + (u - winLo) / (winHi - winLo) * axisW;     // no cell to magnify
       if (u <= floorU) return x0 + (u - winLo) / (floorU - winLo) * (xA - x0);
@@ -221,6 +271,14 @@
 
     function txt(x, y, cls, anchor, s) {
       return '<text x="' + x + '" y="' + y + '" class="' + cls + '" text-anchor="' + anchor + '" stroke="#fff" stroke-width="3" style="paint-order:stroke">' + esc(s) + '</text>';
+    }
+    // emit a label clamped so its estimated extent stays inside the viewBox
+    function txtAt(x, y, line, anchor) {
+      var w = estLabelW(line.s, line.fs, line.up);
+      if (anchor === 'end') x = Math.max(x, w + PAD);
+      else if (anchor === 'start') x = Math.min(x, W - w - PAD);
+      else x = Math.max(w / 2 + PAD, Math.min(W - w / 2 - PAD, x));
+      return txt(x, y, line.cls, anchor, line.s);
     }
 
     // hierarchical ruler: taller ticks for coarser units (a ruler look), denser
@@ -272,26 +330,23 @@
       svg += '<line x1="' + xR + '" y1="' + ySrc + '" x2="' + xR + '" y2="' + yTgt + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="' + (t.nearIsMin ? 2 : 1) + '"/>';
 
       // bound values hug the hatch edges, mirrored; decimal under each
-      function boundBlock(snapU, atLeft, isNearest) {
-        var x = atLeft ? (xL - 8) : (xR + 8);
+      // (lines prebuilt above so the clearance reservation matches exactly)
+      function boundBlock(lines, atLeft) {
+        var x = atLeft ? (xL - GAP) : (xR + GAP);
         var anchor = atLeft ? 'end' : 'start';
-        var role = (atLeft ? 'round down' : 'round up') + (isNearest ? ' · nearest' : '');
-        var valCls = 'nl-snap-val' + (isNearest ? ' nl-nearest' : '');
-        var s = txt(x, bandMid - 15, 'nl-snap-role', anchor, role);
-        s += txt(x, bandMid + 1, valCls, anchor, formatSnapped(snapU, target, denom));
-        if (target === 'imperial') s += txt(x, bandMid + 15, 'nl-src-val', anchor, formatTrue(snapU, target));
-        s += txt(x, bandMid + (target === 'imperial' ? 28 : 15), 'nl-residual', anchor, formatResidual(snapU - units, target));
+        var s = '';
+        for (var i = 0; i < lines.length; i++) s += txtAt(x, bandMid + lines[i].dy, lines[i], anchor);
         return s;
       }
-      svg += boundBlock(floorU, true, t.nearIsMax);
-      svg += boundBlock(ceilU, false, t.nearIsMin);
+      svg += boundBlock(leftLines, true);
+      svg += boundBlock(rightLines, false);
     }
 
     // true tick — from the hatch top extending only DOWNWARD (not up through the
     // source ruler), pointing at the exact value placed below the number line
     svg += '<line x1="' + tx + '" y1="' + ySrc + '" x2="' + tx + '" y2="' + (yTgt + 24) + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="2"/>';
-    svg += txt(tx, yTgt + 32, 'nl-true-val', 'middle', formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''));
-    if (source !== target) svg += txt(tx, yTgt + 44, 'nl-src-val', 'middle', formatTrue(units, source));
+    svg += txtAt(tx, yTgt + 32, { s: formatTrue(units, target) + (t.onGrid ? ' · on grid' : ''), cls: 'nl-true-val', fs: 13 }, 'middle');
+    if (source !== target) svg += txtAt(tx, yTgt + 44, { s: formatTrue(units, source), cls: 'nl-src-val', fs: 10 }, 'middle');
 
     svg += '</svg>';
     return svg;
@@ -307,7 +362,8 @@
     metricDecimal: metricDecimal,
     formatSnapped: formatSnapped,
     formatTrue: formatTrue,
-    formatResidual: formatResidual
+    formatResidual: formatResidual,
+    _estLabelW: estLabelW           // the figure's clearance estimator (tests)
   };
 });
 
@@ -343,6 +399,35 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   // Renders without throwing, produces an <svg>.
   var svg = NL.numberline({ units: 1000 * MM_, gridCount: IN_ / 8, targetSystem: 'imperial', sourceSystem: 'metric' });
   ok('renders svg', /^<svg/.test(svg) && /nlhatch/.test(svg));
+
+  // Clearance: every label stays inside the viewBox even at phone widths —
+  // regression for 'round down · nearest' clipping off the left (1 m,
+  // imperial, coarse grids). Checked with the same estimator the layout
+  // reserves space with.
+  var FSMAP = { 'nl-snap-role': [9, true], 'nl-snap-val': [12, false], 'nl-src-val': [10, false],
+                'nl-residual': [10, false], 'nl-true-val': [13, false], 'nl-axis-label': [10, true] };
+  function clipCount(svgStr, W) {
+    var re = /<text x="([-\d.]+)" y="[-\d.]+" class="([^"]+)" text-anchor="(\w+)"[^>]*>([^<]*)<\/text>/g;
+    var m, bad = 0;
+    while ((m = re.exec(svgStr))) {
+      var x = parseFloat(m[1]), f = FSMAP[m[2].split(' ')[0]] || [13, false];
+      var w = NL._estLabelW(m[4], f[0], f[1]);
+      if (m[3] === 'end' ? x - w < -0.5
+        : m[3] === 'start' ? x + w > W + 0.5
+        : (x - w / 2 < -0.5 || x + w / 2 > W + 0.5)) bad++;
+    }
+    return bad;
+  }
+  var clips = 0, renders = 0;
+  [238, 320, 680].forEach(function (W) {
+    [2, 4, 8, 64].forEach(function (d) {
+      renders++;
+      clips += clipCount(NL.numberline({ units: 1000 * MM_, gridCount: IN_ / d, targetSystem: 'imperial', sourceSystem: 'metric', width: W }), W);
+    });
+    renders++;
+    clips += clipCount(NL.numberline({ units: 31997, gridCount: 600 * MM_, targetSystem: 'metric', sourceSystem: 'imperial', width: W }), W);
+  });
+  ok('labels stay on canvas across widths (' + renders + ' renders)', clips === 0);
 
   console.log('=== numberline: ' + pass + ' passed, ' + fail + ' failed ===');
   process.exit(fail === 0 ? 0 : 1);
