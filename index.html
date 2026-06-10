@@ -58,10 +58,17 @@
   /* The line art is a MASK painted with the page ink: it recolors with the
      scheme (no invert() filter — filtering the big PNG rasterized with an
      opaque backing on iOS) and the ground is transparent by construction.
-     All make2d exports share one 2843x2221 canvas. */
-  .desk-img{width:100%;aspect-ratio:2843/2221;background-color:var(--ink);
-            -webkit-mask:var(--desk-art) center / contain no-repeat;
-            mask:var(--desk-art) center / contain no-repeat;}
+     LONGHANDS only, and the image URL is set inline by the page JS — the
+     `mask` shorthand and url()-through-custom-property both have shaky
+     WebKit support and painted an unmasked ink slab on iOS. The ink only
+     paints where masking is certain, so a non-supporting engine shows
+     nothing rather than a rectangle. All exports share one 2843x2221 canvas. */
+  .desk-img{width:100%;aspect-ratio:2843/2221;}
+  @supports (-webkit-mask-image: url('x.png')) or (mask-image: url('x.png')) {
+    .desk-img{background-color:var(--ink);
+              -webkit-mask-position:center;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;
+              mask-position:center;mask-size:contain;mask-repeat:no-repeat;}
+  }
 
   /* Software nav + scroll */
   .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
@@ -597,7 +604,7 @@ function runPicker(){
     if (!filename) return '';
     var url = 'assets/desk-images/' + filename + '.png';
     return '<div class="desk-img" role="img" aria-label="' + filename.replace(/_/g, ' ') + ' desk layout"' +
-      ' data-art="' + url + '" style="--desk-art:url(\'' + url + '\')"></div>';
+      ' data-art="' + url + '" style="-webkit-mask-image:url(\'' + url + '\');mask-image:url(\'' + url + '\')"></div>';
   }
   // A CSS mask gives no error event, so probe the art with an Image and fall
   // back to the stock dual-27 desk if a combo export is missing (the safety
@@ -607,7 +614,9 @@ function runPicker(){
     if (!deskArt) return;
     var probe = new Image();
     probe.onerror = function () {
-      deskArt.style.setProperty('--desk-art', "url('assets/desk-images/NorthXL_2x27.png')");
+      var fallback = "url('assets/desk-images/NorthXL_2x27.png')";
+      deskArt.style.setProperty('-webkit-mask-image', fallback);
+      deskArt.style.setProperty('mask-image', fallback);
     };
     probe.src = deskArt.dataset.art;
   }

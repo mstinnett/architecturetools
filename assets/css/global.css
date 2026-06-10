@@ -41,6 +41,9 @@
 
 /* ---- TOKENS ---- */
 :root {
+  /* both schemes are first-class — UA widgets/scrollbars follow the page */
+  color-scheme: light dark;
+
   /* Warm neutral foundation. Text, hairlines and --paper come from the
      canonical palette (tokens.css); the page field behind the sheet is
      --gray-100 (see body). */
