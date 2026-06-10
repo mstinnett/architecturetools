@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-09 (UI review pass landed; converter promoted to main — the live site is now picker + converter)_
+_Last updated: 2026-06-10 (main merged into dev; five new engine tool pages + C-0 index built on dev; superseded standalones retired)_
 
 ## Live architectural picture
 
@@ -28,15 +28,26 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
     the moment it's on `main`.
 - **Calculator engine (`calculators/lib/`):** the spine of the calculator
   family. Model: **parse a dimension expression → resolve it against a discrete
-  constraint → show the residual.** Modules: `parse-length.js` (never throws),
-  `snap.js` (fails loud, floor/nearest/ceil to a grid), `numberline.js` (pure
-  SVG string), and `partition.js` (fails loud; divides a run into a whole number
-  of equal parts — sections, tiles, on-center, balusters — and exposes the
-  residual; reuses snap's integer division). `convert.html`, the Precise Unit
-  Converter, is the only **tool page** yet built on the engine — **shipped and
-  frozen**; it uses parse/snap/numberline. `partition.js` is landed and tested
-  but has no tool page yet. Every other `calculators/*.html` is older,
-  standalone, and does **not** use the engine.
+  constraint → show the residual.** Compute modules: `parse-length.js` (never
+  throws), `snap.js` (fails loud, floor/nearest/ceil to a grid), `partition.js`
+  (fails loud; divides a run into equal parts — sections, tiles, on-center,
+  balusters — and exposes the residual). Figure modules (pure SVG strings,
+  same conventions): `numberline.js`, `runbar.js` (a partition layout to scale,
+  residual hatched, overruns drawn past the dimension line), `slopefig.js`
+  (true-angle triangle, angular residual hatched as a wedge), `stairfig.js`
+  (stair section, layout drift hatched at the floor line).
+- **Six engine tool pages.** `convert.html` (Precise Unit Converter — shipped
+  on `main`, frozen) plus five new on `dev` (2026-06-10, noindexed, awaiting
+  operator browser review then one-at-a-time promotion): `run.html` (the
+  partition tool — tile/joint, on-center, balusters, sections), `scale.html`,
+  `slope.html`, `area.html`, `stairs.html` (introduces the edition pill +
+  citation pattern: IRC/IBC limits located, never ruled on). `index.html` is
+  the C-0 cover; the new tools' crumbs route through it. Each new page has a
+  jsdom wiring smoke (`/tmp` harness, not committed). Retired as superseded:
+  `dimension-converter.html`, `slope-calculator.html`, `stair-calculator.html`.
+  Still off-engine: `sheet-sizes.html` (a reference table — home undecided) and
+  the four code-lookup pages (`occupant-load`, `egress-width`, `fixture-calc`,
+  `parking-ratio`).
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
@@ -81,6 +92,21 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
 
 ## Recent decisions
 
+- 2026-06-10 — Calculator build-out on `dev` (operator-directed: "get through
+  as many as possible in the style of convert.html"). Five tool pages + three
+  figure modules + the C-0 index, all on the shell/engine conventions, each
+  gate-checked and jsdom-smoke-tested. The governing principle stated by the
+  operator and applied everywhere: **surface information, don't decide for the
+  user** — floor/nearest/ceil all get rows, alternatives are equal cards,
+  limits and call-outs are located with citations rather than colored as
+  verdicts, assumptions are echoed until the user replaces them.
+- 2026-06-10 — `main` merged into `dev` (operator-directed: main's picker +
+  converter are the approved versions). Main's side won every overlapping file
+  — it had absorbed dev's palette work and moved past it (promotion, css
+  consolidation, numberline clearance fix, research-pass data). Dev kept its
+  unique files (partition.js, fixtures, HANDOFF.md, In Progress docs, the
+  deferred pages). Stale `global2.css` removed. dev pushed; calculator work
+  continued on `claude/calculator-implementations-ov885q` from that merge.
 - 2026-06-09 — Interim nav revised after operator review: every title block
   opens with a breadcrumb (site title linking home + the set trail as a
   label — "Calculators → Precise Unit Converter"), in place of routing the
@@ -159,18 +185,17 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
 
 ## Active concerns
 
-- **Next build:** a **tool page** on `partition.js` — a convert.html-style page
-  (figure + parsed input + residual) exposing tile cuts / n-sections / on-center
-  / balusters. The primitive is done; this is the UI layer. Then slope,
-  area+coverage, scale. See `docs/HANDOFF.md` §5 and the backlog.
-- **Provenance loose end:** `noindex` is now on all 11 `dev` WIP pages
-  (`components`, `site-screen`, every `calculators/*.html`) — remove on
+- **The five new tools + C-0 await operator browser review, then promotion.**
+  They are gate-green and jsdom-smoke-tested, but no real browser has rendered
+  them (this environment has none) — figures, dark scheme, and phone widths
+  need eyes before any page moves to `main`. Promotion drops each page's
+  `noindex`; the C-0 promotion also wires convert.html's crumb (convert stays
+  frozen until then).
+- **Provenance loose end:** `noindex` is on every `dev` WIP page — remove on
   promotion. Still open: no neutral preview host is configured, so WIP can only
   be viewed locally until one is stood up.
-- **Legacy calculators are off-engine.** `slope`, `stair`, `sheet-sizes` get
-  rebuilt onto the engine; `dimension-converter.html` is superseded by
-  `convert.html` and should be retired, not ported. The code-compliance
-  calculators (`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`)
-  are a different lineage (table lookups) — out of scope for the engine thread.
+- **Next calc thread:** occupant load (area ÷ OLF + the stairs citation
+  pattern), then egress width / fixtures consume it — suite map steps 5–6.
+  `sheet-sizes.html`'s home (C reference vs L-series) is an open backlog item.
 - The richer AT-0 master cover (a multi-set index) is deferred behind the
   picker-only launch — tracked in the backlog.

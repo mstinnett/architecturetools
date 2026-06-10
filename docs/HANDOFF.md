@@ -8,6 +8,15 @@ tool page yet**. This doc is for the next context picking up the calculator
 work. It is self-contained; read it before touching `calculators/`._
 
 **Progress since the original handoff (all on `dev`, see `state.md` for detail):**
+- **2026-06-10 — §5's whole first arc is built.** Five tool pages on the engine
+  (`run.html` — the partition tool, `scale.html`, `slope.html`, `area.html`,
+  `stairs.html`), three new figure modules on the numberline conventions
+  (`runbar.js`, `slopefig.js`, `stairfig.js`, each with inline tests), the
+  C-0 cover (`calculators/index.html`), and the superseded standalones retired
+  (`dimension-converter`, `slope-calculator`, `stair-calculator`). All
+  noindexed, gate-green, jsdom-smoke-tested — awaiting operator browser
+  review, then one-at-a-time promotion per §2. `main` was merged into `dev`
+  first (operator-directed), so `dev` carries the shipped picker/converter.
 - `partition.js` shipped — the layout primitive (sections / tiles / on-center /
   balusters), 35 inline tests. Its tool page is the next build.
 - Engine hardened after a review: `numberline` + `partition` now delegate the
@@ -150,20 +159,25 @@ will wrap it. Exports `partition(spec)` plus `sections` / `tiles` / `onCenter` /
 - **baluster gap:** smallest _n_ where `gap = (R − n·w)/(n+1) ≤ maxGap`.
 
 **Suggested order:**
-1. ~~`partition()` primitive~~ ✅ **done** — `calculators/lib/partition.js`,
-   35 inline tests. **Next: its tool page** (parse a run with `parse-length`,
-   run `partition`, draw the layout + residual reusing `numberline`'s format
-   helpers; add `noindex`; clearer Min/Max-style labels per the review).
-2. **slope** (then fold legacy `slope`/`stair` onto the engine).
-3. **area + coverage** (then fold legacy `sheet-sizes`).
-4. **scale** — quick win anytime.
+1. ~~`partition()` primitive + its tool page~~ ✅ **done** — `run.html` +
+   `lib/runbar.js` (2026-06-10).
+2. ~~**slope**~~ ✅ **done** — `slope.html` + `lib/slopefig.js`; legacy
+   `slope-calculator.html` + `stair-calculator.html` retired (stairs got its
+   own engine page, `stairs.html` + `lib/stairfig.js`).
+3. ~~**area + coverage**~~ ✅ **done** — `area.html`. `sheet-sizes.html` was
+   NOT folded in: it's a paper-size reference table, not an engine calc —
+   its home (C reference vs L-series) is an open backlog item.
+4. ~~**scale**~~ ✅ **done** — `scale.html`.
+5. **Next:** occupant load on `area`'s input + the citation/edition pattern
+   from `stairs.html`; then egress width / fixtures consume it (suite map
+   steps 5–6).
 
-**Legacy pages** (`calculators/*.html`, all standalone, no engine):
-`slope`, `stair`, `sheet-sizes` get **rebuilt onto** the engine per the order
-above. `dimension-converter.html` is **superseded by `convert.html` — retire it**
-rather than port. The code-compliance calculators (`occupant-load`,
-`egress-width`, `fixture-calc`, `parking-ratio`) are a **different lineage**
-(table lookups, not the dimensional engine) — out of scope for this thread.
+**Legacy pages** (`calculators/*.html`, standalone, no engine):
+`dimension-converter.html`, `slope-calculator.html`, and
+`stair-calculator.html` are **retired** (2026-06-10). `sheet-sizes.html` is a
+reference table, kept as-is for now. The code-compliance calculators
+(`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`) are a
+**different lineage** (table lookups) — now the NEXT thread, not out of scope.
 
 ---
 

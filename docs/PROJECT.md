@@ -99,21 +99,27 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
 │   └── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
 ├── calculators/                    # convert.html + the 3 lib modules it uses are LIVE on main; the rest is dev-only
+│   ├── index.html                  # C-0 — the calculators set cover (dev, noindexed)
 │   ├── convert.html                # Precise Unit Converter — engine-powered, LIVE
+│   ├── run.html                    # Run Solver — partition tool page (dev, noindexed)
+│   ├── scale.html                  # Scale Converter (dev, noindexed)
+│   ├── slope.html                  # Slope — rise/run/slope (dev, noindexed)
+│   ├── area.html                   # Area & Coverage takeoff (dev, noindexed)
+│   ├── stairs.html                 # Stairs — risers + IRC/IBC citations (dev, noindexed)
 │   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)
 │   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
 │   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)
-│   │   ├── numberline.js           # Pure SVG-string figure (no DOM)
 │   │   ├── partition.js            # Run → whole-number layout + residual (fails loud)
+│   │   ├── numberline.js           # Pure SVG-string figure (no DOM)
+│   │   ├── runbar.js               # Layout figure for partition results (no DOM)
+│   │   ├── slopefig.js             # True-angle slope triangle figure (no DOM)
+│   │   ├── stairfig.js             # Stair section figure (no DOM)
 │   │   └── parse-length.fixtures.js
-│   ├── dimension-converter.html    # LEGACY standalone — superseded by convert.html, retire
-│   ├── slope-calculator.html       # LEGACY standalone — rebuild onto the engine
-│   ├── stair-calculator.html       # LEGACY standalone — rebuild onto the engine
-│   ├── sheet-sizes.html            # LEGACY standalone — rebuild onto the engine
-│   ├── occupant-load.html          # LEGACY — code-lookup lineage, out of engine scope
+│   ├── sheet-sizes.html            # Reference table (ARCH/ANSI) — home undecided (C ref vs L)
+│   ├── occupant-load.html          # LEGACY — code-lookup lineage, next engine thread
 │   ├── parking-ratio.html          # LEGACY — code-lookup lineage, out of engine scope
-│   ├── egress-width.html           # LEGACY — code-lookup lineage, out of engine scope
-│   └── fixture-calc.html           # LEGACY — code-lookup lineage, out of engine scope
+│   ├── egress-width.html           # LEGACY — code-lookup lineage, consumes occupant load
+│   └── fixture-calc.html           # LEGACY — code-lookup lineage, consumes occupant load
 ├── .github/workflows/
 │   └── build-data.yml              # Rebuilds hardware-data.json on push, commits it back
 ├── CNAME                           # Custom domain: architecture.tools
@@ -301,35 +307,35 @@ charter — engine model, build plan, conventions — is `docs/HANDOFF.md`.
 
 ### The engine (`calculators/lib/`)
 The spine of the family: **parse a dimension expression → resolve it against a
-discrete constraint → show the residual.** Modules: `parse-length.js`
+discrete constraint → show the residual.** Compute modules: `parse-length.js`
 (expression evaluator, never throws), `snap.js` (integer-exact snap to a grid,
-fails loud), `numberline.js` (pure SVG-string figure), and `partition.js`
-(divides a run into a whole number of equal parts — sections, tiles, on-center,
-balusters — and exposes the residual; reuses snap's integer division, fails
-loud). New tools follow the engine conventions: UMD wrapper, pure functions, an
-inline test block, relative asset paths only.
+fails loud), `partition.js` (divides a run into a whole number of equal parts
+and exposes the residual; fails loud). Figure modules (pure SVG strings):
+`numberline.js`, `runbar.js`, `slopefig.js`, `stairfig.js`. New tools follow
+the engine conventions: UMD wrapper, pure functions, an inline test block,
+relative asset paths only.
 
 ### Engine-powered pages
 - `calculators/convert.html` — **Precise Unit Converter. Shipped and frozen.**
-  The first and currently only tool on the engine.
+  Live on `main`.
+- On `dev`, built 2026-06-10, noindexed, awaiting browser review then
+  one-at-a-time promotion: `run.html` (Run Solver — the partition tool),
+  `scale.html`, `slope.html`, `area.html`, `stairs.html`, and the **C-0 cover**
+  `calculators/index.html`.
 
-### Next on the engine (see HANDOFF §5)
-The `partition.js` primitive is built (tile cuts, n-sections, on-center,
-balusters); its **tool page** is the next build. Then slope, then area +
-coverage, then a scale converter.
+### Next on the engine
+Occupant load (area ÷ OLF table, reusing the citation/edition pattern stairs
+introduced), then egress width and plumbing fixtures consume it — suite map
+steps 5–6 (`docs/In Progress/calculator-suite-map.md`).
 
-### Legacy standalone pages (not on the engine)
-- Rebuild onto the engine, then retire the standalone:
-  `dimension-converter.html` (superseded by `convert.html` — retire, don't port),
-  `slope-calculator.html`, `stair-calculator.html`, `sheet-sizes.html`.
-- A different lineage (code/table lookups, not the dimensional engine) — out of
-  engine scope: `occupant-load.html`, `egress-width.html`, `fixture-calc.html`,
-  `parking-ratio.html`.
-
-### C-0 cover
-A `calculators/index.html` that frames the set, explains what questions it
-answers, and links each tool — still to build, once the engine-based tools
-settle.
+### Standalone pages (not on the engine)
+- `sheet-sizes.html` — a reference table; whether it stays a C reference or
+  moves to the L-series is an open backlog item.
+- A different lineage (code/table lookups, not the dimensional engine):
+  `occupant-load.html`, `egress-width.html`, `fixture-calc.html`,
+  `parking-ratio.html` — the first two are the next thread (above).
+- Retired 2026-06-10 (superseded by engine tools): `dimension-converter.html`,
+  `slope-calculator.html`, `stair-calculator.html`.
 
 ---
 
@@ -411,8 +417,8 @@ intentional while the numbered set structure grows around them.
 These seed `docs/decisions/backlog.md` (the work source); keep the two in step.
 The backlog leads with the calculator-engine thread (HANDOFF §5).
 
-1. Extend the calculator engine — `partition()`, then slope, area+coverage,
-   scale — and retire the superseded `dimension-converter.html`
+1. Review the five new tools + C-0 in a real browser, then promote to `main`
+   one at a time; next engine thread is occupant load → egress width/fixtures
 2. Close the provenance loose ends (noindex on dev WIP, a neutral preview host)
 3. Grow `index.html` toward a fuller **AT-0** cover; add a **C-0** calculator
    index once the engine tools settle
