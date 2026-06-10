@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Area &amp; Coverage -- architecture.tools</title>
+<meta name="description" content="Area takeoff from a typed expression — chain rooms, subtract openings — then divide by a sheet or tile to a piece count, with the shortfall and the leftover both shown.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover the coverage field row. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+  .cov-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+               font-size: 1.05rem; font-weight: 400; width: 11em; max-width: 100%;
+               color: var(--ink); background: var(--card);
+               padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+               box-shadow: var(--shadow-well); border-radius: var(--radius);
+               outline: none; -webkit-appearance: none; appearance: none; }
+  .cov-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .cov-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Area &amp; Coverage</span>
+    </nav>
+    <h1>Area &amp; Coverage</h1>
+    <p>Type the takeoff the way you'd say it: chain rooms with +, subtract
+       openings with &minus;, parentheses welcome. Divide by a sheet or tile and
+       the count comes with both ends of the rounding — what's short, what's
+       left over.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT -->
+  <div class="section-label">Area — length × length, chained</div>
+  <div class="field-wrap">
+    <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="160"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 12' x 14'  ·  12'x14' + 8'x6' − 3'x4'  ·  10m x 4m" autofocus>
+    <div class="field-note" id="fieldNote"></div>
+    <div class="bare-ask" id="bareAsk"></div>
+  </div>
+
+  <!-- slot 2 · tool controls: the divisor and the waste allowance -->
+  <div class="param-block" style="margin-bottom: var(--space-lg);">
+    <div class="section-label">Divide by — a sheet, tile, or batch (optional)</div>
+    <input type="text" id="covInput" class="cov-input" spellcheck="false" maxlength="80"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 4' x 8'">
+    <div class="param-chips grid-row" id="covChips" style="margin-top:0.35rem;"></div>
+    <div class="cov-note" id="covNote"></div>
+  </div>
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Waste allowance</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-waste="0">none</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-waste="5">+5%</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-waste="10">+10%</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-waste="15">+15%</button>
+    </div>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 5 · ANSWER CARD: the area in every register, then the count -->
+    <div class="answer-card" id="areaCard" style="display:none;">
+      <div class="answer-card-label" id="areaLabel"></div>
+      <div class="snap-rows" id="areaRows"></div>
+    </div>
+    <div class="answer-card" id="covCard" style="display:none;">
+      <div class="answer-card-label" id="covLabel"></div>
+      <div class="snap-rows" id="covRows"></div>
+    </div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/numberline.js"></script>
+<script>
+(function () {
+  'use strict';
+  var MAX_AREA_MM2 = 1e16;              // (100 km)² — same area cap as the converter
+  function areaOutOfRange(mm2) { return !Number.isFinite(mm2) || Math.abs(mm2) > MAX_AREA_MM2; }
+
+  var COV_CHIPS = {
+    imperial: ["4' x 8'", "4' x 10'", "4' x 12'", "2' x 2'", "2' x 4'", '12" x 12"', '24" x 24"'],
+    metric: ['1.2m x 2.4m', '600mm x 600mm', '600mm x 1200mm', '300mm x 300mm']
+  };
+
+  var state = {
+    text: '',
+    covText: '',
+    waste: 0,
+    defaultUnit: 'in',
+    target: 'imperial',
+    chipsSystem: null
+  };
+
+  var els = {};
+  ['dimInput','fieldNote','bareAsk','covInput','covChips','covNote','echo','echoLine','echoAssume',
+   'areaCard','areaLabel','areaRows','covCard','covLabel','covRows','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+  function sig(n, d) {
+    if (n === 0) return '0';
+    if (d == null) d = Math.max(0, 4 - Math.floor(Math.log(Math.abs(n)) / Math.LN10) - 1);
+    return String(parseFloat(n.toFixed(Math.min(6, d))));
+  }
+
+  /* area display in both registers; the input's system leads */
+  function areaBoth(mm2) {
+    var m2 = mm2 / 1e6, ft2 = mm2 / 92903.04;
+    return state.target === 'metric'
+      ? { lead: sig(m2) + ' m²', alt: sig(ft2) + ' ft²' }
+      : { lead: sig(ft2) + ' ft²', alt: sig(m2) + ' m²' };
+  }
+
+  /* ---- field notes + bare ask (as the converter) --------------------------- */
+  function pendingNote(text, result) {
+    if (!text || !result || !result.spans) return '';
+    var lines = [];
+    result.spans.forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = text.slice(sp.start, sp.end).trim();
+      if (!frag) return;
+      lines.push('ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : ''));
+    });
+    return lines.join('<br>');
+  }
+  function renderBareAsk(result) {
+    els.bareAsk.innerHTML = '';
+    if (!result || result.units == null && result.dimension !== 2) return;
+    var terms = (result.interpretation && result.interpretation.terms) || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;
+    function pick(u, label) {
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+    Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+    });
+  }
+
+  /* ---- coverage chips (rebuilt when the system flips) ----------------------- */
+  function renderCovChips() {
+    if (state.chipsSystem !== state.target) {
+      var html = '';
+      COV_CHIPS[state.target].forEach(function (c) {
+        html += '<button type="button" class="grid-box" aria-pressed="false" data-cov="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
+      });
+      els.covChips.innerHTML = html;
+      state.chipsSystem = state.target;
+      Array.prototype.forEach.call(els.covChips.querySelectorAll('[data-cov]'), function (chip) {
+        chip.addEventListener('click', function () {
+          els.covInput.value = chip.dataset.cov;
+          state.covText = chip.dataset.cov;
+          render();
+        });
+      });
+    }
+    Array.prototype.forEach.call(els.covChips.querySelectorAll('[data-cov]'), function (chip) {
+      UI.press(chip, state.covText === chip.dataset.cov);
+    });
+  }
+
+  /* ---- echo ------------------------------------------------------------------ */
+  var OP_GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+  function tokensOf(result) {
+    var parts = (result && result.interpretation && result.interpretation.parts) || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op') html += '<span class="op">' + (OP_GLYPH[p.text] || escapeHtml(p.text)) + '</span>';
+      else if (p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+    return html;
+  }
+  function renderEcho(result, asmExtra) {
+    if (!result) { els.echo.style.display = 'none'; return; }
+    var html = tokensOf(result);
+    if (result.dimension === 2 && result.area_mm2 != null) {
+      if (areaOutOfRange(result.area_mm2)) html += '<span class="eq">=</span><span class="op">area out of range</span>';
+      else if (result.area_mm2 < 0) html += '<span class="eq">=</span><span class="op">negative — more opening than room</span>'
+        + '<span class="result"> ' + escapeHtml(areaBoth(result.area_mm2).lead) + '</span>';
+      else html += '<span class="eq">=</span><span class="result">' + escapeHtml(areaBoth(result.area_mm2).lead) + '</span>';
+    } else if (result.dimension === 1) {
+      html += '<span class="eq">—</span><span class="op">that\'s a length. An area is length × length (12\' x 14\')</span>';
+    } else if (result.note) {
+      html += '<span class="eq">=</span><span class="op">' + escapeHtml(result.note) + '</span>';
+    } else {
+      html += '<span class="eq">—</span><span class="op">unresolved</span>';
+    }
+    els.echoLine.innerHTML = html;
+    var asm = ((result.interpretation && result.interpretation.assumptions) || []).concat(asmExtra || []);
+    var seen = {};
+    asm = asm.filter(function (a) { if (seen[a]) return false; seen[a] = true; return true; });
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- rows -------------------------------------------------------------------- */
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  function renderArea(mm2) {
+    els.areaCard.style.display = '';
+    els.areaLabel.textContent = 'The area, in every register';
+    var a = Math.abs(mm2), neg = mm2 < 0 ? '−' : '';
+    var rows = '';
+    var m2 = a / 1e6, ft2 = a / 92903.04, in2 = a / 645.16;
+    var lead = areaBoth(mm2);
+    rows += rowHtml('Area', '', '<span class="fact">' + escapeHtml(neg + lead.lead) + '</span>', '—', true);
+    rows += rowHtml('Also', '', escapeHtml(neg + lead.alt + '  ·  ' + neg + sig(in2) + ' in²  ·  ' + neg + sig(a) + ' mm²'), '—', false, 'is-ref');
+    els.areaRows.innerHTML = rows;
+  }
+
+  function renderCoverage(mm2, cov, covRes) {
+    if (cov == null) { els.covCard.style.display = 'none'; return null; }
+    els.covCard.style.display = '';
+    var w = state.waste;
+    var plan = mm2 * (1 + w / 100);                 // the planning area
+    var ratio = plan / cov;
+    var down = Math.floor(ratio), up = Math.ceil(ratio);
+    els.covLabel.textContent = 'Divided by ' + (covRes ? covRes.original || state.covText : state.covText)
+      + (w ? ' — planning at +' + w + '% waste' : '');
+
+    var rows = '';
+    if (down === up) {
+      rows += rowHtml('Exact fit', 'the coverage divides the area evenly', '<span class="fact">' + up + ' pieces</span>', '0', true, 'is-exact');
+    } else {
+      var short = plan - down * cov;
+      var extra = up * cov - plan;
+      rows += rowHtml('Round up · buy', 'partial pieces still get bought', '<span class="fact">' + up + ' pieces</span>',
+                      '+' + escapeHtml(areaBoth(extra).lead) + ' over', true);
+      rows += rowHtml('Exact ratio', w ? 'area × ' + (1 + w / 100).toFixed(2) + ' ÷ coverage' : 'area ÷ coverage',
+                      escapeHtml(sig(ratio)) + ' pieces', '—', false);
+      rows += rowHtml('Round down', 'covers less than the area', down + ' pieces',
+                      '−' + escapeHtml(areaBoth(short).lead) + ' short', false);
+    }
+    els.covRows.innerHTML = rows;
+    return { plan: plan, ratio: ratio, up: up, down: down };
+  }
+
+  /* ---- main render ---------------------------------------------------------------- */
+  function syncDetected(result) {
+    if (!result || !result.interpretation) return;
+    var sys = result.unitSystem;
+    if (sys !== 'imperial' && sys !== 'metric') return;
+    var stated = (result.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!stated) return;
+    state.target = sys;
+    state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+  }
+
+  function render() {
+    var result = state.text ? parseLength(state.text, { defaultUnit: state.defaultUnit }) : null;
+    syncDetected(result);
+    syncURL();
+    renderCovChips();
+    els.fieldNote.innerHTML = pendingNote(state.text, result);
+    renderBareAsk(result);
+
+    // the divisor: must itself be an area
+    var covRes = state.covText.trim() ? parseLength(state.covText, { defaultUnit: state.defaultUnit }) : null;
+    var cov = null, covNote = '';
+    if (covRes) {
+      if (covRes.dimension === 2 && covRes.area_mm2 != null && covRes.area_mm2 > 0 && !areaOutOfRange(covRes.area_mm2)) cov = covRes.area_mm2;
+      else covNote = 'needs an area — width × height, like 4\' x 8\'';
+    }
+    els.covNote.innerHTML = covNote ? escapeHtml(covNote) : (covRes ? pendingNote(state.covText, covRes) : '');
+
+    var asmExtra = [];
+    if (state.waste > 0 && cov != null) asmExtra.push('counts include +' + state.waste + '% waste — the area rows stay net');
+    renderEcho(result, asmExtra);
+
+    var ok = result && result.dimension === 2 && result.area_mm2 != null
+          && !areaOutOfRange(result.area_mm2) && result.area_mm2 > 0;
+    if (!ok) {
+      els.areaCard.style.display = 'none';
+      els.covCard.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    renderArea(result.area_mm2);
+    var c = renderCoverage(result.area_mm2, cov, covRes);
+
+    var lines = [escapeHtml(result.interpretation.work) + ' (unit²) = ' + sig(result.area_mm2) + ' mm² = ' + sig(result.area_mm2 / 1e6) + ' m²'];
+    if (c) {
+      lines.push('coverage = ' + sig(cov) + ' mm² · count = ' + (state.waste ? sig(result.area_mm2) + ' × ' + (1 + state.waste / 100).toFixed(2) + ' ÷ ' + sig(cov) : sig(result.area_mm2) + ' ÷ ' + sig(cov)) + ' = <b>' + sig(c.ratio, 4) + '</b>');
+      lines.push('lengths are exact lattice integers; their products and this ratio are floating point, shown to 4 significant figures');
+    }
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- shareable URL ----------------------------------------------------------------- */
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.text && state.text !== "12' x 14'") params.set('d', state.text);
+      if (state.covText && state.covText !== "4' x 8'") params.set('c', state.covText);
+      if (state.waste) params.set('w', String(state.waste));
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var wv = parseInt(params.get('w') || '', 10);
+    if ([5, 10, 15].indexOf(wv) !== -1) state.waste = wv;
+    return {
+      d: params.get('d') != null ? params.get('d').slice(0, 160) : null,
+      c: params.get('c') != null ? params.get('c').slice(0, 80) : null
+    };
+  }
+
+  /* ---- wiring -------------------------------------------------------------------------- */
+  function setActive(selector, attr, value) {
+    Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
+      UI.press(el, el.dataset[attr] === value);
+    });
+  }
+  els.dimInput.addEventListener('input', function () { state.text = els.dimInput.value; render(); });
+  els.dimInput.addEventListener('focus', function () { setTimeout(function () { els.dimInput.select(); }, 0); });
+  els.covInput.addEventListener('input', function () { state.covText = els.covInput.value; render(); });
+  els.covInput.addEventListener('focus', function () { setTimeout(function () { els.covInput.select(); }, 0); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-waste]'), function (el) {
+    el.addEventListener('click', function () {
+      state.waste = +el.dataset.waste;
+      setActive('[data-waste]', 'waste', String(state.waste));
+      render();
+    });
+  });
+
+  // initial state — URL params override the worked example (12'×14' ÷ 4'×8')
+  var u = initFromURL();
+  els.dimInput.value = u.d != null ? u.d : "12' x 14'";
+  els.covInput.value = u.c != null ? u.c : "4' x 8'";
+  state.text = els.dimInput.value;
+  state.covText = els.covInput.value;
+  setActive('[data-waste]', 'waste', String(state.waste));
+  render();
+})();
+</script>
+</body>
+</html>
