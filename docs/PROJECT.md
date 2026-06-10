@@ -109,6 +109,9 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── occupant-load.html          # Occupant Load — takeoff ÷ Table 1004.5 (dev, noindexed)
 │   ├── egress-width.html           # Egress Width — load×factor ↔ capacity (dev, noindexed)
 │   ├── ramp.html                   # Ramp — rise → runs + landings, §405 (dev, noindexed)
+│   ├── exits.html                  # Exits — count thresholds + half-diagonal (dev, noindexed)
+│   ├── fixture-calc.html           # Plumbing Fixtures — banded ratios, draft-tagged data (dev)
+│   ├── sheet-sizes.html            # Sheet Sizes — ARCH/ANSI fit reference, on the theme (dev)
 │   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)
 │   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
 │   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)
@@ -117,10 +120,9 @@ They are part of the site structure, but they do not need premature renaming or 
 │   │   ├── runbar.js               # Layout figure for partition results (no DOM)
 │   │   ├── slopefig.js             # True-angle slope triangle figure (no DOM)
 │   │   ├── stairfig.js             # Stair section figure (no DOM)
+│   │   ├── bands.js                # Banded code-table ratios (1 per N to a cutoff…)
 │   │   └── parse-length.fixtures.js
-│   ├── sheet-sizes.html            # Reference table (ARCH/ANSI) — home undecided (C ref vs L)
-│   ├── parking-ratio.html          # LEGACY — code-lookup lineage, out of engine scope
-│   └── fixture-calc.html           # LEGACY — deferred until IPC table verified (see backlog)
+│   └── parking-ratio.html          # LEGACY — code-lookup lineage, zoning-adjacent, out of scope
 ├── .github/workflows/
 │   └── build-data.yml              # Rebuilds hardware-data.json on push, commits it back
 ├── CNAME                           # Custom domain: architecture.tools
@@ -327,20 +329,20 @@ relative asset paths only.
   Plus the **C-0 cover** `calculators/index.html`.
 
 ### Next on the engine
-Exits & arrangement (number of exits, separation, travel distances — likely
-one page), and plumbing fixtures once its IPC table is verified — see the
-backlog for both preconditions
-(`docs/In Progress/calculator-suite-map.md` family 2).
+Promotions (after the operator's taste pass), then data completion: replace
+the fixtures page's draft-tagged ratios and add exits' single-exit/travel
+tables from checked copies — the backlog records the per-value provenance
+procedure. New nodes after that: WWR, triangle/squaring, the material layer
+(suite map families 5–6).
 
 ### Standalone pages (not on the engine)
-- `sheet-sizes.html` — a reference table; whether it stays a C reference or
-  moves to the L-series is an open backlog item.
-- A different lineage (code/table lookups, not the dimensional engine):
-  `fixture-calc.html` (deferred until its table is verified),
-  `parking-ratio.html`.
+- `parking-ratio.html` — code/table-lookup lineage, zoning-adjacent (the suite
+  map's default-out family).
 - Retired 2026-06-10 (superseded by engine tools): `dimension-converter.html`,
   `slope-calculator.html`, `stair-calculator.html`, and the pre-engine
-  `occupant-load.html` / `egress-width.html` lookups (rebuilt in place).
+  `occupant-load.html` / `egress-width.html` / `fixture-calc.html` lookups
+  (rebuilt in place). `sheet-sizes.html` restyled onto the theme and kept as
+  the set's fit reference.
 
 ---
 

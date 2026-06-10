@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-10 (second build pass: occupant load + egress width rebuilt on the engine, ramp added — three tool families now in use; eight new tools + C-0 on dev awaiting browser review)_
+_Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value provenance tags, sheet-sizes restyled; headless-Chromium render sweep green over all 14 pages — operator taste pass is what's left before promotions)_
 
 ## Live architectural picture
 
@@ -36,22 +36,25 @@ _Last updated: 2026-06-10 (second build pass: occupant load + egress width rebui
   residual hatched, overruns drawn past the dimension line), `slopefig.js`
   (true-angle triangle, angular residual hatched as a wedge), `stairfig.js`
   (stair section, layout drift hatched at the floor line).
-- **Nine engine tool pages, three families.** `convert.html` (shipped on
-  `main`, frozen) plus eight on `dev` (2026-06-10, noindexed, awaiting operator
-  browser review then one-at-a-time promotion). Drafting family: `run.html`
-  (the partition tool), `scale.html`, `slope.html` (incl. projected lengths),
-  `area.html`, `stairs.html` (introduces the edition pill + citation pattern).
-  Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table 1004.5,
-  gross/net surfaced) and `egress-width.html` (load×factor both directions,
-  minimums located) — chained: area ?d=→ OL ?ol=→ egress width. Accessibility
+- **Twelve engine tool pages, three families.** `convert.html` (shipped on
+  `main`, frozen) plus eleven on `dev` (2026-06-10, noindexed, awaiting the
+  operator's taste pass then one-at-a-time promotion). Drafting family:
+  `run.html` (the partition tool), `scale.html`, `slope.html` (incl. projected
+  lengths), `area.html`, `stairs.html` (introduces the edition pill + citation
+  pattern), `sheet-sizes.html` (the fit reference, restyled onto the theme,
+  ANSI added). Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table
+  1004.5, gross/net surfaced), `egress-width.html` (load×factor both
+  directions, minimums located), `exits.html` (count thresholds + the
+  half-diagonal separation, both verified), `fixture-calc.html` (banded
+  ratios via `lib/bands.js`, per-value verified/draft provenance tags) —
+  chained: area ?d=→ OL ?ol=→ egress width / exits / fixtures. Accessibility
   family: `ramp.html` (rise → runs + landings, §405 cited). `index.html` is
   the C-0 cover; tool crumbs route through it. Each page has a jsdom wiring
-  smoke (`/tmp` harness, not committed). Retired as superseded:
-  `dimension-converter`, `slope-calculator`, `stair-calculator`, and the
-  pre-engine `occupant-load`/`egress-width` lookups (rebuilt in place). Still
-  off-engine: `sheet-sizes.html` (reference table — home undecided),
-  `fixture-calc.html` (deferred until its IPC table is verified — see
-  backlog), `parking-ratio.html`.
+  smoke and a headless-Chromium render check (`/tmp/smoke` harness, not
+  committed). Retired/rebuilt as superseded: `dimension-converter`,
+  `slope-calculator`, `stair-calculator`, and the pre-engine
+  `occupant-load`/`egress-width`/`fixture-calc` lookups. Still off-engine:
+  `parking-ratio.html` (zoning-adjacent, default out).
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
@@ -198,12 +201,17 @@ _Last updated: 2026-06-10 (second build pass: occupant load + egress width rebui
 
 ## Active concerns
 
-- **The eight new tools + C-0 await operator browser review, then promotion.**
-  They are gate-green and jsdom-smoke-tested, but no real browser has rendered
-  them (this environment has none) — figures, dark scheme, and phone widths
-  need eyes before any page moves to `main`. Promotion drops each page's
-  `noindex`; the C-0 promotion also wires convert.html's crumb (convert stays
-  frozen until then).
+- **Eleven new tools + C-0 await the operator's taste pass, then promotion.**
+  Gate-green, 196 jsdom checks, and now RENDERED: a Puppeteer/headless-Chromium
+  sweep (installed in the session sandbox via npm; harness in /tmp/smoke, not
+  committed) covered all 14 pages × light/dark × desktop/phone — zero page
+  errors, zero horizontal overflow, dark figures inverting. Remaining risk is
+  taste and real-device behavior, not wiring. Promotion drops each page's
+  `noindex`; the C-0 promotion also wires convert.html's crumb.
+- **Two draft-data pointers carry visible tags until checked:** fixture ratios
+  beyond the verified business/A-1 values, and exits' Table 1006.2.1 +
+  travel-distance tables (left out entirely). Backlog records the
+  replace-from-a-checked-copy procedure.
 - **Provenance loose end:** `noindex` is on every `dev` WIP page — remove on
   promotion. Still open: no neutral preview host is configured, so WIP can only
   be viewed locally until one is stood up.

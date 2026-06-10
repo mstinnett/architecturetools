@@ -171,8 +171,13 @@ will wrap it. Exports `partition(spec)` plus `sections` / `tiles` / `onCenter` /
 5. ~~**occupant load + egress width**~~ ✅ **done** (2026-06-10 second pass) —
    rebuilt in place of the pre-engine lookups, chained area → OL → egress
    width; `ramp.html` landed too (family 4, nearly free after slope).
-6. **Next:** exits & arrangement (one page); plumbing fixtures only once its
-   banded IPC table is verified (see backlog — don't build it from memory).
+6. ~~**exits + fixtures**~~ ✅ **built** (2026-06-10 third pass) — exits with
+   its two verified rules computed (counts, half-diagonal separation) and the
+   per-occupancy tables left as draft-tagged pointers; fixtures fully wired on
+   `lib/bands.js` with PER-VALUE provenance tags (verified business/A-1
+   values; everything else visibly draft until checked). `sheet-sizes.html`
+   restyled onto the theme. **Next:** promotions, then draft-data replacement
+   from checked copies (backlog).
 
 **Legacy pages** (`calculators/*.html`, standalone, no engine):
 `dimension-converter.html`, `slope-calculator.html`, `stair-calculator.html`,
