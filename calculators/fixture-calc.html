@@ -201,6 +201,7 @@
       + '<div class="snap-resid">' + resid + '</div></div>';
   }
   function prov(v) {
+    if (v === 'yours') return '<span class="prov ok">yours</span>';
     return v ? '<span class="prov ok">verified</span>' : '<span class="prov draft">draft — check the table</span>';
   }
 
@@ -214,10 +215,10 @@
       var c = state.custom;
       occ = {
         id: 'custom', label: 'custom ratios',
-        wcM: c.wc ? { b: [{ per: c.wc }], v: true } : null,   // user-entered = theirs, no draft tag
-        wcF: c.wc ? { b: [{ per: c.wc }], v: true } : null,
-        lav: c.lav ? { b: [{ per: c.lav }], v: true } : null,
-        df: c.df ? { per: c.df, v: true } : null,
+        wcM: c.wc ? { b: [{ per: c.wc }], v: 'yours' } : null,
+        wcF: c.wc ? { b: [{ per: c.wc }], v: 'yours' } : null,
+        lav: c.lav ? { b: [{ per: c.lav }], v: 'yours' } : null,
+        df: c.df ? { per: c.df, v: 'yours' } : null,
         sink: true
       };
     } else {
