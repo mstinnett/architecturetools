@@ -79,7 +79,10 @@
      <picture media> can't pick the file — deskHeroHTML() reads
      html[data-scheme] and update() re-renders on schemechange.
      Dark variants: tools/recolor-desk-dark.mjs. */
-  .desk-hero img{width:100%;height:auto;display:block;}
+  /* every export shares one 2843x2221 make2d canvas — reserving the ratio
+     keeps the page from collapsing and shifting under the pointer while a
+     scheme swap loads the other variant */
+  .desk-hero img{width:100%;height:auto;display:block;aspect-ratio:2843/2221;}
 
   /* Software nav + scroll */
   /* the heavy rule closes the software band: thin track line above the
@@ -1090,7 +1093,17 @@ function runPicker(){
   var swScrubScrollPerPixel = 1;
   swNavEl.addEventListener('pointerdown', function(e) {
     if (e.button !== undefined && e.button !== 0) return;
-    if (e.target.closest('.sw-nav-item')) return;  // let the nav-item click jump
+    // A press inside the indicator is a thumb grab and always scrubs — even
+    // where the thumb overlaps a label (the indicator is pointer-events:none,
+    // so the label underneath is the event target). Only an exposed label
+    // keeps its jump-to-group click.
+    var overThumb = false;
+    if (!swNavIndicator.hidden) {
+      var thumbRect = swNavIndicator.getBoundingClientRect();
+      overThumb = e.clientX >= thumbRect.left && e.clientX <= thumbRect.right &&
+                  e.clientY >= thumbRect.top && e.clientY <= thumbRect.bottom;
+    }
+    if (!overThumb && e.target.closest('.sw-nav-item')) return;  // let the nav-item click jump
     var maxScroll = swScroll.scrollWidth - swScroll.clientWidth;
     if (maxScroll <= 0) return;
     var navWidth = swNavEl.offsetWidth;
@@ -1113,11 +1126,16 @@ function runPicker(){
   function endScrub(e) {
     if (!swScrubbing) return;
     swScrubbing = false;
+    swSuppressClick = true;   // a scrub press releasing over a label isn't a click
     swNavEl.classList.remove('is-scrubbing');
     try { swNavEl.releasePointerCapture(e.pointerId); } catch (err) {}
   }
   swNavEl.addEventListener('pointerup', endScrub);
   swNavEl.addEventListener('pointercancel', endScrub);
+  var swSuppressClick = false;
+  swNavEl.addEventListener('click', function(e) {
+    if (swSuppressClick) { swSuppressClick = false; e.stopPropagation(); e.preventDefault(); }
+  }, true);
   updateSwControls();
 })();
 }
