@@ -112,6 +112,7 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── exits.html                  # Exits — count thresholds + half-diagonal (dev, noindexed)
 │   ├── fixture-calc.html           # Plumbing Fixtures — banded ratios, draft-tagged data (dev)
 │   ├── sheet-sizes.html            # Sheet Sizes — ARCH/ANSI fit reference, on the theme (dev)
+│   ├── codes.html                  # Codes & Standards — what applies when + the library (dev)
 │   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)
 │   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
 │   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)

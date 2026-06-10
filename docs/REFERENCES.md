@@ -9,6 +9,11 @@ unverified number is findable in one place instead of eleven.
 **Maintenance rule:** a new citation in any page lands here in the same
 commit. A value's status here must match the tag it renders on the page.
 
+This is the **internal** ledger (per-value verification status). The
+**public-facing** reference sheet — which codes apply when, plus the library
+of standards behind the tools with editions, access, and source links — is
+`calculators/codes.html`; keep the two in step when a standard is added.
+
 ## Status vocabulary
 
 - **verified** — checked against ICC/source material during a session, with
