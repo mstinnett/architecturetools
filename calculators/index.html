@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Calculators -- architecture.tools</title>
+<meta name="description" content="C-0 — the calculators set. Dimensional tools on one exact engine: every answer shows the rounding it carries, drawn to scale, never hidden.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only: the tool index rows ---- */
+  html, body { overflow-x: hidden; }
+  .tool-row { display: flex; align-items: baseline; gap: 1rem; padding: 0.7rem 0.2rem; border-bottom: var(--border-light); }
+  .tool-row:last-child { border-bottom: none; }
+  .tool-name { width: 13.5em; flex-shrink: 0; }
+  .tool-name a { font-size: var(--text-md); font-weight: 400; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color 0.15s, border-color 0.15s; }
+  .tool-name a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .tool-desc { flex: 1; font-size: var(--text-sm); color: var(--ink-2); line-height: 1.55; }
+  .tool-tag { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .set-note { margin: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); color: var(--ink-2); line-height: 1.65; max-width: 46em; }
+  @media (max-width: 540px) { .tool-row { flex-direction: column; gap: 0.15rem; } .tool-name { width: auto; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span aria-current="page">Calculators</span> <span class="crumb-sep">&middot;</span> <span>C-0</span>
+    </nav>
+    <h1>Calculators</h1>
+    <p>Dimensional tools on one exact engine — every length is an integer count
+       of 1/960&nbsp;mm, so the math never drifts. What each tool adds is the part
+       calculators usually hide: the residual. The cut, the slack, the drift,
+       the rounding — drawn to scale, signed, yours to judge.</p>
+  </div>
+
+  <div class="set-note">
+    These tools surface information; they don't decide. None of them will tell
+    you a dimension is right or wrong — they show exactly what each choice
+    costs, against the grid, the limit, or the reference you pick, and leave
+    the call where it belongs.
+  </div>
+
+  <div class="section-label">On the engine</div>
+  <div style="margin-bottom: var(--space-xl);">
+    <div class="tool-row">
+      <span class="tool-name"><a href="convert.html">Precise Unit Converter</a></span>
+      <span class="tool-desc">Any dimension, any format, snapped to a fabrication grid — Min / Nearest / Max with their signed residuals on a dual-scale number line.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="run.html">Run Solver</a></span>
+      <span class="tool-desc">Fit a repeating module into a run — tiles with joints, on-center spacing, balusters, equal sections. The leftover is drawn, flush and balanced layouts side by side.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="scale.html">Scale Converter</a></span>
+      <span class="tool-desc">Real dimension to drawn size and back, on architect's, engineer's, and metric scales — including what a snap error on the sheet reads back as in the field.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="slope.html">Slope</a></span>
+      <span class="tool-desc">Any two of rise, run, slope. Percent, ratio, pitch, and degrees from one exact calculation, bracketed by the nearest standard steps and located against common call-outs.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="area.html">Area &amp; Coverage</a></span>
+      <span class="tool-desc">The takeoff as you'd say it — chain rooms, subtract openings — divided by a sheet or tile into a count with both ends of the rounding shown.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="stairs.html">Stairs</a></span>
+      <span class="tool-desc">Every workable riser count from a total rise, each located against the IRC or IBC figure with its citation, the section drawn to scale with the layout drift hatched.</span>
+    </div>
+  </div>
+
+  <div class="section-label">Reference</div>
+  <div style="margin-bottom: var(--space-xl);">
+    <div class="tool-row">
+      <span class="tool-name"><a href="sheet-sizes.html">Sheet Size Reference</a></span>
+      <span class="tool-desc">ARCH and ANSI sheet sizes with viewable areas at standard title blocks.</span>
+    </div>
+  </div>
+
+  <div class="section-label">Older pages — a different lineage, not yet rebuilt</div>
+  <div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="occupant-load.html">Occupant Load</a></span>
+      <span class="tool-desc">Area ÷ occupant load factor. <span class="tool-tag">table lookup · pre-engine</span></span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="egress-width.html">Egress Width</a></span>
+      <span class="tool-desc">Required width from occupant load. <span class="tool-tag">table lookup · pre-engine</span></span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="fixture-calc.html">Plumbing Fixtures</a></span>
+      <span class="tool-desc">Fixture counts by occupancy. <span class="tool-tag">table lookup · pre-engine</span></span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="parking-ratio.html">Parking Ratio</a></span>
+      <span class="tool-desc">Stall counts from ratios. <span class="tool-tag">table lookup · pre-engine</span></span>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+</body>
+</html>
