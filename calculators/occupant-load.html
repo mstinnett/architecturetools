@@ -346,7 +346,9 @@
       html += rowHtml('Headroom', 'area you could add before the count reaches ' + (up + 1), escapeHtml(sig(up * fx.f - ft2, 1)) + ' ft²', '—', false, 'is-ref');
     }
     els.olRows.innerHTML = html;
-    els.carry.innerHTML = 'Carry it forward: <a class="card-link" href="egress-width.html?ol=' + up + '">egress width for ' + up + ' occupants →</a>';
+    els.carry.innerHTML = 'Carry it forward: <a class="card-link" href="egress-width.html?ol=' + up + '">egress width →</a>'
+      + '<a class="card-link" href="exits.html?ol=' + up + '">exits →</a>'
+      + '<a class="card-link" href="fixture-calc.html?ol=' + up + '">fixtures →</a>';
     els.citeLine.innerHTML = escapeHtml(CITE);
 
     els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
