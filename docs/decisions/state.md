@@ -16,7 +16,8 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
     (`calculators/convert.html` + the three lib modules it loads — promoted
     2026-06-09). `picker.html` redirects to `/`. Plus `assets/`, `data/`,
     `tools/`, `docs/`, the `build-data` workflow, `CNAME`, `.nojekyll`.
-    Interim nav (SITE_FRAMEWORK "Hierarchy"): picker footer links each live
+    Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb (site title
+    home link + set-trail label) on every page; picker footer links each live
     tool; each tool back-links home. Nothing links a deferred page, so
     nothing 404s.
   - **`dev` — the workbench (this branch).** The full prior site
@@ -80,6 +81,12 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
 
 ## Recent decisions
 
+- 2026-06-09 — Interim nav revised after operator review: every title block
+  opens with a breadcrumb (site title linking home + the set trail as a
+  label — "Calculators → Precise Unit Converter"), in place of routing the
+  two live pages through a C-0 cover. C-0 deferred until the set has a
+  second shipped tool (a one-item index is less deliberate than a labeled
+  trail); footer cross-links kept. Rule in SITE_FRAMEWORK "Hierarchy".
 - 2026-06-09 — UI review pass (operator-directed, "act on all of them"), then
   the converter promoted to `main`. One base font size site-wide (18px, the
   picker's iterated scale, set once in global.css). The calculator shell

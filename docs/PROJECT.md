@@ -389,9 +389,11 @@ them all at once.
 - `index.html` — the picker, doubling as the home page (a fuller **AT-0** cover
   is deferred behind the picker-only launch).
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
-- Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): the picker footer
-  links each live tool; each tool's back-link returns home. The AT-0/C-0
-  covers replace this when they land.
+- Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
+  opens with a crumb — site title linking home, then the set trail as a
+  label ("Calculators → Precise Unit Converter"); the picker footer links
+  each live tool; each tool's back-link returns home. C-0 is deferred until
+  the set has a second shipped tool.
 
 ### Promote from `dev` as ready
 - `components.html`, `site-screen.html`
