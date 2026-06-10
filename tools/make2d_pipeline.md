@@ -117,3 +117,13 @@ corners as a conservative footprint.
 - `EMIT_TOP_VIEW` — off by default (top view is pure cost in the iterate loop;
   it is only the visual backstop). Turn on when you want it cached.
 - `PX_PER_MM`, `MARGIN_MM`, colors, stroke widths — top of `render.py`.
+
+## Dark-mode variants
+
+The picker serves the desk art in both color schemes via `<picture>`: the
+originals here in light, and `assets/desk-images-dark/` (same filenames,
+lines recolored to the dark-page ink, alpha preserved) in dark. After
+re-exporting desk images, regenerate the dark set:
+
+    node tools/recolor-desk-dark.mjs   # needs playwright + chromium
+
