@@ -19,10 +19,6 @@
      surface and the key/well material all come from global.css (linked
      above). Rules here are index-only, or deliberate overrides of the
      shared sheet. */
-  @media (prefers-color-scheme: dark){
-    /* desk line-art (transparent PNGs) → invert so dark lines read light on the dark field */
-    img[src*="desk-images"]{ filter: invert(0.9); }
-  }
   body{overflow-anchor:none;}   /* font + base size + ink + grain + desk tone inherit from global.css */
   /* the sheet itself comes from the shared .page-wide; the picker only widens
      it and stacks its sections (the @580 padding tweak below stays its own) */
@@ -56,8 +52,16 @@
   /* make2d desk illustration hero */
   /* Hero fills its width; the make2d images are a uniform canvas now, so no
      fixed slot is needed. */
-  .desk-hero{max-width:880px;margin:0 auto 1.5rem;}
-  .desk-hero img{width:100%;height:auto;display:block;}
+  /* width is explicit: the auto margins opt out of flex stretching, and the
+     masked div below has no intrinsic size to shrink-to-fit around */
+  .desk-hero{width:100%;max-width:880px;margin:0 auto 1.5rem;}
+  /* The line art is a MASK painted with the page ink: it recolors with the
+     scheme (no invert() filter — filtering the big PNG rasterized with an
+     opaque backing on iOS) and the ground is transparent by construction.
+     All make2d exports share one 2843x2221 canvas. */
+  .desk-img{width:100%;aspect-ratio:2843/2221;background-color:var(--ink);
+            -webkit-mask:var(--desk-art) center / contain no-repeat;
+            mask:var(--desk-art) center / contain no-repeat;}
 
   /* Software nav + scroll */
   .sw-nav{display:flex;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
@@ -591,7 +595,21 @@ function runPicker(){
   function deskHeroHTML(role, deskIds, platform) {
     var filename = deskImageFilename(role, deskIds, platform);
     if (!filename) return '';
-    return '<img src="assets/desk-images/' + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout" loading="eager" onerror="this.onerror=null;this.src=\'assets/desk-images/NorthXL_2x27.png\';">';
+    var url = 'assets/desk-images/' + filename + '.png';
+    return '<div class="desk-img" role="img" aria-label="' + filename.replace(/_/g, ' ') + ' desk layout"' +
+      ' data-art="' + url + '" style="--desk-art:url(\'' + url + '\')"></div>';
+  }
+  // A CSS mask gives no error event, so probe the art with an Image and fall
+  // back to the stock dual-27 desk if a combo export is missing (the safety
+  // net the old <img onerror> provided).
+  function ensureDeskArt() {
+    var deskArt = document.querySelector('#deskHero .desk-img');
+    if (!deskArt) return;
+    var probe = new Image();
+    probe.onerror = function () {
+      deskArt.style.setProperty('--desk-art', "url('assets/desk-images/NorthXL_2x27.png')");
+    };
+    probe.src = deskArt.dataset.art;
   }
 
   function bindMonitorConfigEvents(containerId) {
@@ -807,9 +825,10 @@ function runPicker(){
     document.getElementById('panel-mobile').classList.toggle('active', showLaptop);
     document.getElementById('panelsWrapper').classList.toggle('panels-split', isSplit);
 
-    // Hero desk illustration -- one big image that swaps with state.
+    // Hero desk illustration -- one big drawing that swaps with state.
     var heroRole = isSplit ? 'combo' : (State.machineType === 'laptop' ? 'laptop' : 'desktop');
     document.getElementById('deskHero').innerHTML = deskHeroHTML(heroRole, State.desk, activePlatform);
+    ensureDeskArt();
 
     // Desktop spec + desk zone
     var desktopBudgetTier = State.budget;
