@@ -9,7 +9,7 @@
     "x3d_top": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 7 9800X3D", "note": "" },
     "mixed": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 9 9950X", "note": "" },
     "mixed_x3d": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 9 9950X3D", "note": "" },
-    "top_x3d": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 9 9950X3D", "note": "" },
+    "top_x3d": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 9 9950X3D2", "note": "" },
     "render12": { "intel": "", "amd": "AMD Ryzen 9 9900X", "note": "" },
     "render16": { "intel": "", "amd": "AMD Ryzen 9 9950X", "note": "" },
     "render_max": { "intel": "", "amd": "AMD Ryzen 9 9950X or AMD Threadripper PRO", "note": "" }
@@ -264,9 +264,9 @@
     },
     {
       "type": "mini",
-      "name": "ASUS NUC 14 Pro",
-      "price": "$550--$850",
-      "note": "Compact, with Thunderbolt 4 and a good dock ecosystem.",
+      "name": "ASUS NUC 15 Pro",
+      "price": "$600--$1,000",
+      "note": "Compact, with Thunderbolt 4 and a good dock ecosystem. Drives four 4K displays.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {}
     },
@@ -340,9 +340,9 @@
     },
     {
       "type": "gaming",
-      "name": "ASUS ROG G16CH",
-      "price": "$1,800--$2,500",
-      "note": "Up to RTX 4080, 850W PSU, good airflow. Gamer looks, but the cooling and power are right.",
+      "name": "HP Omen 35L",
+      "price": "$1,800--$2,400",
+      "note": "RTX 5070 Ti and 32 GB from the factory. Mainstream and widely stocked, with a standard layout that's easy to upgrade later.",
       "workloadProfiles": [ "modeling", "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "value": true },
