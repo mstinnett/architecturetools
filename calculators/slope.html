@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Slope Calculator -- architecture.tools</title>
+<meta name="description" content="Rise, run, and slope — give any two. Percent, ratio, roof pitch, and degrees from exact engine math, drawn to true angle against the nearest standard pitches.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover this tool's three-field input
+     row and the reference list. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .tri-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-sm); }
+  .tri { display: flex; flex-direction: column; }
+  .tri label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+               text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .tri-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+               font-size: 1.05rem; font-weight: 400; width: 10.5em; max-width: 100%;
+               color: var(--ink); background: var(--card);
+               padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+               box-shadow: var(--shadow-well); border-radius: var(--radius);
+               outline: none; -webkit-appearance: none; appearance: none; }
+  .tri-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .tri-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 13em; }
+
+  /* the reference list — common slopes located against yours; facts, not rulings */
+  .ref-rows { margin-top: var(--space-sm); }
+  .ref-row { display: flex; align-items: baseline; padding: 0.4rem 0; border-bottom: var(--border-light); font-size: var(--text-sm); }
+  .ref-row:last-child { border-bottom: none; }
+  .ref-what { flex: 1; color: var(--ink-2); }
+  .ref-slope { width: 9em; color: var(--ink); }
+  .ref-delta { width: 11em; text-align: right; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Slope</span>
+    </nav>
+    <h1>Slope</h1>
+    <p>Give any two of rise, run, and slope. Every expression of the answer —
+       percent, ratio, roof pitch, degrees — from one exact calculation, drawn
+       to true angle, located against the slopes drawings usually call out.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the triangle, two of three -->
+  <div class="section-label">Rise · run · slope — fill any two</div>
+  <div class="tri-row">
+    <div class="tri">
+      <label for="riseInput">rise</label>
+      <input type="text" id="riseInput" class="tri-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 7'  ·  30&quot;  ·  150mm" autofocus>
+      <div class="tri-note" id="riseNote"></div>
+    </div>
+    <div class="tri">
+      <label for="runInput">run</label>
+      <input type="text" id="runInput" class="tri-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 22'  ·  3.6m">
+      <div class="tri-note" id="runNote"></div>
+    </div>
+    <div class="tri">
+      <label for="slopeInput">slope</label>
+      <input type="text" id="slopeInput" class="tri-input" spellcheck="false" maxlength="40"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 2%  ·  4:12  ·  1:20  ·  5°">
+      <div class="tri-note" id="slopeNote"></div>
+    </div>
+  </div>
+  <div class="bare-ask" id="bareAsk"></div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 4 · CONSTRAINT: which family of standard steps to read against -->
+    <div id="slopeOut" style="display:none;">
+      <div class="section-label">Read against</div>
+      <div class="grid-presets"><div class="grid-row" id="exprRow">
+        <button type="button" class="grid-box" aria-pressed="false" data-expr="pitch">x : 12 pitch</button>
+        <button type="button" class="grid-box" aria-pressed="false" data-expr="ratio">1 : n ratio</button>
+        <button type="button" class="grid-box" aria-pressed="false" data-expr="percent">whole %</button>
+      </div></div>
+
+      <!-- slot 5 · ANSWER CARD: triangle + every expression + the brackets -->
+      <div class="answer-card">
+        <div class="figure-wrap" id="figure"></div>
+        <div class="snap-rows" id="snapRows"></div>
+      </div>
+
+      <!-- slot 6 · reference slopes, located against yours -->
+      <div class="ratio-box" id="refBox">
+        <div class="section-label">Common call-outs — where yours sits</div>
+        <div class="ref-rows" id="refRows"></div>
+        <div style="margin-top:.5rem;font-size:var(--text-xs);color:var(--ink-3);">
+          References to locate yourself, not rulings — the figure that governs your
+          project depends on its code edition, occupancy, and exceptions.</div>
+      </div>
+    </div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/slopefig.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+
+  var state = {
+    rise: '', run: '', slope: '',
+    defaultUnit: 'in',
+    expr: 'pitch',            // which standard family to bracket against
+    target: 'imperial'
+  };
+
+  var els = {};
+  ['riseInput','runInput','slopeInput','riseNote','runNote','slopeNote','bareAsk',
+   'echo','echoLine','echoAssume','slopeOut','exprRow','figure','snapRows','refBox','refRows','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+
+  /* ---- slope text: %, x:12, 1:n, degrees, or a bare ratio ----------------- */
+  // returns { ratio, kind, text } or null; never throws
+  function parseSlope(text) {
+    if (!text) return null;
+    var t = text.trim().toLowerCase().replace(/\s+/g, '');
+    var m;
+    if ((m = /^(\d+(?:\.\d+)?)%$/.exec(t))) return { ratio: +m[1] / 100, kind: 'percent', v: +m[1] };
+    if ((m = /^(\d+(?:\.\d+)?)(?:°|deg)$/.exec(t))) {
+      var deg = +m[1];
+      if (deg <= 0 || deg >= 90) return { error: 'angle must be between 0° and 90°' };
+      return { ratio: Math.tan(deg * Math.PI / 180), kind: 'deg', v: deg };
+    }
+    if ((m = /^(\d+(?:\.\d+)?)(?::|in|\/)(\d+(?:\.\d+)?)$/.exec(t))) {
+      var p = +m[1], q = +m[2];
+      if (!(p > 0 && q > 0)) return { error: 'both numbers must be positive' };
+      return { ratio: p / q, kind: q === 12 ? 'pitch' : 'ratio', p: p, q: q };
+    }
+    if ((m = /^(0?\.\d+)$/.exec(t))) return { ratio: +m[1], kind: 'bare' };
+    return { error: 'use 2%, 4:12, 1:20, or 5°' };
+  }
+
+  function parseDim(text) { return parseLength(text, { defaultUnit: state.defaultUnit }); }
+
+  // one field's reading: null (empty) | {units} | {error}
+  function readDim(text) {
+    if (!text.trim()) return null;
+    var r = parseDim(text);
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length', result: r };
+    if (outOfRange(r.units) || r.units <= 0) return { error: r.units <= 0 ? 'must be more than zero' : 'out of range', result: r };
+    return { units: r.units, result: r };
+  }
+
+  /* ---- formatting ---------------------------------------------------------- */
+  function fmtLen(u) {
+    if (state.target === 'metric') return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+  /* ---- main render ----------------------------------------------------------- */
+  function syncDetected(res) {
+    if (!res || !res.result || !res.result.interpretation) return;
+    var sys = res.result.unitSystem;
+    if (sys !== 'imperial' && sys !== 'metric') return;
+    var stated = (res.result.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!stated) return;
+    state.target = sys;
+    state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+  }
+
+  function fieldNote(el, res) {
+    if (!res) { el.innerHTML = ''; return; }
+    if (res.error) { el.innerHTML = escapeHtml(res.error); return; }
+    el.innerHTML = '';
+  }
+
+  function render() {
+    var rise = readDim(state.rise);
+    var run = readDim(state.run);
+    var slope = state.slope.trim() ? parseSlope(state.slope) : null;
+    syncDetected(rise && !rise.error ? rise : (run && !run.error ? run : null));
+    syncURL();
+
+    fieldNote(els.riseNote, rise);
+    fieldNote(els.runNote, run);
+    els.slopeNote.innerHTML = slope && slope.error ? escapeHtml(slope.error) : '';
+
+    var riseU = rise && !rise.error ? rise.units : null;
+    var runU = run && !run.error ? run.units : null;
+    var ratio = slope && !slope.error ? slope.ratio : null;
+
+    // solve the third — and SAY which two governed
+    var solved = null, derivedNote = null, quant = null;
+    if (riseU != null && runU != null) {
+      solved = { rise: riseU, run: runU };
+      if (ratio != null) derivedNote = 'rise and run define the slope — the slope field is ignored';
+    } else if (riseU != null && ratio != null) {
+      var runX = riseU / ratio;
+      if (!outOfRange(Math.round(runX))) { solved = { rise: riseU, run: Math.round(runX) }; quant = runX - solved.run; derivedNote = 'run solved from rise and slope'; }
+    } else if (runU != null && ratio != null) {
+      var riseX = runU * ratio;
+      if (!outOfRange(Math.round(riseX))) { solved = { rise: Math.round(riseX), run: runU }; quant = riseX - solved.rise; derivedNote = 'rise solved from run and slope'; }
+    }
+
+    renderEcho(rise, run, slope, solved, derivedNote);
+    if (!solved || solved.rise <= 0 || solved.run <= 0) {
+      els.slopeOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    els.slopeOut.style.display = '';
+    renderAnswer(solved, quant, derivedNote);
+  }
+
+  function tokensOf(result) {
+    var parts = (result && result.interpretation && result.interpretation.parts) || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op' || p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+    return html;
+  }
+
+  function renderEcho(rise, run, slope, solved, derivedNote) {
+    var any = (rise || run || (slope && !slope.error));
+    if (!any) { els.echo.style.display = 'none'; return; }
+    var html = '';
+    if (rise && rise.result) html += '<span class="op">rise </span>' + tokensOf(rise.result);
+    if (run && run.result) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">run </span>' + tokensOf(run.result);
+    if (slope && !slope.error && state.slope.trim()) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">slope </span><span class="tok stated">' + escapeHtml(state.slope.trim()) + '</span>';
+    if (solved) {
+      var pc = 100 * solved.rise / solved.run;
+      html += '<span class="eq">=</span><span class="result">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>';
+    } else {
+      html += '<span class="eq">—</span><span class="op">two of the three, and the third follows</span>';
+    }
+    els.echoLine.innerHTML = html;
+    var asm = [];
+    [rise, run].forEach(function (f) {
+      if (f && f.result && f.result.interpretation) asm = asm.concat(f.result.interpretation.assumptions || []);
+    });
+    if (derivedNote) asm.push(derivedNote);
+    var seen = {};
+    asm = asm.filter(function (a) { if (seen[a]) return false; seen[a] = true; return true; });
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- the answer: figure, expressions, brackets, references ---------------- */
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  // the bracketing standard steps for the chosen expression family.
+  // pitch: whole x in x:12 · ratio: whole n in 1:n (down = shallower n+1) ·
+  // percent: whole percent. Each returns {lo, hi} as ratios + label maker.
+  function brackets(s) {
+    if (state.expr === 'pitch') {
+      var x = 12 * s;
+      return { lo: Math.floor(x) / 12 || null, hi: Math.ceil(x) / 12,
+               loL: Math.floor(x) + ':12', hiL: Math.ceil(x) + ':12',
+               exact: x === Math.round(x) };
+    }
+    if (state.expr === 'ratio') {
+      var n = 1 / s;                       // bigger n = shallower
+      var nHi = Math.floor(n) || 1, nLo = Math.ceil(n);
+      return { lo: 1 / nLo, hi: 1 / nHi,
+               loL: '1:' + nLo, hiL: '1:' + nHi,
+               exact: n === Math.round(n) };
+    }
+    var p = 100 * s;
+    return { lo: Math.floor(p) / 100 || null, hi: Math.ceil(p) / 100,
+             loL: Math.floor(p) + '%', hiL: Math.ceil(p) + '%',
+             exact: p === Math.round(p) };
+  }
+
+  var REFS = [
+    { label: 'accessible cross slope · 1/4" per foot drainage', ratio: 1 / 48, face: '1:48 (2.08%)' },
+    { label: 'walkway / ramp boundary call-out', ratio: 1 / 20, face: '1:20 (5%)' },
+    { label: 'ramp running slope call-out', ratio: 1 / 12, face: '1:12 (8.33%)' },
+    { label: 'common low-slope shingle minimum call-out', ratio: 2 / 12, face: '2:12 (16.67%)' }
+  ];
+
+  function renderAnswer(solved, quant, derivedNote) {
+    var riseU = solved.rise, runU = solved.run;
+    var s = riseU / runU;
+    var g = gcd(riseU, runU);
+    var p = riseU / g, q = runU / g;
+    var deg = Math.atan2(riseU, runU) * 180 / Math.PI;
+    var pc = 100 * s;
+    var pitch = 12 * s;
+    var overOne = s > 1;
+
+    Array.prototype.forEach.call(els.exprRow.querySelectorAll('[data-expr]'), function (b) {
+      UI.press(b, b.dataset.expr === state.expr);
+    });
+
+    var br = brackets(s);
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.innerHTML = SlopeFig.slopefig({
+      rise: riseU, run: runU,
+      riseLabel: fmtLen(riseU), runLabel: fmtLen(runU),
+      angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
+      refLo: br.exact ? null : br.lo, refHi: br.exact ? null : br.hi,
+      refLoLabel: br.exact ? null : br.loL, refHiLabel: br.exact ? null : br.hiL,
+      width: width, height: 200
+    });
+
+    // every expression of the one slope — exact where the lattice allows
+    var html = '';
+    html += rowHtml('Percent', 'rise over run × 100', '<span class="fact">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>', '—', true);
+    html += rowHtml('Ratio', 'reduced exactly from the lattice', '1 : ' + escapeHtml(sig(q / p, q / p >= 100 ? 1 : 2)) + (q % p === 0 ? '' : ' (' + p + '/' + q + ' exact)'), '—', false);
+    html += rowHtml('Pitch', 'per 12 of run', escapeHtml(sig(pitch, 2)) + ' : 12', '—', false);
+    html += rowHtml('Angle', '', escapeHtml(sig(deg, deg < 1 ? 3 : 2)) + '°', '—', false);
+
+    // the brackets, with what each would mean in RISE over this run
+    if (!br.exact) {
+      [{ r: br.lo, L: br.loL, name: 'Round down', gloss: 'shallower' },
+       { r: br.hi, L: br.hiL, name: 'Round up', gloss: 'steeper' }].forEach(function (b) {
+        if (b.r == null) return;
+        var riseAt = Math.round(runU * b.r);
+        html += rowHtml(b.name + ' · ' + b.L, b.gloss + ' — rise becomes ' + escapeHtml(fmtLen(riseAt)) + ' over this run',
+                        escapeHtml(sig(100 * b.r, 3)) + '%',
+                        escapeHtml(NumberLine.formatResidual(riseAt - riseU, state.target)) + ' rise', false, 'is-ref');
+      });
+    } else {
+      html += rowHtml('On a standard step', 'lands exactly on ' + escapeHtml(br.hiL), 'no bracket needed', '—', false, 'is-exact');
+    }
+    if (overOne) html += rowHtml('Steeper than 1:1', 'past 45° — most slope call-outs assume the shallow side', '', '—', false, 'is-ref');
+    els.snapRows.innerHTML = html;
+
+    // references — located, never ruled on
+    var refs = '';
+    REFS.forEach(function (r) {
+      var d = s - r.ratio;
+      var side = d === 0 ? 'exactly this' : (d > 0 ? 'steeper by ' : 'shallower by ') + sig(Math.abs(d) * 100, 3) + '%';
+      refs += '<div class="ref-row"><div class="ref-what">' + escapeHtml(r.label) + '</div>'
+            + '<div class="ref-slope">' + escapeHtml(r.face) + '</div>'
+            + '<div class="ref-delta">' + escapeHtml('yours is ' + side) + '</div></div>';
+    });
+    els.refRows.innerHTML = refs;
+
+    var lines = [
+      'rise = <b>' + riseU + '</b> units · run = <b>' + runU + '</b> units (1 unit = 1/960 mm)',
+      'gcd ' + g + ' → slope = ' + p + '/' + q + ' exactly = ' + sig(s, 6),
+      'percent = 100·' + p + '/' + q + ' = ' + sig(pc, 4) + '% · pitch = 12·' + p + '/' + q + ' = ' + sig(pitch, 4) + ':12'
+    ];
+    if (quant) lines.push('solved leg quantized to the lattice (true value off by ' + escapeHtml(NumberLine.formatResidual(quant, state.target)) + ')');
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- shareable URL ---------------------------------------------------------- */
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.rise && state.rise !== "7'") params.set('a', state.rise);
+      if (state.run && state.run !== "22'") params.set('b', state.run);
+      if (state.slope) params.set('s', state.slope);
+      if (state.expr !== 'pitch') params.set('x', state.expr);
+      var qq = params.toString();
+      try { history.replaceState(null, '', qq ? '?' + qq : location.pathname); } catch (e) { /* sandboxed view */ }
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var a = params.get('a'), b = params.get('b'), sl = params.get('s'), x = params.get('x');
+    if (x === 'ratio' || x === 'percent' || x === 'pitch') state.expr = x;
+    return {
+      rise: a != null ? a.slice(0, 80) : null,
+      run: b != null ? b.slice(0, 80) : null,
+      slope: sl != null ? sl.slice(0, 40) : null
+    };
+  }
+
+  /* ---- wiring ------------------------------------------------------------------ */
+  [['riseInput', 'rise'], ['runInput', 'run'], ['slopeInput', 'slope']].forEach(function (pair) {
+    var el = els[pair[0]];
+    el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });
+    el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
+  });
+  Array.prototype.forEach.call(els.exprRow.querySelectorAll('[data-expr]'), function (b) {
+    b.addEventListener('click', function () { state.expr = b.dataset.expr; render(); });
+  });
+
+  // initial state — URL params override the worked example (7' over 22')
+  var u = initFromURL();
+  els.riseInput.value = u.rise != null ? u.rise : (u.run != null || u.slope != null ? '' : "7'");
+  els.runInput.value = u.run != null ? u.run : (u.rise != null || u.slope != null ? '' : "22'");
+  els.slopeInput.value = u.slope != null ? u.slope : '';
+  state.rise = els.riseInput.value;
+  state.run = els.runInput.value;
+  state.slope = els.slopeInput.value;
+  render();
+})();
+</script>
+</body>
+</html>
