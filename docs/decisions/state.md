@@ -60,12 +60,12 @@ _Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value pro
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
   warm sheet theme; imports `assets/css/tokens.css`, the canonical color
   palette; owns the per-family accent system selected via `data-family` on
-  `<html>` and the one shared dark scheme). The picker and converter use it
-  fully; `components.html` and `dimension-converter.html` link it and inherit
-  the theme (the old cool-neutral sheet of the same name was replaced —
-  same class/token vocabulary, re-valued). `assets/data/hardware-data.json`
-  (the picker's runtime data, generated from the `data/` CSV tables — see the
-  pipeline contract below).
+  `<html>` and the one shared dark scheme). The picker and every
+  `calculators/` page except `parking-ratio.html` use it fully;
+  `components.html` links it and inherits the theme but hasn't been reviewed
+  against it; `site-screen.html` still carries its own inline styles.
+  `assets/data/hardware-data.json` (the picker's runtime data, generated from
+  the `data/` CSV tables — see the pipeline contract below).
 - **Verification gate:** `.claude/gate/run.sh` — htmlhint + stylelint +
   internal-link check. A dependency carve-out under `.claude/gate/`; not
   shipped with the site.
@@ -96,113 +96,56 @@ _Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value pro
   New tools follow them (`docs/HANDOFF.md` §3).
 - The provenance rule: never serve WIP on `architecture.tools` or a subdomain
   of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
+- The citation ledger: every external code/standard a tool cites has a row in
+  `docs/REFERENCES.md` with a per-value status (verified / cross-checked /
+  memory); a new citation lands there in the same commit, and a page's
+  draft tags must agree with the ledger.
 
 ## Recent decisions
 
-- 2026-06-10 (second pass) — The life-safety thread opened: occupant load and
-  egress width rebuilt on the engine in place of their pre-engine lookups, ramp
-  added; the egress and accessibility family accents are now in use. Two
-  notable calls: code TABLE values only ship cross-checked (the legacy
-  mercantile 30/60 split was silently outdated — corrected to the post-2015
-  flat 60 gross), and **plumbing fixtures was deliberately deferred** because
-  its banded IPC ratios couldn't be verified here — a misquoted table is the
-  exact failure the suite is built against (backlog item records the
-  precondition).
-- 2026-06-10 — Calculator build-out on `dev` (operator-directed: "get through
-  as many as possible in the style of convert.html"). Five tool pages + three
-  figure modules + the C-0 index, all on the shell/engine conventions, each
-  gate-checked and jsdom-smoke-tested. The governing principle stated by the
-  operator and applied everywhere: **surface information, don't decide for the
-  user** — floor/nearest/ceil all get rows, alternatives are equal cards,
-  limits and call-outs are located with citations rather than colored as
-  verdicts, assumptions are echoed until the user replaces them.
+- 2026-06-10 — **The calculator build-out** (operator-directed, three passes in
+  one day; per-tool records live in backlog "Done"). Eleven tool pages + five
+  engine/figure modules + the C-0 cover, all on the shell conventions; the
+  superseded standalones retired or rebuilt in place. Governing principle,
+  operator-stated: **surface information, don't decide for the user.** Two
+  durable sub-decisions: (a) code TABLE values ship only with per-value
+  provenance — verified / cross-checked / memory, rendered as visible tags
+  (`docs/REFERENCES.md` is the ledger); fixtures was deferred for exactly this
+  until the banded engine + tagged-draft approach made it shippable honestly.
+  (b) A real-browser render sweep (Puppeteer/Chromium in the session sandbox)
+  is now part of verification alongside the jsdom smokes and the gate.
 - 2026-06-10 — `main` merged into `dev` (operator-directed: main's picker +
   converter are the approved versions). Main's side won every overlapping file
-  — it had absorbed dev's palette work and moved past it (promotion, css
-  consolidation, numberline clearance fix, research-pass data). Dev kept its
-  unique files (partition.js, fixtures, HANDOFF.md, In Progress docs, the
-  deferred pages). Stale `global2.css` removed. dev pushed; calculator work
-  continued on `claude/calculator-implementations-ov885q` from that merge.
-- 2026-06-09 — Interim nav revised after operator review: every title block
-  opens with a breadcrumb (site title linking home + the set trail as a
-  label — "Calculators → Precise Unit Converter"), in place of routing the
-  two live pages through a C-0 cover. C-0 deferred until the set has a
-  second shipped tool (a one-item index is less deliberate than a labeled
-  trail); footer cross-links kept. Rule in SITE_FRAMEWORK "Hierarchy".
-- 2026-06-09 — UI review pass (operator-directed, "act on all of them"), then
-  the converter promoted to `main`. One base font size site-wide (18px, the
-  picker's iterated scale, set once in global.css). The calculator shell
-  graduated into global.css ("CALCULATOR SHELL": input well, echo, constraint
-  dial, debossed answer card, snap rows, figure text classes, mathnote) with
-  the slots labeled in convert.html and the convention recorded in HANDOFF §3.
-  All interactive pills on both pages are now real `<button>`s with
-  `aria-pressed` (synced via the new shared `assets/js/ui.js`, which also owns
-  `esc()`), one focus-visible ring, and coarse-pointer hit-height bumps; the
-  picker's markup order now matches its visual order (CSS `order` removed) and
-  ~10 dead inline CSS classes from earlier iterations were trimmed. Converter
-  gained a shareable URL (`?d=&t=&g=`) and an echo assumption line announcing
-  the auto-flipped target; the picker footer date now derives from
-  `Meta.dataUpdated` (build-data stamps the last data/ commit date). Interim
-  nav nailed down in SITE_FRAMEWORK and wired (footer link ↔ back-link).
-- 2026-06-09 — Shared CSS consolidated to one sheet (operator-directed).
-  `global2.css` renamed over `assets/css/global.css`, replacing the old
-  cool-neutral sheet (same class/token vocabulary, so its two consumers —
-  `components.html`, `dimension-converter.html` — re-theme without edits).
-  The `--paper` repetition resolved: tokens.css is its only definer (the
-  brand's warm-white anchor, like `--lightbox` for dark); the theme's grounds
-  are `--card` (the sheet) and `--gray-100` (the field behind it), and the
-  unused `--page-bg` alias was dropped. Picker + converter verified
-  computed-style identical in both schemes.
-- 2026-06-09 — Shared CSS refactor (operator-directed). The canonical palette
-  graduated from `docs/In Progress/tokens.css` to `assets/css/tokens.css`;
-  `global2.css` imports it and now owns the family-accent system (pages
-  declare `<html data-family="picker|drafting|…">`) plus the single shared
-  dark scheme that `index.html` and `convert.html` had each been carrying
-  inline. Both pages' duplicated `:root` mirrors and dark blocks were
-  deleted; rendering verified pixel-identical (computed-style diff, both
-  schemes). Future tool pages adopt the look with one link + one attribute.
-- 2026-06-07 — `partition.js` shipped: the layout primitive (sibling to
-  `snap.js`) that divides a run into a whole number of equal parts and exposes
-  the residual, unifying four tools (sections / tiles / on-center / balusters)
-  behind one module. Pure integer math, fails loud, 35 inline `node` tests
-  passing. No tool page consumes it yet — that is the next build.
-- 2026-06-07 — Engine hardened after a review of `convert.html` + the lib:
-  `numberline.js` and `partition.js` now **delegate** the floor/nearest/ceil
-  kernel to `snap.js` (one source of truth, no duplicated `snapTriple`/`pick`);
-  `numberline()` validates its public inputs; `partition` infeasibility carries
-  stable `reason` codes; the `Number`-range bound is documented. Conventions
-  updated in `docs/HANDOFF.md` §3. Also fixed the flagged convert.html UI bugs
-  (mobile-CSS selector, area out-of-range guard, Min/Max row wording). Open
-  follow-ups in the backlog: parser `reason` codes, and convert.html
-  pending-span policy + area/ratio polish.
-- 2026-06-07 — `noindex` added to all 11 `dev` WIP pages (provenance §4).
-- 2026-06-07 — Precise Unit Converter shipped (frozen), and the calculator
-  **engine** (`calculators/lib/`) established as the spine for the family. Build
-  plan and provenance rule captured in `docs/HANDOFF.md`. These agent docs
-  (`state.md`, `backlog.md`) were reconciled to match — they previously omitted
-  the engine entirely and still listed removed pages as live.
-- 2026-06-07 — `main` trimmed to picker-only (`f01b200`): `components.html`,
-  `site-screen.html`, and `calculators/` removed from the live branch and kept
-  on `dev`. The two-branch promotion model (above) is the working arrangement.
-- 2026-06-05 — Deployment moved in-repo. `CNAME` points the custom domain
-  (architecture.tools) at the site; `.github/workflows/build-data.yml`
-  recompiles `hardware-data.json` on push and commits it back. With `.nojekyll`
-  this is a GitHub Pages setup serving `main`, not an external pipeline.
-- 2026-06-03 — Hardware data split into per-table CSVs. The single `catalog.csv`
-  became `cpus.csv` + `gpus.csv` + `chips.csv`; the spec matrices reference
-  catalog keys, compiled by `tools/build-data.mjs`. `data/README.md` is
-  authoritative. (Supersedes the earlier Pages-CMS / `.pages.yml` idea, which
-  never shipped.)
-- 2026-05-29 — Picker-only launch revision (operator-directed). The picker
-  became the site home page; live pricing was removed from the picker UI (price
-  data retained, unrendered).
-- 2026-05-22 — Autonomous work system bootstrapped. Setup choices recorded
-  in `docs/decisions/OPERATING_GUIDE.md`.
+  — it had absorbed dev's palette work and moved past it. Dev kept its unique
+  files; stale `global2.css` removed.
+- 2026-06-09 — **UI/CSS consolidation + converter promotion** (operator-
+  directed; full detail in backlog "Done" + HANDOFF §3). One 18px base size;
+  the calculator shell graduated into `global.css`; `tokens.css` promoted as
+  the canonical palette with the `data-family` accent system and one shared
+  dark scheme; all pills real `<button>`s via shared `assets/js/ui.js`;
+  interim nav nailed (title-block crumb, no C-0 until the set earned it);
+  `convert.html` + lib promoted to `main`.
+- 2026-06-07 — **Engine established.** Precise Unit Converter shipped
+  (frozen); `calculators/lib/` set as the family's spine with its conventions
+  (HANDOFF §3); then hardened after review — one rounding kernel in `snap.js`
+  with others delegating, public-input validation, stable infeasibility
+  `reason` codes. `partition.js` landed. `noindex` on all dev WIP pages.
+- 2026-06-07 — `main` trimmed to picker-only (`f01b200`); the two-branch
+  promotion model (above) is the working arrangement.
+- 2026-06-05 — Deployment moved in-repo: `CNAME`, the `build-data` workflow,
+  `.nojekyll` — GitHub Pages serving `main`, no external pipeline.
+- 2026-06-03 — Hardware data split into per-table CSVs compiled by
+  `tools/build-data.mjs`; `data/README.md` authoritative. (Supersedes the
+  Pages-CMS idea, never shipped.)
+- 2026-05-29 — Picker-only launch revision (operator-directed): picker became
+  the home page; live pricing removed from the UI (data retained).
+- 2026-05-22 — Autonomous work system bootstrapped
+  (`docs/decisions/OPERATING_GUIDE.md`).
 
 ## Active concerns
 
 - **Eleven new tools + C-0 await the operator's taste pass, then promotion.**
-  Gate-green, 196 jsdom checks, and now RENDERED: a Puppeteer/headless-Chromium
+  Gate-green, 185 jsdom checks, and now RENDERED: a Puppeteer/headless-Chromium
   sweep (installed in the session sandbox via npm; harness in /tmp/smoke, not
   committed) covered all 14 pages × light/dark × desktop/phone — zero page
   errors, zero horizontal overflow, dark figures inverting. Remaining risk is

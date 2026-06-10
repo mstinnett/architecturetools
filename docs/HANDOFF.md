@@ -103,6 +103,10 @@ Every planned tool is the same operation with a different constraint.
   paths break githack / pages.dev previews. (All current files comply.)
 - Add `<meta name="robots" content="noindex, nofollow">` to any page not yet on
   `main`; remove it as part of promotion (see §4).
+- **Citations are ledgered.** Every external code/standard a page cites gets a
+  row in `docs/REFERENCES.md` (status: verified / cross-checked / memory) in
+  the same commit; values a page renders from memory carry a visible draft
+  tag that agrees with the ledger.
 
 ---
 

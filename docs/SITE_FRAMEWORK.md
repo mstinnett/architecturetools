@@ -225,11 +225,12 @@ The C-series is a set, not an afterthought.
 
 These pages can be more interactive than the A-series, but they should still feel disciplined, diagram-led, and architecturally framed.
 
-> **Status (2026-06-07):** the C-series is being rebuilt on a shared **engine**
-> (`calculators/lib/`) rather than as independent pages — see `docs/HANDOFF.md`.
-> The Precise Unit Converter (`calculators/convert.html`) ships first; the
-> legacy pages below are standalone and are being folded onto the engine or
-> retired. All of this lives on `dev`; only the picker is live on `main`.
+> **Status (2026-06-10):** the rebuild is done — twelve tools on the shared
+> engine (`calculators/lib/`) across three family accents, the C-0 cover
+> built, the superseded standalones retired. The converter is live on `main`;
+> everything else sits on `dev` (noindexed) awaiting the operator's review,
+> then one-at-a-time promotion. Citations across the set are ledgered in
+> `docs/REFERENCES.md`. See `docs/HANDOFF.md` for the build record.
 
 ### C-0 — Calculators Cover
 

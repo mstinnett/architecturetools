@@ -131,14 +131,15 @@ They are part of the site structure, but they do not need premature renaming or 
     ├── PROJECT.md                  # This file — actual repo & shipping state
     ├── SITE_FRAMEWORK.md           # The structural/editorial roadmap
     ├── HANDOFF.md                  # Calculator-engine charter, build plan, provenance
+    ├── REFERENCES.md               # Citation ledger — every code/standard cited, with status
     ├── voice.md                    # Recommendation-copy voice & glossary
     └── decisions/                  # Autonomous work system (state, backlog, queue, guide)
 ```
 
 Notes:
 - `/a/`, `/c/`, and `/l/` are the long-term structural homes (not created yet).
-- `calculators/index.html` (a C-0 cover) is not built yet; add it once the
-  engine-based tools settle.
+- `calculators/index.html` is the built C-0 cover (dev, noindexed); the
+  long-term `/c/` home can alias it later.
 - On `main` the picker is the only page; the rest of this tree is `dev`-only
   until promoted.
 
@@ -220,7 +221,7 @@ Contains:
 - reusable components such as `.section-label`, `.input-group`, `.option-pill`, `.app-toggle`, `.result-row`, `.output-row`, `.field-row`, `.note-box`, `.priority-box`, `.answer-card`, `.card-link`, `.page-footer`, `.spec-block`, `.purchase-path`, `.pick`, `.ref-table`, `.scale-table`
 - type scale from `--text-xs` through `--text-2xl`
 
-**Status:** created but not yet applied everywhere. Continue migrating pages toward shared styles rather than inventing a larger system.
+**Status:** applied across the picker and every `calculators/` page except `parking-ratio.html`. Remaining: `site-screen.html` (own inline styles), a review pass of `components.html` (linked, unreviewed). Continue reusing the shell rather than inventing a larger system.
 
 ### Hardware data — `data/` (source) → `assets/data/hardware-data.json` (generated)
 The picker fetches `assets/data/hardware-data.json` at runtime, but that file is
@@ -424,14 +425,13 @@ intentional while the numbered set structure grows around them.
 These seed `docs/decisions/backlog.md` (the work source); keep the two in step.
 The backlog leads with the calculator-engine thread (HANDOFF §5).
 
-1. Review the five new tools + C-0 in a real browser, then promote to `main`
-   one at a time; next engine thread is occupant load → egress width/fixtures
-2. Close the provenance loose ends (noindex on dev WIP, a neutral preview host)
-3. Grow `index.html` toward a fuller **AT-0** cover; add a **C-0** calculator
-   index once the engine tools settle
-4. Bring the remaining pages onto `global.css` as they're touched (the picker
-   and converter are on it; the legacy calculators and `site-screen.html`
-   still carry their own inline styles)
+1. Operator taste pass over the eleven new tools + C-0 (wiring risk already
+   retired by the Chromium render sweep), then promote to `main` one at a time
+2. Replace the draft-tagged code-table values (fixtures ratios; exits'
+   single-exit/travel tables) from checked copies — `docs/REFERENCES.md` is
+   the ledger and must agree with the page tags
+3. Close the provenance loose ends (noindex on dev WIP, a neutral preview host)
+4. Grow `index.html` toward a fuller **AT-0** cover as more of the site ships
 5. Add thin A-series pages gradually rather than waiting for a complete set
 
 ---
