@@ -1,210 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-family="egress">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- dev work-in-progress: not yet promoted to main; remove on promotion -->
+<!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
-<title>Fixture Requirements Calculator -- architecture.tools</title>
+<title>Plumbing Fixtures -- architecture.tools</title>
+<meta name="description" content="Minimum fixture counts from an occupant load — IPC Table 403.1 banded ratios with the 50/50 sex split stated, exact quotients beside every round-up, and each table value carrying its own verification status.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--black:#111;--gray-700:#555;--gray-500:#888;--gray-400:#aaa;--gray-300:#ccc;--gray-200:#ddd;--gray-100:#eee;--gray-50:#f5f5f4;--white:#fff;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'DM Mono','SF Mono',monospace;}
-  html{font-size:15px;}
-  body{font-family:var(--font-body);color:var(--black);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;}
-  .tool{max-width:780px;margin:0 auto;padding:3rem 2rem 5rem;}
-  .tool-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--black);}
-  .tool-header h1{font-size:1.5rem;font-weight:300;letter-spacing:-0.01em;margin-bottom:0.4rem;}
-  .tool-header p{font-size:0.82rem;color:var(--gray-500);font-weight:300;max-width:50em;}
-  .section-label{font-size:0.65rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:0.5rem;}
-
-  .input-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;align-items:flex-end;}
-  .input-group{display:flex;flex-direction:column;}
-  .input-group label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.3rem;}
-  .input-group input,.input-group select{font-family:var(--font-mono);font-size:0.85rem;font-weight:300;padding:0.45rem 0.6rem;border:1px solid var(--gray-300);background:var(--white);outline:none;-webkit-appearance:none;appearance:none;}
-  .input-group input:focus,.input-group select:focus{border-color:var(--black);}
-  .input-group input{width:120px;}
-  .input-group select{min-width:240px;}
-
-  .results{display:none;margin-bottom:1.5rem;}
-  .fixture-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-bottom:1.5rem;}
-  .fixture-card{padding:0.75rem;border:1px solid var(--gray-200);text-align:center;}
-  .fixture-card .fc-val{font-family:var(--font-mono);font-size:1.5rem;font-weight:300;margin-bottom:0.15rem;}
-  .fixture-card .fc-label{font-size:0.6rem;font-family:var(--font-mono);font-weight:300;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray-500);}
-  .fixture-card .fc-note{font-size:0.62rem;font-weight:300;color:var(--gray-400);margin-top:0.2rem;}
-
-  .calc-detail{font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;margin-bottom:1rem;}
-  .note-box{padding:0.75rem 1rem;background:var(--gray-50);border:1px solid var(--gray-100);font-size:0.72rem;font-weight:300;color:var(--gray-500);line-height:1.6;margin-top:1rem;}
-  .note-box strong{font-weight:400;color:var(--black);}
-
-  .ref-table{margin-top:2.5rem;}
-  .ref-table table{width:100%;border-collapse:collapse;}
-  .ref-table th{font-size:0.58rem;font-family:var(--font-mono);font-weight:300;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray-400);text-align:left;padding:0.5rem 0.5rem;border-bottom:1px solid var(--gray-200);}
-  .ref-table td{font-size:0.72rem;font-weight:300;padding:0.4rem 0.5rem;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background 0.1s;}
-  .ref-table tr:hover td{background:var(--gray-50);}
-  .ref-table td:nth-child(n+2){font-family:var(--font-mono);font-size:0.68rem;color:var(--gray-500);white-space:nowrap;}
-
-  .tool-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);font-size:0.68rem;color:var(--gray-500);font-weight:300;line-height:1.7;}
-  @media(max-width:480px){.input-row{flex-direction:column;}.input-group select{min-width:0;width:100%;}.fixture-grid{grid-template-columns:repeat(2,1fr);}}
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover the occupancy picker, the
+     custom-ratio row, and the per-value provenance tags. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+  .occ-box { min-width: 0; text-align: left; line-height: 1.3; }
+  .custom-row { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: flex-end; margin-top: 0.6rem; }
+  .custom-row .cf { display: flex; flex-direction: column; }
+  .custom-row .cf label { font-size: var(--text-xs); color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.2rem; }
+  .cite { margin-top: var(--space-sm); font-size: var(--text-xs); color: var(--ink-3); line-height: 1.7; }
+  .fact { color: var(--ink); font-weight: 400; }
+  /* provenance: a quiet per-row tag; draft values must be visibly draft */
+  .prov { font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; }
+  .prov.ok { color: var(--ink-3); }
+  .prov.draft { color: var(--accent); }
 </style>
 </head>
 <body>
-<div class="tool">
-  <div class="tool-header">
-    <h1>Plumbing Fixture Calculator</h1>
-    <p>Enter occupant load and use group to calculate minimum required plumbing fixtures per IPC Table 403.1. Split by gender assumes 50/50 unless otherwise noted.</p>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Plumbing Fixtures</span>
+    </nav>
+    <h1>Plumbing Fixtures</h1>
+    <p>An occupant load through the IPC's banded ratios: split per sex as
+       &sect;403.1.1 directs, the exact quotient beside every rounded-up count, and
+       the band arithmetic written out underneath. Every table value carries
+       its own verification status — read those tags before you lean on this.</p>
   </div>
 
-  <div class="section-label">Input</div>
-  <div class="input-row">
-    <div class="input-group">
-      <label>Use / Occupancy</label>
-      <select id="inUse"></select>
+  <!-- the data-layer status, said before anything else -->
+  <div class="note-box" style="margin-bottom: var(--space-lg);">
+    <strong>The math is tested; part of the table is draft.</strong> The banded
+    arithmetic and the &sect;403.1.1 split are engine-tested. Ratios tagged
+    <em>verified</em> were checked against ICC source material; ratios tagged
+    <em>draft</em> are pre-filled from memory of Table 403.1 and must be read
+    against your copy of the table before anything rides on them. The custom
+    occupancy takes your own ratios directly.
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the load -->
+  <div class="duo" style="margin-bottom: var(--space-lg); display:flex; flex-direction:column;">
+    <span class="section-label">Occupant load</span>
+    <input type="number" id="olInput" class="grid-custom" style="width: 9em; font-size: 1.05rem;" inputmode="numeric" min="1" max="100000" step="1"
+           placeholder="from the occupant load calc" autofocus>
+    <div style="font-size: var(--text-xs); margin-top: 0.3rem;"><a class="card-link" href="occupant-load.html" style="margin-right:0;">need the count? →</a></div>
+  </div>
+
+  <!-- slot 2 · tool controls: the occupancy (the ratio set) -->
+  <div class="section-label">Occupancy — IPC 2021 Table 403.1</div>
+  <div class="grid-presets" id="occPresets"></div>
+  <div class="custom-row" id="customRow">
+    <span class="grid-group-label" style="align-self: center;">custom · 1 per</span>
+    <div class="cf"><label for="cu_wc">water closet</label><input class="grid-custom" id="cu_wc" type="number" min="1" step="1" placeholder="n" style="width:70px;"></div>
+    <div class="cf"><label for="cu_lav">lavatory</label><input class="grid-custom" id="cu_lav" type="number" min="1" step="1" placeholder="n" style="width:70px;"></div>
+    <div class="cf"><label for="cu_df">drinking fountain</label><input class="grid-custom" id="cu_df" type="number" min="1" step="1" placeholder="n" style="width:70px;"></div>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
     </div>
-    <div class="input-group">
-      <label>Occupant Load</label>
-      <input type="number" id="inOcc" placeholder="e.g. 150" value="">
+
+    <!-- slot 5 · ANSWER CARD -->
+    <div class="answer-card" id="fxCard" style="display:none;">
+      <div class="answer-card-label" id="fxLabel"></div>
+      <div class="snap-rows" id="fxRows"></div>
     </div>
+    <div class="cite" id="citeLine" style="display:none;"></div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
   </div>
 
-  <div class="results" id="results">
-    <div class="section-label">Minimum Fixtures Required</div>
-    <div class="fixture-grid" id="fixtureGrid"></div>
-    <div class="calc-detail" id="calcDetail"></div>
-    <div class="note-box" id="notes"></div>
-  </div>
-
-  <div class="ref-table">
-    <div class="section-label">IPC Table 403.1 -- Minimum Fixtures (click to use)</div>
-    <table>
-      <thead><tr><th>Use</th><th>WC (M)</th><th>WC (F)</th><th>Lav</th><th>DF</th><th>Service Sink</th></tr></thead>
-      <tbody id="refBody"></tbody>
-    </table>
-  </div>
-
-  <div class="tool-footer">
-    Based on IPC Table 403.1. Ratios are expressed as "1 per X occupants." WC = water closets, Lav = lavatories, DF = drinking fountains. Many jurisdictions require all-gender restrooms or have local amendments. Always verify locally.
-    <br>architecture.tools
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
   </div>
 </div>
 
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/bands.js"></script>
 <script>
-(function(){
+(function () {
+  'use strict';
 
-  // IPC Table 403.1 simplified
-  // Ratios: 1 fixture per N occupants. wc_m/wc_f = water closets, lav = lavatories, df = drinking fountain
-  // ss = service sinks (typically 1 per floor)
-  var Uses = [
-    { use: 'Assembly (theaters, stadiums)', wc_m: 125, wc_f: 65, lav: 200, df: 500, ss: 'floor', note: 'Male WC: urinals may substitute up to 67%' },
-    { use: 'Assembly (restaurants, banquets)', wc_m: 75, wc_f: 75, lav: 200, df: 500, ss: 'floor', note: '' },
-    { use: 'Assembly (worship)', wc_m: 150, wc_f: 75, lav: 200, df: 500, ss: 'floor', note: '' },
-    { use: 'Business (office)', wc_m: 25, wc_f: 25, lav: 40, df: 100, ss: 'floor', note: 'Per IPC for B occupancy' },
-    { use: 'Educational', wc_m: 50, wc_f: 50, lav: 50, df: 100, ss: 'floor', note: '' },
-    { use: 'Industrial / Factory', wc_m: 100, wc_f: 100, lav: 100, df: 400, ss: 'floor', note: '' },
-    { use: 'Institutional (hospital)', wc_m: 10, wc_f: 10, lav: 10, df: 100, ss: 'floor', note: 'Per room in patient areas' },
-    { use: 'Mercantile (retail)', wc_m: 500, wc_f: 500, lav: 750, df: 1000, ss: 'floor', note: 'For customer use. Employee facilities separate.' },
-    { use: 'Residential (apartments)', wc_m: 1, wc_f: 1, lav: 1, df: 0, ss: 'none', note: '1 per dwelling unit (not per occupant)' },
-    { use: 'Storage / Warehouse', wc_m: 100, wc_f: 100, lav: 100, df: 1000, ss: 'floor', note: 'Employee count basis' },
+  /* The ratio sets. Bands use lib/bands.js shapes. PROVENANCE IS DATA:
+     v:true marks a value verified against ICC source material (the 2021
+     Significant Changes worked example for business WC/lav bands; the A-1
+     theater WC ratios with their 1000-occupant example); everything else is
+     v:false — DRAFT, pre-filled from memory of Table 403.1, rendered with a
+     visible draft tag until checked against the table itself. */
+  var BIZ_WC = [{ per: 25, upTo: 50 }, { per: 50 }];
+  var BIZ_LAV = [{ per: 40, upTo: 80 }, { per: 80 }];
+  function open1(n) { return [{ per: n }]; }
+
+  var OCCS = [
+    { id: 'b',  label: 'business (B)',
+      wcM: { b: BIZ_WC, v: true }, wcF: { b: BIZ_WC, v: true },
+      lav: { b: BIZ_LAV, v: true }, df: { per: 100, v: false }, sink: true },
+    { id: 'a1', label: 'theaters (A-1)',
+      wcM: { b: open1(125), v: true }, wcF: { b: open1(65), v: true },
+      lav: { b: open1(200), v: false }, df: { per: 500, v: false }, sink: true },
+    { id: 'a2', label: 'restaurants · banquet (A-2)',
+      wcM: { b: open1(75), v: false }, wcF: { b: open1(75), v: false },
+      lav: { b: open1(200), v: false }, df: { per: 500, v: false }, sink: true },
+    { id: 'a3', label: 'worship · libraries · lecture (A-3)',
+      wcM: { b: open1(125), v: false }, wcF: { b: open1(65), v: false },
+      lav: { b: open1(200), v: false }, df: { per: 500, v: false }, sink: true },
+    { id: 'e',  label: 'educational (E)',
+      wcM: { b: open1(50), v: false }, wcF: { b: open1(50), v: false },
+      lav: { b: open1(50), v: false }, df: { per: 100, v: false }, sink: true },
+    { id: 'f',  label: 'factory (F-1 · F-2)',
+      wcM: { b: open1(100), v: false }, wcF: { b: open1(100), v: false },
+      lav: { b: open1(100), v: false }, df: { per: 400, v: false }, sink: true },
+    { id: 'm',  label: 'mercantile (M)',
+      wcM: { b: open1(500), v: false }, wcF: { b: open1(500), v: false },
+      lav: { b: open1(750), v: false }, df: { per: 1000, v: false }, sink: true },
+    { id: 's',  label: 'storage (S)',
+      wcM: { b: open1(100), v: false }, wcF: { b: open1(100), v: false },
+      lav: { b: open1(100), v: false }, df: { per: 1000, v: false }, sink: true },
+    { id: 'r2', label: 'dormitories (R-2)',
+      wcM: { b: open1(10), v: false }, wcF: { b: open1(10), v: false },
+      lav: { b: open1(10), v: false }, df: { per: 100, v: false },
+      shower: { per: 8, v: false }, sink: true }
   ];
+  function findOcc(id) {
+    for (var i = 0; i < OCCS.length; i++) if (OCCS[i].id === id) return OCCS[i];
+    return null;
+  }
 
-  function useOptions() {
-    var h = '<option value="">-- select use --</option>';
-    for (var i = 0; i < Uses.length; i++) {
-      h += '<option value="'+i+'">'+Uses[i].use+'</option>';
+  var CITE = 'IPC 2021 — §403.1 + Table 403.1 set the minimums; §403.1.1: the occupant load is divided in half to get the load of each sex, the ratios applied per sex (verified wording). Separate facilities and their exceptions are §403.2 — small occupancies can often share single facilities; check it. Fixture fractions read up. Local amendments vary — verify the edition and amendments that govern your project.';
+
+  var state = { ol: '', occId: 'b', custom: { wc: null, lav: null, df: null }, customOn: false };
+
+  var els = {};
+  ['olInput','occPresets','cu_wc','cu_lav','cu_df','echo','echoLine','echoAssume',
+   'fxCard','fxLabel','fxRows','citeLine','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 2 : d))); }
+
+  function buildOccs() {
+    var html = '';
+    html += '<div class="grid-row">';
+    OCCS.forEach(function (o) {
+      html += '<button type="button" class="grid-box occ-box" aria-pressed="false" data-occ="' + o.id + '">' + escapeHtml(o.label) + '</button>';
+    });
+    html += '</div>';
+    els.occPresets.innerHTML = html;
+    Array.prototype.forEach.call(els.occPresets.querySelectorAll('[data-occ]'), function (box) {
+      box.addEventListener('click', function () {
+        state.occId = box.dataset.occ;
+        state.customOn = false;
+        render();
+      });
+    });
+  }
+  function updateOccActive() {
+    Array.prototype.forEach.call(els.occPresets.querySelectorAll('[data-occ]'), function (box) {
+      UI.press(box, !state.customOn && box.dataset.occ === state.occId);
+    });
+  }
+
+  function readOL() {
+    var n = parseInt(state.ol, 10);
+    return (Number.isInteger(n) && n >= 1 && n <= 100000) ? n : null;
+  }
+
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+  function prov(v) {
+    return v ? '<span class="prov ok">verified</span>' : '<span class="prov draft">draft — check the table</span>';
+  }
+
+  function render() {
+    syncURL();
+    updateOccActive();
+
+    var ol = readOL();
+    var occ;
+    if (state.customOn) {
+      var c = state.custom;
+      occ = {
+        id: 'custom', label: 'custom ratios',
+        wcM: c.wc ? { b: [{ per: c.wc }], v: true } : null,   // user-entered = theirs, no draft tag
+        wcF: c.wc ? { b: [{ per: c.wc }], v: true } : null,
+        lav: c.lav ? { b: [{ per: c.lav }], v: true } : null,
+        df: c.df ? { per: c.df, v: true } : null,
+        sink: true
+      };
+    } else {
+      occ = findOcc(state.occId);
     }
-    return h;
-  }
-  document.getElementById('inUse').innerHTML = useOptions();
 
-  function calcFixtures(occ, ratio) {
-    if (ratio === 0) return 0;
-    return Math.max(1, Math.ceil(occ / ratio));
-  }
-
-  function update() {
-    var useIdx = document.getElementById('inUse').value;
-    var occ = parseInt(document.getElementById('inOcc').value);
-
-    if (useIdx === '' || isNaN(occ) || occ <= 0) {
-      document.getElementById('results').style.display = 'none';
+    if (ol == null) {
+      els.echo.style.display = 'none';
+      els.fxCard.style.display = 'none';
+      els.citeLine.style.display = 'none';
+      els.mathNote.innerHTML = '';
       return;
     }
 
-    document.getElementById('results').style.display = '';
-    var u = Uses[parseInt(useIdx)];
+    var perSex = ol / 2;                                     // §403.1.1, verified wording
+    els.echoLine.innerHTML = '<span class="tok stated">' + ol + '</span><span class="op"> occupants </span>'
+      + '<span class="eq">→</span><span class="result">' + sig(perSex, 1) + ' per sex</span>'
+      + '<span class="op"> through ' + escapeHtml(occ.label) + '</span>';
+    els.echoAssume.innerHTML = '<div>' + escapeHtml('split in half per sex as §403.1.1 directs — a different distribution needs approval') + '</div>'
+      + (state.customOn ? '<div>' + escapeHtml('custom ratios — yours, applied as single open bands') + '</div>' : '');
+    els.echo.style.display = '';
 
-    // Assume 50/50 gender split
-    var maleOcc = Math.ceil(occ / 2);
-    var femaleOcc = occ - maleOcc;
+    els.fxCard.style.display = '';
+    els.citeLine.style.display = '';
+    els.citeLine.innerHTML = escapeHtml(CITE);
+    els.fxLabel.textContent = occ.label + ' — minimums from the ratios below';
 
-    // Special case: residential is per unit, not per occupant
-    var isResidential = u.use.indexOf('Residential') >= 0;
-
-    var wc_m, wc_f, lav, df, ss;
-    if (isResidential) {
-      wc_m = occ; wc_f = 0; // 1 per unit (occ = units)
-      lav = occ;
-      df = 0;
-      ss = 0;
-    } else {
-      wc_m = calcFixtures(maleOcc, u.wc_m);
-      wc_f = calcFixtures(femaleOcc, u.wc_f);
-      lav = calcFixtures(occ, u.lav);
-      df = u.df > 0 ? calcFixtures(occ, u.df) : 0;
-      ss = u.ss === 'floor' ? 1 : 0;
+    var html = '', math = [];
+    function fixtureRows(name, spec, load, gloss) {
+      if (!spec) return;
+      var r = Bands.banded(load, spec.b);
+      html += rowHtml(name, escapeHtml(Bands.describe(spec.b)) + (gloss ? ' · ' + gloss : ''),
+        '<span class="fact">' + r.count + '</span>' + (r.exact !== r.count ? ' <span class="snap-gloss">exact ' + sig(r.exact, 3) + ' — reads up</span>' : ' <span class="snap-gloss">exact</span>'),
+        prov(spec.v), r.count > 0);
+      math.push(name.toLowerCase() + ': ' + Bands.describe(spec.b) + ' over ' + sig(load, 1) + ' = ' + sig(r.exact, 4) + ' → <b>' + r.count + '</b>');
     }
-
-    var totalWC = wc_m + wc_f;
-
-    var gridHTML = '';
-    if (isResidential) {
-      gridHTML += '<div class="fixture-card"><div class="fc-val">'+wc_m+'</div><div class="fc-label">Water Closets</div><div class="fc-note">1 per unit</div></div>';
-      gridHTML += '<div class="fixture-card"><div class="fc-val">'+lav+'</div><div class="fc-label">Lavatories</div><div class="fc-note">1 per unit</div></div>';
-    } else {
-      gridHTML += '<div class="fixture-card"><div class="fc-val">'+wc_m+'</div><div class="fc-label">WC (Male)</div><div class="fc-note">1 per '+u.wc_m+'</div></div>';
-      gridHTML += '<div class="fixture-card"><div class="fc-val">'+wc_f+'</div><div class="fc-label">WC (Female)</div><div class="fc-note">1 per '+u.wc_f+'</div></div>';
-      gridHTML += '<div class="fixture-card"><div class="fc-val">'+lav+'</div><div class="fc-label">Lavatories</div><div class="fc-note">1 per '+u.lav+'</div></div>';
-      if (df > 0) gridHTML += '<div class="fixture-card"><div class="fc-val">'+df+'</div><div class="fc-label">Drinking Fount.</div><div class="fc-note">1 per '+u.df+'</div></div>';
-      if (ss > 0) gridHTML += '<div class="fixture-card"><div class="fc-val">'+ss+'</div><div class="fc-label">Service Sink</div><div class="fc-note">1 per floor</div></div>';
+    fixtureRows('Water closets · male', occ.wcM, perSex);
+    fixtureRows('Water closets · female', occ.wcF, perSex);
+    fixtureRows('Lavatories · per sex', occ.lav, perSex, 'applied to each sex');
+    if (occ.shower) {
+      var sh = Bands.banded(ol, [{ per: occ.shower.per }]);
+      html += rowHtml('Showers', '1 per ' + occ.shower.per + ' · on the total load',
+        '<span class="fact">' + sh.count + '</span>' + (sh.exact !== sh.count ? ' <span class="snap-gloss">exact ' + sig(sh.exact, 3) + '</span>' : ''),
+        prov(occ.shower.v), false);
+      math.push('showers: 1 per ' + occ.shower.per + ' over ' + ol + ' = ' + sig(sh.exact, 4) + ' → <b>' + sh.count + '</b>');
     }
-    document.getElementById('fixtureGrid').innerHTML = gridHTML;
-
-    // Calculation detail
-    var detailHTML = '';
-    if (!isResidential) {
-      detailHTML = 'Based on '+occ+' occupants ('+maleOcc+' M / '+femaleOcc+' F). ';
-      detailHTML += 'Total water closets: <strong>'+totalWC+'</strong>. ';
-      detailHTML += 'Male urinals may substitute for up to 67% of male WC in most use groups.';
-    } else {
-      detailHTML = 'Based on '+occ+' dwelling units. Each unit requires its own WC, lav, tub/shower, and kitchen sink.';
+    if (occ.df) {
+      var df = Bands.banded(ol, [{ per: occ.df.per }]);
+      html += rowHtml('Drinking fountains', '1 per ' + occ.df.per + ' · on the total load',
+        '<span class="fact">' + df.count + '</span>' + (df.exact !== df.count ? ' <span class="snap-gloss">exact ' + sig(df.exact, 3) + '</span>' : ''),
+        prov(occ.df.v), false);
+      math.push('drinking fountains: 1 per ' + occ.df.per + ' over ' + ol + ' = ' + sig(df.exact, 4) + ' → <b>' + df.count + '</b>');
     }
-    document.getElementById('calcDetail').innerHTML = detailHTML;
+    if (occ.sink) {
+      html += rowHtml('Service sink', 'one, regardless of load', '<span class="fact">1</span>',
+        '<span class="prov draft">draft — check the table</span>', false, 'is-ref');
+    }
+    els.fxRows.innerHTML = html;
 
-    // Notes
-    var notesHTML = '';
-    if (u.note) notesHTML += u.note + '<br>';
-    notesHTML += '<strong>ADA:</strong> At least 1 accessible WC and 1 accessible lav per restroom. Drinking fountains: provide both hi and lo. ';
-    notesHTML += '<strong>All-gender:</strong> Many jurisdictions now require or allow single-user all-gender restrooms. Check local code.';
-    document.getElementById('notes').innerHTML = notesHTML;
+    els.mathNote.innerHTML = '<b>engine</b> — banded division (lib/bands.js), fractions read up at the end:<br>'
+      + 'per-sex load = ' + ol + ' / 2 = ' + sig(perSex, 1) + ' (§403.1.1)<br>' + math.join('<br>');
   }
 
-  document.getElementById('inUse').addEventListener('change', update);
-  document.getElementById('inOcc').addEventListener('input', update);
-
-  // Reference table
-  var rHTML = '';
-  for (var i = 0; i < Uses.length; i++) {
-    var u = Uses[i];
-    rHTML += '<tr data-idx="'+i+'"><td>'+u.use+'</td><td>1:'+u.wc_m+'</td><td>1:'+u.wc_f+'</td><td>1:'+u.lav+'</td><td>'+(u.df>0?'1:'+u.df:'--')+'</td><td>'+(u.ss==='floor'?'1/floor':'--')+'</td></tr>';
+  /* ---- shareable URL ----------------------------------------------------------------- */
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.ol) params.set('ol', state.ol);
+      if (!state.customOn && state.occId !== 'b') params.set('o', state.occId);
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+    }, 250);
   }
-  document.getElementById('refBody').innerHTML = rHTML;
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var ol = params.get('ol');
+    if (ol != null && /^\d{1,6}$/.test(ol)) state.ol = ol;
+    var o = params.get('o');
+    if (o && findOcc(o)) state.occId = o;
+  }
 
-  document.getElementById('refBody').addEventListener('click', function(e) {
-    var tr = e.target.closest('tr');
-    if (!tr) return;
-    document.getElementById('inUse').value = tr.dataset.idx;
-    update();
+  /* ---- wiring -------------------------------------------------------------------------- */
+  els.olInput.addEventListener('input', function () { state.ol = els.olInput.value; render(); });
+  [['cu_wc', 'wc'], ['cu_lav', 'lav'], ['cu_df', 'df']].forEach(function (pair) {
+    els[pair[0]].addEventListener('input', function () {
+      var v = parseInt(els[pair[0]].value, 10);
+      state.custom[pair[1]] = (Number.isInteger(v) && v >= 1 && v <= 100000) ? v : null;
+      state.customOn = !!(state.custom.wc || state.custom.lav || state.custom.df);
+      render();
+    });
   });
+
+  // initial state — ?ol= chains in from the occupant load calc
+  buildOccs();
+  initFromURL();
+  els.olInput.value = state.ol || '240';
+  state.ol = els.olInput.value;
+  render();
 })();
 </script>
 </body>
