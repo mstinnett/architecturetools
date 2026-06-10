@@ -11,6 +11,16 @@
 <meta property="og:title" content="What computer should I buy for architecture?">
 <meta property="og:description" content="A live, opinionated hardware picker for architects — specific CPU, GPU, RAM, monitor, and laptop picks for your software and project scale.">
 <meta name="twitter:card" content="summary">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
 <link rel="stylesheet" href="assets/css/global.css">
 <style>
   /* Page-specific layout + controls only. The canonical palette
@@ -23,7 +33,14 @@
   /* the sheet itself comes from the shared .page-wide; the picker only widens
      it and stacks its sections (the @580 padding tweak below stays its own) */
   .picker{max-width:1120px;display:flex;flex-direction:column;}
-  .picker-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
+  .picker-header{position:relative;margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--black);}
+  /* Scheme toggle — sun/moon key in the header corner. Moon shows in light
+     mode (tap for dark), sun in dark; CSS picks the icon off html[data-scheme]. */
+  .scheme-toggle{position:absolute;top:0;right:0;width:2.25rem;height:2.25rem;border:1px solid var(--rule-2);background:var(--card);box-shadow:var(--shadow-key);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-2);padding:0;transition:border-color 0.15s,color 0.15s,box-shadow 0.15s;}
+  .scheme-toggle:hover{border-color:var(--ink-3);color:var(--ink);box-shadow:var(--shadow-key-hover);}
+  .scheme-toggle .icon-sun{display:none;}
+  html[data-scheme="dark"] .scheme-toggle .icon-sun{display:block;}
+  html[data-scheme="dark"] .scheme-toggle .icon-moon{display:none;}
   .picker-header h1{font-size:1.5rem;font-weight:500;letter-spacing:-0.01em;margin-bottom:0.2rem;}
   .picker-header p{font-size:0.82rem;color:var(--gray-700);font-weight:300;max-width:44em;}
   .section-label{font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-700);margin-bottom:0.75rem;}
@@ -56,14 +73,18 @@
      masked div below has no intrinsic size to shrink-to-fit around */
   .desk-hero{width:100%;max-width:880px;margin:0 auto 1.5rem;}
   /* The line art ships as plain transparent PNGs in BOTH schemes — a light
-     original and a pre-rendered dark recolor picked by <picture> media. No
-     filter, no mask: both tricks rasterized as opaque slabs somewhere
-     (filter on iOS, mask in other engines). Plain images render everywhere.
+     original and a pre-rendered dark recolor. No filter, no mask: both tricks
+     rasterized as opaque slabs somewhere (filter on iOS, mask in other
+     engines). Plain images render everywhere. The manual scheme toggle means
+     <picture media> can't pick the file — deskHeroHTML() reads
+     html[data-scheme] and update() re-renders on schemechange.
      Dark variants: tools/recolor-desk-dark.mjs. */
   .desk-hero img{width:100%;height:auto;display:block;}
 
   /* Software nav + scroll */
-  .sw-nav{display:flex;justify-content:space-between;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--gray-700);position:relative;cursor:pointer;touch-action:none;user-select:none;}
+  /* the heavy rule closes the software band: thin track line above the
+     scrubber, 2px black below it (the indicator overhangs both by design) */
+  .sw-nav{display:flex;justify-content:space-between;margin-top:0.5rem;padding:0.5rem 0;border-top:1px solid var(--gray-700);border-bottom:2px solid var(--black);position:relative;cursor:pointer;touch-action:none;user-select:none;}
   .sw-nav-item{background:none;border:0;padding:0;font-size:0.65rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);cursor:pointer;transition:color 0.15s;white-space:nowrap;position:relative;z-index:1;}
   .sw-nav-item:hover{color:var(--black);}
   .sw-nav-item.sw-active{color:var(--black);}
@@ -94,8 +115,6 @@
   .option-pill.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:var(--shadow-press);transform:translateY(1px);}
   .option-pill .pill-detail{font-size:0.68rem;font-weight:300;opacity:0.7;margin-top:0.1rem;}
   .option-pill.active .pill-detail{opacity:0.7;}
-
-  .divider{border:none;border-top:2px solid var(--black);margin:3rem 0;}
 
   .plat-forced{font-size:0.6rem;font-family:var(--font-body);font-weight:300;color:var(--gray-400);letter-spacing:0.1em;text-transform:uppercase;}
   .hidden{display:none !important;}
@@ -206,7 +225,6 @@
   }
   @media(max-width:820px){
     .picker-header{margin-bottom:2rem;padding-bottom:1.5rem;}
-    .divider{margin:2rem 0;}
     .result-columns{flex-direction:column;align-items:stretch;}
     .result-side{width:100%;}
     .spec-block{gap:1rem 2rem;}
@@ -231,14 +249,18 @@
 <body>
 <div class="page-wide picker">
   <!-- Markup order = visual order (no CSS reordering, so tab order matches
-       what's on screen): hero leads, then the heading, the inputs, and below
-       the rule the full recommendation. -->
+       what's on screen): hero leads, then the heading, the inputs (software
+       closes with the heavy rule), and then the full recommendation. -->
   <div class="desk-hero" id="deskHero"></div>
 
   <div class="picker-header">
     <div class="page-crumb">architecture.tools</div>
     <h1>What computer should I buy for architecture?</h1>
     <p>Live recommendation. Tweak the inputs below.</p>
+    <button type="button" class="scheme-toggle" id="schemeToggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
   </div>
 
   <div class="input-section">
@@ -341,9 +363,6 @@
     </button>
     <div class="mon-drawer-body" id="monDrawerBody"></div>
   </div>
-
-  <!-- Heavy rule separates the tweakable inputs above from the full recommendation below. -->
-  <hr class="divider">
 
   <div id="panelsWrapper">
   <!-- Desktop -->
@@ -595,15 +614,11 @@ function runPicker(){
   function deskHeroHTML(role, deskIds, platform) {
     var filename = deskImageFilename(role, deskIds, platform);
     if (!filename) return '';
-    // on a missing export, fall back to the stock dual-27 desk in BOTH sources
-    var onerror = "this.onerror=null;" +
-      "this.parentElement.querySelector('source').srcset='assets/desk-images-dark/NorthXL_2x27.png';" +
-      "this.src='assets/desk-images/NorthXL_2x27.png';";
-    return '<picture>' +
-      '<source srcset="assets/desk-images-dark/' + filename + '.png" media="(prefers-color-scheme: dark)">' +
-      '<img src="assets/desk-images/' + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout"' +
-      ' loading="eager" onerror="' + onerror + '">' +
-      '</picture>';
+    var dir = document.documentElement.dataset.scheme === 'dark' ? 'assets/desk-images-dark/' : 'assets/desk-images/';
+    // on a missing export, fall back to the stock dual-27 desk in the same scheme
+    var onerror = "this.onerror=null;this.src='" + dir + "NorthXL_2x27.png';";
+    return '<img src="' + dir + filename + '.png" alt="' + filename.replace(/_/g, ' ') + ' desk layout"' +
+      ' loading="eager" onerror="' + onerror + '">';
   }
 
   function bindMonitorConfigEvents(containerId) {
@@ -1023,6 +1038,10 @@ function runPicker(){
     });
   }
 
+  // Repaint when the scheme toggle (or the OS) flips the page scheme — the
+  // desk art is scheme-specific and chosen in JS, not by <picture media>.
+  document.addEventListener('schemechange', updatePreservingScroll);
+
   update();
 
   // ---- SOFTWARE SCROLL CHEVRONS + NAV INDICATOR ----
@@ -1102,6 +1121,30 @@ function runPicker(){
   updateSwControls();
 })();
 }
+
+// Scheme toggle (header sun/moon): flips html[data-scheme], persists the
+// choice, and notifies the picker so the desk art re-renders. With no stored
+// choice the page follows the system scheme live.
+(function(){
+  var btn = document.getElementById('schemeToggle');
+  function label() {
+    if (btn) btn.setAttribute('aria-label', document.documentElement.dataset.scheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  function apply(scheme, persist) {
+    document.documentElement.dataset.scheme = scheme;
+    if (persist) { try { localStorage.setItem('scheme', scheme); } catch (e) {} }
+    label();
+    document.dispatchEvent(new Event('schemechange'));
+  }
+  label();
+  if (btn) btn.addEventListener('click', function(){
+    apply(document.documentElement.dataset.scheme === 'dark' ? 'light' : 'dark', true);
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e){
+    var stored = null; try { stored = localStorage.getItem('scheme'); } catch (err) {}
+    if (!stored) apply(e.matches ? 'dark' : 'light', false);
+  });
+})();
 
 // hardware-data.json is generated from the CSV tables in data/ (see
 // data/README.md). It keeps each CPU/GPU/Mac chip (its name and standard note)

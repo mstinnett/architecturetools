@@ -41,8 +41,9 @@
 
 /* ---- TOKENS ---- */
 :root {
-  /* both schemes are first-class — UA widgets/scrollbars follow the page */
-  color-scheme: light dark;
+  /* UA widgets/scrollbars follow the resolved scheme; the dark block at the
+     end of this file sets color-scheme: dark under html[data-scheme="dark"] */
+  color-scheme: light;
 
   /* Warm neutral foundation. Text, hairlines and --paper come from the
      canonical palette (tokens.css); the page field behind the sheet is
@@ -444,29 +445,32 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
 @media (max-width: 480px) { .page { padding: var(--space-xl) var(--space-lg) var(--space-2xl); } .input-row { flex-direction: column; } .result-label { width: 110px; } }
 
 /* ---- DARK — one shared scheme for every page; only the family accent
-   differs (it swaps to its lifted dark variant via --family-dark). ---- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* surfaces — derived from --lightbox: backdrop darkest, sheet lifts */
-    --gray-100: #0F1115; --gray-50: var(--lightbox);
-    --card: #181B21; --white: #181B21; --card-2: #20242B;
-    /* text — palette text-on-dark */
-    --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2: #ADA89F; --ink-3: #7E7A72;
-    --gray-700: #B8B4AB; --gray-900: #D8D4CB; --gray-400: #6A665F;
-    /* lines */
-    --rule: #2E323A; --rule-2: #3C414B; --gray-200: #2A2E36; --gray-300: #383D46;
-    /* family accent — the lifted dark variant */
-    --accent: var(--family-dark);
-    --accent-ink: var(--lightbox);
-    --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
-    --selected-bg: var(--accent);
-    /* number-line strokes — inverted for the dark field */
-    --nl-ink: #CBC8C2; --nl-hatch: #6E727C; --nl-tick: #3F434B; --nl-axis: #6E727B;
-    /* shadows recut for a dark field (warm browns -> deep blacks) */
-    --shadow-card: 0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
-    --shadow-key: inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
-    --shadow-key-hover: inset 0 1px 0 rgba(255,255,255,.06), 0 3px 7px rgba(0,0,0,.6);
-    --shadow-press: inset 0 2px 5px rgba(0,0,0,.65);
-    --shadow-well: inset 0 2px 4px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04);
-  }
+   differs (it swaps to its lifted dark variant via --family-dark).
+   Keyed off html[data-scheme="dark"], not the media query: each page's
+   pre-paint head script sets the attribute from localStorage('scheme') or,
+   absent a stored choice, the system preference — so the page's sun/moon
+   toggle can override the OS. ---- */
+:root[data-scheme="dark"] {
+  color-scheme: dark;
+  /* surfaces — derived from --lightbox: backdrop darkest, sheet lifts */
+  --gray-100: #0F1115; --gray-50: var(--lightbox);
+  --card: #181B21; --white: #181B21; --card-2: #20242B;
+  /* text — palette text-on-dark */
+  --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2: #ADA89F; --ink-3: #7E7A72;
+  --gray-700: #B8B4AB; --gray-900: #D8D4CB; --gray-400: #6A665F;
+  /* lines */
+  --rule: #2E323A; --rule-2: #3C414B; --gray-200: #2A2E36; --gray-300: #383D46;
+  /* family accent — the lifted dark variant */
+  --accent: var(--family-dark);
+  --accent-ink: var(--lightbox);
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+  --selected-bg: var(--accent);
+  /* number-line strokes — inverted for the dark field */
+  --nl-ink: #CBC8C2; --nl-hatch: #6E727C; --nl-tick: #3F434B; --nl-axis: #6E727B;
+  /* shadows recut for a dark field (warm browns -> deep blacks) */
+  --shadow-card: 0 1px 2px rgba(0,0,0,.5), 0 16px 34px rgba(0,0,0,.55);
+  --shadow-key: inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.55);
+  --shadow-key-hover: inset 0 1px 0 rgba(255,255,255,.06), 0 3px 7px rgba(0,0,0,.6);
+  --shadow-press: inset 0 2px 5px rgba(0,0,0,.65);
+  --shadow-well: inset 0 2px 4px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04);
 }
