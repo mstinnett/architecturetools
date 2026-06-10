@@ -241,53 +241,8 @@
     <p>Live recommendation. Tweak the inputs below.</p>
   </div>
 
-  <div class="controls-cluster">
-    <div class="controls-row">
-      <div class="control-group">
-        <div class="section-label">Budget</div>
-        <div class="option-row" id="budgetOptions"></div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Project Scale</div>
-        <div class="option-row" id="scaleOptions">
-          <button type="button" class="option-pill active" aria-pressed="true" data-scale="small">Small / Medium<span class="pill-detail">SFR, small office, single models</span></button>
-          <button type="button" class="option-pill" aria-pressed="false" data-scale="large">Large / Complex<span class="pill-detail">Large buildings, multiple linked files</span></button>
-        </div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Setup</div>
-        <div class="option-row" id="machineTypeOptions">
-          <button type="button" class="option-pill active" aria-pressed="true" data-machinetype="desktop">Desktop</button>
-          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="laptop">Laptop</button>
-          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="desktop_travel">Desktop + Travel Laptop</button>
-          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="desktop_workstation">Desktop + Powerful Laptop</button>
-        </div>
-      </div>
-      <div class="control-group">
-        <div class="section-label">Platform</div>
-        <div class="option-row" id="platArea">
-          <button type="button" class="option-pill active" aria-pressed="true" data-platform="win">Windows</button>
-          <button type="button" class="option-pill" aria-pressed="false" data-platform="mac">Mac</button>
-        </div>
-        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
-          <span class="plat-forced">Windows -- required by selected apps</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Monitors: one collapsible drawer, grouped with the setup inputs above.
-       Closed by default (shows the current pick); opening it reveals the tiered
-       configs. Picking one redraws the hero. -->
-  <div class="mon-drawer" id="monDrawer">
-    <button class="mon-drawer-toggle" id="monDrawerToggle" type="button" aria-expanded="false" aria-controls="monDrawerBody">
-      <span class="mon-drawer-label">Monitors</span>
-      <span class="mon-drawer-summary" id="monDrawerSummary"></span>
-    </button>
-    <div class="mon-drawer-body" id="monDrawerBody"></div>
-  </div>
-
   <div class="input-section">
+    <div class="section-label">Software -- select all you use</div>
     <div class="sw-nav" id="swNav">
       <span class="sw-nav-indicator" id="swNavIndicator" hidden></span>
       <button type="button" class="sw-nav-item" data-target="grp-modeling">Modeling / BIM</button>
@@ -339,6 +294,52 @@
     </div>
     <button class="sw-chevron" id="swChevRight" type="button">&#8250;</button>
     </div>
+  </div>
+
+  <div class="controls-cluster">
+    <div class="controls-row">
+      <div class="control-group">
+        <div class="section-label">Budget</div>
+        <div class="option-row" id="budgetOptions"></div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Project Scale</div>
+        <div class="option-row" id="scaleOptions">
+          <button type="button" class="option-pill active" aria-pressed="true" data-scale="small">Small / Medium<span class="pill-detail">SFR, small office, single models</span></button>
+          <button type="button" class="option-pill" aria-pressed="false" data-scale="large">Large / Complex<span class="pill-detail">Large buildings, multiple linked files</span></button>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Setup</div>
+        <div class="option-row" id="machineTypeOptions">
+          <button type="button" class="option-pill active" aria-pressed="true" data-machinetype="desktop">Desktop</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="laptop">Laptop</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="desktop_travel">Desktop + Travel Laptop</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-machinetype="desktop_workstation">Desktop + Powerful Laptop</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="section-label">Platform</div>
+        <div class="option-row" id="platArea">
+          <button type="button" class="option-pill active" aria-pressed="true" data-platform="win">Windows</button>
+          <button type="button" class="option-pill" aria-pressed="false" data-platform="mac">Mac</button>
+        </div>
+        <div id="platForced" class="hidden" style="margin-top:0.35rem;">
+          <span class="plat-forced">Windows -- required by selected apps</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitors: one collapsible drawer, grouped with the setup inputs above.
+       Closed by default (shows the current pick); opening it reveals the tiered
+       configs. Picking one redraws the hero. -->
+  <div class="mon-drawer" id="monDrawer">
+    <button class="mon-drawer-toggle" id="monDrawerToggle" type="button" aria-expanded="false" aria-controls="monDrawerBody">
+      <span class="mon-drawer-label">Monitors</span>
+      <span class="mon-drawer-summary" id="monDrawerSummary"></span>
+    </button>
+    <div class="mon-drawer-body" id="monDrawerBody"></div>
   </div>
 
   <!-- Heavy rule separates the tweakable inputs above from the full recommendation below. -->
