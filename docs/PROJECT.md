@@ -106,6 +106,9 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── slope.html                  # Slope — rise/run/slope (dev, noindexed)
 │   ├── area.html                   # Area & Coverage takeoff (dev, noindexed)
 │   ├── stairs.html                 # Stairs — risers + IRC/IBC citations (dev, noindexed)
+│   ├── occupant-load.html          # Occupant Load — takeoff ÷ Table 1004.5 (dev, noindexed)
+│   ├── egress-width.html           # Egress Width — load×factor ↔ capacity (dev, noindexed)
+│   ├── ramp.html                   # Ramp — rise → runs + landings, §405 (dev, noindexed)
 │   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)
 │   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
 │   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)
@@ -116,10 +119,8 @@ They are part of the site structure, but they do not need premature renaming or 
 │   │   ├── stairfig.js             # Stair section figure (no DOM)
 │   │   └── parse-length.fixtures.js
 │   ├── sheet-sizes.html            # Reference table (ARCH/ANSI) — home undecided (C ref vs L)
-│   ├── occupant-load.html          # LEGACY — code-lookup lineage, next engine thread
 │   ├── parking-ratio.html          # LEGACY — code-lookup lineage, out of engine scope
-│   ├── egress-width.html           # LEGACY — code-lookup lineage, consumes occupant load
-│   └── fixture-calc.html           # LEGACY — code-lookup lineage, consumes occupant load
+│   └── fixture-calc.html           # LEGACY — deferred until IPC table verified (see backlog)
 ├── .github/workflows/
 │   └── build-data.yml              # Rebuilds hardware-data.json on push, commits it back
 ├── CNAME                           # Custom domain: architecture.tools
@@ -319,23 +320,27 @@ relative asset paths only.
 - `calculators/convert.html` — **Precise Unit Converter. Shipped and frozen.**
   Live on `main`.
 - On `dev`, built 2026-06-10, noindexed, awaiting browser review then
-  one-at-a-time promotion: `run.html` (Run Solver — the partition tool),
-  `scale.html`, `slope.html`, `area.html`, `stairs.html`, and the **C-0 cover**
-  `calculators/index.html`.
+  one-at-a-time promotion. Drafting family: `run.html` (Run Solver — the
+  partition tool), `scale.html`, `slope.html`, `area.html`, `stairs.html`.
+  Egress family: `occupant-load.html`, `egress-width.html` (chained:
+  area → occupant load → egress width). Accessibility family: `ramp.html`.
+  Plus the **C-0 cover** `calculators/index.html`.
 
 ### Next on the engine
-Occupant load (area ÷ OLF table, reusing the citation/edition pattern stairs
-introduced), then egress width and plumbing fixtures consume it — suite map
-steps 5–6 (`docs/In Progress/calculator-suite-map.md`).
+Exits & arrangement (number of exits, separation, travel distances — likely
+one page), and plumbing fixtures once its IPC table is verified — see the
+backlog for both preconditions
+(`docs/In Progress/calculator-suite-map.md` family 2).
 
 ### Standalone pages (not on the engine)
 - `sheet-sizes.html` — a reference table; whether it stays a C reference or
   moves to the L-series is an open backlog item.
 - A different lineage (code/table lookups, not the dimensional engine):
-  `occupant-load.html`, `egress-width.html`, `fixture-calc.html`,
-  `parking-ratio.html` — the first two are the next thread (above).
+  `fixture-calc.html` (deferred until its table is verified),
+  `parking-ratio.html`.
 - Retired 2026-06-10 (superseded by engine tools): `dimension-converter.html`,
-  `slope-calculator.html`, `stair-calculator.html`.
+  `slope-calculator.html`, `stair-calculator.html`, and the pre-engine
+  `occupant-load.html` / `egress-width.html` lookups (rebuilt in place).
 
 ---
 

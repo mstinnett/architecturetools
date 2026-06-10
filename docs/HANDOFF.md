@@ -168,16 +168,18 @@ will wrap it. Exports `partition(spec)` plus `sections` / `tiles` / `onCenter` /
    NOT folded in: it's a paper-size reference table, not an engine calc —
    its home (C reference vs L-series) is an open backlog item.
 4. ~~**scale**~~ ✅ **done** — `scale.html`.
-5. **Next:** occupant load on `area`'s input + the citation/edition pattern
-   from `stairs.html`; then egress width / fixtures consume it (suite map
-   steps 5–6).
+5. ~~**occupant load + egress width**~~ ✅ **done** (2026-06-10 second pass) —
+   rebuilt in place of the pre-engine lookups, chained area → OL → egress
+   width; `ramp.html` landed too (family 4, nearly free after slope).
+6. **Next:** exits & arrangement (one page); plumbing fixtures only once its
+   banded IPC table is verified (see backlog — don't build it from memory).
 
 **Legacy pages** (`calculators/*.html`, standalone, no engine):
-`dimension-converter.html`, `slope-calculator.html`, and
-`stair-calculator.html` are **retired** (2026-06-10). `sheet-sizes.html` is a
-reference table, kept as-is for now. The code-compliance calculators
-(`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`) are a
-**different lineage** (table lookups) — now the NEXT thread, not out of scope.
+`dimension-converter.html`, `slope-calculator.html`, `stair-calculator.html`,
+and the pre-engine `occupant-load`/`egress-width` lookups are **retired/
+rebuilt** (2026-06-10). `sheet-sizes.html` is a reference table, kept as-is
+for now. Still pre-engine: `fixture-calc.html` (deferred pending verified
+table data) and `parking-ratio.html` (zoning-adjacent — default out).
 
 ---
 

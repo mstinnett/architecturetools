@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-10 (main merged into dev; five new engine tool pages + C-0 index built on dev; superseded standalones retired)_
+_Last updated: 2026-06-10 (second build pass: occupant load + egress width rebuilt on the engine, ramp added — three tool families now in use; eight new tools + C-0 on dev awaiting browser review)_
 
 ## Live architectural picture
 
@@ -36,18 +36,22 @@ _Last updated: 2026-06-10 (main merged into dev; five new engine tool pages + C-
   residual hatched, overruns drawn past the dimension line), `slopefig.js`
   (true-angle triangle, angular residual hatched as a wedge), `stairfig.js`
   (stair section, layout drift hatched at the floor line).
-- **Six engine tool pages.** `convert.html` (Precise Unit Converter — shipped
-  on `main`, frozen) plus five new on `dev` (2026-06-10, noindexed, awaiting
-  operator browser review then one-at-a-time promotion): `run.html` (the
-  partition tool — tile/joint, on-center, balusters, sections), `scale.html`,
-  `slope.html`, `area.html`, `stairs.html` (introduces the edition pill +
-  citation pattern: IRC/IBC limits located, never ruled on). `index.html` is
-  the C-0 cover; the new tools' crumbs route through it. Each new page has a
-  jsdom wiring smoke (`/tmp` harness, not committed). Retired as superseded:
-  `dimension-converter.html`, `slope-calculator.html`, `stair-calculator.html`.
-  Still off-engine: `sheet-sizes.html` (a reference table — home undecided) and
-  the four code-lookup pages (`occupant-load`, `egress-width`, `fixture-calc`,
-  `parking-ratio`).
+- **Nine engine tool pages, three families.** `convert.html` (shipped on
+  `main`, frozen) plus eight on `dev` (2026-06-10, noindexed, awaiting operator
+  browser review then one-at-a-time promotion). Drafting family: `run.html`
+  (the partition tool), `scale.html`, `slope.html` (incl. projected lengths),
+  `area.html`, `stairs.html` (introduces the edition pill + citation pattern).
+  Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table 1004.5,
+  gross/net surfaced) and `egress-width.html` (load×factor both directions,
+  minimums located) — chained: area ?d=→ OL ?ol=→ egress width. Accessibility
+  family: `ramp.html` (rise → runs + landings, §405 cited). `index.html` is
+  the C-0 cover; tool crumbs route through it. Each page has a jsdom wiring
+  smoke (`/tmp` harness, not committed). Retired as superseded:
+  `dimension-converter`, `slope-calculator`, `stair-calculator`, and the
+  pre-engine `occupant-load`/`egress-width` lookups (rebuilt in place). Still
+  off-engine: `sheet-sizes.html` (reference table — home undecided),
+  `fixture-calc.html` (deferred until its IPC table is verified — see
+  backlog), `parking-ratio.html`.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
@@ -92,6 +96,15 @@ _Last updated: 2026-06-10 (main merged into dev; five new engine tool pages + C-
 
 ## Recent decisions
 
+- 2026-06-10 (second pass) — The life-safety thread opened: occupant load and
+  egress width rebuilt on the engine in place of their pre-engine lookups, ramp
+  added; the egress and accessibility family accents are now in use. Two
+  notable calls: code TABLE values only ship cross-checked (the legacy
+  mercantile 30/60 split was silently outdated — corrected to the post-2015
+  flat 60 gross), and **plumbing fixtures was deliberately deferred** because
+  its banded IPC ratios couldn't be verified here — a misquoted table is the
+  exact failure the suite is built against (backlog item records the
+  precondition).
 - 2026-06-10 — Calculator build-out on `dev` (operator-directed: "get through
   as many as possible in the style of convert.html"). Five tool pages + three
   figure modules + the C-0 index, all on the shell/engine conventions, each
@@ -185,7 +198,7 @@ _Last updated: 2026-06-10 (main merged into dev; five new engine tool pages + C-
 
 ## Active concerns
 
-- **The five new tools + C-0 await operator browser review, then promotion.**
+- **The eight new tools + C-0 await operator browser review, then promotion.**
   They are gate-green and jsdom-smoke-tested, but no real browser has rendered
   them (this environment has none) — figures, dark scheme, and phone widths
   need eyes before any page moves to `main`. Promotion drops each page's
@@ -194,8 +207,9 @@ _Last updated: 2026-06-10 (main merged into dev; five new engine tool pages + C-
 - **Provenance loose end:** `noindex` is on every `dev` WIP page — remove on
   promotion. Still open: no neutral preview host is configured, so WIP can only
   be viewed locally until one is stood up.
-- **Next calc thread:** occupant load (area ÷ OLF + the stairs citation
-  pattern), then egress width / fixtures consume it — suite map steps 5–6.
-  `sheet-sizes.html`'s home (C reference vs L-series) is an open backlog item.
+- **Next calc thread:** exits & arrangement (the last life-safety node besides
+  fixtures), and plumbing fixtures once its IPC table is verified — both in
+  the backlog with their preconditions. `sheet-sizes.html`'s home (C reference
+  vs L-series) is an open backlog item.
 - The richer AT-0 master cover (a multi-set index) is deferred behind the
   picker-only launch — tracked in the backlog.
