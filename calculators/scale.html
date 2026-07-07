@@ -84,7 +84,12 @@
   </div>
   <div class="grid-presets" id="scalePresets"></div>
 
-  <!-- precision control — mode-specific (PDF measure tool vs tape) -->
+  <!-- precision control — mode-specific (sheet reading + PDF tool, vs tape) -->
+  <div id="sheetBlock">
+    <div class="section-label" style="margin-top:var(--space-md);">On The Sheet You Can Read To</div>
+    <div class="grid-presets" id="sheetPresets"></div>
+    <div class="section-note" style="margin:0.35rem 0 0;">A vector PDF (Revit, CAD) reads finer than a scan or a scale rule on paper.</div>
+  </div>
   <div id="readBlock">
     <div class="section-label" style="margin-top:var(--space-md);">Your PDF Measure Tool Reads To</div>
     <div class="grid-presets" id="readPresets"></div>
@@ -213,8 +218,9 @@
     scaleId: '48',                                       // 1/4" = 1'-0"
     customN: null,                                       // a typed 1:n (wins while set)
     target: 'imperial',                                  // system for readouts, follows the input
-    // the drawing's own resolution — a fixed property (a fine plotted line
-    // ~1/32"), drives R; not a user control (no one lays a scale on paper now)
+    // the drawing's own resolution — how fine you can read the sheet (a Revit /
+    // vector PDF reads finer than a scan); drives R = sheet × scale
+    sheetUiSystem: null,
     sheet: { imperial: { denom: 32 }, metric: { mm: 0.5 } },
     readUiSystem: null,
     read: { imperial: 6096, metric: 4800 },              // PDF measure-tool precision (Bluebeam default 1/4", 5mm)
@@ -232,6 +238,9 @@
   // finest distance you can read or mark on the SHEET, in units
   function sheetUnits() {
     return state.target === 'imperial' ? IN / state.sheet.imperial.denom : state.sheet.metric.mm * MM;
+  }
+  function sheetLabel() {
+    return state.target === 'imperial' ? '1/' + state.sheet.imperial.denom + '"' : state.sheet.metric.mm + ' mm';
   }
   // what one sheet increment is worth in the REAL world — the scale's resolution
   function resolutionUnits() { return sheetUnits() * currentN(); }
@@ -252,7 +261,7 @@
   function tapeLabel() { return fracLabel(tapeUnits()); }
 
   var els = {};
-  ['dimInput','fieldNote','bareAsk','scalePresets','readBlock','readPresets','readNote','measureBlock','measurePresets','resolution',
+  ['dimInput','fieldNote','bareAsk','scalePresets','sheetBlock','sheetPresets','readBlock','readPresets','readNote','measureBlock','measurePresets','resolution',
    'echo','echoLine','echoAssume','lengthOut','figure','snapRows',
    'runSection','runPresets','stackFigure','stackLegend','stackTable','stackNote','engineNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
@@ -323,6 +332,39 @@
     if (els.scalePresets.dataset.fam !== state.family) buildScalePresets();
     Array.prototype.forEach.call(els.scalePresets.querySelectorAll('[data-scale]'), function (box) {
       UI.press(box, state.customN == null && box.dataset.scale === state.scaleId);
+    });
+  }
+
+  /* ---- sheet reading precision (Scaled Drawing mode; drives R) ------------- */
+  function buildSheetPresets() {
+    var html = '';
+    function box(v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-denom="' + v + '">' + label + '</button>'; }
+    if (state.target === 'imperial') {
+      var labels = { 8: '1/8', 16: '1/16', 32: '1/32', 64: '1/64' };
+      html += '<div class="grid-row">';
+      [8, 16, 32, 64].forEach(function (d) { html += box(d, labels[d] + '"'); });
+      html += '</div>';
+    } else {
+      html += '<div class="grid-row"><span class="grid-group-label">mm</span>';
+      [0.25, 0.5, 1, 2].forEach(function (m) { html += '<button type="button" class="grid-box" aria-pressed="false" data-mm="' + m + '">' + m + '</button>'; });
+      html += '</div>';
+    }
+    els.sheetPresets.innerHTML = html;
+    state.sheetUiSystem = state.target;
+    Array.prototype.forEach.call(els.sheetPresets.querySelectorAll('.grid-box'), function (box) {
+      box.addEventListener('click', function () {
+        if (box.dataset.denom) state.sheet.imperial.denom = +box.dataset.denom;
+        if (box.dataset.mm) state.sheet.metric.mm = +box.dataset.mm;
+        render();
+      });
+    });
+  }
+  function renderSheetPresets() {
+    if (state.sheetUiSystem !== state.target) buildSheetPresets();
+    var active = state.target === 'imperial' ? state.sheet.imperial.denom : state.sheet.metric.mm;
+    var attr = state.target === 'imperial' ? 'denom' : 'mm';
+    Array.prototype.forEach.call(els.sheetPresets.querySelectorAll('.grid-box'), function (box) {
+      UI.press(box, +box.dataset[attr] === active);
     });
   }
 
@@ -397,7 +439,7 @@
     } else {
       var band = readBand(), falsePrec = band > readUnits();
       els.resolution.innerHTML =
-        'Your tool reads to <b>' + escapeHtml(readLabel()) + '</b>, but a <b>' + escapeHtml(currentFace()) + '</b> drawing resolves to about <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b>. '
+        'Your tool reads to <b>' + escapeHtml(readLabel()) + '</b>; reading a <b>' + escapeHtml(currentFace()) + '</b> drawing to <b>' + escapeHtml(sheetLabel()) + '</b> on the sheet is <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b>. '
         + 'Trust the coarser: <b>±' + escapeHtml(NumberLine.formatTrue(band, state.target)) + '</b>. '
         + '<span class="quiet">' + (falsePrec ? 'The extra digits your measure tool shows are false precision.' : 'Your tool is the limit here, not the scale.') + '</span>';
     }
@@ -650,9 +692,10 @@
     renderFieldNote(result);
     renderBareAsk(result);
     renderScalePresets();
+    els.sheetBlock.style.display = state.question === 'read' ? '' : 'none';
     els.readBlock.style.display = state.question === 'read' ? '' : 'none';
     els.measureBlock.style.display = state.question === 'draw' ? '' : 'none';
-    if (state.question === 'read') renderReadPresets(); else renderMeasurePresets();
+    if (state.question === 'read') { renderSheetPresets(); renderReadPresets(); } else renderMeasurePresets();
     renderResolution();
     renderRun();
 
