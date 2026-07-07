@@ -68,11 +68,9 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Slope</span>
     </nav>
     <h1>Slope</h1>
-    <p>Enter any two of rise, run, and slope. You get the third and every way to
-       say it: percent, ratio, roof pitch, degrees. And because a framing square
-       cuts whole pitches and a grader works in whole percents, it shows the
-       nearest step you can build and what rounding to it costs in rise across
-       your run.</p>
+    <p>Enter any two of rise, run, and slope. The third follows, read every way:
+       percent, ratio, pitch, degrees — each beside the nearest standard step and
+       what rounding to it costs in rise across your run.</p>
   </div>
 
   <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
@@ -108,17 +106,9 @@
       <div class="echo-assumptions" id="echoAssume"></div>
     </div>
 
-    <!-- slot 4 · CONSTRAINT: the standard step you'll actually build to -->
     <div id="slopeOut" style="display:none;">
-      <div class="section-label">Round to a buildable step</div>
-      <div class="grid-presets"><div class="grid-row" id="exprRow">
-        <button type="button" class="grid-box" aria-pressed="false" data-expr="pitch">x : 12 pitch</button>
-        <button type="button" class="grid-box" aria-pressed="false" data-expr="ratio">1 : n ratio</button>
-        <button type="button" class="grid-box" aria-pressed="false" data-expr="percent">whole %</button>
-      </div></div>
-      <div class="step-note">The step your framing square, spec sheet, or grader actually works in.</div>
-
-      <!-- slot 5 · ANSWER CARD: triangle + the buildable step, every name, the sides -->
+      <!-- slot 5 · ANSWER CARD: triangle (linear precision) + the slope every
+           way with its rounding, and the three sides -->
       <div class="answer-card">
         <div class="figure-wrap" id="figure"></div>
         <div class="snap-rows" id="snapRows"></div>
@@ -161,13 +151,12 @@
   var state = {
     rise: '', run: '', slope: '',
     defaultUnit: 'in',
-    expr: 'pitch',            // which standard family to round (build) to
     target: 'imperial'
   };
 
   var els = {};
   ['riseInput','runInput','slopeInput','riseNote','runNote','slopeNote','bareAsk',
-   'echo','echoLine','echoAssume','slopeOut','exprRow','figure','snapRows','refBox','refRows','mathNote']
+   'echo','echoLine','echoAssume','slopeOut','figure','snapRows','refBox','refRows','mathNote']
     .forEach(function (id) { els[id] = document.getElementById(id); });
 
   var escapeHtml = UI.esc;
@@ -211,6 +200,14 @@
   }
   function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
   function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  // a signed rise cost, at a practical scale (not the lattice-fine residual):
+  // decimal inches under a foot, ft-in above, mm for metric
+  function fmtDelta(u) {
+    if (u === 0) return '0';
+    var sign = u < 0 ? '−' : '+', a = Math.abs(u);
+    if (state.target === 'metric') return sign + sig(a / MM, 1) + ' mm';
+    return sign + (a >= 12 * IN ? fmtLen(a) : sig(a / IN, 2) + '"');
+  }
 
   /* ---- main render ----------------------------------------------------------- */
   function syncDetected(res) {
@@ -312,27 +309,14 @@
   }
   function groupLabel(t) { return '<div class="rows-label">' + t + '</div>'; }
 
-  // the bracketing standard steps for the chosen expression family.
-  // pitch: whole x in x:12 · ratio: whole n in 1:n (down = shallower n+1) ·
-  // percent: whole percent. Each returns {lo, hi} as ratios + label maker.
-  function brackets(s) {
-    if (state.expr === 'pitch') {
-      var x = 12 * s;
-      return { lo: Math.floor(x) / 12 || null, hi: Math.ceil(x) / 12,
-               loL: Math.floor(x) + ':12', hiL: Math.ceil(x) + ':12',
-               exact: x === Math.round(x) };
-    }
-    if (state.expr === 'ratio') {
-      var n = 1 / s;                       // bigger n = shallower
-      var nHi = Math.floor(n) || 1, nLo = Math.ceil(n);
-      return { lo: 1 / nLo, hi: 1 / nHi,
-               loL: '1:' + nLo, hiL: '1:' + nHi,
-               exact: n === Math.round(n) };
-    }
-    var p = 100 * s;
-    return { lo: Math.floor(p) / 100 || null, hi: Math.ceil(p) / 100,
-             loL: Math.floor(p) + '%', hiL: Math.ceil(p) + '%',
-             exact: p === Math.round(p) };
+  // the nearest standard step in each family — pitch (x:12), ratio (1:n),
+  // whole percent, whole degree. Returns {face, ratio, exact}. No family
+  // toggle: every family's rounding is read out at once.
+  function nearestStep(s, fam) {
+    if (fam === 'pitch') { var x = 12 * s, xr = Math.round(x); return { face: xr + ':12', ratio: xr / 12, exact: x === xr }; }
+    if (fam === 'ratio') { var n = 1 / s, nr = Math.max(1, Math.round(n)); return { face: '1:' + nr, ratio: 1 / nr, exact: n === nr }; }
+    if (fam === 'degree') { var a = Math.atan(s) * 180 / Math.PI, ar = Math.round(a); return { face: ar + '°', ratio: Math.tan(ar * Math.PI / 180), exact: a === ar }; }
+    var pp = 100 * s, pr = Math.round(pp); return { face: pr + '%', ratio: pr / 100, exact: pp === pr };
   }
 
   var REFS = [
@@ -351,75 +335,57 @@
     var pc = 100 * s;
     var pitch = 12 * s;
     var overOne = s > 1;
-    // the true length along the slope (a rafter, a ramp surface) — the one
-    // value here that is Pythagorean, not rational; quantized for display
+    // the true length along the slope — the one value here that is Pythagorean,
+    // not rational; quantized for display
     var hypU = Math.round(Math.sqrt(riseU * riseU + runU * runU));
 
-    Array.prototype.forEach.call(els.exprRow.querySelectorAll('[data-expr]'), function (b) {
-      UI.press(b, b.dataset.expr === state.expr);
-    });
-
-    var br = brackets(s);
+    // figure — a clean true-angle triangle; the solved leg carries its own
+    // linear precision (the lattice residual) right on the figure
+    var solvedResid = quant ? ' (' + NumberLine.formatResidual(quant, state.target) + ')' : '';
+    var riseLbl = fmtLen(riseU) + (solved.leg === 'rise' ? solvedResid : '');
+    var runLbl = fmtLen(runU) + (solved.leg === 'run' ? solvedResid : '');
     var width = els.figure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
     els.figure.innerHTML = SlopeFig.slopefig({
       rise: riseU, run: runU,
-      riseLabel: fmtLen(riseU), runLabel: fmtLen(runU),
+      riseLabel: riseLbl, runLabel: runLbl,
       angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
       hypoLabel: fmtLen(hypU),
-      refLo: br.exact ? null : br.lo, refHi: br.exact ? null : br.hi,
-      refLoLabel: br.exact ? null : br.loL, refHiLabel: br.exact ? null : br.hiL,
+      refLo: null, refHi: null, refLoLabel: null, refHiLabel: null,
       width: width, height: 200
     });
 
-    var html = '';
-
-    // GROUP 1 (hero) — the nearest step you can build, and what rounding costs
-    html += groupLabel('Nearest buildable step');
-    if (!br.exact) {
-      var loD = br.lo != null ? Math.abs(s - br.lo) : Infinity, hiD = Math.abs(s - br.hi);
-      var nearIsHi = hiD <= loD;
-      [{ r: br.hi, L: br.hiL, dir: 'steeper', near: nearIsHi },
-       { r: br.lo, L: br.loL, dir: 'shallower', near: !nearIsHi }].forEach(function (b) {
-        if (b.r == null) return;
-        var riseAt = Math.round(runU * b.r), d = riseAt - riseU;
-        html += rowHtml(escapeHtml(b.L) + (b.near ? ' · nearest' : ''),
-          b.dir + ', rise ' + NumberLine.formatResidual(d, state.target) + ' over this run',
-          '<span class="fact">' + escapeHtml(sig(100 * b.r, 3)) + '%</span>',
-          escapeHtml(fmtLen(riseAt)) + ' rise', b.near, b.near ? '' : 'is-ref');
-      });
-    } else {
-      html += rowHtml('Lands on ' + escapeHtml(br.hiL), 'exact, nothing to round',
-        '<span class="fact">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>', 'on step', true, 'is-exact');
+    // one row per representation: the exact value, then the nearest standard
+    // step it rounds to and what that costs in rise. Every family read out.
+    function roundResid(fam) {
+      var st = nearestStep(s, fam);
+      if (st.exact) return 'on step';
+      var d = Math.round(runU * st.ratio) - riseU;
+      return '→ ' + st.face + ', ' + fmtDelta(d) + ' rise';
     }
-    if (overOne) html += rowHtml('Steeper than 1:1', 'past 45°, most slope call-outs assume the shallow side', '', '—', false, 'is-ref');
+    var html = groupLabel('The slope');
+    html += rowHtml('Percent', '', '<span class="fact">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>', roundResid('percent'), false);
+    html += rowHtml('Ratio', '', '1 : ' + escapeHtml(sig(q / p, q / p >= 100 ? 1 : 2)) + (q % p === 0 ? '' : ' (' + p + '/' + q + ' exact)'), roundResid('ratio'), false);
+    html += rowHtml('Pitch', '', escapeHtml(sig(pitch, 2)) + ' : 12', roundResid('pitch'), false);
+    html += rowHtml('Angle', '', escapeHtml(sig(deg, deg < 1 ? 3 : 2)) + '°', roundResid('degree'), false);
+    if (overOne) html += rowHtml('Steeper than 1:1', 'past 45°', '', '—', false, 'is-ref');
 
-    // GROUP 2 — every way to say the one slope, exact where the lattice allows
-    html += groupLabel('Every way to say it');
-    html += rowHtml('Percent', 'rise over run × 100', '<span class="fact">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>', '—', false);
-    html += rowHtml('Ratio', 'reduced exactly from the lattice', '1 : ' + escapeHtml(sig(q / p, q / p >= 100 ? 1 : 2)) + (q % p === 0 ? '' : ' (' + p + '/' + q + ' exact)'), '—', false);
-    html += rowHtml('Pitch', 'per 12 of run', escapeHtml(sig(pitch, 2)) + ' : 12', '—', false);
-    html += rowHtml('Angle', 'from horizontal', escapeHtml(sig(deg, deg < 1 ? 3 : 2)) + '°', '—', false);
-
-    // GROUP 3 — the triangle's three sides as plan / elevation / along-the-slope
+    // the triangle's three sides as plan / elevation / along-the-slope
     html += groupLabel('The three sides');
-    html += rowHtml('In plan · run', solved.leg === 'run' ? 'solved from the rise at this slope' : 'the horizontal projection',
-                    escapeHtml(fmtLen(runU)), '—', solved.leg === 'run');
-    html += rowHtml('In elevation · rise', solved.leg === 'rise' ? 'solved from the plan run at this slope' : 'the vertical projection',
-                    escapeHtml(fmtLen(riseU)), '—', solved.leg === 'rise');
-    html += rowHtml('Along the slope', '√(rise² + run²), a rafter or ramp surface',
-                    escapeHtml(fmtLen(hypU)), '—', false);
+    html += rowHtml('In plan · run', solved.leg === 'run' ? 'solved' : '', escapeHtml(fmtLen(runU)), '—', solved.leg === 'run');
+    html += rowHtml('In elevation · rise', solved.leg === 'rise' ? 'solved' : '', escapeHtml(fmtLen(riseU)), '—', solved.leg === 'rise');
+    html += rowHtml('Along the slope', '', escapeHtml(fmtLen(hypU)), '—', false);
     els.snapRows.innerHTML = html;
 
-    // references — located, never ruled on
+    // references — located, never ruled on; brief
     var refs = '';
     REFS.forEach(function (r) {
       var d = s - r.ratio;
-      var side = d === 0 ? 'exactly this' : (d > 0 ? 'steeper by ' : 'shallower by ') + sig(Math.abs(d) * 100, 3) + '%';
+      var side = d === 0 ? 'exact' : sig(Math.abs(d) * 100, Math.abs(d) * 100 < 1 ? 3 : 1) + '% ' + (d > 0 ? 'steeper' : 'shallower');
       refs += '<div class="ref-row"><div class="ref-what">' + escapeHtml(r.label) + '</div>'
             + '<div class="ref-slope">' + escapeHtml(r.face) + '</div>'
-            + '<div class="ref-delta">' + escapeHtml('yours is ' + side) + '</div></div>';
+            + '<div class="ref-delta">' + escapeHtml(side) + '</div></div>';
     });
     els.refRows.innerHTML = refs;
 
@@ -440,18 +406,16 @@
     clearTimeout(urlTimer);
     urlTimer = setTimeout(function () {
       var params = new URLSearchParams();
-      if (state.rise && state.rise !== "7'") params.set('a', state.rise);
-      if (state.run && state.run !== "22'") params.set('b', state.run);
-      if (state.slope) params.set('s', state.slope);
-      if (state.expr !== 'pitch') params.set('x', state.expr);
+      if (state.rise) params.set('a', state.rise);
+      if (state.run && state.run !== "9'") params.set('b', state.run);
+      if (state.slope && state.slope !== "8:12") params.set('s', state.slope);
       var qq = params.toString();
       try { history.replaceState(null, '', qq ? '?' + qq : location.pathname); } catch (e) { /* sandboxed view */ }
     }, 250);
   }
   function initFromURL() {
     var params = new URLSearchParams(location.search);
-    var a = params.get('a'), b = params.get('b'), sl = params.get('s'), x = params.get('x');
-    if (x === 'ratio' || x === 'percent' || x === 'pitch') state.expr = x;
+    var a = params.get('a'), b = params.get('b'), sl = params.get('s');
     return {
       rise: a != null ? a.slice(0, 80) : null,
       run: b != null ? b.slice(0, 80) : null,
@@ -465,15 +429,13 @@
     el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });
     el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
   });
-  Array.prototype.forEach.call(els.exprRow.querySelectorAll('[data-expr]'), function (b) {
-    b.addEventListener('click', function () { state.expr = b.dataset.expr; render(); });
-  });
 
-  // initial state — URL params override the worked example (7' over 22')
+  // initial state — URL params override the worked example (9' run at 8:12)
   var u = initFromURL();
-  els.riseInput.value = u.rise != null ? u.rise : (u.run != null || u.slope != null ? '' : "7'");
-  els.runInput.value = u.run != null ? u.run : (u.rise != null || u.slope != null ? '' : "22'");
-  els.slopeInput.value = u.slope != null ? u.slope : '';
+  var anyURL = u.rise != null || u.run != null || u.slope != null;
+  els.riseInput.value = u.rise != null ? u.rise : '';
+  els.runInput.value = u.run != null ? u.run : (anyURL ? '' : "9'");
+  els.slopeInput.value = u.slope != null ? u.slope : (anyURL ? '' : "8:12");
   state.rise = els.riseInput.value;
   state.run = els.runInput.value;
   state.slope = els.slopeInput.value;
