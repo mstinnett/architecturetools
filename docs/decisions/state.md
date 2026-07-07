@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value provenance tags, sheet-sizes restyled; headless-Chromium render sweep green over all 14 pages — operator taste pass is what's left before promotions)_
+_Last updated: 2026-07-07 (`scale.html` redesigned operator-directed into **Scale Resolution** — a trust/precision tool, not a converter; a story-first rethink over several rounds, still on `dev`/noindexed. The eleven-tool taste pass + promotions remain otherwise open.)_
 
 ## Live architectural picture
 
@@ -39,7 +39,9 @@ _Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value pro
 - **Twelve engine tool pages, three families.** `convert.html` (shipped on
   `main`, frozen) plus eleven on `dev` (2026-06-10, noindexed, awaiting the
   operator's taste pass then one-at-a-time promotion). Drafting family:
-  `run.html` (the partition tool), `scale.html`, `slope.html` (incl. projected
+  `run.html` (the partition tool), `scale.html` (**redesigned 2026-07-07 into
+  "Scale Resolution"** — trust/precision, two modes, stack-up figure; see Recent
+  decisions), `slope.html` (incl. projected
   lengths), `area.html`, `stairs.html` (introduces the edition pill + citation
   pattern), `sheet-sizes.html` (the fit reference, restyled onto the theme,
   ANSI added). Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table
@@ -103,6 +105,23 @@ _Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value pro
 
 ## Recent decisions
 
+- 2026-07-07 — **`scale.html` → Scale Resolution** (operator-directed, story-first
+  redesign; not a promotion). What began as "promote a drafting calc to the
+  converter's status" turned into a ground-up rethink: the tool no longer just
+  converts a scaled dimension, it answers **how much a measurement can be
+  trusted**. Two modes, framed by what you're measuring: **Scaled Drawing Of
+  Object** (a PDF measure tool — Bluebeam default 1/4″ — reads to more digits
+  than the scale holds; the trust band = `max(tool precision, drawing
+  resolution)`, with a false-precision reveal) and **Physical Object** (measure
+  to a tape precision, encode to the sheet, then the run: tolerance **stack-up**,
+  **chain vs baseline** dimensioning, cumulative ∝ n / compensating ∝ √n against
+  what the drawing holds). Governing rule held throughout: **show, don't judge**
+  — no pass/fail, references the reader owns. New page-local figures (prominent
+  ±band; the stack-up wedge). Fixed a real bug: scale-family pills used
+  `data-family`, which also lives on `<html>` (the accent system) — clicks
+  bubbled to the root and corrupted state; pills now use `data-sfam`. Takeaway
+  for the remaining tools: a real promotion here is a **redesign**, not a
+  noindex-drop — budget accordingly.
 - 2026-06-10 — **The calculator build-out** (operator-directed, three passes in
   one day; per-tool records live in backlog "Done"). Eleven tool pages + five
   engine/figure modules + the C-0 cover, all on the shell conventions; the
