@@ -43,8 +43,10 @@
                 color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
   .rows-label:first-child { margin-top: 0.2rem; }
 
-  /* the buildable-step control note */
-  .step-note { font-size: var(--text-xs); color: var(--ink-2); margin: 0.35rem 0 0; }
+  /* the info box answer — the solved values, carrying the accent */
+  .echo-answer { margin-top: 0.45rem; }
+  .ans-sides { font-size: 1.15rem; color: var(--accent); font-weight: 500; line-height: 1.35; }
+  .ans-slope { margin-top: 0.15rem; color: var(--accent); font-size: var(--text-sm); }
 
   /* the reference list — common slopes located against yours; facts, not rulings */
   .ref-rows { margin-top: var(--space-sm); }
@@ -68,9 +70,9 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Slope</span>
     </nav>
     <h1>Slope</h1>
-    <p>Enter any two of rise, run, and slope. The third follows, read every way:
-       percent, ratio, pitch, degrees — each beside the nearest standard step and
-       what rounding to it costs in rise across your run.</p>
+    <p>Enter any two of rise, run, and slope. The missing sides and the slope
+       come back as values, each with the nearest standard step and what
+       rounding to it costs in rise across your run.</p>
   </div>
 
   <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
@@ -103,6 +105,7 @@
     <!-- slot 3 · ECHO -->
     <div class="echo" id="echo" style="display:none;">
       <div class="echo-line" id="echoLine"></div>
+      <div class="echo-answer" id="echoAnswer"></div>
       <div class="echo-assumptions" id="echoAssume"></div>
     </div>
 
@@ -156,7 +159,7 @@
 
   var els = {};
   ['riseInput','runInput','slopeInput','riseNote','runNote','slopeNote','bareAsk',
-   'echo','echoLine','echoAssume','slopeOut','figure','snapRows','refBox','refRows','mathNote']
+   'echo','echoLine','echoAnswer','echoAssume','slopeOut','figure','snapRows','refBox','refRows','mathNote']
     .forEach(function (id) { els[id] = document.getElementById(id); });
 
   var escapeHtml = UI.esc;
@@ -282,13 +285,24 @@
     if (rise && rise.result) html += '<span class="op">rise </span>' + tokensOf(rise.result);
     if (run && run.result) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">run </span>' + tokensOf(run.result);
     if (slope && !slope.error && state.slope.trim()) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">slope </span><span class="tok stated">' + escapeHtml(state.slope.trim()) + '</span>';
-    if (solved) {
-      var pc = 100 * solved.rise / solved.run;
-      html += '<span class="eq">=</span><span class="result">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>';
-    } else {
-      html += '<span class="eq">—</span><span class="op">two of the three, and the third follows</span>';
-    }
     els.echoLine.innerHTML = html;
+
+    // the answer: the missing sides and the slope as values (what you didn't enter)
+    if (solved) {
+      var riseU = solved.rise, runU = solved.run;
+      var g = gcd(riseU, runU), p = riseU / g, q = runU / g;
+      var deg = Math.atan2(riseU, runU) * 180 / Math.PI, pc = 100 * riseU / runU, pitch = 12 * riseU / runU;
+      var hypU = Math.round(Math.sqrt(riseU * riseU + runU * runU));
+      var sides = [];
+      if (solved.leg === 'rise') sides.push('rise ' + fmtLen(riseU));
+      else if (solved.leg === 'run') sides.push('run ' + fmtLen(runU));
+      sides.push('along slope ' + fmtLen(hypU));
+      var forms = sig(pc, pc < 1 ? 3 : 2) + '%  ·  1:' + sig(q / p, q / p >= 100 ? 1 : 2) + '  ·  ' + sig(pitch, 2) + ':12  ·  ' + sig(deg, deg < 1 ? 3 : 2) + '°';
+      els.echoAnswer.innerHTML = '<div class="ans-sides">' + sides.map(escapeHtml).join('&nbsp;&nbsp;·&nbsp;&nbsp;') + '</div>'
+        + '<div class="ans-slope">' + escapeHtml(forms) + '</div>';
+    } else {
+      els.echoAnswer.innerHTML = '<div class="ans-slope" style="color:var(--ink-3)">two of the three, and the rest follow</div>';
+    }
     var asm = [];
     [rise, run].forEach(function (f) {
       if (f && f.result && f.result.interpretation) asm = asm.concat(f.result.interpretation.assumptions || []);
@@ -356,26 +370,20 @@
       width: width, height: 200
     });
 
-    // one row per representation: the exact value, then the nearest standard
-    // step it rounds to and what that costs in rise. Every family read out.
-    function roundResid(fam) {
+    // one row per representation: the nearest standard step you'd build to,
+    // and what rounding to it costs in rise. The exact values live in the
+    // info box; these are the buildable steps and their residual.
+    function stepRow(name, fam) {
       var st = nearestStep(s, fam);
-      if (st.exact) return 'on step';
-      var d = Math.round(runU * st.ratio) - riseU;
-      return '→ ' + st.face + ', ' + fmtDelta(d) + ' rise';
+      var cost = st.exact ? 'on step' : fmtDelta(Math.round(runU * st.ratio) - riseU) + ' rise';
+      return rowHtml(name, '', escapeHtml(st.face), cost, false);
     }
-    var html = groupLabel('The slope');
-    html += rowHtml('Percent', '', '<span class="fact">' + escapeHtml(sig(pc, pc < 1 ? 3 : 2)) + '%</span>', roundResid('percent'), false);
-    html += rowHtml('Ratio', '', '1 : ' + escapeHtml(sig(q / p, q / p >= 100 ? 1 : 2)) + (q % p === 0 ? '' : ' (' + p + '/' + q + ' exact)'), roundResid('ratio'), false);
-    html += rowHtml('Pitch', '', escapeHtml(sig(pitch, 2)) + ' : 12', roundResid('pitch'), false);
-    html += rowHtml('Angle', '', escapeHtml(sig(deg, deg < 1 ? 3 : 2)) + '°', roundResid('degree'), false);
+    var html = groupLabel('Nearest standard step');
+    html += stepRow('Percent', 'percent');
+    html += stepRow('Ratio', 'ratio');
+    html += stepRow('Pitch', 'pitch');
+    html += stepRow('Angle', 'degree');
     if (overOne) html += rowHtml('Steeper than 1:1', 'past 45°', '', '—', false, 'is-ref');
-
-    // the triangle's three sides as plan / elevation / along-the-slope
-    html += groupLabel('The three sides');
-    html += rowHtml('In plan · run', solved.leg === 'run' ? 'solved' : '', escapeHtml(fmtLen(runU)), '—', solved.leg === 'run');
-    html += rowHtml('In elevation · rise', solved.leg === 'rise' ? 'solved' : '', escapeHtml(fmtLen(riseU)), '—', solved.leg === 'rise');
-    html += rowHtml('Along the slope', '', escapeHtml(fmtLen(hypU)), '—', false);
     els.snapRows.innerHTML = html;
 
     // references — located, never ruled on; brief
