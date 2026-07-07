@@ -56,6 +56,11 @@
   .round-table td:first-child, .round-table th:first-child { color: var(--ink-2); width: 6em; }
   .round-table .cost { color: var(--ink-3); font-size: var(--text-xs); margin-left: 0.35rem; }
   .round-table .on-step { color: var(--ink-2); }
+  /* selectable cells drive the figure's hatch */
+  .round-table td.rc { cursor: pointer; }
+  .round-table td.rc:hover { background: var(--accent-soft); }
+  .round-table td.rc.sel { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); color: var(--ink); }
+  .round-table td.rc.sel .cost { color: var(--ink-2); }
 
   /* the reference list — common slopes located against yours; facts, not rulings */
   .ref-rows { margin-top: var(--space-sm); }
@@ -163,6 +168,7 @@
   var state = {
     rise: '', run: '', slope: '',
     defaultUnit: 'in',
+    sel: null,                // {fam, dir} — which rounding cell drives the figure hatch
     target: 'imperial'
   };
 
@@ -379,47 +385,70 @@
     // no lengths (a pure conversion has no real sides).
     var isConv = solved.leg === 'slopeonly';
     var solvedResid = quant ? ' (' + NumberLine.formatResidual(quant, state.target) + ')' : '';
+
+    // families curated to the slope's regime (no 0:12 pitch on a drainage fall,
+    // no 1:0.6 ratio on a steep roof)
+    var fams = [['Percent', 'percent']];
+    if (s <= 1) fams.push(['Ratio', 'ratio']);
+    if (12 * s >= 1) fams.push(['Pitch', 'pitch']);
+    fams.push(['Angle', 'degree']);
+
+    // the selected rounding drives the figure's hatch. Default = the family
+    // that fits the regime (pitch for roofs, ratio for shallow) at its nearer
+    // bracket — a legible wedge; a click on any cell re-pins it.
+    function defaultSel() {
+      var fam = (12 * s >= 1) ? 'pitch' : (s <= 1 ? 'ratio' : 'pitch');
+      if (!fams.some(function (f) { return f[1] === fam; })) fam = 'percent';
+      var st = famSteps(s, fam);
+      if (st.exact) return { fam: fam, dir: 'on' };
+      return { fam: fam, dir: Math.abs(s - st.lo.ratio) <= Math.abs(s - st.hi.ratio) ? 'lo' : 'hi' };
+    }
+    var sel = state.sel;
+    var selOk = sel && fams.some(function (f) { return f[1] === sel.fam; }) &&
+      (famSteps(s, sel.fam).exact ? sel.dir === 'on' : (sel.dir === 'lo' || sel.dir === 'hi'));
+    if (!selOk) sel = defaultSel();
+
+    // the triangle carries the precision hatch: the exact slope wedged between
+    // the SELECTED family's two bracketing steps, hatched to the selected one —
+    // the angular residual, drawn the way the converters hatch the linear one.
+    var ss = famSteps(s, sel.fam), wedge = !ss.exact;
+    var hatchTo = sel.dir === 'lo' ? ss.lo.ratio : ss.hi.ratio;
     var width = els.figure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
-    // the triangle carries the precision hatch: the exact slope wedged between
-    // its two bracketing standard steps — the angular residual, drawn the way
-    // the converters hatch the linear one. The wedge family follows the regime.
-    var wedgeFam = (12 * s >= 1) ? 'pitch' : (s <= 1 ? 'ratio' : 'pitch');
-    var ws = famSteps(s, wedgeFam), wedge = !ws.exact;
     els.figure.innerHTML = SlopeFig.slopefig({
       rise: riseU, run: runU,
       riseLabel: isConv ? '' : fmtLen(riseU) + (solved.leg === 'rise' ? solvedResid : ''),
       runLabel: isConv ? '' : fmtLen(runU) + (solved.leg === 'run' ? solvedResid : ''),
       angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
       hypoLabel: isConv ? '' : fmtLen(hypU),
-      refLo: wedge ? ws.lo.ratio : null, refHi: wedge ? ws.hi.ratio : null,
-      refLoLabel: wedge ? ws.lo.face : null, refHiLabel: wedge ? ws.hi.face : null,
+      refLo: wedge ? ss.lo.ratio : null, refHi: wedge ? ss.hi.ratio : null,
+      refLoLabel: wedge ? ss.lo.face : null, refHiLabel: wedge ? ss.hi.face : null,
+      hatchTo: wedge ? hatchTo : null,
       width: width, height: 200
     });
 
-    // the rounding: two bracketing standard steps per family — shallower (build
-    // to for a maximum) and steeper (for a minimum) — with the cost of each.
-    // Families are curated to the slope's regime (no 0:12 pitch on a drainage
-    // fall, no 1:0.6 ratio on a steep roof).
+    // the rounding table — shallower (for a max) vs steeper (for a min), each
+    // cell selectable to drive the figure. Cost per cell (rise, or % for a
+    // pure conversion with no run to cost against).
     function cost(stepRatio) {
       if (isConv) { var dp = (stepRatio - s) * 100; return (dp >= 0 ? '+' : '−') + sig(Math.abs(dp), Math.abs(dp) < 1 ? 3 : 1) + '%'; }
       return fmtDelta(Math.round(runU * stepRatio) - riseU);
     }
-    var fams = [['Percent', 'percent']];
-    if (s <= 1) fams.push(['Ratio', 'ratio']);
-    if (12 * s >= 1) fams.push(['Pitch', 'pitch']);   // pitch is roof language; skip below 1:12 (drainage)
-    fams.push(['Angle', 'degree']);
+    function rc(fam, dir, step) {
+      var on = sel.fam === fam && sel.dir === dir;
+      return '<td class="rc' + (on ? ' sel' : '') + '" data-fam="' + fam + '" data-dir="' + dir + '">'
+        + escapeHtml(step.face) + '<span class="cost">' + escapeHtml(cost(step.ratio)) + '</span></td>';
+    }
     var t = '<div class="rows-label">Rounded to a standard step</div>'
           + '<table class="round-table"><tr><th></th><th>shallower<span>for a max</span></th><th>steeper<span>for a min</span></th></tr>';
     fams.forEach(function (f) {
       var st = famSteps(s, f[1]);
       if (st.exact) {
-        t += '<tr><td>' + f[0] + '</td><td class="on-step" colspan="2">' + escapeHtml(st.hi.face) + ' · on step</td></tr>';
+        var onSel = sel.fam === f[1] && sel.dir === 'on';
+        t += '<tr><td>' + f[0] + '</td><td class="rc on-step' + (onSel ? ' sel' : '') + '" data-fam="' + f[1] + '" data-dir="on" colspan="2">' + escapeHtml(st.hi.face) + ' · on step</td></tr>';
       } else {
-        t += '<tr><td>' + f[0] + '</td>'
-           + '<td>' + escapeHtml(st.lo.face) + '<span class="cost">' + escapeHtml(cost(st.lo.ratio)) + '</span></td>'
-           + '<td>' + escapeHtml(st.hi.face) + '<span class="cost">' + escapeHtml(cost(st.hi.ratio)) + '</span></td></tr>';
+        t += '<tr><td>' + f[0] + '</td>' + rc(f[1], 'lo', st.lo) + rc(f[1], 'hi', st.hi) + '</tr>';
       }
     });
     t += '</table>';
@@ -482,6 +511,14 @@
     var el = els[pair[0]];
     el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });
     el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
+  });
+  // selecting a rounding cell re-pins the figure's hatch (delegated — the table
+  // is rebuilt every render)
+  els.snapRows.addEventListener('click', function (e) {
+    var cell = e.target.closest ? e.target.closest('.rc') : null;
+    if (!cell) return;
+    state.sel = { fam: cell.dataset.fam, dir: cell.dataset.dir };
+    render();
   });
 
   // initial state — URL params override the worked example (9' run at 8:12)

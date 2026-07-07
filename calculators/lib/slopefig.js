@@ -75,13 +75,19 @@
       return { x: ex, y: ey };
     }
 
-    // the hatched wedge between the true hypotenuse and the NEARER reference
-    // ray — the angular residual. Drawn first so lines sit on top.
+    // the hatched wedge between the true hypotenuse and a reference ray — the
+    // angular residual. By default the NEARER ref; a caller can pin it to a
+    // chosen ref via hatchTo (a ratio), e.g. when a UI selects one bracket.
+    // Drawn first so lines sit on top.
     var nearer = null;
     if (refLo != null || refHi != null) {
-      var dLo = refLo != null ? Math.abs(s - refLo) : Infinity;
-      var dHi = refHi != null ? Math.abs(refHi - s) : Infinity;
-      nearer = dLo <= dHi ? refLo : refHi;
+      if (opts.hatchTo != null) {
+        nearer = ratioOf(opts.hatchTo);
+      } else {
+        var dLo = refLo != null ? Math.abs(s - refLo) : Infinity;
+        var dHi = refHi != null ? Math.abs(refHi - s) : Infinity;
+        nearer = dLo <= dHi ? refLo : refHi;
+      }
       if (nearer != null && nearer !== s) {
         // wedge out to the true triangle's horizontal extent
         var wx = xT, wyTrue = yT, wyRef = y0 - px * nearer;
@@ -156,6 +162,10 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   // exact refs accepted as {p,q}; no wedge when the slope IS the reference
   var on = SF.slopefig({ rise: FT, run: 12 * FT, refLo: { p: 1, q: 12 }, refHi: { p: 1, q: 12 } });
   ok('no wedge on a standard slope', on.indexOf('url(#sfhatch)') === -1);
+
+  // hatchTo pins the wedge to a chosen bracket (not just the nearer one)
+  var pinned = SF.slopefig({ rise: 38 * FT, run: 100 * FT, refLo: 3 / 12, refHi: 4 / 12, hatchTo: 3 / 12 });
+  ok('hatchTo keeps a wedge', pinned.indexOf('url(#sfhatch)') > 0);
 
   // steep slope stays in the box (legs clipped by scale, not distorted)
   var steep = SF.slopefig({ rise: 100 * FT, run: 2 * FT });
