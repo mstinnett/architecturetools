@@ -6,7 +6,7 @@
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
 <title>Scale Resolution -- architecture.tools</title>
-<meta name="description" content="Choose a drawing scale and a reading resolution and check the precision of a measurement: the real size behind a scaled dimension, the cost of a misread, and how error accumulates across a chain of measurements — chain vs baseline, shown not judged.">
+<meta name="description" content="Choose a drawing scale and check the precision of a measurement: the real size behind a scaled dimension read off a drawing, and — measuring a physical object — the encoded error and how it accumulates across a run, chain vs baseline, shown not judged.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -67,9 +67,10 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Scale Resolution</span>
     </nav>
     <h1>Scale Resolution</h1>
-    <p>Choose a drawing scale and a reading resolution to check the precision of
-       a measurement — the real size behind a scaled dimension, the cost of a
-       misread, and how error accumulates when you step along a run.</p>
+    <p>Choose a drawing scale and check the precision of a measurement — the real
+       size behind a dimension read off a drawing, and, measuring a physical
+       object, the error you encode and how it accumulates when you step along
+       a run.</p>
   </div>
 
   <!-- ================= SCALE + RESOLUTION (always on) ================= -->
@@ -83,9 +84,15 @@
   </div>
   <div class="grid-presets" id="scalePresets"></div>
 
-  <!-- reading precision on the sheet — feeds the resolution and the figures -->
-  <div class="section-label" style="margin-top:var(--space-md);">On The Sheet You Can Read To</div>
-  <div class="grid-presets" id="sheetPresets"></div>
+  <!-- precision control — mode-specific (sheet reading vs tape measurement) -->
+  <div id="sheetBlock">
+    <div class="section-label" style="margin-top:var(--space-md);">On The Sheet You Can Read To</div>
+    <div class="grid-presets" id="sheetPresets"></div>
+  </div>
+  <div id="measureBlock" style="display:none;">
+    <div class="section-label" style="margin-top:var(--space-md);">Measured To</div>
+    <div class="grid-presets" id="measurePresets"></div>
+  </div>
 
   <!-- the always-on fact: what this scale can hold. No dimension required. -->
   <div class="resolution" id="resolution"></div>
@@ -121,13 +128,13 @@
     </div>
   </div>
 
-  <!-- ================= OVER A RUN (stack-up) — Scaled Drawing mode only == -->
+  <!-- ================= OVER A RUN (stack-up) — Physical Object mode only == -->
   <div class="tool-section" id="runSection">
     <div class="section-label">Across A Run Of Measurements</div>
     <p class="section-note">Measure a room feature to feature and each measurement's
        error carries into a chain. Measure everything from one baseline and it
        doesn't. This shows how error accumulates across a chain, each feature
-       measured to the drawing's resolution.</p>
+       measured to your tape precision, against what the drawing holds.</p>
 
     <div class="section-label" style="font-size:var(--text-xs);">Features In The Run</div>
     <div class="grid-presets" id="runPresets"></div>
@@ -200,13 +207,15 @@
   var state = {
     text: '',
     defaultUnit: 'in',
-    question: 'read',                                    // 'read' = scaled drawing (primary) | 'draw' = physical object
+    question: 'read',                                    // 'read' = scaled drawing (1-to-1) | 'draw' = physical object (+ run)
     family: 'architect',                                 // which scale family's chips are shown
     scaleId: '48',                                       // 1/4" = 1'-0"
     customN: null,                                       // a typed 1:n (wins while set)
     target: 'imperial',                                  // system for readouts, follows the input
     sheetUiSystem: null,
-    sheet: { imperial: { denom: 32 }, metric: { mm: 0.5 } }, // finest you can read/mark on the sheet
+    sheet: { imperial: { denom: 32 }, metric: { mm: 0.5 } }, // finest you can read/mark on the sheet (drives R)
+    tapeUiSystem: null,
+    tape: { imperial: 6096, metric: 4800 },              // how fine you measure the object, in units (1/4", 5mm)
     links: 5                                             // features in the run (chained measurements)
   };
   function currentN() { return state.customN != null ? state.customN : findScale(state.scaleId).n; }
@@ -225,9 +234,13 @@
   }
   // what one sheet increment is worth in the REAL world — the scale's resolution
   function resolutionUnits() { return sheetUnits() * currentN(); }
+  // how fine you measured the physical object (real-world, in units)
+  function tapeUnits() { return state.target === 'imperial' ? state.tape.imperial : state.tape.metric; }
+  function tapeDenom() { return state.target === 'imperial' ? Math.round(IN / state.tape.imperial) : null; }
+  function tapeLabel() { return NumberLine.formatTrue(tapeUnits(), state.target); }
 
   var els = {};
-  ['dimInput','fieldNote','bareAsk','scalePresets','sheetPresets','resolution',
+  ['dimInput','fieldNote','bareAsk','scalePresets','sheetBlock','sheetPresets','measureBlock','measurePresets','resolution',
    'echo','echoLine','echoAssume','lengthOut','figure','snapRows',
    'runSection','runPresets','stackFigure','stackLegend','stackTable','stackNote','engineNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
@@ -294,17 +307,14 @@
       render();
     });
   }
-  function updateScaleActive() {
+  function renderScalePresets() {
+    if (els.scalePresets.dataset.fam !== state.family) buildScalePresets();
     Array.prototype.forEach.call(els.scalePresets.querySelectorAll('[data-scale]'), function (box) {
       UI.press(box, state.customN == null && box.dataset.scale === state.scaleId);
     });
   }
-  function renderScalePresets() {
-    if (els.scalePresets.dataset.fam !== state.family) buildScalePresets();
-    updateScaleActive();
-  }
 
-  /* ---- sheet reading precision (feeds resolution + the figure grid) -------- */
+  /* ---- sheet reading precision (Scaled Drawing mode; drives R) ------------- */
   function buildSheetPresets() {
     var html = '';
     function box(attr, v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-' + attr + '="' + v + '">' + label + '</button>'; }
@@ -337,15 +347,50 @@
     });
   }
 
+  /* ---- tape precision (Physical Object mode; how fine you measured) -------- */
+  function buildMeasurePresets() {
+    var html = '';
+    function box(v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-tape="' + v + '">' + label + '</button>'; }
+    if (state.target === 'imperial') {
+      html += '<div class="grid-row">' + box(IN, '1"') + box(IN / 2, '1/2"') + box(IN / 4, '1/4"') + box(IN / 8, '1/8"') + box(IN / 16, '1/16"') + '</div>';
+    } else {
+      html += '<div class="grid-row"><span class="grid-group-label">mm</span>' + box(MM, '1') + box(2 * MM, '2') + box(5 * MM, '5') + box(10 * MM, '10') + '</div>';
+    }
+    els.measurePresets.innerHTML = html;
+    state.tapeUiSystem = state.target;
+    Array.prototype.forEach.call(els.measurePresets.querySelectorAll('.grid-box'), function (box) {
+      box.addEventListener('click', function () {
+        if (state.target === 'imperial') state.tape.imperial = +box.dataset.tape;
+        else state.tape.metric = +box.dataset.tape;
+        render();
+      });
+    });
+  }
+  function renderMeasurePresets() {
+    if (state.tapeUiSystem !== state.target) buildMeasurePresets();
+    var active = tapeUnits();
+    Array.prototype.forEach.call(els.measurePresets.querySelectorAll('.grid-box'), function (box) {
+      UI.press(box, +box.dataset.tape === active);
+    });
+  }
+
   /* ---- the always-on resolution line -------------------------------------- */
-  // A plain fact about the drawing, no dimension required: one readable sheet
-  // increment is worth this much in the field. Stated, never ruled on.
+  // A plain fact about the drawing, no dimension required. In Scaled Drawing
+  // mode: what a sheet mark is worth in the field. In Physical Object mode:
+  // what the drawing can hold, beside how fine you measured. Stated, not ruled.
   function renderResolution() {
     var R = resolutionUnits();
-    els.resolution.innerHTML =
-      'At <b>' + escapeHtml(currentFace()) + '</b>, a <b>' + escapeHtml(sheetLabel()) + '</b> mark on the sheet '
-      + 'is <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b> in the field. '
-      + '<span class="quiet">Measuring the real thing finer than that won\'t change what the drawing holds.</span>';
+    if (state.question === 'draw') {
+      els.resolution.innerHTML =
+        'At <b>' + escapeHtml(currentFace()) + '</b>, the drawing can hold about <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b>. '
+        + 'You\'re measuring to <b>' + escapeHtml(tapeLabel()) + '</b>. '
+        + '<span class="quiet">Measuring finer than the drawing holds won\'t change what you can draw.</span>';
+    } else {
+      els.resolution.innerHTML =
+        'At <b>' + escapeHtml(currentFace()) + '</b>, a <b>' + escapeHtml(sheetLabel()) + '</b> mark on the sheet '
+        + 'is <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b> in the field. '
+        + '<span class="quiet">Measuring the real thing finer than that won\'t change what the drawing holds.</span>';
+    }
   }
 
   /* ---- echo (single dimension) -------------------------------------------- */
@@ -376,10 +421,7 @@
     els.echo.style.display = '';
   }
 
-  /* ---- read-mode figure: the real value with ±R reading error bars --------
-     Pure SVG, numberline tokens (inverts in dark). A schematic centred on the
-     value, spanning ±3R so the ±R band reads; the band IS the reading
-     resolution carried into the field. Shows the uncertainty, never a verdict. */
+  /* ---- read-mode figure: the real value with ±R reading error bars -------- */
   function readFig(o) {
     var W = o.width, H = 116, padL = 8, padR = 8, padT = 30, padB = 28;
     var innerW = W - padL - padR, midY = padT + (H - padT - padB) / 2;
@@ -391,15 +433,11 @@
             + 'aria-label="The real value with a reading-error band of plus or minus R.">';
     svg += '<defs><pattern id="rdhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/></pattern></defs>';
-    // ±R band
     svg += '<rect x="' + xL + '" y="' + top + '" width="' + (xR - xL) + '" height="' + (bot - top) + '" fill="url(#rdhatch)" stroke="none"/>';
-    // axis
     svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + (W - padR) + '" y2="' + midY + '" stroke="var(--nl-tick,#bbb)" stroke-width="1"/>';
-    // band edges + centre value tick
     svg += '<line x1="' + xL + '" y1="' + top + '" x2="' + xL + '" y2="' + bot + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
     svg += '<line x1="' + xR + '" y1="' + top + '" x2="' + xR + '" y2="' + bot + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
     svg += '<line x1="' + xC + '" y1="' + (top - 6) + '" x2="' + xC + '" y2="' + (bot + 6) + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.6"/>';
-    // labels
     svg += '<text x="' + xC + '" y="' + (top - 12) + '" text-anchor="middle" font-size="13" font-weight="600" fill="var(--nl-ink,#0a0a0a)">' + escapeHtml(NumberLine.formatTrue(o.valueU, o.system)) + '</text>';
     svg += '<text x="' + xL + '" y="' + (bot + 16) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(NumberLine.formatTrue(o.valueU - o.RU, o.system)) + '</text>';
     svg += '<text x="' + xR + '" y="' + (bot + 16) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(NumberLine.formatTrue(o.valueU + o.RU, o.system)) + '</text>';
@@ -408,56 +446,7 @@
     return svg;
   }
 
-  /* ---- draw-mode figure + rows: the single measurement you encode ---------
-     The drawn value snapped to what the rule can MARK; the residual reads back
-     n× in the field — the error you're building into the drawing. */
-  function renderDraw(result, conv) {
-    var g = Math.round(sheetUnits()); if (g < 1) g = 1;
-    var denom = state.target === 'imperial' ? state.sheet.imperial.denom : null;
-    var source = result.unitSystem === 'metric' ? 'metric'
-               : result.unitSystem === 'imperial' ? 'imperial' : 'mixed';
-    var width = els.figure.clientWidth;
-    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
-    width = Math.min(width, 680);
-    els.figure.innerHTML = NumberLine.numberline({
-      units: conv, gridCount: g, targetSystem: state.target, sourceSystem: source, width: width
-    });
-
-    function nameCell(name, gloss) {
-      return '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>';
-    }
-    function decUnder(u) {
-      return state.target === 'imperial' ? '<span class="snap-dec">' + escapeHtml(NumberLine.imperialDecimal(u, 4)) + '</span>' : '';
-    }
-    function realBack(u) {
-      var backErr = (u - conv) * currentN();
-      if (backErr === 0) return '';
-      return ' <span class="snap-gloss">' + escapeHtml(NumberLine.formatResidual(backErr, state.target)) + ' in the field</span>';
-    }
-    var floorU = snap(conv, g, 'floor'), ceilU = snap(conv, g, 'ceil'), nearU = snap(conv, g, 'nearest');
-    var truePrec = state.target === 'imperial' ? '0.0001″' : '0.01 mm';
-    var html = '';
-    if (floorU === ceilU) {
-      html = '<div class="snap-row is-primary is-exact">' + nameCell('On grid', 'exact — no rounding')
-           + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(conv, state.target, denom)) + decUnder(conv) + '</div>'
-           + '<div class="snap-resid">on grid</div></div>';
-    } else {
-      [{ name: 'Round down', gloss: 'use for a max — won\'t exceed', u: floorU },
-       { name: 'Round up', gloss: 'use for a min — won\'t fall below', u: ceilU }].forEach(function (b) {
-        var near = b.u === nearU;
-        html += '<div class="snap-row' + (near ? ' is-primary' : '') + '">'
-              + nameCell(b.name + (near ? ' · nearest' : ''), b.gloss)
-              + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(b.u, state.target, denom)) + decUnder(b.u) + '</div>'
-              + '<div class="snap-resid">' + escapeHtml(NumberLine.formatResidual(b.u - conv, state.target)) + realBack(b.u) + '</div></div>';
-      });
-      html += '<div class="snap-row is-ref">' + nameCell('True value', 'to the nearest ' + truePrec)
-            + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(conv, state.target)) + decUnder(conv) + '</div>'
-            + '<div class="snap-resid">—</div></div>';
-    }
-    els.snapRows.innerHTML = html;
-  }
-
-  /* ---- read-mode render: real size + the cost of a misread ---------------- */
+  /* ---- Scaled Drawing render: real size + the cost of a misread ----------- */
   function renderRead(result, conv) {
     var R = resolutionUnits();
     var width = els.figure.clientWidth;
@@ -471,24 +460,71 @@
       + '<div class="snap-resid">± ' + escapeHtml(NumberLine.formatTrue(R, state.target)) + ' in the field</div></div>';
   }
 
-  /* ---- the stack-up figure: chain vs baseline ----------------------------
-     Per-feature error is the drawing's resolution R (read each feature to that);
-     baseline holds flat at ±R, chain grows ∝ n, compensating ∝ √n. Shows two
-     error profiles; the reader owns whether the spread matters. No verdict. */
+  /* ---- Physical Object render: measurement snapped to the tape, then drawn -
+     Snap the REAL measurement to the tape precision (nearest 1/4", etc.) — the
+     precision you actually have — and report the drawn size it encodes to. */
+  function renderDraw(result, drawnUnits) {
+    var realU = result.units, g = Math.round(tapeUnits()); if (g < 1) g = 1;
+    var denom = tapeDenom();
+    var source = result.unitSystem === 'metric' ? 'metric'
+               : result.unitSystem === 'imperial' ? 'imperial' : 'mixed';
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.innerHTML = NumberLine.numberline({
+      units: realU, gridCount: g, targetSystem: state.target, sourceSystem: source, width: width
+    });
+
+    function nameCell(name, gloss) {
+      return '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>';
+    }
+    var floorU = snap(realU, g, 'floor'), ceilU = snap(realU, g, 'ceil'), nearU = snap(realU, g, 'nearest');
+    var html = '';
+    if (floorU === ceilU) {
+      html = '<div class="snap-row is-primary is-exact">' + nameCell('On the tape', 'exact — no rounding')
+           + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(realU, state.target, denom)) + '</div>'
+           + '<div class="snap-resid">on grid</div></div>';
+    } else {
+      [{ name: 'Round down', gloss: 'use for a max — won\'t exceed', u: floorU },
+       { name: 'Round up', gloss: 'use for a min — won\'t fall below', u: ceilU }].forEach(function (b) {
+        var near = b.u === nearU;
+        html += '<div class="snap-row' + (near ? ' is-primary' : '') + '">'
+              + nameCell(b.name + (near ? ' · nearest' : ''), b.gloss)
+              + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(b.u, state.target, denom)) + '</div>'
+              + '<div class="snap-resid">' + escapeHtml(NumberLine.formatResidual(b.u - realU, state.target)) + '</div></div>';
+      });
+    }
+    // the encoded size — what you actually draw
+    html += '<div class="snap-row is-ref">' + nameCell('Drawn at ' + escapeHtml(currentFace()), 'on the sheet')
+          + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(drawnUnits, state.target)) + '</div>'
+          + '<div class="snap-resid">—</div></div>';
+    els.snapRows.innerHTML = html;
+  }
+
+  /* ---- the stack-up figure: chain vs baseline against R -------------------
+     Per-measurement error is the tape precision e; baseline holds flat at ±e,
+     chain grows ∝ n, compensating ∝ √n. R is a dashed reference — what the
+     drawing can hold. Shows two profiles and a reference; no verdict. */
   function stackFig(o) {
     var W = o.width, H = 168, padL = 8, padR = 8, padT = 16, padB = 30;
     var innerW = W - padL - padR, innerH = H - padT - padB, midY = padT + innerH / 2;
-    var kMax = o.kMax, RU = o.RU;
-    var maxMag = kMax * RU * 1.15 || 1;
+    var kMax = o.kMax, eU = o.eU, RU = o.RU;
+    var maxMag = Math.max(kMax * eU, RU) * 1.18 || 1;
     function yh(mag) { return (mag / maxMag) * (innerH / 2); }
     function xk(k) { return padL + (k / kMax) * innerW; }
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" '
-            + 'aria-label="Error across a run: chain grows with each measurement, baseline stays flat.">';
+            + 'aria-label="Error across a run: chain grows with each measurement, baseline stays flat, against the drawing\'s resolution.">';
     svg += '<defs><pattern id="skhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/></pattern></defs>';
 
-    // chain — cumulative wedge (linear), hatched, widening to ±kMax·RU
-    var yTop = midY - yh(kMax * RU), yBot = midY + yh(kMax * RU), xe = xk(kMax);
+    // R reference envelope (dashed) — what the drawing can hold, a fact not a limit
+    var yR = yh(RU);
+    svg += '<line x1="' + padL + '" y1="' + (midY - yR) + '" x2="' + (W - padR) + '" y2="' + (midY - yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
+    svg += '<line x1="' + padL + '" y1="' + (midY + yR) + '" x2="' + (W - padR) + '" y2="' + (midY + yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
+    svg += '<text x="' + (W - padR) + '" y="' + (midY - yR - 4) + '" text-anchor="end" font-size="10" fill="var(--nl-axis,#999)">the drawing holds ±' + escapeHtml(NumberLine.formatTrue(RU, o.system)) + '</text>';
+
+    // chain — cumulative wedge (linear), hatched, widening to ±kMax·eU
+    var yTop = midY - yh(kMax * eU), yBot = midY + yh(kMax * eU), xe = xk(kMax);
     svg += '<polygon points="' + padL + ',' + midY + ' ' + xe + ',' + yTop + ' ' + xe + ',' + yBot + '" fill="url(#skhatch)" stroke="none"/>';
     svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + xe + '" y2="' + yTop + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.3"/>';
     svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + xe + '" y2="' + yBot + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.3"/>';
@@ -496,18 +532,17 @@
     // chain — compensating (√) curve
     var up = '', dn = '';
     for (var i = 0; i <= kMax; i++) {
-      var x = xk(i), m = Math.sqrt(i) * RU;
+      var x = xk(i), m = Math.sqrt(i) * eU;
       up += (i ? ' L' : 'M') + x + ',' + (midY - yh(m));
       dn += (i ? ' L' : 'M') + x + ',' + (midY + yh(m));
     }
     svg += '<path d="' + up + '" fill="none" stroke="var(--accent,#004C80)" stroke-width="1.2" stroke-dasharray="4 2"/>';
     svg += '<path d="' + dn + '" fill="none" stroke="var(--accent,#004C80)" stroke-width="1.2" stroke-dasharray="4 2"/>';
 
-    // baseline — flat band at ±RU (= the drawing's resolution)
-    var yb = yh(RU);
+    // baseline — flat band at ±eU
+    var yb = yh(eU);
     svg += '<line x1="' + padL + '" y1="' + (midY - yb) + '" x2="' + (W - padR) + '" y2="' + (midY - yb) + '" stroke="var(--ink-2,#555)" stroke-width="1.1"/>';
     svg += '<line x1="' + padL + '" y1="' + (midY + yb) + '" x2="' + (W - padR) + '" y2="' + (midY + yb) + '" stroke="var(--ink-2,#555)" stroke-width="1.1"/>';
-    svg += '<text x="' + (W - padR) + '" y="' + (midY - yb - 4) + '" text-anchor="end" font-size="10" fill="var(--ink-2,#555)">baseline ±' + escapeHtml(NumberLine.formatTrue(RU, o.system)) + '</text>';
 
     // the run line + per-measurement ticks
     svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + (W - padR) + '" y2="' + midY + '" stroke="var(--nl-tick,#bbb)" stroke-width="1"/>';
@@ -540,11 +575,11 @@
     Array.prototype.forEach.call(els.runPresets.querySelectorAll('[data-links]'), function (box) {
       UI.press(box, +box.dataset.links === state.links);
     });
-    var RU = resolutionUnits(), kMax = state.links;
+    var eU = tapeUnits(), RU = resolutionUnits(), kMax = state.links;
     var width = els.stackFigure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
-    els.stackFigure.innerHTML = stackFig({ RU: RU, kMax: kMax, system: state.target, width: width });
+    els.stackFigure.innerHTML = stackFig({ eU: eU, RU: RU, kMax: kMax, system: state.target, width: width });
 
     els.stackLegend.innerHTML =
       '<span><span class="swatch" style="background:var(--nl-hatch);opacity:.5;"></span>Worst case — errors add up (∝ n)</span>'
@@ -554,16 +589,17 @@
     var rows = '<tr><th>Measurements</th><th>Worst Case Error</th><th>Randomized Read Errors (√n)</th><th>Baseline</th></tr>';
     for (var k = 1; k <= kMax; k++) {
       rows += '<tr><td>' + k + '</td>'
-            + '<td>' + escapeHtml(NumberLine.formatTrue(k * RU, state.target)) + '</td>'
-            + '<td>' + escapeHtml(NumberLine.formatTrue(Math.sqrt(k) * RU, state.target)) + '</td>'
-            + '<td class="strat-base">' + escapeHtml(NumberLine.formatTrue(RU, state.target)) + '</td></tr>';
+            + '<td>' + escapeHtml(NumberLine.formatTrue(k * eU, state.target)) + '</td>'
+            + '<td>' + escapeHtml(NumberLine.formatTrue(Math.sqrt(k) * eU, state.target)) + '</td>'
+            + '<td class="strat-base">' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '</td></tr>';
     }
     els.stackTable.innerHTML = rows;
 
     els.stackNote.innerHTML =
-      'Each feature is measured to <b>±' + escapeHtml(NumberLine.formatTrue(RU, state.target)) + '</b>, the finest the drawing will hold at this scale. '
+      'Each feature is measured to <b>±' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '</b> (your tape). '
       + 'Chain error is the sum of the measurements before it (worst case, ∝ n); if the read errors fall either way at random '
-      + 'they partly cancel (∝ √n). From a baseline every feature is one measurement from the same datum, so it does not add up.';
+      + 'they partly cancel (∝ √n). From a baseline every feature is one measurement from the same datum, so it stays at ±' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '. '
+      + 'For reference, the drawing holds <b>±' + escapeHtml(NumberLine.formatTrue(RU, state.target)) + '</b> at this scale.';
   }
 
   /* ---- engine audit — the exact-integer working, at the page bottom ------- */
@@ -599,7 +635,9 @@
     renderFieldNote(result);
     renderBareAsk(result);
     renderScalePresets();
-    renderSheetPresets();
+    els.sheetBlock.style.display = state.question === 'read' ? '' : 'none';
+    els.measureBlock.style.display = state.question === 'draw' ? '' : 'none';
+    if (state.question === 'read') renderSheetPresets(); else renderMeasurePresets();
     renderResolution();
     renderRun();
 
