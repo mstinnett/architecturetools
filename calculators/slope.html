@@ -382,13 +382,19 @@
     var width = els.figure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
+    // the triangle carries the precision hatch: the exact slope wedged between
+    // its two bracketing standard steps — the angular residual, drawn the way
+    // the converters hatch the linear one. The wedge family follows the regime.
+    var wedgeFam = (12 * s >= 1) ? 'pitch' : (s <= 1 ? 'ratio' : 'pitch');
+    var ws = famSteps(s, wedgeFam), wedge = !ws.exact;
     els.figure.innerHTML = SlopeFig.slopefig({
       rise: riseU, run: runU,
       riseLabel: isConv ? '' : fmtLen(riseU) + (solved.leg === 'rise' ? solvedResid : ''),
       runLabel: isConv ? '' : fmtLen(runU) + (solved.leg === 'run' ? solvedResid : ''),
       angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
       hypoLabel: isConv ? '' : fmtLen(hypU),
-      refLo: null, refHi: null, refLoLabel: null, refHiLabel: null,
+      refLo: wedge ? ws.lo.ratio : null, refHi: wedge ? ws.hi.ratio : null,
+      refLoLabel: wedge ? ws.lo.face : null, refHiLabel: wedge ? ws.hi.face : null,
       width: width, height: 200
     });
 
