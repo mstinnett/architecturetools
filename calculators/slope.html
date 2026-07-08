@@ -6,7 +6,7 @@
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
 <title>Slope -- architecture.tools</title>
-<meta name="description" content="Enter any two of rise, run, and slope: get the third and every way to say it — percent, ratio, roof pitch, degrees — plus the nearest step you can actually build and what rounding to it costs in rise across your run.">
+<meta name="description" content="Enter any two of rise, run, and slope: the missing sides and the slope come back as values — percent, ratio, roof pitch, degrees — with what rounding each to a whole number costs in rise across your run, and common slopes drawn for comparison.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -94,8 +94,8 @@
     </nav>
     <h1>Slope</h1>
     <p>Enter any two of rise, run, and slope. The missing sides and the slope
-       come back as values, each with the nearest standard step and what
-       rounding to it costs in rise across your run.</p>
+       come back as values, with what rounding each to a whole number costs in
+       rise across your run.</p>
   </div>
 
   <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
@@ -225,6 +225,14 @@
   }
   function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
   function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  // the along-slope length is irrational — show it short (2 dp, trimmed), the
+  // suite's band formatting, not 4-decimal lattice noise
+  function fmtShort(u) {
+    var a = Math.abs(u);
+    if (state.target === 'metric') { var mm = a / MM; return mm >= 1000 ? sig(mm / 1000, 2) + ' m' : sig(mm, 1) + ' mm'; }
+    if (a >= 12 * IN) { var f = Math.floor(a / (12 * IN)), rin = (a - f * 12 * IN) / IN; return f + "'" + (rin ? '-' + sig(rin, 2) + '"' : ''); }
+    return sig(a / IN, 2) + '"';
+  }
   // a signed rise cost, at a practical scale (not the lattice-fine residual):
   // decimal inches under a foot, ft-in above, mm for metric
   function fmtDelta(u) {
@@ -328,7 +336,7 @@
       var sides = [];
       if (solved.leg === 'rise') sides.push('rise ' + fmtLen(riseU));
       else if (solved.leg === 'run') sides.push('run ' + fmtLen(runU));
-      if (solved.leg !== 'slopeonly') sides.push('along slope ' + fmtLen(hypU));
+      if (solved.leg !== 'slopeonly') sides.push('along slope ' + fmtShort(hypU));
       var forms = sig(pc, pc < 1 ? 3 : 2) + '%  ·  1:' + sig(q / p, q / p >= 100 ? 1 : 2) + '  ·  ' + sig(pitch, 2) + ':12  ·  ' + sig(deg, deg < 1 ? 3 : 2) + '°';
       els.echoAnswer.innerHTML = (sides.length ? '<div class="ans-sides">' + sides.map(escapeHtml).join('&nbsp;&nbsp;·&nbsp;&nbsp;') + '</div>' : '')
         + '<div class="' + (sides.length ? 'ans-slope' : 'ans-sides') + '">' + escapeHtml(forms) + '</div>';
@@ -346,7 +354,7 @@
     els.echo.style.display = '';
   }
 
-  /* ---- the answer: figure, buildable step, every name, the sides, refs ------ */
+  /* ---- the answer: figure, whole-number rounding, common slopes ------------- */
   function rowHtml(name, gloss, value, resid, primary, cls) {
     return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
       + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
@@ -370,13 +378,13 @@
     var p = 100 * s; return { lo: { face: Math.floor(p) + '%', ratio: Math.floor(p) / 100 }, hi: { face: Math.ceil(p) + '%', ratio: Math.ceil(p) / 100 }, exact: whole(p) };
   }
 
-  // type marks whether the call-out is a ceiling (max — round shallower to stay
+  // type marks whether the figure is a ceiling (max — round shallower to stay
   // under) or a floor (min — round steeper to stay over). Located, not ruled.
   var REFS = [
-    { label: 'accessible cross slope · 1/4" per foot drainage', ratio: 1 / 48, face: '1:48 (2.08%)', type: 'max' },
-    { label: 'walkway / ramp boundary call-out', ratio: 1 / 20, face: '1:20 (5%)', type: 'max' },
-    { label: 'ramp running slope call-out', ratio: 1 / 12, face: '1:12 (8.33%)', type: 'max' },
-    { label: 'common low-slope shingle minimum call-out', ratio: 2 / 12, face: '2:12 (16.67%)', type: 'min' }
+    { label: 'Accessible cross slope · 1/4" per foot', ratio: 1 / 48, face: '1:48 (2.08%)', type: 'max' },
+    { label: 'Walkway / ramp boundary', ratio: 1 / 20, face: '1:20 (5%)', type: 'max' },
+    { label: 'Ramp running slope', ratio: 1 / 12, face: '1:12 (8.33%)', type: 'max' },
+    { label: 'Low-slope shingle minimum', ratio: 2 / 12, face: '2:12 (16.67%)', type: 'min' }
   ];
 
   function renderAnswer(solved, quant, derivedNote) {
@@ -436,7 +444,7 @@
       riseLabel: isConv ? '' : fmtLen(riseU) + (solved.leg === 'rise' ? solvedResid : ''),
       runLabel: isConv ? '' : fmtLen(runU) + (solved.leg === 'run' ? solvedResid : ''),
       angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
-      hypoLabel: isConv ? '' : fmtLen(hypU),
+      hypoLabel: isConv ? '' : fmtShort(hypU),
       refLo: wedge ? ss.lo.ratio : null, refHi: wedge ? ss.hi.ratio : null,
       refLoLabel: wedge ? ss.lo.face : null, refHiLabel: wedge ? ss.hi.face : null,
       hatchTo: wedge ? hatchTo : null,
