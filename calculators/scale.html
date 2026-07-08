@@ -6,7 +6,7 @@
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
 <title>Scale Resolution -- architecture.tools</title>
-<meta name="description" content="Choose a drawing scale and check how much a measurement can be trusted: a dimension read off a scaled drawing carries more digits than the scale can hold, and — measuring a physical object — the error you encode and how it accumulates across a run, chain vs baseline, shown not judged.">
+<meta name="description" content="Choose a drawing scale and see the range you actually know. Reading a drawing, sheet error multiplies by the scale into the field; measuring to draw, tape error accumulates across a run and anything finer than the sheet holds disappears into it. Shown, not judged.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -21,23 +21,20 @@
 <style>
   /* ---- page-specific only ----
      The calculator shell is shared via global.css; the engine lives in the
-     imported lib/ modules. Local rules cover the scale chips' two-line faces,
-     the always-on resolution line, and the stack-up section. */
+     imported lib/ modules. Local rules cover the two-line chips, the computed
+     relation line under the precision controls, and the run section. */
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
   .scale-box { min-width: 5.2rem; line-height: 1.25; padding: 0.4rem 0.55rem; }
   .scale-box .ratio { display: block; font-size: var(--text-xs); opacity: 0.7; }
 
-  /* resolution line — a calm, always-on fact once a scale is picked */
-  .resolution { margin: var(--space-md) 0 var(--space-sm); padding: 0.75rem 0.9rem;
-    border-left: 2px solid var(--accent); background: var(--accent-soft);
-    font-size: var(--text-sm); color: var(--ink); line-height: 1.6; border-radius: 2px; }
-  .resolution b { font-weight: 600; }
-  .resolution .quiet { color: var(--ink-2); }
-
-  /* a group of sections, each its own quiet block */
   .tool-section { margin-top: var(--space-xl); }
   .section-note { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.6;
     max-width: 44em; margin: 0.2rem 0 var(--space-md); }
+
+  /* the computed relation line — the model shown live, numbers only */
+  .rel-line { font-size: var(--text-sm); color: var(--ink-2); margin: var(--space-md) 0 0;
+    font-variant-numeric: tabular-nums; }
+  .rel-line b { color: var(--ink); font-weight: 600; }
 
   /* stack-up readout table */
   .stack-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm);
@@ -67,13 +64,13 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Scale Resolution</span>
     </nav>
     <h1>Scale Resolution</h1>
-    <p>Choose a drawing scale and check how much a measurement can be trusted —
-       a dimension read off a drawing carries more digits than the scale can
-       hold, and, measuring a physical object, the error you encode and how it
-       accumulates across a run.</p>
+    <p>Reading a drawing, sheet error multiplies by the scale into the field.
+       Measuring to draw, tape error accumulates across a run, and anything finer
+       than the sheet holds disappears into it. Either way, this shows the range
+       you actually know — not the digits you read.</p>
   </div>
 
-  <!-- ================= SCALE + RESOLUTION (always on) ================= -->
+  <!-- ================= 1 · SCALE ================= -->
   <div class="section-label">Scale</div>
   <div class="opt-line">
     <div class="opt-cluster">
@@ -84,36 +81,39 @@
   </div>
   <div class="grid-presets" id="scalePresets"></div>
 
-  <!-- precision control — mode-specific (sheet reading + PDF tool, vs tape) -->
-  <div id="sheetBlock" style="display:none;">
-    <div class="section-label" style="margin-top:var(--space-md);">On The Sheet, Drawn To</div>
-    <div class="grid-presets" id="sheetPresets"></div>
-    <div class="section-note">With the scale, this sets what the drawing can hold (±R).</div>
+  <!-- ================= 2 · TASK ================= -->
+  <div class="opt-line" style="margin-top:var(--space-lg);">
+    <div class="opt-cluster">
+      <button type="button" class="mini-pill" aria-pressed="false" data-q="read">Read A Drawing</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-q="draw">Measure To Draw</button>
+    </div>
   </div>
+
+  <!-- ================= 3 · PRECISIONS ================= -->
+  <!-- the drawing-floor knob: what the sheet is — a spectrum of pick precisions.
+       Sub-label shows each source's sheet precision; × scale = the floor. -->
+  <div class="section-label" id="sourceLabel" style="margin-top:var(--space-md);">Reading From</div>
+  <div class="grid-presets" id="sourceChips"></div>
+
   <div id="readBlock">
-    <div class="section-label" style="margin-top:var(--space-md);">Precision Of Read</div>
+    <div class="section-label" style="margin-top:var(--space-md);">Read To</div>
     <input type="text" id="readPrec" class="dim-input" spellcheck="false" maxlength="24"
            autocomplete="off" autocapitalize="off" style="max-width:12rem;" value="1/4&quot;">
-    <div class="section-note">Bluebeam standard = 1/4&Prime;.</div>
+    <div class="section-note" style="margin-bottom:0;">Bluebeam standard = 1/4&Prime;.</div>
   </div>
-  <div id="measureBlock" style="display:none;">
-    <div class="section-label" style="margin-top:var(--space-md);">Measured To</div>
-    <div class="grid-presets" id="measurePresets"></div>
+  <div id="tapeBlock" style="display:none;">
+    <div class="section-label" style="margin-top:var(--space-md);">Tape Reads To</div>
+    <input type="text" id="tapePrec" class="dim-input" spellcheck="false" maxlength="24"
+           autocomplete="off" autocapitalize="off" style="max-width:12rem;" value="1/4&quot;">
   </div>
 
-  <!-- the always-on fact: what this scale can hold. No dimension required. -->
-  <div class="resolution" id="resolution"></div>
+  <!-- the relationship, computed live: instrument · floor → band -->
+  <div class="rel-line" id="relLine"></div>
 
-  <!-- ================= A DIMENSION (scaled drawing / physical object) ===== -->
+  <!-- ================= 4 · THE DIMENSION ================= -->
   <div class="tool-section">
-    <div class="section-label">You're Measuring A</div>
-    <div class="opt-line" style="margin-top:0.4rem;">
-      <div class="opt-cluster">
-        <button type="button" class="mini-pill" aria-pressed="false" data-q="read">Scaled Drawing Of Object</button>
-        <button type="button" class="mini-pill" aria-pressed="false" data-q="draw">Physical Object</button>
-      </div>
-    </div>
-    <div class="field-wrap" style="margin-top:0.6rem;">
+    <div class="section-label" id="dimLabel">Dimension As Read</div>
+    <div class="field-wrap" style="margin-top:0.4rem;">
       <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="120"
              autocomplete="off" autocapitalize="off" placeholder="e.g. 2 1/16&quot;  ·  24'-6&quot;  ·  30m">
       <div class="field-note" id="fieldNote"></div>
@@ -135,16 +135,13 @@
     </div>
   </div>
 
-  <!-- ================= OVER A RUN (stack-up) — Physical Object mode only == -->
+  <!-- ================= 5 · OVER A RUN (Measure To Draw only) ============= -->
   <div class="tool-section" id="runSection">
-    <div class="section-label">How Far Off, Across A Run</div>
-    <p class="section-note">Two things set how far off the drawing lands: how fine
-       you measure (your tape), which accumulates when you chain feature to
-       feature, and how fine the drawing holds at this scale (±R). Measuring from
-       one baseline keeps the tape part flat. The drawing is off by the worse of
-       the two.</p>
+    <div class="section-label">Across A Run Of Measurements</div>
+    <p class="section-note">Feature to feature, each measurement's error carries
+       into the next. From one baseline it doesn't.</p>
 
-    <div class="section-label" style="font-size:var(--text-xs);">Features In The Run</div>
+    <div class="section-label" style="font-size:var(--text-xs);">Chained Measurements</div>
     <div class="grid-presets" id="runPresets"></div>
 
     <div class="answer-card" style="margin-top:var(--space-md);">
@@ -212,22 +209,32 @@
     return hit;
   }
 
+  /* The drawing-floor spectrum: what the sheet is, as a pick precision in
+     sheet space. × scale = the floor — the finest the drawing holds. */
+  var SOURCES = [
+    { id: 'cad',  face: 'Revit · CAD',        mm: 0,   sub: 'snap' },
+    { id: 'pdf',  face: 'PDF · Revu',         mm: 0.3, sub: '≈ 0.3 mm' },
+    { id: 'rule', face: 'Print · Scale Rule', mm: 0.5, sub: '≈ 0.5 mm' },
+    { id: 'hand', face: 'Hand Drawn',         mm: 0.8, sub: '≈ 0.8 mm' }
+  ];
+  function findSource(id) {
+    var hit = SOURCES[1];
+    SOURCES.forEach(function (s) { if (s.id === id) hit = s; });
+    return hit;
+  }
+
   var state = {
     text: '',
     defaultUnit: 'in',
-    question: 'read',                                    // 'read' = scaled drawing (1-to-1) | 'draw' = physical object (+ run)
-    family: 'architect',                                 // which scale family's chips are shown
-    scaleId: '48',                                       // 1/4" = 1'-0"
-    customN: null,                                       // a typed 1:n (wins while set)
-    target: 'imperial',                                  // system for readouts, follows the input
-    // the drawing's own resolution — how fine you can read the sheet (a Revit /
-    // vector PDF reads finer than a scan); drives R = sheet × scale
-    sheetUiSystem: null,
-    sheet: { imperial: { denom: 32 }, metric: { mm: 0.5 } },
-    readText: '1/4"',                                    // precision of read — continuous (Bluebeam standard 1/4")
-    tapeUiSystem: null,
-    tape: { imperial: 6096, metric: 4800 },              // how fine you measure the object, in units (1/4", 5mm)
-    links: 5                                             // features in the run (chained measurements)
+    question: 'read',                 // 'read' = read a drawing | 'draw' = measure to draw
+    family: 'architect',
+    scaleId: '48',                    // 1/4" = 1'-0"
+    customN: null,                    // a typed 1:n (wins while set)
+    source: 'pdf',                    // the drawing-floor knob
+    readText: '1/4"',                 // read precision (real units, continuous)
+    tapeText: '1/4"',                 // tape precision (real units, continuous)
+    links: 5,                         // chained measurements shown in the run
+    target: 'imperial'
   };
   function currentN() { return state.customN != null ? state.customN : findScale(state.scaleId).n; }
   function currentFace() {
@@ -236,39 +243,43 @@
     return s.face + (s.n !== +s.face.split(':')[1] ? ' (1:' + s.n + ')' : '');
   }
 
-  // finest distance you can read or mark on the SHEET, in units
-  function sheetUnits() {
-    return state.target === 'imperial' ? IN / state.sheet.imperial.denom : state.sheet.metric.mm * MM;
+  /* ---- the model's three numbers ------------------------------------------ */
+  // a precision field parsed as a length, with a sane fallback while mid-edit
+  function precUnits(text) {
+    var r = parseLength(text || '', { defaultUnit: state.defaultUnit });
+    return (r && r.dimension === 1 && r.units > 0 && !outOfRange(r.units)) ? r.units
+         : (state.target === 'imperial' ? IN / 4 : 5 * MM);
   }
-  function sheetLabel() {
-    return state.target === 'imperial' ? '1/' + state.sheet.imperial.denom + '"' : state.sheet.metric.mm + ' mm';
-  }
-  // what one sheet increment is worth in the REAL world — the scale's resolution
-  function resolutionUnits() { return sheetUnits() * currentN(); }
-  // precision of read — parsed from a continuous field (any length), with a
-  // sane fallback while the field is mid-edit or empty
-  function readUnits() {
-    var r = parseLength(state.readText || '', { defaultUnit: state.defaultUnit });
-    return (r && r.dimension === 1 && r.units > 0 && !outOfRange(r.units)) ? r.units : (state.target === 'imperial' ? IN / 4 : 5 * MM);
-  }
-  // a real precision shown as a fraction (imperial) or mm
-  function fracLabel(units) {
-    if (state.target !== 'imperial') return NumberLine.formatTrue(units, state.target);
-    return NumberLine.formatSnapped(units, 'imperial', Math.max(1, Math.round(IN / units)));
-  }
-  function readBand() { return readUnits(); }
-  // how fine you measured the physical object (real-world, in units)
-  function tapeUnits() { return state.target === 'imperial' ? state.tape.imperial : state.tape.metric; }
-  function tapeDenom() { return state.target === 'imperial' ? Math.round(IN / state.tape.imperial) : null; }
-  function tapeLabel() { return fracLabel(tapeUnits()); }
+  function readUnits() { return precUnits(state.readText); }
+  function tapeUnits() { return precUnits(state.tapeText); }
+  // the floor: the source's sheet precision × the scale. 0 for CAD snap.
+  function floorUnits() { return findSource(state.source).mm * MM * currentN(); }
+  // reading a drawing you get value ± max(read, floor)
+  function readBand() { return Math.max(readUnits(), floorUnits()); }
 
   var els = {};
-  ['dimInput','fieldNote','bareAsk','scalePresets','sheetBlock','sheetPresets','readBlock','readPrec','measureBlock','measurePresets','resolution',
+  ['dimInput','dimLabel','fieldNote','bareAsk','scalePresets','sourceLabel','sourceChips',
+   'readBlock','readPrec','tapeBlock','tapePrec','relLine',
    'echo','echoLine','echoAssume','lengthOut','figure','snapRows',
    'runSection','runPresets','stackFigure','stackLegend','stackTable','stackNote','engineNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
   });
   var escapeHtml = UI.esc;
+
+  /* ---- short length formatting (bands and ranges, 2 dp, trimmed) ---------- */
+  function trimNum(x, dp) { return String(parseFloat(x.toFixed(dp))); }
+  function fmtShort(u) {
+    var sign = u < 0 ? '−' : '', a = Math.abs(u);
+    if (state.target === 'metric') {
+      var mm = a / MM;
+      return sign + (mm >= 1000 ? trimNum(mm / 1000, 2) + ' m' : trimNum(mm, 1) + ' mm');
+    }
+    if (a >= FT) {
+      var f = Math.floor(a / FT), rin = (a - f * FT) / IN;
+      return sign + f + "'" + (rin ? '-' + trimNum(rin, 2) + '"' : '');
+    }
+    return sign + trimNum(a / IN, 2) + '"';
+  }
 
   /* ---- pending hint + bare-unit choice (as the converter) ----------------- */
   function renderFieldNote(result) {
@@ -337,82 +348,42 @@
     });
   }
 
-  /* ---- sheet reading precision (Scaled Drawing mode; drives R) ------------- */
-  function buildSheetPresets() {
-    var html = '';
-    function box(v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-denom="' + v + '">' + label + '</button>'; }
-    if (state.target === 'imperial') {
-      var labels = { 8: '1/8', 16: '1/16', 32: '1/32', 64: '1/64' };
-      html += '<div class="grid-row">';
-      [8, 16, 32, 64].forEach(function (d) { html += box(d, labels[d] + '"'); });
-      html += '</div>';
+  /* ---- the drawing-floor chips (built once) -------------------------------- */
+  function buildSourceChips() {
+    var html = '<div class="grid-row">';
+    SOURCES.forEach(function (s) {
+      html += '<button type="button" class="grid-box scale-box" aria-pressed="false" data-source="' + s.id + '">'
+            + escapeHtml(s.face) + '<span class="ratio">' + escapeHtml(s.sub) + '</span></button>';
+    });
+    html += '</div>';
+    els.sourceChips.innerHTML = html;
+    Array.prototype.forEach.call(els.sourceChips.querySelectorAll('[data-source]'), function (box) {
+      box.addEventListener('click', function () { state.source = box.dataset.source; render(); });
+    });
+  }
+  function renderSourceChips() {
+    Array.prototype.forEach.call(els.sourceChips.querySelectorAll('[data-source]'), function (box) {
+      UI.press(box, box.dataset.source === state.source);
+    });
+  }
+
+  /* ---- the relation line: instrument · floor → band, numbers only --------- */
+  function renderRel() {
+    var F = floorUnits();
+    var floorTxt = F > 0
+      ? '±' + fmtShort(F) + ' <span style="color:var(--ink-3)">(' + findSource(state.source).mm + ' mm × ' + currentN() + ')</span>'
+      : '0 <span style="color:var(--ink-3)">(snap)</span>';
+    if (state.question === 'read') {
+      var r = readUnits(), band = readBand();
+      els.relLine.innerHTML = 'read ±' + fmtShort(r) + ' · sheet floor ' + floorTxt
+        + ' &rarr; <b>±' + fmtShort(band) + '</b>';
     } else {
-      html += '<div class="grid-row"><span class="grid-group-label">mm</span>';
-      [0.25, 0.5, 1, 2].forEach(function (m) { html += '<button type="button" class="grid-box" aria-pressed="false" data-mm="' + m + '">' + m + '</button>'; });
-      html += '</div>';
+      var t = tapeUnits();
+      els.relLine.innerHTML = 'tape ±' + fmtShort(t) + ' · sheet holds ' + floorTxt;
     }
-    els.sheetPresets.innerHTML = html;
-    state.sheetUiSystem = state.target;
-    Array.prototype.forEach.call(els.sheetPresets.querySelectorAll('.grid-box'), function (box) {
-      box.addEventListener('click', function () {
-        if (box.dataset.denom) state.sheet.imperial.denom = +box.dataset.denom;
-        if (box.dataset.mm) state.sheet.metric.mm = +box.dataset.mm;
-        render();
-      });
-    });
-  }
-  function renderSheetPresets() {
-    if (state.sheetUiSystem !== state.target) buildSheetPresets();
-    var active = state.target === 'imperial' ? state.sheet.imperial.denom : state.sheet.metric.mm;
-    var attr = state.target === 'imperial' ? 'denom' : 'mm';
-    Array.prototype.forEach.call(els.sheetPresets.querySelectorAll('.grid-box'), function (box) {
-      UI.press(box, +box.dataset[attr] === active);
-    });
   }
 
-  /* ---- tape precision (Physical Object mode; how fine you measured) -------- */
-  function buildMeasurePresets() {
-    var html = '';
-    function box(v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-tape="' + v + '">' + label + '</button>'; }
-    if (state.target === 'imperial') {
-      html += '<div class="grid-row">' + box(IN, '1"') + box(IN / 2, '1/2"') + box(IN / 4, '1/4"') + box(IN / 8, '1/8"') + box(IN / 16, '1/16"') + '</div>';
-    } else {
-      html += '<div class="grid-row"><span class="grid-group-label">mm</span>' + box(MM, '1') + box(2 * MM, '2') + box(5 * MM, '5') + box(10 * MM, '10') + '</div>';
-    }
-    els.measurePresets.innerHTML = html;
-    state.tapeUiSystem = state.target;
-    Array.prototype.forEach.call(els.measurePresets.querySelectorAll('.grid-box'), function (box) {
-      box.addEventListener('click', function () {
-        if (state.target === 'imperial') state.tape.imperial = +box.dataset.tape;
-        else state.tape.metric = +box.dataset.tape;
-        render();
-      });
-    });
-  }
-  function renderMeasurePresets() {
-    if (state.tapeUiSystem !== state.target) buildMeasurePresets();
-    var active = tapeUnits();
-    Array.prototype.forEach.call(els.measurePresets.querySelectorAll('.grid-box'), function (box) {
-      UI.press(box, +box.dataset.tape === active);
-    });
-  }
-
-  /* ---- the always-on resolution line -------------------------------------- */
-  // A plain fact about the drawing, no dimension required. In Scaled Drawing
-  // mode: what a sheet mark is worth in the field. In Physical Object mode:
-  // what the drawing can hold, beside how fine you measured. Stated, not ruled.
-  function renderResolution() {
-    // read mode shows the variance in the answer (the ±range), no separate line
-    if (state.question !== 'draw') { els.resolution.style.display = 'none'; return; }
-    els.resolution.style.display = '';
-    var R = resolutionUnits();
-    els.resolution.innerHTML =
-      'At <b>' + escapeHtml(currentFace()) + '</b>, the drawing can hold about <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b>. '
-      + 'You\'re measuring to <b>' + escapeHtml(tapeLabel()) + '</b>. '
-      + '<span class="quiet">Measuring finer than the drawing holds won\'t change what you can draw.</span>';
-  }
-
-  /* ---- echo (single dimension) -------------------------------------------- */
+  /* ---- echo ---------------------------------------------------------------- */
   var OP_GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
   function renderEcho(result, conv) {
     if (!result) { els.echo.style.display = 'none'; return; }
@@ -434,7 +405,7 @@
             + '<span class="eq">=</span><span class="result">' + escapeHtml(NumberLine.formatTrue(conv, state.target)) + '</span>'
             + '<span class="op"> on the sheet</span>';
     } else {
-      html += '<span class="op"> measured off a ' + escapeHtml(currentFace()) + ' drawing</span>';
+      html += '<span class="op"> read off a ' + escapeHtml(currentFace()) + ' drawing</span>';
     }
     els.echoLine.innerHTML = html;
     var asm = (result.interpretation.assumptions || []).slice();
@@ -442,18 +413,15 @@
     els.echo.style.display = '';
   }
 
-  /* ---- read-mode figure: the value with a PROMINENT ±band ----------------
-     The band is the point — a scaled reading is much coarser than the digits a
-     PDF tool shows — so it's drawn big: tinted, hatched, bold edges, the ±
-     called out in the accent. */
-  function readFig(o) {
+  /* ---- the range figure: a value with its ±band, drawn big ---------------- */
+  function rangeFig(o) {
     var W = o.width, H = 134, padL = 8, padR = 8, padT = 36, padB = 32;
     var innerW = W - padL - padR, midY = padT + (H - padT - padB) / 2;
     var half = o.RU * 2.6 || 1;
     function x(m) { return padL + ((m + half) / (2 * half)) * innerW; }
     var xL = x(-o.RU), xR = x(o.RU), xC = x(0), top = midY - 26, bot = midY + 26;
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" '
-            + 'aria-label="The measured value with a prominent trust band — the precision a scaled reading actually holds.">';
+            + 'aria-label="The value with its range — the precision actually known.">';
     svg += '<defs><pattern id="rdhatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.7"/></pattern></defs>';
     svg += '<rect x="' + xL + '" y="' + top + '" width="' + (xR - xL) + '" height="' + (bot - top) + '" fill="var(--accent-soft)" stroke="none"/>';
@@ -462,73 +430,56 @@
     svg += '<line x1="' + xR + '" y1="' + top + '" x2="' + xR + '" y2="' + bot + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.4"/>';
     svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + (W - padR) + '" y2="' + midY + '" stroke="var(--nl-tick,#bbb)" stroke-width="1"/>';
     svg += '<line x1="' + xC + '" y1="' + (top - 8) + '" x2="' + xC + '" y2="' + (bot + 8) + '" stroke="var(--accent,#004C80)" stroke-width="2"/>';
-    svg += '<text x="' + xC + '" y="' + (top - 15) + '" text-anchor="middle" font-size="14" font-weight="700" fill="var(--nl-ink,#0a0a0a)">' + escapeHtml(NumberLine.formatTrue(o.valueU, o.system)) + '</text>';
-    svg += '<text x="' + xC + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="12" font-weight="600" fill="var(--accent,#004C80)">± ' + escapeHtml(NumberLine.formatTrue(o.RU, o.system)) + '</text>';
-    svg += '<text x="' + xL + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(NumberLine.formatTrue(o.valueU - o.RU, o.system)) + '</text>';
-    svg += '<text x="' + xR + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(NumberLine.formatTrue(o.valueU + o.RU, o.system)) + '</text>';
+    svg += '<text x="' + xC + '" y="' + (top - 15) + '" text-anchor="middle" font-size="14" font-weight="700" fill="var(--nl-ink,#0a0a0a)">' + escapeHtml(o.valueLabel) + '</text>';
+    svg += '<text x="' + xC + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="12" font-weight="600" fill="var(--accent,#004C80)">± ' + escapeHtml(o.bandLabel) + '</text>';
+    svg += '<text x="' + xL + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(o.loLabel) + '</text>';
+    svg += '<text x="' + xR + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(o.hiLabel) + '</text>';
     svg += '</svg>';
     return svg;
   }
 
-  /* ---- Scaled Drawing render: real size + the cost of a misread ----------- */
-  function renderRead(result, conv) {
+  function figWidth() {
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    return Math.min(width, 680);
+  }
+
+  /* ---- Read A Drawing: the value ± max(read, floor) ------------------------ */
+  function renderAnswerRead(result, conv) {
     var band = readBand();
-    var width = els.figure.clientWidth;
-    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
-    width = Math.min(width, 680);
-    els.figure.innerHTML = readFig({ valueU: conv, RU: band, system: state.target, width: width });
-    els.snapRows.innerHTML =
-      '<div class="snap-row is-primary"><div class="snap-name">Accurate to'
-      + '<span class="snap-gloss">off a ' + escapeHtml(currentFace()) + ' drawing</span></div>'
-      + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(conv - band, state.target)) + ' to ' + escapeHtml(NumberLine.formatTrue(conv + band, state.target)) + '</div>'
-      + '<div class="snap-resid">± ' + escapeHtml(NumberLine.formatTrue(band, state.target)) + '</div></div>';
-  }
-
-  /* ---- Physical Object render: measurement snapped to the tape, then drawn -
-     Snap the REAL measurement to the tape precision (nearest 1/4", etc.) — the
-     precision you actually have — and report the drawn size it encodes to. */
-  function renderDraw(result, drawnUnits) {
-    var realU = result.units, g = Math.round(tapeUnits()); if (g < 1) g = 1;
-    var denom = tapeDenom();
-    var source = result.unitSystem === 'metric' ? 'metric'
-               : result.unitSystem === 'imperial' ? 'imperial' : 'mixed';
-    var width = els.figure.clientWidth;
-    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
-    width = Math.min(width, 680);
-    els.figure.innerHTML = NumberLine.numberline({
-      units: realU, gridCount: g, targetSystem: state.target, sourceSystem: source, width: width
+    els.figure.innerHTML = rangeFig({
+      valueU: conv, RU: band, width: figWidth(),
+      valueLabel: NumberLine.formatTrue(conv, state.target),
+      bandLabel: fmtShort(band),
+      loLabel: fmtShort(conv - band), hiLabel: fmtShort(conv + band)
     });
-
-    function nameCell(name, gloss) {
-      return '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>';
-    }
-    var floorU = snap(realU, g, 'floor'), ceilU = snap(realU, g, 'ceil'), nearU = snap(realU, g, 'nearest');
-    var html = '';
-    if (floorU === ceilU) {
-      html = '<div class="snap-row is-primary is-exact">' + nameCell('On the tape', 'exact — no rounding')
-           + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(realU, state.target, denom)) + '</div>'
-           + '<div class="snap-resid">on grid</div></div>';
-    } else {
-      [{ name: 'Round down', gloss: 'use for a max — won\'t exceed', u: floorU },
-       { name: 'Round up', gloss: 'use for a min — won\'t fall below', u: ceilU }].forEach(function (b) {
-        var near = b.u === nearU;
-        html += '<div class="snap-row' + (near ? ' is-primary' : '') + '">'
-              + nameCell(b.name + (near ? ' · nearest' : ''), b.gloss)
-              + '<div class="snap-value">' + escapeHtml(NumberLine.formatSnapped(b.u, state.target, denom)) + '</div>'
-              + '<div class="snap-resid">' + escapeHtml(NumberLine.formatResidual(b.u - realU, state.target)) + '</div></div>';
-      });
-    }
-    // the encoded size — what you actually draw
-    html += '<div class="snap-row is-ref">' + nameCell('Drawn at ' + escapeHtml(currentFace()), 'on the sheet')
-          + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(drawnUnits, state.target)) + '</div>'
-          + '<div class="snap-resid">—</div></div>';
-    els.snapRows.innerHTML = html;
+    els.snapRows.innerHTML =
+      '<div class="snap-row is-primary"><div class="snap-name">Accurate To'
+      + '<span class="snap-gloss">off a ' + escapeHtml(currentFace()) + ' drawing</span></div>'
+      + '<div class="snap-value">' + escapeHtml(fmtShort(conv - band)) + ' to ' + escapeHtml(fmtShort(conv + band)) + '</div>'
+      + '<div class="snap-resid">± ' + escapeHtml(fmtShort(band)) + '</div></div>';
   }
 
-  /* ---- the stack-up figure: chain vs baseline against R -------------------
-     Per-measurement error is the tape precision e; baseline holds flat at ±e,
-     chain grows ∝ n, compensating ∝ √n. R is a dashed reference — what the
-     drawing can hold. Shows two profiles and a reference; no verdict. */
+  /* ---- Measure To Draw: the value ± tape, and the size it draws to --------- */
+  function renderAnswerDraw(result, drawnU) {
+    var realU = result.units, t = tapeUnits();
+    els.figure.innerHTML = rangeFig({
+      valueU: realU, RU: t, width: figWidth(),
+      valueLabel: NumberLine.formatTrue(realU, state.target),
+      bandLabel: fmtShort(t),
+      loLabel: fmtShort(realU - t), hiLabel: fmtShort(realU + t)
+    });
+    els.snapRows.innerHTML =
+      '<div class="snap-row is-primary"><div class="snap-name">Accurate To'
+      + '<span class="snap-gloss">one measurement</span></div>'
+      + '<div class="snap-value">' + escapeHtml(fmtShort(realU - t)) + ' to ' + escapeHtml(fmtShort(realU + t)) + '</div>'
+      + '<div class="snap-resid">± ' + escapeHtml(fmtShort(t)) + '</div></div>'
+      + '<div class="snap-row is-ref"><div class="snap-name">Drawn At ' + escapeHtml(currentFace()) + '</div>'
+      + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(drawnU, state.target)) + '</div>'
+      + '<div class="snap-resid">on the sheet</div></div>';
+  }
+
+  /* ---- the stack-up figure: chain vs baseline against the floor ----------- */
   function stackFig(o) {
     var W = o.width, H = 168, padL = 8, padR = 8, padT = 16, padB = 30;
     var innerW = W - padL - padR, innerH = H - padT - padB, midY = padT + innerH / 2;
@@ -537,15 +488,17 @@
     function yh(mag) { return (mag / maxMag) * (innerH / 2); }
     function xk(k) { return padL + (k / kMax) * innerW; }
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" '
-            + 'aria-label="Error across a run: chain grows with each measurement, baseline stays flat, against the drawing\'s resolution.">';
+            + 'aria-label="Error across a run: chain grows with each measurement, baseline stays flat, against what the sheet holds.">';
     svg += '<defs><pattern id="skhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/></pattern></defs>';
 
-    // R reference envelope (dashed) — what the drawing can hold, a fact not a limit
-    var yR = yh(RU);
-    svg += '<line x1="' + padL + '" y1="' + (midY - yR) + '" x2="' + (W - padR) + '" y2="' + (midY - yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
-    svg += '<line x1="' + padL + '" y1="' + (midY + yR) + '" x2="' + (W - padR) + '" y2="' + (midY + yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
-    svg += '<text x="' + (W - padR) + '" y="' + (midY - yR - 4) + '" text-anchor="end" font-size="10" fill="var(--nl-axis,#999)">the drawing holds ±' + escapeHtml(NumberLine.formatTrue(RU, o.system)) + '</text>';
+    // the floor envelope (dashed) — what the sheet holds; absent for CAD snap
+    if (RU > 0) {
+      var yR = yh(RU);
+      svg += '<line x1="' + padL + '" y1="' + (midY - yR) + '" x2="' + (W - padR) + '" y2="' + (midY - yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
+      svg += '<line x1="' + padL + '" y1="' + (midY + yR) + '" x2="' + (W - padR) + '" y2="' + (midY + yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
+      svg += '<text x="' + (W - padR) + '" y="' + (midY - yR - 4) + '" text-anchor="end" font-size="10" fill="var(--nl-axis,#999)">the sheet holds ±' + escapeHtml(fmtShort(RU)) + '</text>';
+    }
 
     // chain — cumulative wedge (linear), hatched, widening to ±kMax·eU
     var yTop = midY - yh(kMax * eU), yBot = midY + yh(kMax * eU), xe = xk(kMax);
@@ -592,18 +545,16 @@
     });
   }
   function renderRun() {
-    // the run is the physical-measuring case: you step a tape along a real room,
-    // where chain vs baseline actually diverge. Scaled-drawing mode is 1-to-1.
     els.runSection.style.display = state.question === 'draw' ? '' : 'none';
     if (state.question !== 'draw') return;
     Array.prototype.forEach.call(els.runPresets.querySelectorAll('[data-links]'), function (box) {
       UI.press(box, +box.dataset.links === state.links);
     });
-    var eU = tapeUnits(), RU = resolutionUnits(), kMax = state.links;
+    var eU = tapeUnits(), RU = floorUnits(), kMax = state.links;
     var width = els.stackFigure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
-    els.stackFigure.innerHTML = stackFig({ eU: eU, RU: RU, kMax: kMax, system: state.target, width: width });
+    els.stackFigure.innerHTML = stackFig({ eU: eU, RU: RU, kMax: kMax, width: width });
 
     els.stackLegend.innerHTML =
       '<span><span class="swatch" style="background:var(--nl-hatch);opacity:.5;"></span>Worst case — errors add up (∝ n)</span>'
@@ -613,21 +564,22 @@
     var rows = '<tr><th>Measurements</th><th>Worst Case Error</th><th>Randomized Read Errors (√n)</th><th>Baseline</th></tr>';
     for (var k = 1; k <= kMax; k++) {
       rows += '<tr><td>' + k + '</td>'
-            + '<td>' + escapeHtml(NumberLine.formatTrue(k * eU, state.target)) + '</td>'
-            + '<td>' + escapeHtml(NumberLine.formatTrue(Math.sqrt(k) * eU, state.target)) + '</td>'
-            + '<td class="strat-base">' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '</td></tr>';
+            + '<td>' + escapeHtml(fmtShort(k * eU)) + '</td>'
+            + '<td>' + escapeHtml(fmtShort(Math.sqrt(k) * eU)) + '</td>'
+            + '<td class="strat-base">' + escapeHtml(fmtShort(eU)) + '</td></tr>';
     }
     els.stackTable.innerHTML = rows;
 
-    // the two dimensions and how they combine: the drawing is off by the worse
-    // of the accumulated tape error and its own resolution R
-    var offBase = Math.max(eU, RU), offChain = Math.max(kMax * eU, RU);
-    els.stackNote.innerHTML =
-      'You measure to <b>±' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '</b> (your tape); the drawing holds <b>±' + escapeHtml(NumberLine.formatTrue(RU, state.target)) + '</b> at this scale. '
-      + 'The drawing is off by the worse of the two: from a baseline <b>±' + escapeHtml(NumberLine.formatTrue(offBase, state.target)) + '</b>, chained across ' + kMax + ' <b>±' + escapeHtml(NumberLine.formatTrue(offChain, state.target)) + '</b> (worst case). '
-      + (RU >= kMax * eU
-          ? 'Here the scale limits you, not the tape — measuring finer won\'t help until the chain drifts past ±R.'
-          : 'Here the chain has drifted past ±R, so your measurement is the limit, not the scale.');
+    // the synthesis: what you know vs what the sheet holds, and where drift
+    // starts to be drawn. Values, no advice.
+    var note = 'Chained, the k-th feature is known to ±k × ' + fmtShort(eU) + ' worst case, ±√k × ' + fmtShort(eU) + ' if the errors randomize. From one baseline every feature stays ±' + fmtShort(eU) + '.';
+    if (RU > 0) {
+      var N = Math.floor(RU / eU) + 1;
+      note += ' The sheet holds ±' + fmtShort(RU) + ' — drift finer than that disappears into the drawing; worst case it is drawn from chained measurement ' + N + '.';
+    } else {
+      note += ' Drawn in CAD the measured numbers are recorded exactly — the drawing carries the tape drift itself.';
+    }
+    els.stackNote.innerHTML = note;
   }
 
   /* ---- engine audit — the exact-integer working, at the page bottom ------- */
@@ -635,13 +587,16 @@
     if (!result || result.dimension !== 1 || result.units == null || outOfRange(result.units) || conv == null) {
       els.engineNote.innerHTML = ''; return;
     }
-    var n = currentN();
-    var line2 = state.question === 'draw'
-      ? 'drawn = ' + result.units + ' / ' + n + ' = <b>' + conv + '</b> units on the sheet'
-      : 'measured off a 1:' + n + ' drawing — <b>' + result.units + '</b> units, trust ±<b>' + readBand() + '</b> units';
-    els.engineNote.innerHTML =
-      '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
-      + escapeHtml(result.interpretation.work) + ' = <b>' + result.units + '</b> units<br>' + line2;
+    var n = currentN(), F = floorUnits(), src = findSource(state.source);
+    var lines = [escapeHtml(result.interpretation.work) + ' = <b>' + result.units + '</b> units'];
+    if (state.question === 'draw') {
+      lines.push('drawn = ' + result.units + ' / ' + n + ' = <b>' + conv + '</b> units on the sheet');
+      lines.push('tape ±' + tapeUnits() + ' units · floor = ' + src.mm + ' mm × ' + n + ' = ' + F + ' units');
+    } else {
+      lines.push('floor = ' + src.mm + ' mm × ' + n + ' = ' + F + ' units · read ±' + readUnits() + ' units');
+      lines.push('band = max(read, floor) = <b>' + Math.max(readUnits(), F) + '</b> units');
+    }
+    els.engineNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
   }
 
   /* ---- main render -------------------------------------------------------- */
@@ -663,29 +618,28 @@
     renderFieldNote(result);
     renderBareAsk(result);
     renderScalePresets();
-    // read mode: one continuous "precision of read" field. physical mode: the
-    // drawing-resolution (sheet) control + the tape control — the two dimensions
+    renderSourceChips();
+
+    els.sourceLabel.textContent = state.question === 'read' ? 'Reading From' : 'Drawing In';
     els.readBlock.style.display = state.question === 'read' ? '' : 'none';
-    els.sheetBlock.style.display = state.question === 'draw' ? '' : 'none';
-    els.measureBlock.style.display = state.question === 'draw' ? '' : 'none';
-    if (state.question === 'draw') { renderSheetPresets(); renderMeasurePresets(); }
-    renderResolution();
+    els.tapeBlock.style.display = state.question === 'draw' ? '' : 'none';
+    els.dimLabel.textContent = state.question === 'read' ? 'Dimension As Read' : 'Feature Dimension';
+    renderRel();
     renderRun();
 
     var ok = result && result.dimension === 1 && result.units != null && !outOfRange(result.units);
     var conv = null;
     if (ok) {
-      var n = currentN();
-      if (state.question === 'draw') { conv = roundHalf(result.units / n); }
-      else { conv = result.units; }              // read: the value you measured IS the real size
+      if (state.question === 'draw') conv = roundHalf(result.units / currentN());
+      else conv = result.units;                 // read: the value you read IS the real size
       if (outOfRange(conv)) conv = null;
     }
     renderEcho(result, conv);
     renderEngine(result, conv);
     if (!ok || conv == null) { els.lengthOut.style.display = 'none'; return; }
     els.lengthOut.style.display = '';
-    if (state.question === 'draw') renderDraw(result, conv);
-    else renderRead(result, conv);
+    if (state.question === 'draw') renderAnswerDraw(result, conv);
+    else renderAnswerRead(result, conv);
   }
 
   /* ---- shareable URL ------------------------------------------------------ */
@@ -699,35 +653,36 @@
       if (state.customN != null) params.set('s', 'c' + state.customN);
       else if (state.scaleId !== '48') params.set('s', state.scaleId);
       if (state.question !== 'read') params.set('q', state.question);
-      if (state.target === 'imperial' ? state.sheet.imperial.denom !== 32 : state.sheet.metric.mm !== 0.5) {
-        params.set('sh', state.target === 'imperial' ? String(state.sheet.imperial.denom) : state.sheet.metric.mm + 'mm');
-      }
+      if (state.source !== 'pdf') params.set('src', state.source);
+      if (state.readText !== '1/4"') params.set('rp', state.readText);
+      if (state.tapeText !== '1/4"') params.set('tp', state.tapeText);
+      if (state.links !== 5) params.set('k', String(state.links));
       var q = params.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
     }, 250);
   }
   function initFromURL() {
     var params = new URLSearchParams(location.search);
-    var s = params.get('s'), sh = params.get('sh'), q = params.get('q');
+    var s = params.get('s'), q = params.get('q'), src = params.get('src');
+    var rp = params.get('rp'), tp = params.get('tp'), k = params.get('k');
     if (s) {
       var c = /^c(\d+)$/.exec(s);
       if (c && +c[1] >= 1 && +c[1] <= 100000) state.customN = +c[1];
       else if (findScale(s)) { state.scaleId = s; state.family = familyOf(s); }
     }
     if (q === 'draw') state.question = 'draw';
-    if (sh) {
-      var mm = /^([\d.]+)mm$/.exec(sh);
-      if (mm && +mm[1] > 0) state.sheet.metric.mm = Math.min(100, Math.max(0.2, +mm[1]));
-      else if (/^\d+$/.test(sh)) state.sheet.imperial.denom = Math.min(256, Math.max(1, +sh));
-    }
+    if (src && SOURCES.some(function (x) { return x.id === src; })) state.source = src;
+    if (rp) state.readText = rp.slice(0, 24);
+    if (tp) state.tapeText = tp.slice(0, 24);
+    if (k && /^\d+$/.test(k) && +k >= 1 && +k <= 24) state.links = +k;
     var d = params.get('d');
     return d != null ? d.slice(0, 120) : null;
   }
 
   /* ---- wiring ------------------------------------------------------------- */
   // NB: scope toggle selectors to their OWN attribute — `data-family` also
-  // lives on <html> (the accent system), so a broad [data-family] selector
-  // would bind a click handler to the root and corrupt state on bubble.
+  // lives on <html> (the accent system); pills here use data-sfam/data-q/
+  // data-source so a click can never bubble into the root's dataset.
   function setActive(selector, attr, value) {
     Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
       UI.press(el, el.dataset[attr] === value);
@@ -736,6 +691,7 @@
   els.dimInput.addEventListener('input', function () { state.text = els.dimInput.value; render(); });
   els.dimInput.addEventListener('focus', function () { setTimeout(function () { els.dimInput.select(); }, 0); });
   els.readPrec.addEventListener('input', function () { state.readText = els.readPrec.value; render(); });
+  els.tapePrec.addEventListener('input', function () { state.tapeText = els.tapePrec.value; render(); });
   Array.prototype.forEach.call(document.querySelectorAll('[data-q]'), function (el) {
     el.addEventListener('click', function () {
       state.question = el.dataset.q;
@@ -752,12 +708,15 @@
     });
   });
 
-  // initial state — URL params override the worked example (2 1/16" read at 1/4")
+  // initial state — URL params override the worked example (24'-6" read at 1/4")
   var urlDim = initFromURL();
   buildScalePresets();
+  buildSourceChips();
   buildRunPresets();
   setActive('[data-q]', 'q', state.question);
   setActive('[data-sfam]', 'sfam', state.family);
+  els.readPrec.value = state.readText;
+  els.tapePrec.value = state.tapeText;
   els.dimInput.value = urlDim != null ? urlDim : '24\'-6"';
   state.text = els.dimInput.value;
   render();
