@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-07-07 (`scale.html` redesigned operator-directed into **Scale Resolution** — a trust/precision tool, not a converter; a story-first rethink over several rounds, still on `dev`/noindexed. The eleven-tool taste pass + promotions remain otherwise open.)_
+_Last updated: 2026-07-08 (`scale.html` rebuilt again on the **crossing model** and `slope.html` given a coherence pass; both answer surfaces matched to `convert.html`'s echo grammar. Work on branch `claude/calculator-converter-promotion-qcbhgv`, still noindexed — operator moves to `main` manually. The eleven-tool taste pass + promotions remain otherwise open; `area.html` is the next redesign candidate.)_
 
 ## Live architectural picture
 
@@ -39,10 +39,12 @@ _Last updated: 2026-07-07 (`scale.html` redesigned operator-directed into **Scal
 - **Twelve engine tool pages, three families.** `convert.html` (shipped on
   `main`, frozen) plus eleven on `dev` (2026-06-10, noindexed, awaiting the
   operator's taste pass then one-at-a-time promotion). Drafting family:
-  `run.html` (the partition tool), `scale.html` (**redesigned 2026-07-07 into
-  "Scale Resolution"** — trust/precision, two modes, stack-up figure; see Recent
-  decisions), `slope.html` (incl. projected
-  lengths), `area.html`, `stairs.html` (introduces the edition pill + citation
+  `run.html` (the partition tool), `scale.html` (**"Scale Resolution"** — rebuilt
+  2026-07-08 on the crossing model: a dimension crosses between sheet and world
+  through an instrument, scale `n` converts sheet error to real error; see Recent
+  decisions), `slope.html` (any-two-of-three; coherence-passed 2026-07-08,
+  answer surface matched to the converter), `area.html` (**next redesign
+  candidate**), `stairs.html` (introduces the edition pill + citation
   pattern), `sheet-sizes.html` (the fit reference, restyled onto the theme,
   ANSI added). Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table
   1004.5, gross/net surfaced), `egress-width.html` (load×factor both
@@ -105,23 +107,35 @@ _Last updated: 2026-07-07 (`scale.html` redesigned operator-directed into **Scal
 
 ## Recent decisions
 
-- 2026-07-07 — **`scale.html` → Scale Resolution** (operator-directed, story-first
-  redesign; not a promotion). What began as "promote a drafting calc to the
-  converter's status" turned into a ground-up rethink: the tool no longer just
-  converts a scaled dimension, it answers **how much a measurement can be
-  trusted**. Two modes, framed by what you're measuring: **Scaled Drawing Of
-  Object** (a PDF measure tool — Bluebeam default 1/4″ — reads to more digits
-  than the scale holds; the trust band = `max(tool precision, drawing
-  resolution)`, with a false-precision reveal) and **Physical Object** (measure
-  to a tape precision, encode to the sheet, then the run: tolerance **stack-up**,
-  **chain vs baseline** dimensioning, cumulative ∝ n / compensating ∝ √n against
-  what the drawing holds). Governing rule held throughout: **show, don't judge**
-  — no pass/fail, references the reader owns. New page-local figures (prominent
-  ±band; the stack-up wedge). Fixed a real bug: scale-family pills used
-  `data-family`, which also lives on `<html>` (the accent system) — clicks
-  bubbled to the root and corrupted state; pills now use `data-sfam`. Takeaway
-  for the remaining tools: a real promotion here is a **redesign**, not a
-  noindex-drop — budget accordingly.
+- 2026-07-08 — **`scale.html` rebuilt on the crossing model; `slope.html`
+  coherence pass; both answer surfaces matched to `convert.html`** (operator-
+  directed, branch `claude/calculator-converter-promotion-qcbhgv`; not a
+  promotion). The 2026-07-07 two-mode Scale Resolution ("Scaled Drawing Of
+  Object" / "Physical Object") **stopped reading** and was rebuilt around one
+  unifying idea: **a dimension crosses between sheet and world through an
+  instrument; scale `n` converts sheet error to real error.** Five quantities —
+  drawing scale `n`, drawing floor `R` (source sheet-precision × `n`), read
+  resolution `r`, tape resolution `t`, run accumulation. Two rules: reading →
+  `value ± max(r, R)`; measuring to draw → known to ±(accumulated tape error),
+  drawn off by `max(that, R)`. Page order is fixed: **scale → verb-named task
+  toggle (Read A Drawing / Measure To Draw) → precisions → dimension → run.**
+  The **drawing floor is a knob** — a source-fidelity spectrum (Revit/CAD `snap`
+  · PDF/Revu ≈0.3 mm · Print/Scale-rule ≈0.5 mm · Hand-drawn ≈0.8 mm) — so the
+  floor is set without a second length field. The run section now takes a
+  **physical tape length** (12/25/50 ft, metric 5/10/30 m, custom); each lay
+  covers one tape length, the table carries a Run column and highlights the lay
+  where the worst-case chain first breaches the floor (`N ≈ R/t`), with a marker
+  on the stack-up figure. Imperial real-measurement displays read as native
+  ft-in fractions, not survey decimals. **Slope**: any-two-of-three inputs; the
+  three redundant sides collapsed to the solved ones; a rounding table
+  (shallower-for-a-max / steeper-for-a-min) whose cells are selectable and drive
+  the figure's hatch and comparison rays; regime-aware curation (pitch only when
+  12s≥1, ratio only when s≤1); conflict validation on non-triangular inputs; a
+  larger, more diagrammatic true-angle triangle with steep-tip label stacking.
+  **Both** tools now use the converter's echo grammar — stated/inferred tokens,
+  `tokens = result`, three registers (echo / figure / rows). **Show-don't-judge**
+  held throughout. Standing takeaway (unchanged): a genuine promotion here is a
+  **redesign**, not a noindex-drop.
 - 2026-06-10 — **The calculator build-out** (operator-directed, three passes in
   one day; per-tool records live in backlog "Done"). Eleven tool pages + five
   engine/figure modules + the C-0 cover, all on the shell conventions; the
