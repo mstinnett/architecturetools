@@ -45,6 +45,10 @@
     text-transform: uppercase; letter-spacing: 0.06em; }
   .stack-table td:first-child, .stack-table th:first-child { text-align: left; }
   .stack-table .strat-base td { color: var(--ink-2); }
+  /* the lays whose worst case is coarser than the sheet holds — drift is drawn */
+  .stack-table .run-breach td { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+  .stack-table .run-breach td:nth-child(3) { color: var(--accent); font-weight: 500; }
+  .stack-table .run-breach-first td { box-shadow: inset 0 1px 0 var(--accent); }
   .stack-legend { display: flex; flex-wrap: wrap; gap: 1.1rem; margin-top: var(--space-sm);
     font-size: var(--text-xs); color: var(--ink-2); }
   .stack-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
@@ -139,9 +143,10 @@
   <div class="tool-section" id="runSection">
     <div class="section-label">Across A Run Of Measurements</div>
     <p class="section-note">Feature to feature, each measurement's error carries
-       into the next. From one baseline it doesn't.</p>
+       into the next. From one baseline it doesn't. A run longer than the tape is
+       laid end to end — every re-lay is one more link in the chain.</p>
 
-    <div class="section-label" style="font-size:var(--text-xs);">Chained Measurements</div>
+    <div class="section-label" style="font-size:var(--text-xs);">Tape Length</div>
     <div class="grid-presets" id="runPresets"></div>
 
     <div class="answer-card" style="margin-top:var(--space-md);">
@@ -233,7 +238,7 @@
     source: 'pdf',                    // the drawing-floor knob
     readText: '1/4"',                 // read precision (real units, continuous)
     tapeText: '1/4"',                 // tape precision (real units, continuous)
-    links: 5,                         // chained measurements shown in the run
+    tapeLen: 25 * FT,                 // physical tape length (units) — sets run per lay
     target: 'imperial'
   };
   function currentN() { return state.customN != null ? state.customN : findScale(state.scaleId).n; }
@@ -523,49 +528,98 @@
     svg += '<line x1="' + padL + '" y1="' + (midY - yb) + '" x2="' + (W - padR) + '" y2="' + (midY - yb) + '" stroke="var(--ink-2,#555)" stroke-width="1.1"/>';
     svg += '<line x1="' + padL + '" y1="' + (midY + yb) + '" x2="' + (W - padR) + '" y2="' + (midY + yb) + '" stroke="var(--ink-2,#555)" stroke-width="1.1"/>';
 
-    // the run line + per-measurement ticks
+    // where the worst-case chain pierces the floor — past here drift is drawable
+    if (RU > 0 && o.breachK) {
+      var cont = RU / eU;                       // continuous crossing, in lays
+      if (cont <= kMax) {
+        var xb = xk(cont), tail = xb > W - 90;
+        svg += '<line x1="' + xb + '" y1="' + padT + '" x2="' + xb + '" y2="' + (H - padB) + '" stroke="var(--accent,#004C80)" stroke-width="1" stroke-dasharray="2 2"/>';
+        svg += '<circle cx="' + xb + '" cy="' + (midY - yh(RU)) + '" r="2.4" fill="var(--accent,#004C80)"/>';
+        svg += '<circle cx="' + xb + '" cy="' + (midY + yh(RU)) + '" r="2.4" fill="var(--accent,#004C80)"/>';
+        svg += '<text x="' + (tail ? xb - 4 : xb + 4) + '" y="' + (padT + 9) + '" text-anchor="' + (tail ? 'end' : 'start') + '" font-size="10" fill="var(--accent,#004C80)">drawn past here</text>';
+      }
+    }
+
+    // the run line + per-lay ticks
     svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + (W - padR) + '" y2="' + midY + '" stroke="var(--nl-tick,#bbb)" stroke-width="1"/>';
     for (var k = 1; k <= kMax; k++) {
       var xt = xk(k);
       svg += '<line x1="' + xt + '" y1="' + (H - padB) + '" x2="' + xt + '" y2="' + (H - padB + 4) + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
       svg += '<text x="' + xt + '" y="' + (H - padB + 16) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + k + '</text>';
     }
-    svg += '<text x="' + padL + '" y="' + (H - 4) + '" font-size="10" fill="var(--nl-axis,#999)">measurements in the chain →</text>';
+    svg += '<text x="' + padL + '" y="' + (H - 4) + '" font-size="10" fill="var(--nl-axis,#999)">tape lays →</text>';
     svg += '</svg>';
     return svg;
   }
 
+  // physical tape lengths, per unit system — the run each lay covers before a
+  // re-lay adds another link to the chain. Value carried in engine units.
+  var TAPES = {
+    imperial: [{ id: '12', face: "12'", u: 12 * FT }, { id: '25', face: "25'", u: 25 * FT }, { id: '50', face: "50'", u: 50 * FT }],
+    metric:   [{ id: '5', face: '5 m', u: 5000 * MM }, { id: '10', face: '10 m', u: 10000 * MM }, { id: '30', face: '30 m', u: 30000 * MM }]
+  };
   function buildRunPresets() {
+    var list = TAPES[state.target] || TAPES.imperial;
     var html = '<div class="grid-row">';
-    [2, 3, 5, 8, 12].forEach(function (k) {
-      html += '<button type="button" class="grid-box" aria-pressed="false" data-links="' + k + '">' + k + '</button>';
+    list.forEach(function (t) {
+      html += '<button type="button" class="grid-box" aria-pressed="false" data-tape="' + t.u + '">' + escapeHtml(t.face) + '</button>';
     });
-    html += '</div>';
+    html += '<span class="grid-group-label" style="margin-left:.3rem;">custom</span>'
+          + '<input class="grid-custom" id="tapeCustom" type="number" inputmode="decimal" min="1" step="1" placeholder="' + (state.target === 'metric' ? 'm' : 'ft') + '"></div>';
     els.runPresets.innerHTML = html;
-    Array.prototype.forEach.call(els.runPresets.querySelectorAll('[data-links]'), function (box) {
-      box.addEventListener('click', function () { state.links = +box.dataset.links; render(); });
+    els.runPresets.dataset.target = state.target;
+
+    Array.prototype.forEach.call(els.runPresets.querySelectorAll('[data-tape]'), function (box) {
+      box.addEventListener('click', function () {
+        state.tapeLen = +box.dataset.tape;
+        var custom = document.getElementById('tapeCustom');
+        if (custom) custom.value = '';
+        render();
+      });
     });
+    var custom = document.getElementById('tapeCustom');
+    custom.addEventListener('input', function () {
+      var v = parseFloat(custom.value);
+      if (isFinite(v) && v > 0) state.tapeLen = Math.round(v * (state.target === 'metric' ? 1000 * MM : FT));
+      render();
+    });
+  }
+  // run distance formatted as feet / metres — a lay count times the tape length
+  function fmtRun(u) {
+    if (state.target === 'metric') return trimNum(u / (1000 * MM), 2) + ' m';
+    var ft = u / FT;
+    return (Number.isInteger(ft) ? String(ft) : trimNum(ft, 1)) + "'";
   }
   function renderRun() {
     els.runSection.style.display = state.question === 'draw' ? '' : 'none';
     if (state.question !== 'draw') return;
-    Array.prototype.forEach.call(els.runPresets.querySelectorAll('[data-links]'), function (box) {
-      UI.press(box, +box.dataset.links === state.links);
+    if (els.runPresets.dataset.target !== state.target) buildRunPresets();
+    Array.prototype.forEach.call(els.runPresets.querySelectorAll('[data-tape]'), function (box) {
+      UI.press(box, +box.dataset.tape === state.tapeLen);
     });
-    var eU = tapeUnits(), RU = floorUnits(), kMax = state.links;
+
+    var eU = tapeUnits(), RU = floorUnits(), L = state.tapeLen;
+    // the lay at which the worst-case chain first exceeds what the sheet holds
+    var breachK = RU > 0 ? Math.floor(RU / eU) + 1 : 0;
+    // show enough rows to carry the breach, with a couple past it for context
+    var kMax = breachK ? Math.min(Math.max(breachK + 2, 5), 12) : 6;
+
     var width = els.stackFigure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
-    els.stackFigure.innerHTML = stackFig({ eU: eU, RU: RU, kMax: kMax, width: width });
+    els.stackFigure.innerHTML = stackFig({ eU: eU, RU: RU, kMax: kMax, width: width, breachK: breachK });
 
     els.stackLegend.innerHTML =
       '<span><span class="swatch" style="background:var(--nl-hatch);opacity:.5;"></span>Worst case — errors add up (∝ n)</span>'
       + '<span><span class="swatch" style="background:var(--accent);"></span>Randomized read errors (∝ √n)</span>'
       + '<span><span class="swatch" style="background:var(--ink-2);"></span>Baseline — one measurement, flat</span>';
 
-    var rows = '<tr><th>Measurements</th><th>Worst Case Error</th><th>Randomized Read Errors (√n)</th><th>Baseline</th></tr>';
+    var rows = '<tr><th>Lays</th><th>Run</th><th>Worst Case Error</th><th>Randomized Read Errors (√n)</th><th>Baseline</th></tr>';
     for (var k = 1; k <= kMax; k++) {
-      rows += '<tr><td>' + k + '</td>'
+      var hit = breachK && k >= breachK;   // this lay's worst case is drawable
+      var cls = hit ? (k === breachK ? ' class="run-breach run-breach-first"' : ' class="run-breach"') : '';
+      rows += '<tr' + cls + '><td>' + k + '</td>'
+            + '<td>' + escapeHtml(fmtRun(k * L)) + '</td>'
             + '<td>' + escapeHtml(fmtShort(k * eU)) + '</td>'
             + '<td>' + escapeHtml(fmtShort(Math.sqrt(k) * eU)) + '</td>'
             + '<td class="strat-base">' + escapeHtml(fmtShort(eU)) + '</td></tr>';
@@ -574,10 +628,9 @@
 
     // the synthesis: what you know vs what the sheet holds, and where drift
     // starts to be drawn. Values, no advice.
-    var note = 'Chained, the k-th feature is known to ±k × ' + fmtShort(eU) + ' worst case, ±√k × ' + fmtShort(eU) + ' if the errors randomize. From one baseline every feature stays ±' + fmtShort(eU) + '.';
+    var note = 'Chained, the k-th lay is known to ±k × ' + fmtShort(eU) + ' worst case, ±√k × ' + fmtShort(eU) + ' if the errors randomize. From one baseline every feature stays ±' + fmtShort(eU) + '.';
     if (RU > 0) {
-      var N = Math.floor(RU / eU) + 1;
-      note += ' The sheet holds ±' + fmtShort(RU) + ' — drift finer than that disappears into the drawing; worst case it is drawn from chained measurement ' + N + '.';
+      note += ' The sheet holds ±' + fmtShort(RU) + ' — drift finer than that disappears into the drawing. With a ' + fmtRun(L) + ' tape the worst-case chain reaches ±' + fmtShort(RU) + ' at lay ' + breachK + ', about ' + fmtRun(breachK * L) + ' of run; past there the drift is drawn.';
     } else {
       note += ' Drawn in CAD the measured numbers are recorded exactly — the drawing carries the tape drift itself.';
     }
@@ -658,7 +711,7 @@
       if (state.source !== 'pdf') params.set('src', state.source);
       if (state.readText !== '1/4"') params.set('rp', state.readText);
       if (state.tapeText !== '1/4"') params.set('tp', state.tapeText);
-      if (state.links !== 5) params.set('k', String(state.links));
+      if (state.tapeLen !== 25 * FT) params.set('t', String(state.tapeLen));
       var q = params.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
     }, 250);
@@ -666,7 +719,7 @@
   function initFromURL() {
     var params = new URLSearchParams(location.search);
     var s = params.get('s'), q = params.get('q'), src = params.get('src');
-    var rp = params.get('rp'), tp = params.get('tp'), k = params.get('k');
+    var rp = params.get('rp'), tp = params.get('tp'), t = params.get('t');
     if (s) {
       var c = /^c(\d+)$/.exec(s);
       if (c && +c[1] >= 1 && +c[1] <= 100000) state.customN = +c[1];
@@ -676,7 +729,7 @@
     if (src && SOURCES.some(function (x) { return x.id === src; })) state.source = src;
     if (rp) state.readText = rp.slice(0, 24);
     if (tp) state.tapeText = tp.slice(0, 24);
-    if (k && /^\d+$/.test(k) && +k >= 1 && +k <= 24) state.links = +k;
+    if (t && /^\d+$/.test(t) && +t >= FT && +t <= 500 * FT) state.tapeLen = +t;
     var d = params.get('d');
     return d != null ? d.slice(0, 120) : null;
   }
