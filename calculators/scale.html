@@ -6,7 +6,7 @@
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
 <title>Scale Resolution -- architecture.tools</title>
-<meta name="description" content="Choose a drawing scale and check how much a measurement can be trusted: a PDF measure tool reads a scaled drawing to more digits than the scale can hold, and — measuring a physical object — the error you encode and how it accumulates across a run, chain vs baseline, shown not judged.">
+<meta name="description" content="Choose a drawing scale and check how much a measurement can be trusted: a dimension read off a scaled drawing carries more digits than the scale can hold, and — measuring a physical object — the error you encode and how it accumulates across a run, chain vs baseline, shown not judged.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -68,9 +68,9 @@
     </nav>
     <h1>Scale Resolution</h1>
     <p>Choose a drawing scale and check how much a measurement can be trusted —
-       a dimension pulled off a drawing with a PDF measure tool reads to more
-       digits than the scale can hold, and, measuring a physical object, the
-       error you encode and how it accumulates across a run.</p>
+       a dimension read off a drawing carries more digits than the scale can
+       hold, and, measuring a physical object, the error you encode and how it
+       accumulates across a run.</p>
   </div>
 
   <!-- ================= SCALE + RESOLUTION (always on) ================= -->
@@ -85,15 +85,16 @@
   <div class="grid-presets" id="scalePresets"></div>
 
   <!-- precision control — mode-specific (sheet reading + PDF tool, vs tape) -->
-  <div id="sheetBlock">
-    <div class="section-label" id="sheetLabel" style="margin-top:var(--space-md);">On The Sheet You Can Read To</div>
+  <div id="sheetBlock" style="display:none;">
+    <div class="section-label" style="margin-top:var(--space-md);">On The Sheet, Drawn To</div>
     <div class="grid-presets" id="sheetPresets"></div>
-    <div class="section-note" id="sheetHint" style="margin:0.35rem 0 0;">A vector PDF (Revit, CAD) reads finer than a scan or a scale rule on paper.</div>
+    <div class="section-note">With the scale, this sets what the drawing can hold (±R).</div>
   </div>
   <div id="readBlock">
-    <div class="section-label" style="margin-top:var(--space-md);">Your PDF Measure Tool Reads To</div>
-    <div class="grid-presets" id="readPresets"></div>
-    <div class="section-note" id="readNote" style="margin:0.35rem 0 0;"></div>
+    <div class="section-label" style="margin-top:var(--space-md);">Precision Of Read</div>
+    <input type="text" id="readPrec" class="dim-input" spellcheck="false" maxlength="24"
+           autocomplete="off" autocapitalize="off" style="max-width:12rem;" value="1/4&quot;">
+    <div class="section-note">Bluebeam standard = 1/4&Prime;.</div>
   </div>
   <div id="measureBlock" style="display:none;">
     <div class="section-label" style="margin-top:var(--space-md);">Measured To</div>
@@ -223,8 +224,7 @@
     // vector PDF reads finer than a scan); drives R = sheet × scale
     sheetUiSystem: null,
     sheet: { imperial: { denom: 32 }, metric: { mm: 0.5 } },
-    readUiSystem: null,
-    read: { imperial: 6096, metric: 4800 },              // PDF measure-tool precision (Bluebeam default 1/4", 5mm)
+    readText: '1/4"',                                    // precision of read — continuous (Bluebeam standard 1/4")
     tapeUiSystem: null,
     tape: { imperial: 6096, metric: 4800 },              // how fine you measure the object, in units (1/4", 5mm)
     links: 5                                             // features in the run (chained measurements)
@@ -245,24 +245,25 @@
   }
   // what one sheet increment is worth in the REAL world — the scale's resolution
   function resolutionUnits() { return sheetUnits() * currentN(); }
-  // how fine your PDF measure tool reports (Bluebeam et al.), in units
-  function readUnits() { return state.target === 'imperial' ? state.read.imperial : state.read.metric; }
-  // a real precision shown as a fraction (imperial) or mm — matches the chips
+  // precision of read — parsed from a continuous field (any length), with a
+  // sane fallback while the field is mid-edit or empty
+  function readUnits() {
+    var r = parseLength(state.readText || '', { defaultUnit: state.defaultUnit });
+    return (r && r.dimension === 1 && r.units > 0 && !outOfRange(r.units)) ? r.units : (state.target === 'imperial' ? IN / 4 : 5 * MM);
+  }
+  // a real precision shown as a fraction (imperial) or mm
   function fracLabel(units) {
     if (state.target !== 'imperial') return NumberLine.formatTrue(units, state.target);
     return NumberLine.formatSnapped(units, 'imperial', Math.max(1, Math.round(IN / units)));
   }
-  function readLabel() { return fracLabel(readUnits()); }
-  // the honest floor on a scaled reading: the coarser of the tool's precision
-  // and what the drawing itself resolves to (a fine mark × the scale)
-  function readBand() { return Math.max(readUnits(), resolutionUnits()); }
+  function readBand() { return readUnits(); }
   // how fine you measured the physical object (real-world, in units)
   function tapeUnits() { return state.target === 'imperial' ? state.tape.imperial : state.tape.metric; }
   function tapeDenom() { return state.target === 'imperial' ? Math.round(IN / state.tape.imperial) : null; }
   function tapeLabel() { return fracLabel(tapeUnits()); }
 
   var els = {};
-  ['dimInput','fieldNote','bareAsk','scalePresets','sheetBlock','sheetLabel','sheetHint','sheetPresets','readBlock','readPresets','readNote','measureBlock','measurePresets','resolution',
+  ['dimInput','fieldNote','bareAsk','scalePresets','sheetBlock','sheetPresets','readBlock','readPrec','measureBlock','measurePresets','resolution',
    'echo','echoLine','echoAssume','lengthOut','figure','snapRows',
    'runSection','runPresets','stackFigure','stackLegend','stackTable','stackNote','engineNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
@@ -369,36 +370,6 @@
     });
   }
 
-  /* ---- PDF measure-tool precision (Scaled Drawing mode) ------------------- */
-  function buildReadPresets() {
-    var html = '';
-    function box(v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-read="' + v + '">' + label + '</button>'; }
-    if (state.target === 'imperial') {
-      html += '<div class="grid-row">' + box(IN / 2, '1/2"') + box(IN / 4, '1/4"') + box(IN / 8, '1/8"') + box(IN / 16, '1/16"') + '</div>';
-    } else {
-      html += '<div class="grid-row"><span class="grid-group-label">mm</span>' + box(MM, '1') + box(2 * MM, '2') + box(5 * MM, '5') + box(10 * MM, '10') + '</div>';
-    }
-    els.readPresets.innerHTML = html;
-    els.readNote.innerHTML = state.target === 'imperial'
-      ? '<b>1/4″</b> is Bluebeam Revu\'s default measurement precision.'
-      : 'Set this to your PDF measure tool\'s precision.';
-    state.readUiSystem = state.target;
-    Array.prototype.forEach.call(els.readPresets.querySelectorAll('.grid-box'), function (box) {
-      box.addEventListener('click', function () {
-        if (state.target === 'imperial') state.read.imperial = +box.dataset.read;
-        else state.read.metric = +box.dataset.read;
-        render();
-      });
-    });
-  }
-  function renderReadPresets() {
-    if (state.readUiSystem !== state.target) buildReadPresets();
-    var active = readUnits();
-    Array.prototype.forEach.call(els.readPresets.querySelectorAll('.grid-box'), function (box) {
-      UI.press(box, +box.dataset.read === active);
-    });
-  }
-
   /* ---- tape precision (Physical Object mode; how fine you measured) -------- */
   function buildMeasurePresets() {
     var html = '';
@@ -431,19 +402,14 @@
   // mode: what a sheet mark is worth in the field. In Physical Object mode:
   // what the drawing can hold, beside how fine you measured. Stated, not ruled.
   function renderResolution() {
+    // read mode shows the variance in the answer (the ±range), no separate line
+    if (state.question !== 'draw') { els.resolution.style.display = 'none'; return; }
+    els.resolution.style.display = '';
     var R = resolutionUnits();
-    if (state.question === 'draw') {
-      els.resolution.innerHTML =
-        'At <b>' + escapeHtml(currentFace()) + '</b>, the drawing can hold about <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b>. '
-        + 'You\'re measuring to <b>' + escapeHtml(tapeLabel()) + '</b>. '
-        + '<span class="quiet">Measuring finer than the drawing holds won\'t change what you can draw.</span>';
-    } else {
-      var band = readBand(), falsePrec = band > readUnits();
-      els.resolution.innerHTML =
-        'Your tool reads to <b>' + escapeHtml(readLabel()) + '</b>; reading a <b>' + escapeHtml(currentFace()) + '</b> drawing to <b>' + escapeHtml(sheetLabel()) + '</b> on the sheet is <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b>. '
-        + 'Trust the coarser: <b>±' + escapeHtml(NumberLine.formatTrue(band, state.target)) + '</b>. '
-        + '<span class="quiet">' + (falsePrec ? 'The extra digits your measure tool shows are false precision.' : 'Your tool is the limit here, not the scale.') + '</span>';
-    }
+    els.resolution.innerHTML =
+      'At <b>' + escapeHtml(currentFace()) + '</b>, the drawing can hold about <b>' + escapeHtml(NumberLine.formatTrue(R, state.target)) + '</b>. '
+      + 'You\'re measuring to <b>' + escapeHtml(tapeLabel()) + '</b>. '
+      + '<span class="quiet">Measuring finer than the drawing holds won\'t change what you can draw.</span>';
   }
 
   /* ---- echo (single dimension) -------------------------------------------- */
@@ -512,9 +478,9 @@
     width = Math.min(width, 680);
     els.figure.innerHTML = readFig({ valueU: conv, RU: band, system: state.target, width: width });
     els.snapRows.innerHTML =
-      '<div class="snap-row is-primary"><div class="snap-name">Trust to'
+      '<div class="snap-row is-primary"><div class="snap-name">Accurate to'
       + '<span class="snap-gloss">off a ' + escapeHtml(currentFace()) + ' drawing</span></div>'
-      + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(conv, state.target)) + '</div>'
+      + '<div class="snap-value">' + escapeHtml(NumberLine.formatTrue(conv - band, state.target)) + ' to ' + escapeHtml(NumberLine.formatTrue(conv + band, state.target)) + '</div>'
       + '<div class="snap-resid">± ' + escapeHtml(NumberLine.formatTrue(band, state.target)) + '</div></div>';
   }
 
@@ -697,21 +663,12 @@
     renderFieldNote(result);
     renderBareAsk(result);
     renderScalePresets();
-    // the sheet control (drawing resolution → R) is relevant to both modes now:
-    // read-mode it bounds the reading; physical-mode it's one of the two
-    // dimensions that set how far off the drawing lands
-    els.sheetBlock.style.display = '';
+    // read mode: one continuous "precision of read" field. physical mode: the
+    // drawing-resolution (sheet) control + the tape control — the two dimensions
     els.readBlock.style.display = state.question === 'read' ? '' : 'none';
+    els.sheetBlock.style.display = state.question === 'draw' ? '' : 'none';
     els.measureBlock.style.display = state.question === 'draw' ? '' : 'none';
-    if (state.question === 'read') {
-      els.sheetLabel.textContent = 'On The Sheet You Can Read To';
-      els.sheetHint.textContent = 'A vector PDF (Revit, CAD) reads finer than a scan or a scale rule on paper.';
-      renderSheetPresets(); renderReadPresets();
-    } else {
-      els.sheetLabel.textContent = 'On The Sheet, Drawn To';
-      els.sheetHint.textContent = 'With the scale, this sets what the drawing can hold (±R).';
-      renderSheetPresets(); renderMeasurePresets();
-    }
+    if (state.question === 'draw') { renderSheetPresets(); renderMeasurePresets(); }
     renderResolution();
     renderRun();
 
@@ -778,6 +735,7 @@
   }
   els.dimInput.addEventListener('input', function () { state.text = els.dimInput.value; render(); });
   els.dimInput.addEventListener('focus', function () { setTimeout(function () { els.dimInput.select(); }, 0); });
+  els.readPrec.addEventListener('input', function () { state.readText = els.readPrec.value; render(); });
   Array.prototype.forEach.call(document.querySelectorAll('[data-q]'), function (el) {
     el.addEventListener('click', function () {
       state.question = el.dataset.q;
