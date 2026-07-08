@@ -49,8 +49,9 @@
 
     var s = rise / run;                       // the true ratio (display only —
                                               // exactness lives in the page's ints)
-    // drawing box: origin bottom-left, run along x, rise up y
-    var mL = 14, mR = 96, mT = 30, mB = 44;   // right margin holds the rise label
+    // drawing box: origin bottom-left, run along x, rise up y. Generous margins
+    // so the larger, more diagrammatic labels clear the box.
+    var mL = 18, mR = 112, mT = 40, mB = 56;   // right margin holds the rise label
     var boxW = W - mL - mR, boxH = H - mT - mB;
     var x0 = mL, y0 = H - mB;                 // the origin (toe of the slope)
 
@@ -116,9 +117,14 @@
     });
 
     // ground + rise legs (light), the slope itself (heavy)
-    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
-    svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
-    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="2"/>';
+    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+    svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+    // right-angle marker at the toe corner — reads as a diagram
+    if (px > 22 && py > 22) {
+      var sq = 10;
+      svg += '<path d="M ' + (xT - sq) + ' ' + y0 + ' L ' + (xT - sq) + ' ' + (y0 - sq) + ' L ' + xT + ' ' + (y0 - sq) + '" fill="none" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+    }
+    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="2.5"/>';
 
     // the slope length (the projected/true length, e.g. a rafter) — labelled
     // at the hypotenuse midpoint, offset perpendicular to sit above the line

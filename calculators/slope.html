@@ -25,6 +25,13 @@
      row, the answer subgroups, and the reference list. */
   html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
 
+  /* the slope figure reads as a diagram — larger labels than the number line
+     (scoped to svg.sf so the shared number-line sizing is untouched) */
+  svg.sf text { font-size: 14px; }
+  svg.sf .nl-true-val { font-size: 16px; font-weight: 500; }
+  svg.sf .nl-snap-val { font-size: 15px; }
+  svg.sf .nl-src-val  { font-size: 13px; }
+
   .tri-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-sm); }
   .tri { display: flex; flex-direction: column; }
   .tri label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
@@ -434,7 +441,7 @@
       refLoLabel: wedge ? ss.lo.face : null, refHiLabel: wedge ? ss.hi.face : null,
       hatchTo: wedge ? hatchTo : null,
       compare: compare,
-      width: width, height: 280
+      width: width, height: 360
     });
 
     // the rounding table — shallower (for a max) vs steeper (for a min), each
@@ -449,13 +456,13 @@
       return '<td class="rc' + (on ? ' sel' : '') + '" data-fam="' + fam + '" data-dir="' + dir + '">'
         + escapeHtml(step.face) + '<span class="cost">' + escapeHtml(cost(step.ratio)) + '</span></td>';
     }
-    var t = '<div class="rows-label">Rounded to a standard step</div>'
+    var t = '<div class="rows-label">Rounded to a whole number</div>'
           + '<table class="round-table"><tr><th></th><th>shallower<span>for a max</span></th><th>steeper<span>for a min</span></th></tr>';
     fams.forEach(function (f) {
       var st = famSteps(s, f[1]);
       if (st.exact) {
         var onSel = sel.fam === f[1] && sel.dir === 'on';
-        t += '<tr><td>' + f[0] + '</td><td class="rc on-step' + (onSel ? ' sel' : '') + '" data-fam="' + f[1] + '" data-dir="on" colspan="2">' + escapeHtml(st.hi.face) + ' · on step</td></tr>';
+        t += '<tr><td>' + f[0] + '</td><td class="rc on-step' + (onSel ? ' sel' : '') + '" data-fam="' + f[1] + '" data-dir="on" colspan="2">' + escapeHtml(st.hi.face) + ' · exact</td></tr>';
       } else {
         t += '<tr><td>' + f[0] + '</td>' + rc(f[1], 'lo', st.lo) + rc(f[1], 'hi', st.hi) + '</tr>';
       }
