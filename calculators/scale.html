@@ -405,7 +405,9 @@
             + '<span class="eq">=</span><span class="result">' + escapeHtml(NumberLine.formatTrue(conv, state.target)) + '</span>'
             + '<span class="op"> on the sheet</span>';
     } else {
-      html += '<span class="op"> read off a ' + escapeHtml(currentFace()) + ' drawing</span>';
+      var band = readBand();
+      html += '<span class="op"> off a ' + escapeHtml(currentFace()) + ' drawing </span>'
+            + '<span class="eq">=</span><span class="result">' + escapeHtml(fmtShort(conv - band)) + ' to ' + escapeHtml(fmtShort(conv + band)) + '</span>';
     }
     els.echoLine.innerHTML = html;
     var asm = (result.interpretation.assumptions || []).slice();

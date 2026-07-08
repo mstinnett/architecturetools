@@ -50,11 +50,6 @@
                 color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
   .rows-label:first-child { margin-top: 0.2rem; }
 
-  /* the info box answer — the solved values, carrying the accent */
-  .echo-answer { margin-top: 0.45rem; }
-  .ans-sides { font-size: 1.15rem; color: var(--accent); font-weight: 500; line-height: 1.35; }
-  .ans-slope { margin-top: 0.15rem; color: var(--accent); font-size: var(--text-sm); }
-
   /* the rounding table — shallower (for a max) vs steeper (for a min) */
   .round-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin-top: 0.3rem; }
   .round-table th, .round-table td { text-align: left; padding: 0.4rem 0.55rem; border-bottom: var(--border-light); vertical-align: baseline; font-variant-numeric: tabular-nums; }
@@ -128,7 +123,6 @@
     <!-- slot 3 · ECHO -->
     <div class="echo" id="echo" style="display:none;">
       <div class="echo-line" id="echoLine"></div>
-      <div class="echo-answer" id="echoAnswer"></div>
       <div class="echo-assumptions" id="echoAssume"></div>
     </div>
 
@@ -181,7 +175,7 @@
 
   var els = {};
   ['riseInput','runInput','slopeInput','riseNote','runNote','slopeNote','bareAsk',
-   'echo','echoLine','echoAnswer','echoAssume','slopeOut','figure','snapRows','refBox','refRows','mathNote']
+   'echo','echoLine','echoAssume','slopeOut','figure','snapRows','refBox','refRows','mathNote']
     .forEach(function (id) { els[id] = document.getElementById(id); });
 
   var escapeHtml = UI.esc;
@@ -325,24 +319,25 @@
     if (rise && rise.result) html += '<span class="op">rise </span>' + tokensOf(rise.result);
     if (run && run.result) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">run </span>' + tokensOf(run.result);
     if (slope && !slope.error && state.slope.trim()) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">slope </span><span class="tok stated">' + escapeHtml(state.slope.trim()) + '</span>';
-    els.echoLine.innerHTML = html;
 
-    // the answer: the missing sides and the slope as values (what you didn't enter)
+    // the answer, on the converter's grammar: tokens = result — the values you
+    // did NOT enter (the solved leg and the slope's forms), with the along-slope
+    // length as a quiet suffix (it also lives on the figure and in no rows)
     if (solved) {
       var riseU = solved.rise, runU = solved.run;
       var g = gcd(riseU, runU), p = riseU / g, q = runU / g;
       var deg = Math.atan2(riseU, runU) * 180 / Math.PI, pc = 100 * riseU / runU, pitch = 12 * riseU / runU;
       var hypU = Math.round(Math.sqrt(riseU * riseU + runU * runU));
-      var sides = [];
-      if (solved.leg === 'rise') sides.push('rise ' + fmtLen(riseU));
-      else if (solved.leg === 'run') sides.push('run ' + fmtLen(runU));
-      if (solved.leg !== 'slopeonly') sides.push('along slope ' + fmtShort(hypU));
-      var forms = sig(pc, pc < 1 ? 3 : 2) + '%  ·  1:' + sig(q / p, q / p >= 100 ? 1 : 2) + '  ·  ' + sig(pitch, 2) + ':12  ·  ' + sig(deg, deg < 1 ? 3 : 2) + '°';
-      els.echoAnswer.innerHTML = (sides.length ? '<div class="ans-sides">' + sides.map(escapeHtml).join('&nbsp;&nbsp;·&nbsp;&nbsp;') + '</div>' : '')
-        + '<div class="' + (sides.length ? 'ans-slope' : 'ans-sides') + '">' + escapeHtml(forms) + '</div>';
+      var parts = [];
+      if (solved.leg === 'rise') parts.push('rise ' + fmtLen(riseU));
+      else if (solved.leg === 'run') parts.push('run ' + fmtLen(runU));
+      parts.push(sig(pc, pc < 1 ? 3 : 2) + '%', '1:' + sig(q / p, q / p >= 100 ? 1 : 2), sig(pitch, 2) + ':12', sig(deg, deg < 1 ? 3 : 2) + '°');
+      html += '<span class="eq">=</span><span class="result">' + escapeHtml(parts.join(' · ')) + '</span>';
+      if (solved.leg !== 'slopeonly') html += '<span class="op"> · along slope ' + escapeHtml(fmtShort(hypU)) + '</span>';
     } else {
-      els.echoAnswer.innerHTML = '<div class="ans-slope" style="color:var(--ink-3)">two of the three, and the rest follow</div>';
+      html += '<span class="eq">—</span><span class="op">two of the three, and the rest follow</span>';
     }
+    els.echoLine.innerHTML = html;
     var asm = [];
     [rise, run].forEach(function (f) {
       if (f && f.result && f.result.interpretation) asm = asm.concat(f.result.interpretation.assumptions || []);
