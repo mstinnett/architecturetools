@@ -97,24 +97,34 @@
       }
     }
 
-    // reference rays — dashed, labelled at their ends
-    [{ r: refLo, label: opts.refLoLabel }, { r: refHi, label: opts.refHiLabel }].forEach(function (ref) {
-      if (ref.r == null) return;
-      var e = rayEnd(ref.r);
-      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="4 3"/>';
-      if (ref.label) svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', ref.label);
-    });
-
-    // comparison rays — user-selected reference slopes (e.g. common slopes),
-    // drawn in the accent with a dotted line and no hatch, distinct from the
-    // rounding brackets above
+    // reference rays (dashed brackets) + comparison rays (accent, dotted).
+    // Draw the lines, then place all labels together: a steep slope clips every
+    // ray to the top edge, bunching their ends onto the apex, so top-clipped
+    // labels are collected into a left-aligned stack just right of and below the
+    // tip — the tip itself stays clean. Right-edge (shallow) labels sit at their
+    // ends as before.
+    var rays = [];
+    if (refLo != null) rays.push({ r: refLo, label: opts.refLoLabel, cmp: false });
+    if (refHi != null) rays.push({ r: refHi, label: opts.refHiLabel, cmp: false });
     (opts.compare || []).forEach(function (c) {
       var r = ratioOf(c.ratio);
-      if (r == null || !(r > 0)) return;
-      var e = rayEnd(r);
-      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:var(--accent,#004C80)" stroke-width="1.3" stroke-dasharray="1 3"/>';
-      if (c.label) svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', c.label);
+      if (r != null && r > 0) rays.push({ r: r, label: c.label, cmp: true });
     });
+    var stack = [];   // top-clipped labels, to be stacked below the tip
+    rays.forEach(function (ray) {
+      var e = rayEnd(ray.r);
+      var stroke = ray.cmp ? 'var(--accent,#004C80)' : 'var(--nl-axis,#999)';
+      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:' + stroke + '" stroke-width="' + (ray.cmp ? 1.3 : 1) + '" stroke-dasharray="' + (ray.cmp ? '1 3' : '4 3') + '"/>';
+      if (!ray.label) return;
+      if (Math.abs(e.y - mT) < 1.5) stack.push({ ex: e.x, label: ray.label });   // clipped to top edge
+      else svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', ray.label);
+    });
+    if (stack.length) {
+      var cx = xT;
+      stack.forEach(function (l) { cx = Math.max(cx, l.ex); });
+      cx = Math.min(cx + 8, W - 4);
+      stack.forEach(function (l, i) { svg += txt(cx, mT + 14 + i * 14, 'nl-src-val', 'start', l.label); });
+    }
 
     // ground + rise legs (light), the slope itself (heavy)
     svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
