@@ -62,10 +62,12 @@
   .round-table td.rc.sel { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); color: var(--ink); }
   .round-table td.rc.sel .cost { color: var(--ink-2); }
 
-  /* the reference list — common slopes located against yours; facts, not rulings */
+  /* common slopes — selectable, each toggles a comparison line on the figure */
   .ref-rows { margin-top: var(--space-sm); }
-  .ref-row { display: flex; align-items: baseline; padding: 0.4rem 0; border-bottom: var(--border-light); font-size: var(--text-sm); }
+  .ref-row { display: flex; align-items: baseline; padding: 0.4rem 0.4rem; border-bottom: var(--border-light); font-size: var(--text-sm); cursor: pointer; }
   .ref-row:last-child { border-bottom: none; }
+  .ref-row:hover { background: var(--accent-soft); }
+  .ref-row.sel { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
   .ref-what { flex: 1; color: var(--ink-2); }
   .ref-slope { width: 9em; color: var(--ink); }
   .ref-delta { width: 11em; text-align: right; color: var(--ink-2); }
@@ -131,13 +133,10 @@
         <div class="snap-rows" id="snapRows"></div>
       </div>
 
-      <!-- slot 6 · reference slopes, located against yours -->
+      <!-- slot 6 · common slopes — selectable, drawn as comparison lines -->
       <div class="ratio-box" id="refBox">
-        <div class="section-label">Common call-outs — where yours sits</div>
+        <div class="section-label">Common Slopes</div>
         <div class="ref-rows" id="refRows"></div>
-        <div style="margin-top:.5rem;font-size:var(--text-xs);color:var(--ink-3);">
-          References to locate yourself, not rulings. The figure that governs your
-          project depends on its code edition, occupancy, and exceptions.</div>
       </div>
     </div>
   </div>
@@ -169,6 +168,7 @@
     rise: '', run: '', slope: '',
     defaultUnit: 'in',
     sel: null,                // {fam, dir} — which rounding cell drives the figure hatch
+    compareRefs: {},          // which common slopes are drawn as comparison lines
     target: 'imperial'
   };
 
@@ -253,18 +253,18 @@
 
     fieldNote(els.riseNote, rise);
     fieldNote(els.runNote, run);
-    els.slopeNote.innerHTML = slope && slope.error ? escapeHtml(slope.error) : '';
 
     var riseU = rise && !rise.error ? rise.units : null;
     var runU = run && !run.error ? run.units : null;
     var ratio = slope && !slope.error ? slope.ratio : null;
 
     // solve the third — and SAY which two governed (solved.leg marks the
-    // projected leg, so the answer rows can lead with it)
-    var solved = null, derivedNote = null, quant = null;
+    // projected leg, so the answer rows can lead with it). All three given and
+    // inconsistent is flagged, not silently resolved.
+    var solved = null, derivedNote = null, quant = null, conflict = false;
     if (riseU != null && runU != null) {
       solved = { rise: riseU, run: runU, leg: null };
-      if (ratio != null) derivedNote = 'rise and run define the slope, the slope field is ignored';
+      if (ratio != null) conflict = Math.abs(riseU / runU - ratio) > 0.005 * Math.max(riseU / runU, ratio);
     } else if (riseU != null && ratio != null) {
       var runX = riseU / ratio;
       if (!outOfRange(Math.round(runX))) { solved = { rise: riseU, run: Math.round(runX), leg: 'run' }; quant = runX - solved.run; derivedNote = 'run solved from rise and slope'; }
@@ -277,6 +277,11 @@
       var rr = 12 * IN;
       solved = { rise: Math.round(rr * ratio), run: rr, leg: 'slopeonly' };
     }
+
+    // the slope field's note: a parse error, or a clear conflict flag when all
+    // three are given and the slope disagrees with rise ÷ run
+    els.slopeNote.innerHTML = slope && slope.error ? escapeHtml(slope.error)
+      : (conflict ? 'doesn\'t match rise ÷ run = ' + escapeHtml(sig(100 * riseU / runU, 1)) + '%' : '');
 
     renderEcho(rise, run, slope, solved, derivedNote);
     if (!solved || solved.rise <= 0 || solved.run <= 0) {
@@ -413,6 +418,9 @@
     // the angular residual, drawn the way the converters hatch the linear one.
     var ss = famSteps(s, sel.fam), wedge = !ss.exact;
     var hatchTo = sel.dir === 'lo' ? ss.lo.ratio : ss.hi.ratio;
+    // selected common slopes → comparison rays
+    var compare = [];
+    REFS.forEach(function (r, i) { if (state.compareRefs[i]) compare.push({ ratio: r.ratio, label: r.face.split(' ')[0] }); });
     var width = els.figure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
@@ -425,7 +433,8 @@
       refLo: wedge ? ss.lo.ratio : null, refHi: wedge ? ss.hi.ratio : null,
       refLoLabel: wedge ? ss.lo.face : null, refHiLabel: wedge ? ss.hi.face : null,
       hatchTo: wedge ? hatchTo : null,
-      width: width, height: 200
+      compare: compare,
+      width: width, height: 280
     });
 
     // the rounding table — shallower (for a max) vs steeper (for a min), each
@@ -455,12 +464,12 @@
     if (overOne) t += '<div class="rows-label" style="text-transform:none;color:var(--ink-2);">Steeper than 1:1 — past 45°.</div>';
     els.snapRows.innerHTML = t;
 
-    // references — located, never ruled on; brief, tagged max/min
+    // common slopes — located, tagged max/min, selectable into the figure
     var refs = '';
-    REFS.forEach(function (r) {
+    REFS.forEach(function (r, i) {
       var d = s - r.ratio;
       var side = d === 0 ? 'exact' : sig(Math.abs(d) * 100, Math.abs(d) * 100 < 1 ? 3 : 1) + '% ' + (d > 0 ? 'steeper' : 'shallower');
-      refs += '<div class="ref-row"><div class="ref-what">' + escapeHtml(r.label) + '</div>'
+      refs += '<div class="ref-row' + (state.compareRefs[i] ? ' sel' : '') + '" data-ref="' + i + '"><div class="ref-what">' + escapeHtml(r.label) + '</div>'
             + '<div class="ref-slope">' + escapeHtml(r.face) + ' · ' + r.type + '</div>'
             + '<div class="ref-delta">' + escapeHtml(side) + '</div></div>';
     });
@@ -518,6 +527,14 @@
     var cell = e.target.closest ? e.target.closest('.rc') : null;
     if (!cell) return;
     state.sel = { fam: cell.dataset.fam, dir: cell.dataset.dir };
+    render();
+  });
+  // toggling a common slope draws (or clears) its comparison line on the figure
+  els.refRows.addEventListener('click', function (e) {
+    var row = e.target.closest ? e.target.closest('.ref-row') : null;
+    if (!row) return;
+    var i = row.dataset.ref;
+    if (state.compareRefs[i]) delete state.compareRefs[i]; else state.compareRefs[i] = true;
     render();
   });
 

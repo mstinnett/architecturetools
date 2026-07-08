@@ -104,6 +104,17 @@
       if (ref.label) svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', ref.label);
     });
 
+    // comparison rays — user-selected reference slopes (e.g. common slopes),
+    // drawn in the accent with a dotted line and no hatch, distinct from the
+    // rounding brackets above
+    (opts.compare || []).forEach(function (c) {
+      var r = ratioOf(c.ratio);
+      if (r == null || !(r > 0)) return;
+      var e = rayEnd(r);
+      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:var(--accent,#004C80)" stroke-width="1.3" stroke-dasharray="1 3"/>';
+      if (c.label) svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', c.label);
+    });
+
     // ground + rise legs (light), the slope itself (heavy)
     svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
     svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
@@ -166,6 +177,10 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   // hatchTo pins the wedge to a chosen bracket (not just the nearer one)
   var pinned = SF.slopefig({ rise: 38 * FT, run: 100 * FT, refLo: 3 / 12, refHi: 4 / 12, hatchTo: 3 / 12 });
   ok('hatchTo keeps a wedge', pinned.indexOf('url(#sfhatch)') > 0);
+
+  // compare rays draw an accent line + label, no extra hatch
+  var cmp = SF.slopefig({ rise: 7 * FT, run: 22 * FT, compare: [{ ratio: 1 / 12, label: '1:12' }] });
+  ok('compare ray labelled', cmp.indexOf('>1:12</text>') > 0);
 
   // steep slope stays in the box (legs clipped by scale, not distorted)
   var steep = SF.slopefig({ rise: 100 * FT, run: 2 * FT });
