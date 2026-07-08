@@ -86,9 +86,9 @@
 
   <!-- precision control — mode-specific (sheet reading + PDF tool, vs tape) -->
   <div id="sheetBlock">
-    <div class="section-label" style="margin-top:var(--space-md);">On The Sheet You Can Read To</div>
+    <div class="section-label" id="sheetLabel" style="margin-top:var(--space-md);">On The Sheet You Can Read To</div>
     <div class="grid-presets" id="sheetPresets"></div>
-    <div class="section-note" style="margin:0.35rem 0 0;">A vector PDF (Revit, CAD) reads finer than a scan or a scale rule on paper.</div>
+    <div class="section-note" id="sheetHint" style="margin:0.35rem 0 0;">A vector PDF (Revit, CAD) reads finer than a scan or a scale rule on paper.</div>
   </div>
   <div id="readBlock">
     <div class="section-label" style="margin-top:var(--space-md);">Your PDF Measure Tool Reads To</div>
@@ -136,11 +136,12 @@
 
   <!-- ================= OVER A RUN (stack-up) — Physical Object mode only == -->
   <div class="tool-section" id="runSection">
-    <div class="section-label">Across A Run Of Measurements</div>
-    <p class="section-note">Measure a room feature to feature and each measurement's
-       error carries into a chain. Measure everything from one baseline and it
-       doesn't. This shows how error accumulates across a chain, each feature
-       measured to your tape precision, against what the drawing holds.</p>
+    <div class="section-label">How Far Off, Across A Run</div>
+    <p class="section-note">Two things set how far off the drawing lands: how fine
+       you measure (your tape), which accumulates when you chain feature to
+       feature, and how fine the drawing holds at this scale (±R). Measuring from
+       one baseline keeps the tape part flat. The drawing is off by the worse of
+       the two.</p>
 
     <div class="section-label" style="font-size:var(--text-xs);">Features In The Run</div>
     <div class="grid-presets" id="runPresets"></div>
@@ -261,7 +262,7 @@
   function tapeLabel() { return fracLabel(tapeUnits()); }
 
   var els = {};
-  ['dimInput','fieldNote','bareAsk','scalePresets','sheetBlock','sheetPresets','readBlock','readPresets','readNote','measureBlock','measurePresets','resolution',
+  ['dimInput','fieldNote','bareAsk','scalePresets','sheetBlock','sheetLabel','sheetHint','sheetPresets','readBlock','readPresets','readNote','measureBlock','measurePresets','resolution',
    'echo','echoLine','echoAssume','lengthOut','figure','snapRows',
    'runSection','runPresets','stackFigure','stackLegend','stackTable','stackNote','engineNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
@@ -652,11 +653,15 @@
     }
     els.stackTable.innerHTML = rows;
 
+    // the two dimensions and how they combine: the drawing is off by the worse
+    // of the accumulated tape error and its own resolution R
+    var offBase = Math.max(eU, RU), offChain = Math.max(kMax * eU, RU);
     els.stackNote.innerHTML =
-      'Each feature is measured to <b>±' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '</b> (your tape). '
-      + 'Chain error is the sum of the measurements before it (worst case, ∝ n); if the read errors fall either way at random '
-      + 'they partly cancel (∝ √n). From a baseline every feature is one measurement from the same datum, so it stays at ±' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '. '
-      + 'For reference, the drawing holds <b>±' + escapeHtml(NumberLine.formatTrue(RU, state.target)) + '</b> at this scale.';
+      'You measure to <b>±' + escapeHtml(NumberLine.formatTrue(eU, state.target)) + '</b> (your tape); the drawing holds <b>±' + escapeHtml(NumberLine.formatTrue(RU, state.target)) + '</b> at this scale. '
+      + 'The drawing is off by the worse of the two: from a baseline <b>±' + escapeHtml(NumberLine.formatTrue(offBase, state.target)) + '</b>, chained across ' + kMax + ' <b>±' + escapeHtml(NumberLine.formatTrue(offChain, state.target)) + '</b> (worst case). '
+      + (RU >= kMax * eU
+          ? 'Here the scale limits you, not the tape — measuring finer won\'t help until the chain drifts past ±R.'
+          : 'Here the chain has drifted past ±R, so your measurement is the limit, not the scale.');
   }
 
   /* ---- engine audit — the exact-integer working, at the page bottom ------- */
@@ -692,10 +697,21 @@
     renderFieldNote(result);
     renderBareAsk(result);
     renderScalePresets();
-    els.sheetBlock.style.display = state.question === 'read' ? '' : 'none';
+    // the sheet control (drawing resolution → R) is relevant to both modes now:
+    // read-mode it bounds the reading; physical-mode it's one of the two
+    // dimensions that set how far off the drawing lands
+    els.sheetBlock.style.display = '';
     els.readBlock.style.display = state.question === 'read' ? '' : 'none';
     els.measureBlock.style.display = state.question === 'draw' ? '' : 'none';
-    if (state.question === 'read') { renderSheetPresets(); renderReadPresets(); } else renderMeasurePresets();
+    if (state.question === 'read') {
+      els.sheetLabel.textContent = 'On The Sheet You Can Read To';
+      els.sheetHint.textContent = 'A vector PDF (Revit, CAD) reads finer than a scan or a scale rule on paper.';
+      renderSheetPresets(); renderReadPresets();
+    } else {
+      els.sheetLabel.textContent = 'On The Sheet, Drawn To';
+      els.sheetHint.textContent = 'With the scale, this sets what the drawing can hold (±R).';
+      renderSheetPresets(); renderMeasurePresets();
+    }
     renderResolution();
     renderRun();
 
