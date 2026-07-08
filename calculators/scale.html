@@ -266,7 +266,10 @@
   });
   var escapeHtml = UI.esc;
 
-  /* ---- short length formatting (bands and ranges, 2 dp, trimmed) ---------- */
+  /* ---- short length formatting: native ft-in fractions (imperial), mm ------
+     A range you'd act on is a drawing dimension, so it reads in fractions, not
+     survey decimals. Denominator adapts to the magnitude so the fraction stays
+     clean; exact units live in the engine note. */
   function trimNum(x, dp) { return String(parseFloat(x.toFixed(dp))); }
   function fmtShort(u) {
     var sign = u < 0 ? '−' : '', a = Math.abs(u);
@@ -274,11 +277,8 @@
       var mm = a / MM;
       return sign + (mm >= 1000 ? trimNum(mm / 1000, 2) + ' m' : trimNum(mm, 1) + ' mm');
     }
-    if (a >= FT) {
-      var f = Math.floor(a / FT), rin = (a - f * FT) / IN;
-      return sign + f + "'" + (rin ? '-' + trimNum(rin, 2) + '"' : '');
-    }
-    return sign + trimNum(a / IN, 2) + '"';
+    var d = a < IN / 4 ? 32 : 16, g = IN / d;
+    return sign + NumberLine.formatSnapped(Math.round(a / g) * g, 'imperial', d);
   }
 
   /* ---- pending hint + bare-unit choice (as the converter) ----------------- */
