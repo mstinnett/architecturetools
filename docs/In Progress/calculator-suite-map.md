@@ -101,10 +101,13 @@ FAR · coverage · setback · height · density · parking. Jurisdiction-by-juri
 
 ## Depth ladders (the ◷ later-layers, logged not built)
 
-**Tile node**
+**Tile node** — fuller first-pass spec in `coverage-layout-tolerance-firstpass.md`
+(merges tile with area/coverage into one deepening node; the grout joint read as
+a tolerance range; the inverse precision-window solver; 2-D patterns + accent
+banding; termination/corner edge cases). Ladder:
 1. ▶ Run + sliver alert + **grout-relaxation-to-whole-tile** (with the 3× lot-variance / ANSI A108.02 spec check — the part the layout tools don't do)
 2. ◷ Boxes / coverage / waste (cheap material-layer add)
-3. ◷ Layout + cutting view (heavy rendering, much later)
+3. ◷ Layout + cutting view (heavy rendering, much later) + precision-window solver (inverse: find a good wall size)
 
 **Area takeoff node**
 1. ▶ Single rectangle
