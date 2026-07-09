@@ -513,6 +513,7 @@
       if (state.slope && state.slope !== "8:12") params.set('s', state.slope);
       var qq = params.toString();
       try { history.replaceState(null, '', qq ? '?' + qq : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
     }, 250);
   }
   function initFromURL() {
@@ -526,6 +527,14 @@
   }
 
   /* ---- wiring ------------------------------------------------------------------ */
+  // recent readings — the URL carries all three fields, so a recent restores
+  // the whole triangle
+  var recents = UI.recents({ key: 'slope', anchor: els.riseInput, entry: function () {
+    var face = [state.rise, state.run, state.slope].filter(Boolean).join(' · ');
+    var r = document.querySelector('#echoLine .result');
+    return { face: face, result: r ? r.textContent : '' };
+  } });
+
   [['riseInput', 'rise'], ['runInput', 'run'], ['slopeInput', 'slope']].forEach(function (pair) {
     var el = els[pair[0]];
     el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });

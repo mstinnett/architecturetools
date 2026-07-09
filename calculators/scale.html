@@ -775,6 +775,7 @@
       if (state.tapeLen !== 25 * FT) params.set('t', String(state.tapeLen));
       var q = params.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
     }, 250);
   }
   function initFromURL() {
@@ -804,6 +805,14 @@
       UI.press(el, el.dataset[attr] === value);
     });
   }
+  // recent readings — the URL carries the whole state (scale, task, source,
+  // precisions, tape), so a recent restores the full reading
+  var recents = UI.recents({ key: 'scale', anchor: els.dimInput, entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: (state.text || '') + ' · ' + currentFace() + ' · ' + (state.question === 'draw' ? 'draw' : 'read'),
+             result: r ? r.textContent : '' };
+  } });
+
   els.dimInput.addEventListener('input', function () { state.text = els.dimInput.value; render(); });
   els.dimInput.addEventListener('focus', function () { setTimeout(function () { els.dimInput.select(); }, 0); });
   els.readPrec.addEventListener('input', function () { state.readText = els.readPrec.value; render(); });
