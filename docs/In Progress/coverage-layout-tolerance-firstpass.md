@@ -31,6 +31,63 @@ Stop treating "someone already does this" as a reason not to build.
 
 ---
 
+## The frame — design tools, not construction tools (operator, 2026-07-09)
+
+**This is the organizing principle for the whole suite** (the suite map should
+adopt it too). Construction tools like Construction Master Pro **fit a module to
+a given dimension and cut the leftover.** We make **design tools: pick the
+dimension so the module lands clean.** Same math, opposite direction, different
+person and moment:
+
+- **Field (CM Pro):** "I'm at the wall, it's 8'-3½". What do I cut?"
+- **Desk (us):** "I'm drawing the wall. What length do I make it so the field
+  never has to cut — or cuts comfortably?"
+
+Two consequences that correct earlier notes:
+- **We already meet their dimensional arithmetic** — feet-inch-fractions, mixed
+  units, expressions, exact-integer math — in `parse-length.js`, as free text
+  instead of hardware keys. Arithmetic is table stakes we *already* hold, not a
+  battle. The edge is the layout a keypad can't render: arbitrary tile/module
+  sizes, arbitrary patterns and combinations, exact cut counts **with blade
+  kerf**, the grout tolerance band **drawn**.
+- **Every strong field calc has a design inverse — the inverse is our tool.**
+
+### Working backwards — field strength → design inverse
+
+| CM Pro is strong at (field) | The design inverse (our desk tool) |
+|---|---|
+| Tile / board run — cut to fill a wall | **What wall length gives an uncut run, with slack?** + terminations (bullnose, metal edge, cut-and-lapped end ≈1 tile thick, corner lap). *(L4 below)* |
+| Blocks / masonry — count CMU, footings | **What wall length + opening heights are whole-course masonry** (8″ module) so nothing's cut? Horizontal + vertical coursing. *(strong new candidate — architects are taught to design to the block; no free tool inverts it)* |
+| Stairs — cut stringers to a measured rise | **What floor-to-floor makes equal risers land in code with a clean run?** *(inverse of the stairs page)* |
+| Rafters / roof — cut common/hip/valley/jack | **What pitch + plate height lands a clean ridge and overhang** and keeps sheathing whole? |
+| Drywall / paneling — count sheets for an area | **What room / wainscot dimensions land joints on framing and minimize cut sheets?** *(aesthetic panel coursing — the live version of the parked structural thread)* |
+
+They are one principle: **design to the module.** The tile precision-window
+solver (L4) and **masonry coursing** are the two strongest, and they sit side by
+side.
+
+---
+
+## Waste, unbundled (operator question, 2026-07-09)
+
+There is **no per-cut failure standard.** The industry's 10 % rule (TCNA: 10 %
+straight, 15–20 % diagonal/herringbone) **fuses three unlike things into one
+fudge.** The honest tool separates them:
+
+1. **Cut waste** — the offcuts that can't be reused. Purely **geometric** — a
+   function of the actual layout and pattern. *We compute this exactly* (with
+   kerf, with/without offcut reuse) instead of guessing. This is the edge.
+2. **Breakage** — a material-brittleness rate, not a cut model: TCNA ~2–5 %
+   (1–2 % standard ceramic, 3–4 % porcelain/stone). Applied as a *named* rate,
+   cited — never smeared into "waste."
+3. **Attic stock** — future-repair reserve, +5–10 %. Not waste at all; a
+   **policy choice** the architect sets explicitly.
+
+One clean number becomes three honest ones. Show-don't-judge applied to the
+waste line itself — no one else does this. (TCNA Handbook; breakage 2–5 %.)
+
+---
+
 ## Coverage and layout are ONE tool that deepens
 
 The old "Area & Coverage" wasn't slack — it was the *shallow end* of a tool that
@@ -42,8 +99,9 @@ input; egress = area→occupants, FAR = area→zoning, both elsewhere).
 - **L0 — Area.** Type a room (chained, L/U, subtract openings) → area in every
   register. The quiet utility. Carries into occupant load (`?d=`).
 - **L1 — Coverage count.** ÷ a unit (sheet, tile, box) or a **rate** (paint
-  ft²/gal, currently rejected — a real gap) → count, leftover, shortfall. Show
-  the real residual, not a 10% rule of thumb.
+  ft²/gal, currently rejected — a real gap) → count, leftover, shortfall, and
+  the **unbundled waste** (cut waste computed · breakage cited · attic stock
+  chosen — see "Waste, unbundled"), never one 10% fudge.
 - **L2 — Linear run.** Tile / plank / carpet run: flush / centered / slide the
   start; the actual cuts, offcut reuse, and the **box delta** (does centering
   cost a box? usually no — two `r/2` end cuts come from one tile if `r ≤ T`).
@@ -205,19 +263,24 @@ tile sizes (1–24″) and flooring rolls (6/12/13/15 ft) + sheets → material 
 with waste. Line also: ElectriCalc Pro, Pipe Trades Pro, HeavyCalc, ProjectCalc.
 
 **What they own (don't compete):** hardware-key speed for repetitive jobsite
-feet-inch math, rafter cutting angles, compound miter.
+feet-inch math, rafter cutting angles, compound miter. These are *field* moves.
+
+**Parity, not deficit, on arithmetic:** `parse-length.js` already matches their
+feet-inch-fraction / mixed-unit / expression / exact-integer math — as free
+text, not keys. So arithmetic is table stakes we hold, not their moat.
 
 **What they entirely lack (our lane):** they hand you *one nominal number*.
 None of them
 - show the rounding residual (they round for you),
 - treat grout/joint/caliber as a **tolerance** or accumulate it across a run,
 - do layout / pattern / offcut / box optimization (coverage = area ÷ sheet),
+- unbundle waste (cut waste vs. breakage vs. attic stock),
 - invert to "**what dimension builds clean**,"
 - show the **trust band** on a scaled read.
 
-Positioning: we are not competing on dimensional arithmetic — they own it. We
-are the **thoughtful, honest, visual, tolerance-aware** layer they've never had:
-free, on the web, the residual shown.
+Positioning: we are its **mirror image** — not a worse construction calculator,
+but the **design tool** that decides the dimensions their field tool executes,
+with the layout rendered and the waste told honestly in three parts.
 
 ---
 
@@ -229,6 +292,11 @@ free, on the web, the residual shown.
 3. Recents placement — field dropdown (recommended) vs. bottom drawer?
 4. Which room-dimension calcs make the first cut (lumen · daylight · proportion)?
 5. Rate divisor (paint ft²/gal) into L1 now, or later?
+6. **Masonry / module coursing** — its own "design to the module" tool (what
+   wall length + opening heights are whole-course CMU/brick), or a preset of the
+   same run engine as tile? Strong candidate, no free tool inverts it.
+7. Adopt **design-vs-construction** (field fits the module / desk picks the
+   dimension) as the suite map's top-level frame?
 
 [bezruchuk]: https://bezruchuk.com/shower-tile-layout-tool/
 [Herron]: https://herron.app/tools/tile-layout-planner
