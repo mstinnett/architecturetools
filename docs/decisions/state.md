@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-07-08 (`scale.html` rebuilt again on the **crossing model** and `slope.html` given a coherence pass; both answer surfaces matched to `convert.html`'s echo grammar. Work on branch `claude/calculator-converter-promotion-qcbhgv`, still noindexed — operator moves to `main` manually. The eleven-tool taste pass + promotions remain otherwise open; `area.html` is the next redesign candidate.)_
+_Last updated: 2026-07-09 (Scale gained the design-side "Across The Scales" table + false-precision reveal ("floor" term retired for **sheet resolution**); shared **recents** component in ui.js; `area.html` renamed **Material Coverage** (rate divisor, waste unbundled); **`precision-window.html`** first draft — the design inverse of a tile run, split from the 2-D pattern surface. All on branch `claude/calculator-converter-promotion-qcbhgv`, noindexed — operator moves to `main` manually. Design thinking captured in `docs/In Progress/coverage-layout-tolerance-firstpass.md`.)_
 
 ## Live architectural picture
 
@@ -43,8 +43,11 @@ _Last updated: 2026-07-08 (`scale.html` rebuilt again on the **crossing model** 
   2026-07-08 on the crossing model: a dimension crosses between sheet and world
   through an instrument, scale `n` converts sheet error to real error; see Recent
   decisions), `slope.html` (any-two-of-three; coherence-passed 2026-07-08,
-  answer surface matched to the converter), `area.html` (**next redesign
-  candidate**), `stairs.html` (introduces the edition pill + citation
+  answer surface matched to the converter), `area.html` (**"Material
+  Coverage"** — rate divisor, waste unbundled into breakage/attic-stock/
+  cut-waste-is-the-layout's), `precision-window.html` (**first draft** — the
+  design inverse of a tile run: buildable windows drawn, forced-cut gaps
+  hatched, bullnose/metal/lapped ends), `stairs.html` (introduces the edition pill + citation
   pattern), `sheet-sizes.html` (the fit reference, restyled onto the theme,
   ANSI added). Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table
   1004.5, gross/net surfaced), `egress-width.html` (load×factor both
