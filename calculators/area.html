@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
-<title>Area &amp; Coverage -- architecture.tools</title>
-<meta name="description" content="Area takeoff from a typed expression — chain rooms, subtract openings — then divide by a sheet or tile to a piece count, with the shortfall and the leftover both shown.">
+<title>Material Coverage -- architecture.tools</title>
+<meta name="description" content="Area takeoff from a typed expression — chain rooms, subtract openings — divided by a sheet, tile, or coverage rate into a count with both ends of the rounding shown, and waste split into its real parts.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -38,13 +38,14 @@
 
   <div class="page-header">
     <nav class="page-crumb" aria-label="Breadcrumb">
-      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Area &amp; Coverage</span>
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Material Coverage</span>
     </nav>
-    <h1>Area &amp; Coverage</h1>
+    <h1>Material Coverage</h1>
     <p>Type the takeoff the way you'd say it: chain rooms with +, subtract
-       openings with &minus;, parentheses welcome. Divide by a sheet or tile and
-       the count comes with both ends of the rounding — what's short, what's
-       left over.</p>
+       openings with &minus;, parentheses welcome. Divide by a sheet, tile, or
+       coverage rate and the count comes with both ends of the rounding.
+       Waste isn't one number here — breakage and attic stock are separate
+       choices, and cut waste belongs to the layout.</p>
   </div>
 
   <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
@@ -58,23 +59,34 @@
     <div class="bare-ask" id="bareAsk"></div>
   </div>
 
-  <!-- slot 2 · tool controls: the divisor and the waste allowance -->
+  <!-- slot 2 · tool controls: the divisor and the unbundled waste knobs -->
   <div class="param-block" style="margin-bottom: var(--space-lg);">
-    <div class="section-label">Divide by — a sheet, tile, or batch (optional)</div>
+    <div class="section-label">Divide by — a sheet, tile, or coverage rate (optional)</div>
     <input type="text" id="covInput" class="cov-input" spellcheck="false" maxlength="80"
-           autocomplete="off" autocapitalize="off" placeholder="e.g. 4' x 8'">
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 4' x 8'  ·  350 ft²">
     <div class="param-chips grid-row" id="covChips" style="margin-top:0.35rem;"></div>
     <div class="cov-note" id="covNote"></div>
   </div>
-  <div class="opt-line">
+  <!-- waste, unbundled: breakage is a material rate, attic stock a chosen
+       reserve, cut waste geometric (a layout's, not a percentage) -->
+  <div class="opt-line" style="margin-bottom:var(--space-sm);">
     <div class="opt-cluster">
-      <span class="section-label">Waste allowance</span>
-      <button type="button" class="mini-pill" aria-pressed="false" data-waste="0">none</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-waste="5">+5%</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-waste="10">+10%</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-waste="15">+15%</button>
+      <span class="section-label">Breakage</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-break="0">none</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-break="2">+2%</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-break="4">+4%</button>
+    </div>
+    <div class="opt-cluster">
+      <span class="section-label">Attic Stock</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-attic="0">none</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-attic="5">+5%</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-attic="10">+10%</button>
     </div>
   </div>
+  <p class="section-note">Breakage is commonly quoted at 2&ndash;5% — ceramic low,
+     porcelain and stone high. Attic stock is the owner's repair reserve. Cut
+     waste comes from the layout, not a percentage — the
+     <a href="run.html">Run Solver</a> counts real cuts in a run.</p>
 
   <div id="results">
     <!-- slot 3 · ECHO -->
@@ -113,18 +125,30 @@
   function areaOutOfRange(mm2) { return !Number.isFinite(mm2) || Math.abs(mm2) > MAX_AREA_MM2; }
 
   var COV_CHIPS = {
-    imperial: ["4' x 8'", "4' x 10'", "4' x 12'", "2' x 2'", "2' x 4'", '12" x 12"', '24" x 24"'],
-    metric: ['1.2m x 2.4m', '600mm x 600mm', '600mm x 1200mm', '300mm x 300mm']
+    imperial: ["4' x 8'", "4' x 10'", "4' x 12'", "2' x 2'", "2' x 4'", '12" x 12"', '24" x 24"', '350 ft²'],
+    metric: ['1.2m x 2.4m', '600mm x 600mm', '600mm x 1200mm', '300mm x 300mm', '10 m²']
   };
 
   var state = {
     text: '',
     covText: '',
-    waste: 0,
+    breakage: 0,                       // material rate, % — a named choice
+    attic: 0,                          // owner's repair reserve, % — a named choice
     defaultUnit: 'in',
     target: 'imperial',
     chipsSystem: null
   };
+
+  // a coverage RATE typed as a bare area — paint per gallon, flooring per box.
+  // Page-local so the frozen parser stays untouched; length × length still
+  // goes through parseLength.
+  function parseAreaRate(text) {
+    var m = /^\s*([\d.,]+)\s*(sf|sq\.?\s?ft|sqft|ft²|ft2|square\s?feet)\s*$/i.exec(text);
+    if (m) return parseFloat(m[1].replace(/,/g, '')) * 92903.04;
+    m = /^\s*([\d.,]+)\s*(m²|m2|sqm|sq\.?\s?m|square\s?met(?:er|re)s?)\s*$/i.exec(text);
+    if (m) return parseFloat(m[1].replace(/,/g, '')) * 1e6;
+    return null;
+  }
 
   var els = {};
   ['dimInput','fieldNote','bareAsk','covInput','covChips','covNote','echo','echoLine','echoAssume',
@@ -244,43 +268,47 @@
   function renderArea(mm2) {
     els.areaCard.style.display = '';
     els.areaLabel.textContent = 'The area, in every register';
-    var a = Math.abs(mm2), neg = mm2 < 0 ? '−' : '';
+    var neg = mm2 < 0 ? '−' : '';
     var rows = '';
-    var m2 = a / 1e6, ft2 = a / 92903.04, in2 = a / 645.16;
     var lead = areaBoth(mm2);
     rows += rowHtml('Area', '', '<span class="fact">' + escapeHtml(neg + lead.lead) + '</span>', '—', true);
-    rows += rowHtml('Also', '', escapeHtml(neg + lead.alt + '  ·  ' + neg + sig(in2) + ' in²  ·  ' + neg + sig(a) + ' mm²'), '—', false, 'is-ref');
+    rows += rowHtml('Also', '', escapeHtml(neg + lead.alt), '—', false, 'is-ref');
     // carry the same takeoff expression into the occupant load calc
     if (mm2 > 0) rows += '<div style="margin-top:var(--space-sm);font-size:var(--text-sm);">Carry it forward: '
       + '<a class="card-link" href="occupant-load.html?d=' + encodeURIComponent(state.text) + '">occupant load for this area →</a></div>';
     els.areaRows.innerHTML = rows;
   }
 
-  function renderCoverage(mm2, cov, covRes) {
+  function renderCoverage(mm2, cov) {
     if (cov == null) { els.covCard.style.display = 'none'; return null; }
     els.covCard.style.display = '';
-    var w = state.waste;
-    var plan = mm2 * (1 + w / 100);                 // the planning area
-    var ratio = plan / cov;
+    var b = state.breakage, aS = state.attic;
+    function pieces(n) { return n + (n === 1 ? ' piece' : ' pieces'); }
+    var ratio = mm2 / cov;                            // net — the area itself
     var down = Math.floor(ratio), up = Math.ceil(ratio);
-    els.covLabel.textContent = 'Divided by ' + (covRes ? covRes.original || state.covText : state.covText)
-      + (w ? ' — planning at +' + w + '% waste' : '');
+    var withB = Math.ceil(ratio * (1 + b / 100));     // + breakage, whole pieces
+    var buy = Math.ceil(ratio * (1 + (b + aS) / 100));
+    var bP = withB - up, aP = buy - withB;
+    els.covLabel.textContent = 'Divided by ' + state.covText;
 
     var rows = '';
     if (down === up) {
-      rows += rowHtml('Exact fit', 'the coverage divides the area evenly', '<span class="fact">' + up + ' pieces</span>', '0', true, 'is-exact');
+      rows += rowHtml('Exact fit', 'the coverage divides the area evenly', '<span class="fact">' + pieces(up) + '</span>', '0', true, 'is-exact');
     } else {
-      var short = plan - down * cov;
-      var extra = up * cov - plan;
-      rows += rowHtml('Round up · buy', 'partial pieces still get bought', '<span class="fact">' + up + ' pieces</span>',
-                      '+' + escapeHtml(areaBoth(extra).lead) + ' over', true);
-      rows += rowHtml('Exact ratio', w ? 'area × ' + (1 + w / 100).toFixed(2) + ' ÷ coverage' : 'area ÷ coverage',
-                      escapeHtml(sig(ratio)) + ' pieces', '—', false);
-      rows += rowHtml('Round down', 'covers less than the area', down + ' pieces',
+      var short = mm2 - down * cov;
+      var extra = up * cov - mm2;
+      rows += rowHtml('Round up · covers it', 'partial pieces still get bought', '<span class="fact">' + pieces(up) + '</span>',
+                      '+' + escapeHtml(areaBoth(extra).lead) + ' over', !(bP || aP));
+      rows += rowHtml('Exact ratio', 'area ÷ coverage', escapeHtml(sig(ratio)) + ' pieces', '—', false);
+      rows += rowHtml('Round down', 'covers less than the area', pieces(down),
                       '−' + escapeHtml(areaBoth(short).lead) + ' short', false);
     }
+    // the unbundle, in whole pieces — each addition a named line, never one fudge
+    if (bP > 0) rows += rowHtml('Breakage +' + b + '%', 'material rate', '+' + pieces(bP), '—', false, 'is-ref');
+    if (aP > 0) rows += rowHtml('Attic stock +' + aS + '%', 'owner’s repair reserve', '+' + pieces(aP), '—', false, 'is-ref');
+    if (buy > up) rows += rowHtml('Buy', 'covers it + breakage + attic stock', '<span class="fact">' + pieces(buy) + '</span>', '—', true);
     els.covRows.innerHTML = rows;
-    return { plan: plan, ratio: ratio, up: up, down: down };
+    return { ratio: ratio, up: up, down: down, buy: buy };
   }
 
   /* ---- main render ---------------------------------------------------------------- */
@@ -302,17 +330,28 @@
     els.fieldNote.innerHTML = pendingNote(state.text, result);
     renderBareAsk(result);
 
-    // the divisor: must itself be an area
-    var covRes = state.covText.trim() ? parseLength(state.covText, { defaultUnit: state.defaultUnit }) : null;
+    // the divisor: an area (width × height) or a coverage rate (a bare area)
+    var covText = state.covText.trim();
     var cov = null, covNote = '';
-    if (covRes) {
-      if (covRes.dimension === 2 && covRes.area_mm2 != null && covRes.area_mm2 > 0 && !areaOutOfRange(covRes.area_mm2)) cov = covRes.area_mm2;
-      else covNote = 'needs an area — width × height, like 4\' x 8\'';
+    var rate = covText ? parseAreaRate(covText) : null;
+    if (rate != null) {
+      if (rate > 0 && !areaOutOfRange(rate)) cov = rate;
+      else covNote = 'rate out of range';
+    } else if (covText) {
+      var covRes = parseLength(covText, { defaultUnit: state.defaultUnit });
+      if (covRes && covRes.dimension === 2 && covRes.area_mm2 != null && covRes.area_mm2 > 0 && !areaOutOfRange(covRes.area_mm2)) cov = covRes.area_mm2;
+      else covNote = 'needs an area — width × height (4\' x 8\') or a rate (350 ft²)';
+      if (!covNote && covRes) { var pn = pendingNote(covText, covRes); if (pn) covNote = pn; }
     }
-    els.covNote.innerHTML = covNote ? escapeHtml(covNote) : (covRes ? pendingNote(state.covText, covRes) : '');
+    els.covNote.innerHTML = covNote || '';
 
     var asmExtra = [];
-    if (state.waste > 0 && cov != null) asmExtra.push('counts include +' + state.waste + '% waste — the area rows stay net');
+    if ((state.breakage > 0 || state.attic > 0) && cov != null) {
+      var parts = [];
+      if (state.breakage > 0) parts.push('+' + state.breakage + '% breakage');
+      if (state.attic > 0) parts.push('+' + state.attic + '% attic stock');
+      asmExtra.push('the buy count adds ' + parts.join(' and ') + ' in whole pieces — the area rows stay net');
+    }
     renderEcho(result, asmExtra);
 
     var ok = result && result.dimension === 2 && result.area_mm2 != null
@@ -324,11 +363,12 @@
       return;
     }
     renderArea(result.area_mm2);
-    var c = renderCoverage(result.area_mm2, cov, covRes);
+    var c = renderCoverage(result.area_mm2, cov);
 
     var lines = [escapeHtml(result.interpretation.work) + ' (unit²) = ' + sig(result.area_mm2) + ' mm² = ' + sig(result.area_mm2 / 1e6) + ' m²'];
     if (c) {
-      lines.push('coverage = ' + sig(cov) + ' mm² · count = ' + (state.waste ? sig(result.area_mm2) + ' × ' + (1 + state.waste / 100).toFixed(2) + ' ÷ ' + sig(cov) : sig(result.area_mm2) + ' ÷ ' + sig(cov)) + ' = <b>' + sig(c.ratio, 4) + '</b>');
+      lines.push('coverage = ' + sig(cov) + ' mm² · count = ' + sig(result.area_mm2) + ' ÷ ' + sig(cov) + ' = <b>' + sig(c.ratio, 4) + '</b>');
+      if (c.buy > c.up) lines.push('buy = ceil(' + sig(c.ratio, 4) + ' × ' + (1 + (state.breakage + state.attic) / 100).toFixed(2) + ') = <b>' + c.buy + '</b>');
       lines.push('lengths are exact lattice integers; their products and this ratio are floating point, shown to 4 significant figures');
     }
     els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
@@ -343,15 +383,19 @@
       var params = new URLSearchParams();
       if (state.text && state.text !== "12' x 14'") params.set('d', state.text);
       if (state.covText && state.covText !== "4' x 8'") params.set('c', state.covText);
-      if (state.waste) params.set('w', String(state.waste));
+      if (state.breakage) params.set('b', String(state.breakage));
+      if (state.attic) params.set('as', String(state.attic));
       var q = params.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
     }, 250);
   }
   function initFromURL() {
     var params = new URLSearchParams(location.search);
-    var wv = parseInt(params.get('w') || '', 10);
-    if ([5, 10, 15].indexOf(wv) !== -1) state.waste = wv;
+    var bv = parseInt(params.get('b') || '', 10);
+    if ([2, 4].indexOf(bv) !== -1) state.breakage = bv;
+    var av = parseInt(params.get('as') || '', 10);
+    if ([5, 10].indexOf(av) !== -1) state.attic = av;
     return {
       d: params.get('d') != null ? params.get('d').slice(0, 160) : null,
       c: params.get('c') != null ? params.get('c').slice(0, 80) : null
@@ -364,14 +408,29 @@
       UI.press(el, el.dataset[attr] === value);
     });
   }
+  // recent readings — the URL carries the takeoff, divisor, and both waste
+  // knobs, so a recent restores the whole reading
+  var recents = UI.recents({ key: 'area', anchor: els.dimInput, entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: (state.text || '') + (state.covText ? ' ÷ ' + state.covText : ''),
+             result: r ? r.textContent : '' };
+  } });
+
   els.dimInput.addEventListener('input', function () { state.text = els.dimInput.value; render(); });
   els.dimInput.addEventListener('focus', function () { setTimeout(function () { els.dimInput.select(); }, 0); });
   els.covInput.addEventListener('input', function () { state.covText = els.covInput.value; render(); });
   els.covInput.addEventListener('focus', function () { setTimeout(function () { els.covInput.select(); }, 0); });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-waste]'), function (el) {
+  Array.prototype.forEach.call(document.querySelectorAll('[data-break]'), function (el) {
     el.addEventListener('click', function () {
-      state.waste = +el.dataset.waste;
-      setActive('[data-waste]', 'waste', String(state.waste));
+      state.breakage = +el.dataset.break;
+      setActive('[data-break]', 'break', String(state.breakage));
+      render();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-attic]'), function (el) {
+    el.addEventListener('click', function () {
+      state.attic = +el.dataset.attic;
+      setActive('[data-attic]', 'attic', String(state.attic));
       render();
     });
   });
@@ -382,7 +441,8 @@
   els.covInput.value = u.c != null ? u.c : "4' x 8'";
   state.text = els.dimInput.value;
   state.covText = els.covInput.value;
-  setActive('[data-waste]', 'waste', String(state.waste));
+  setActive('[data-break]', 'break', String(state.breakage));
+  setActive('[data-attic]', 'attic', String(state.attic));
   render();
 })();
 </script>
