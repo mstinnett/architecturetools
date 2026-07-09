@@ -114,17 +114,17 @@ _Last updated: 2026-07-08 (`scale.html` rebuilt again on the **crossing model** 
   Object" / "Physical Object") **stopped reading** and was rebuilt around one
   unifying idea: **a dimension crosses between sheet and world through an
   instrument; scale `n` converts sheet error to real error.** Five quantities —
-  drawing scale `n`, drawing floor `R` (source sheet-precision × `n`), read
+  drawing scale `n`, sheet resolution `R` (source sheet-precision × `n`), read
   resolution `r`, tape resolution `t`, run accumulation. Two rules: reading →
   `value ± max(r, R)`; measuring to draw → known to ±(accumulated tape error),
   drawn off by `max(that, R)`. Page order is fixed: **scale → verb-named task
   toggle (Read A Drawing / Measure To Draw) → precisions → dimension → run.**
-  The **drawing floor is a knob** — a source-fidelity spectrum (Revit/CAD `snap`
+  The **sheet resolution is a knob** — a source-fidelity spectrum (Revit/CAD `snap`
   · PDF/Revu ≈0.3 mm · Print/Scale-rule ≈0.5 mm · Hand-drawn ≈0.8 mm) — so the
-  floor is set without a second length field. The run section now takes a
+  resolution is set without a second length field. The run section now takes a
   **physical tape length** (12/25/50 ft, metric 5/10/30 m, custom); each lay
   covers one tape length, the table carries a Run column and highlights the lay
-  where the worst-case chain first breaches the floor (`N ≈ R/t`), with a marker
+  where the worst-case chain first exceeds what the sheet holds (`N ≈ R/t`), with a marker
   on the stack-up figure. Imperial real-measurement displays read as native
   ft-in fractions, not survey decimals. **Slope**: any-two-of-three inputs; the
   three redundant sides collapsed to the solved ones; a rounding table
