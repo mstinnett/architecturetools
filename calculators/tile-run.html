@@ -46,6 +46,10 @@
   /* the window your wall lands in */
   .win-table .win-hit td { background: color-mix(in srgb, var(--accent) 9%, transparent); }
   .win-table .win-hit td:last-child { color: var(--accent); font-weight: 500; }
+  /* rows are selectable — the chosen count is drawn on the wall below */
+  .win-table tr[data-n] { cursor: pointer; }
+  .win-table tr[data-n]:hover td { background: var(--accent-soft); }
+  .win-table tr.sel td { box-shadow: inset 2px 0 0 var(--accent); }
 
   /* the engine audit — kept apart from content, at the very bottom */
   .engine-note { margin-top: var(--space-xl); padding-top: var(--space-md);
@@ -136,6 +140,7 @@
         <div class="figure-wrap" id="figure"></div>
       </div>
       <table class="win-table" id="winTable"></table>
+      <p class="section-note" style="margin-top:0.5rem;">Select a row to draw that count on the wall.</p>
     </div>
   </div>
 
@@ -181,7 +186,8 @@
     jmaxText: '3/16"',
     wallText: '',
     endAText: '0"',
-    endBText: '0"'
+    endBText: '0"',
+    selN: null                       // a table row's count, drawn on the wall
   };
   function D() { return DEFAULTS[state.target]; }
 
@@ -263,11 +269,14 @@
         if (xb > xa) svg += '<rect x="' + xa + '" y="' + zoneTop + '" width="' + (xb - xa) + '" height="' + (zoneBot - zoneTop) + '" fill="url(#pwhatch)" opacity="0.5" stroke="none"/>';
       }
     }
-    // uncut-run zones, each carrying its whole-tile count
+    // uncut-run zones, each carrying its whole-tile count; a tick marks the
+    // middle — the dimension with the most slack (the table's third column)
     o.bands.forEach(function (b) {
       var xa = Math.max(padL, x(b.lo)), xb = Math.min(W - padR, x(b.hi));
       if (xb <= xa) return;
       svg += '<rect x="' + xa + '" y="' + zoneTop + '" width="' + (xb - xa) + '" height="' + (zoneBot - zoneTop) + '" fill="var(--accent-soft)" stroke="none"/>';
+      var xm = x((b.lo + b.hi) / 2);
+      if (xm > padL && xm < W - padR) svg += '<line x1="' + xm + '" y1="' + (midY - 5) + '" x2="' + xm + '" y2="' + (midY + 5) + '" stroke="var(--accent,#004C80)" stroke-width="1"/>';
       svg += '<text x="' + ((xa + xb) / 2) + '" y="' + (zoneTop - 6) + '" text-anchor="middle" class="nl-snap-val" stroke-width="3" style="paint-order:stroke">' + b.n + '</text>';
     });
     // the axis through the middle
@@ -289,6 +298,67 @@
            + escapeHtml(fmtShort(near.lo)) + ' – ' + escapeHtml(fmtShort(near.hi)) + '</text>';
     }
     svg += '<text x="' + padL + '" y="' + (H - 4) + '" font-size="10" fill="var(--nl-axis,#999)" stroke-width="3" style="paint-order:stroke">tinted = wall lengths where whole tiles fit · hatched = a cut is forced · numbers = tiles in the run</text>';
+    svg += '</svg>';
+    return svg;
+  }
+
+  /* ---- the elevation: the wall itself, tiles drawn to scale ----------------
+     The concrete register under the abstract one. The chosen count is laid on
+     the wall at the joint your dimension implies (clamped to the range). If
+     it can't reach, the leftover is hatched — the cut, drawn — or the run is
+     shown passing the end of the wall. */
+  function runFig(o) {
+    var W = o.width, H = 126, padL = 8, padR = 8;
+    var joints = Math.max(0, o.n - 1);
+    var mid = o.fA + o.fB + o.n * o.T + joints * (o.jLo + o.jHi) / 2;
+    var targetW = o.Wu != null ? o.Wu : mid;
+    var J = joints > 0 ? Math.max(o.jLo, Math.min(o.jHi, (targetW - o.fA - o.fB - o.n * o.T) / joints)) : 0;
+    var runLen = o.fA + o.fB + o.n * o.T + joints * J;
+    var diff = targetW - runLen;              // > 0: a cut piece is left; < 0: the run passes the wall
+    var fits = Math.abs(diff) < 1;
+    var total = Math.max(targetW, runLen);
+    var k = (W - padL - padR) / (total || 1);
+    var yT = 22, hT = 42, yB = yT + hT, dimY = yB + 20;
+    var wallEnd = padL + targetW * k;
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl" role="img" '
+            + 'aria-label="The wall in elevation: the chosen tile count drawn to scale, any leftover hatched as the cut.">';
+    svg += '<defs><pattern id="pwhatch2" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         + '<line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.7"/></pattern></defs>';
+
+    var x = padL;
+    function piece(w, fill) {
+      if (w <= 0) return;
+      svg += '<rect x="' + x + '" y="' + yT + '" width="' + Math.max(w, 0.75) + '" height="' + hT + '" fill="' + fill + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="0.8"/>';
+      x += w;
+    }
+    if (o.fA > 0) piece(o.fA * k, 'var(--accent-soft)');
+    for (var i = 0; i < o.n; i++) {
+      piece(o.T * k, 'var(--card,#fff)');
+      if (i < o.n - 1) x += J * k;            // the joint — the background shows through
+    }
+    if (o.fB > 0) piece(o.fB * k, 'var(--accent-soft)');
+
+    var caption;
+    if (fits) {
+      caption = o.n + ' whole tiles · joints ≈ ' + fmtShort(J);
+    } else if (diff > 0) {
+      // the leftover strip is the cut, drawn where it lands
+      svg += '<rect x="' + x + '" y="' + yT + '" width="' + (diff * k) + '" height="' + hT + '" fill="url(#pwhatch2)" stroke="var(--nl-ink,#0a0a0a)" stroke-width="0.8"/>';
+      caption = o.n + ' tiles at ' + fmtShort(o.jHi) + ' joints — the last ' + fmtShort(diff) + ' is a cut';
+    } else {
+      // the run passes the wall end; hatch what sticks out
+      svg += '<rect x="' + wallEnd + '" y="' + yT + '" width="' + (-diff * k) + '" height="' + hT + '" fill="url(#pwhatch2)" stroke="none"/>';
+      svg += '<line x1="' + wallEnd + '" y1="' + (yT - 6) + '" x2="' + wallEnd + '" y2="' + (yB + 6) + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.2"/>';
+      caption = o.n + ' tiles at ' + fmtShort(o.jLo) + ' joints — ' + fmtShort(-diff) + ' past the wall';
+    }
+
+    // the wall dimension line
+    svg += '<line x1="' + padL + '" y1="' + dimY + '" x2="' + wallEnd + '" y2="' + dimY + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+    svg += '<line x1="' + padL + '" y1="' + (dimY - 4) + '" x2="' + padL + '" y2="' + (dimY + 4) + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+    svg += '<line x1="' + wallEnd + '" y1="' + (dimY - 4) + '" x2="' + wallEnd + '" y2="' + (dimY + 4) + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+    svg += '<text x="' + (padL + (wallEnd - padL) / 2) + '" y="' + (dimY + 14) + '" text-anchor="middle" class="nl-src-val" stroke-width="3" style="paint-order:stroke">' + escapeHtml(fmtShort(targetW)) + '</text>';
+    svg += '<text x="' + padL + '" y="' + (H - 2) + '" font-size="10" fill="var(--nl-axis,#999)" stroke-width="3" style="paint-order:stroke">' + escapeHtml(caption) + '</text>';
     svg += '</svg>';
     return svg;
   }
@@ -367,17 +437,25 @@
     var width = els.figure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
+    // a selected row draws its count; otherwise the containing (or nearest) one
+    if (state.selN != null && !bands.some(function (b) { return b.n === state.selN; })) state.selN = null;
+    var drawN = state.selN != null ? state.selN : (best ? best.N : (nearBand ? nearBand.n : Nc));
     els.figure.innerHTML = windowsFig({
       bands: bands, W: Wu, WLabel: Wu != null ? fmtShort(Wu) : '',
       vLo: vLo, vHi: vHi, nearBand: nearBand, width: width
+    }) + runFig({
+      n: drawN, T: m.T, jLo: m.jLo, jHi: m.jHi, fA: m.endA.u, fB: m.endB.u,
+      Wu: Wu, width: width
     });
 
-    // ---- table: a menu of dimensions to set, one row per whole-tile count --
+    // ---- table: a menu of dimensions to set, one row per whole-tile count.
+    // Rows select — the chosen count is drawn on the wall above.
     var rows = '<tr><th>Whole Tiles</th><th>Set The Wall Between</th><th>Middle — Most Slack</th></tr>';
     bands.forEach(function (b) {
       var inWin = Wu != null && b.lo <= Wu && Wu <= b.hi;
+      var cls = (inWin ? 'win-hit' : '') + (state.selN === b.n ? ' sel' : '');
       var mid = (b.lo + b.hi) / 2, half = (b.hi - b.lo) / 2;
-      rows += '<tr' + (inWin ? ' class="win-hit"' : '') + '>'
+      rows += '<tr data-n="' + b.n + '"' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>'
             + '<td>' + b.n + '</td>'
             + '<td>' + escapeHtml(fmtShort(b.lo)) + ' – ' + escapeHtml(fmtShort(b.hi)) + '</td>'
             + '<td>' + escapeHtml(fmtShort(mid)) + ' (±' + escapeHtml(fmtShort(half)) + ')</td></tr>';
@@ -515,6 +593,13 @@
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-units]'), function (el) {
     el.addEventListener('click', function () { setUnits(el.dataset.units); render(); });
+  });
+  els.winTable.addEventListener('click', function (e) {
+    var row = e.target.closest ? e.target.closest('tr[data-n]') : null;
+    if (!row) return;
+    var n = +row.dataset.n;
+    state.selN = state.selN === n ? null : n;
+    render();
   });
 
   // initial state — URL params override the worked example (6" tile, 5'-1" wall)
