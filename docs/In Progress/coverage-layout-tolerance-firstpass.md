@@ -284,19 +284,22 @@ with the layout rendered and the waste told honestly in three parts.
 
 ---
 
-## Open questions for the operator
-1. Merge confirmed — but does the tile/precision depth ship on the Material
-   Coverage page, or split L3/L4 into their own page once heavy?
-2. Precision-window solver name: **Precision Window** / **Buildable Run** /
-   **Set It To Fit**?
-3. Recents placement — field dropdown (recommended) vs. bottom drawer?
-4. Which room-dimension calcs make the first cut (lumen · daylight · proportion)?
-5. Rate divisor (paint ft²/gal) into L1 now, or later?
-6. **Masonry / module coursing** — its own "design to the module" tool (what
-   wall length + opening heights are whole-course CMU/brick), or a preset of the
-   same run engine as tile? Strong candidate, no free tool inverts it.
-7. Adopt **design-vs-construction** (field fits the module / desk picks the
-   dimension) as the suite map's top-level frame?
+## Open questions — resolutions as of 2026-07-09
+1. ~~Merge or split~~ — RESOLVED: `tile.html` ("Tile") is its own page with
+   verb-named tasks (Size The Wall · Lay Out The Wall); L4 lives there, L3
+   (pattern surface) stays split until it earns folding in. Material Coverage
+   stays the counting tool.
+2. ~~Solver name~~ — RESOLVED: the page is **Tile**; the solver is its
+   **Size The Wall** task. ("Precision Window" retired — too narrow a door.)
+3. ~~Recents placement~~ — RESOLVED: field-anchored dropdown, shipped on every
+   engine tool (`UI.recents`).
+4. Which room-dimension calcs make the first cut (lumen · daylight ·
+   proportion)? — OPEN; rules need verification first.
+5. ~~Rate divisor~~ — RESOLVED: shipped in Material Coverage.
+6. **Masonry / module coursing** — OPEN. Its own "design to the module" tool,
+   or a preset of the tile/run engine? Strong candidate, no free tool inverts it.
+7. ~~Adopt the frame~~ — RESOLVED: design-vs-construction is now the suite
+   map's top-level frame.
 
 [bezruchuk]: https://bezruchuk.com/shower-tile-layout-tool/
 [Herron]: https://herron.app/tools/tile-layout-planner

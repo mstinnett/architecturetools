@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-07-09 (Scale gained the design-side "Across The Scales" table + false-precision reveal ("floor" term retired for **sheet resolution**); shared **recents** component in ui.js; `area.html` renamed **Material Coverage** (rate divisor, waste unbundled); **`tile-run.html` ("Uncut Tile Run", renamed from precision-window)** first draft — the design inverse of a tile run, split from the 2-D pattern surface. All on branch `claude/calculator-converter-promotion-qcbhgv`, noindexed — operator moves to `main` manually. Design thinking captured in `docs/In Progress/coverage-layout-tolerance-firstpass.md`.)_
+_Last updated: 2026-07-09 (**`tile.html` ("Tile")** is now the tile node: one chassis, verb-named tasks — Size The Wall (the uncut-run solver; answers with dimensions to set, elevation figure, selectable rows) and Lay Out The Wall (flush/centered drawn, cuts as ranges). **Recents on every engine tool.** The **design-vs-construction frame** adopted into the suite map. Scale: Across The Scales + false-precision reveal, metric family flip, "sheet resolution" vocabulary. `area.html` → **Material Coverage** (rate divisor, waste unbundled). A per-tool exemplar-pass queue for the remaining tools is in the backlog. All on branch `claude/calculator-converter-promotion-qcbhgv`, noindexed — operator moves to `main` manually.)_
 
 ## Live architectural picture
 
@@ -45,9 +45,9 @@ _Last updated: 2026-07-09 (Scale gained the design-side "Across The Scales" tabl
   decisions), `slope.html` (any-two-of-three; coherence-passed 2026-07-08,
   answer surface matched to the converter), `area.html` (**"Material
   Coverage"** — rate divisor, waste unbundled into breakage/attic-stock/
-  cut-waste-is-the-layout's), `tile-run.html` ("Uncut Tile Run", renamed from precision-window) (**first draft** — the
-  design inverse of a tile run: buildable windows drawn, forced-cut gaps
-  hatched, bullnose/metal/lapped ends), `stairs.html` (introduces the edition pill + citation
+  cut-waste-is-the-layout's), `tile.html` (**"Tile"** — Size The Wall:
+  the uncut-run solver, dimensions-to-set answers, windows + elevation figures;
+  Lay Out The Wall: flush/centered, cuts as ranges), `stairs.html` (introduces the edition pill + citation
   pattern), `sheet-sizes.html` (the fit reference, restyled onto the theme,
   ANSI added). Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table
   1004.5, gross/net surfaced), `egress-width.html` (load×factor both

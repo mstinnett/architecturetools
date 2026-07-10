@@ -3,6 +3,14 @@
 
 ---
 
+## The frame (adopted 2026-07-09)
+
+**Design tools, not construction tools.** Construction calculators (Construction
+Master Pro and kin) fit a module to a given dimension and cut the leftover. This
+suite picks the dimension so the module lands clean — the field calc's design
+inverse is our tool. Full statement + the field→inverse table in
+`coverage-layout-tolerance-firstpass.md`.
+
 ## Two rules that govern the whole graph
 
 **1. A node is a page with a shared input model.**
@@ -101,7 +109,7 @@ FAR · coverage · setback · height · density · parking. Jurisdiction-by-juri
 
 ## Depth ladders (the ◷ later-layers, logged not built)
 
-**Tile node** — fuller first-pass spec in `coverage-layout-tolerance-firstpass.md`
+**Tile node** — BUILT 2026-07-09 as `tile.html` ("Tile"): one chassis (tile · joint range · run ends · units), verb-named tasks — **Size The Wall** (the uncut-run solver) and **Lay Out The Wall** (flush/centered, cuts as ranges). Pattern surface (L3) still split. Fuller spec in `coverage-layout-tolerance-firstpass.md`
 (merges tile with area/coverage into one deepening node; the grout joint read as
 a tolerance range; the inverse precision-window solver; 2-D patterns + accent
 banding; termination/corner edge cases). Ladder:
