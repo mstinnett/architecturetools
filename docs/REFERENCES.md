@@ -80,7 +80,8 @@ of standards behind the tools with editions, access, and source links — is
 
 | Document | What the suite takes from it | Cited by | Status |
 |---|---|---|---|
-| ANSI A108.02 | named as the spec-check pointer for tile joint-width variation — **no values quoted** | run (tiles mode, joint-relaxation note) | pointer only, by design |
+| ANSI A108.02 | named as the spec-check pointer for tile joint-width variation (run); the minimum-joint rule — joint ≥ 3× the tile's actual facial-dimension variation (tile-run) | run (tiles mode, joint-relaxation note), tile-run (joint note) | **memory** — the 3× rule is consistent across industry secondary sources read 2026-07-09 (Ceramic Tile Foundation, TileLetter, Custom TB85); not read against the standard itself |
+| ANSI A137.1 | facial-dimension variation classes behind the joint note: rectified porcelain under 1/16″, calibrated (pressed) tile wider | tile-run (joint note) | **memory** — figures from industry secondary sources read 2026-07-09; not read against the standard itself |
 | ANSI/ASME Y14.1 sheet series | ANSI A–E sheet dimensions (8.5×11 … 34×44) | sheet-sizes | memory — standard published sizes; ARCH series is customary practice, no single standard cited |
 
 ## Deliberately uncited — named figures without a pinned section

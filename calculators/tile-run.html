@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
-<title>Precision Window -- architecture.tools</title>
-<meta name="description" content="Find the wall lengths where an uncut tile run lands: a run of whole tiles spans a window, not a point, because the joints flex. The buildable windows drawn, your dimension located, the slack shown.">
+<title>Uncut Tile Run -- architecture.tools</title>
+<meta name="description" content="Find the wall lengths where a run of whole tiles fits: the joints flex between their minimum and maximum, so each tile count reaches a window of wall lengths, not a point. The windows drawn, your dimension located, the slack shown.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -32,7 +32,9 @@
   .small-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
   .joint-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
   .joint-row .to { color: var(--ink-3); }
-  .end-note { font-size: var(--text-xs); color: var(--ink-2); margin-top: 0.3rem; min-height: 1.1em; }
+  .end-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.45rem; }
+  .end-row .end-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-3); width: 9.5em; }
 
   .win-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm);
     margin-top: var(--space-md); }
@@ -56,17 +58,26 @@
   <div class="page-header">
     <!-- the set trail is a label until a C-0 index earns its page on main -->
     <nav class="page-crumb" aria-label="Breadcrumb">
-      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Precision Window</span>
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Uncut Tile Run</span>
     </nav>
-    <h1>Precision Window</h1>
-    <p>A run of whole tiles spans a window, not a point: the joints flex between
-       their minimum and maximum. Give it a tile and a joint range and it draws
-       the wall lengths where an uncut run lands, with the slack shown. Near a
-       window's middle the setter absorbs field variation in the joints; near an
-       edge one tight course forces a cut.</p>
+    <h1>Uncut Tile Run</h1>
+    <p>A run of whole tiles fits a window of wall lengths, not one length: the
+       joints flex between their minimum and maximum. Give it a tile and a joint
+       range and it draws those windows, locates your wall, and shows the slack.
+       Near the middle of a window, field variation goes into the joints; at an
+       edge, one tight course forces a cut.</p>
   </div>
 
-  <!-- ================= 1 · TILE ================= -->
+  <!-- ================= 1 · UNITS ================= -->
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Units</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-units="imperial">imperial</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-units="metric">metric</button>
+    </div>
+  </div>
+
+  <!-- ================= 2 · TILE ================= -->
   <div class="section-label">Tile — the dimension along the run</div>
   <div class="joint-row" style="margin-bottom:var(--space-sm);">
     <input type="text" id="tileInput" class="small-input" spellcheck="false" maxlength="24"
@@ -74,8 +85,8 @@
   </div>
   <div class="grid-presets" id="tileChips" style="margin-bottom:var(--space-lg);"></div>
 
-  <!-- ================= 2 · JOINT RANGE ================= -->
-  <div class="section-label">Joint — minimum to maximum the setter can hold</div>
+  <!-- ================= 3 · JOINT RANGE ================= -->
+  <div class="section-label">Joint — minimum to maximum</div>
   <div class="joint-row">
     <input type="text" id="jminInput" class="small-input" spellcheck="false" maxlength="24"
            autocomplete="off" autocapitalize="off" value="1/16&quot;">
@@ -83,37 +94,34 @@
     <input type="text" id="jmaxInput" class="small-input" spellcheck="false" maxlength="24"
            autocomplete="off" autocapitalize="off" value="3/16&quot;">
   </div>
-  <p class="section-note" style="margin-bottom:var(--space-lg);">The spec floor is
-     3&times; the tile's facial variation — rectified porcelain runs under 1/16&Prime;,
-     calibrated tile wider. A range that tight leaves the setter nothing to absorb.</p>
+  <p class="section-note" style="margin-bottom:var(--space-lg);">The minimum joint
+     is 3&times; the tile's actual facial variation (ANSI A108.02 / A137.1) —
+     rectified porcelain runs under 1/16&Prime;, calibrated tile wider. A minimum
+     that tight leaves nothing to adjust.</p>
 
-  <!-- ================= 3 · ENDS ================= -->
-  <div class="section-label">Ends — what the run terminates into</div>
-  <div class="opt-line" style="margin-bottom:var(--space-sm);">
-    <div class="opt-cluster">
-      <span class="section-label" style="font-size:var(--text-xs);">Left</span>
-      <button type="button" class="mini-pill" aria-pressed="false" data-enda="plain">Plain</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-enda="bull">Bullnose</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-enda="metal">Metal Edge</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-enda="lap">Lapped</button>
-    </div>
-    <div class="opt-cluster">
-      <span class="section-label" style="font-size:var(--text-xs);">Right</span>
-      <button type="button" class="mini-pill" aria-pressed="false" data-endb="plain">Plain</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-endb="bull">Bullnose</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-endb="metal">Metal Edge</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-endb="lap">Lapped</button>
-    </div>
+  <!-- ================= 4 · RUN ENDS ================= -->
+  <div class="section-label">Run Ends — a fixed amount added at each end</div>
+  <div class="end-row">
+    <span class="end-label">Beginning Of Run</span>
+    <input type="text" id="endAInput" class="small-input" spellcheck="false" maxlength="24"
+           autocomplete="off" autocapitalize="off" value="0&quot;">
+    <span class="opt-cluster" id="endAPresets"></span>
   </div>
-  <div class="joint-row" id="endDims" style="margin-bottom:0.3rem;"></div>
-  <div class="end-note" id="endNote"></div>
+  <div class="end-row">
+    <span class="end-label">End Of Run</span>
+    <input type="text" id="endBInput" class="small-input" spellcheck="false" maxlength="24"
+           autocomplete="off" autocapitalize="off" value="0&quot;">
+    <span class="opt-cluster" id="endBPresets"></span>
+  </div>
+  <p class="section-note">A preset fills the amount — edit it to match your trim,
+     and include the trim's joint in the number if it gets one.</p>
 
-  <!-- ================= 4 · THE WALL ================= -->
-  <div class="tool-section">
+  <!-- ================= 5 · THE WALL ================= -->
+  <div class="tool-section" style="margin-top:var(--space-xl);">
     <div class="section-label">Wall — the dimension you're setting (optional)</div>
     <div class="field-wrap" style="margin-top:0.4rem;">
       <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="120"
-             autocomplete="off" autocapitalize="off" placeholder="e.g. 5'-1&quot;  ·  1550mm">
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 5'-1&quot;  ·  2.45m">
       <div class="field-note" id="fieldNote"></div>
     </div>
 
@@ -151,40 +159,33 @@
   var MAX_UNITS = 96000000000;
   function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
 
-  /* End conditions: what each termination consumes off the clear run, and
-     whether it adds a joint between itself and the field. First-draft model,
-     dimensions editable, every assumption echoed:
-       plain      — tile meets the end: nothing consumed
-       bullnose   — a trim course + a joint: its width is a real dimension
-       metal edge — the profile's reveal, tight to the first tile
-       lapped     — the adjacent wall's tile laps this run's end: roughly one
-                    tile thickness + its bed consumed, plus the corner joint */
-  var ENDS = {
-    plain: { face: 'plain',      dim: null,   joint: 0 },
-    bull:  { face: 'bullnose',   dim: 'bw',   joint: 1 },
-    metal: { face: 'metal edge', dim: 'mr',   joint: 0 },
-    lap:   { face: 'lapped',     dim: 'lt',   joint: 1 }
-  };
-  var END_DIMS = {
-    bw: { label: 'bullnose width', def: '3"',   defU: 3 * IN },
-    mr: { label: 'edge reveal',    def: '1/8"', defU: IN / 8 },
-    lt: { label: 'lap thickness',  def: '3/8"', defU: 3 * IN / 8 }
+  /* Per-system defaults. A prefill still sitting at one system's default swaps
+     to the other's when the units flip; typed values are never touched. */
+  var DEFAULTS = {
+    imperial: { tile: '6"', jmin: '1/16"', jmax: '3/16"', wall: '5\'-1"', end: '0"',
+                tileU: 6 * IN, jminU: IN / 16, jmaxU: 3 * IN / 16,
+                chips: ['3"', '4 1/4"', '6"', '12"', '24"'],
+                ends: [['None', '0"'], ['Bullnose', '3"'], ['Metal Edge', '1/8"'], ['Lapped', '3/8"']] },
+    metric:   { tile: '150 mm', jmin: '2 mm', jmax: '5 mm', wall: '2.45 m', end: '0 mm',
+                tileU: 150 * MM, jminU: 2 * MM, jmaxU: 5 * MM,
+                chips: ['100 mm', '150 mm', '300 mm', '600 mm'],
+                ends: [['None', '0 mm'], ['Bullnose', '75 mm'], ['Metal Edge', '3 mm'], ['Lapped', '10 mm']] }
   };
 
   var state = {
+    target: 'imperial',
+    defaultUnit: 'in',
     tileText: '6"',
     jminText: '1/16"',
     jmaxText: '3/16"',
     wallText: '',
-    endA: 'plain',
-    endB: 'plain',
-    bwText: '3"', mrText: '1/8"', ltText: '3/8"',
-    defaultUnit: 'in',
-    target: 'imperial'
+    endAText: '0"',
+    endBText: '0"'
   };
+  function D() { return DEFAULTS[state.target]; }
 
   var els = {};
-  ['tileInput','tileChips','jminInput','jmaxInput','endDims','endNote',
+  ['tileInput','tileChips','jminInput','jmaxInput','endAInput','endBInput','endAPresets','endBPresets',
    'dimInput','fieldNote','echo','echoLine','echoAssume','figure','winTable','engineNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
   });
@@ -203,45 +204,33 @@
   }
 
   /* ---- parsing: each small field, with a stated/inferred flag ------------- */
-  function parseField(text, fallbackU) {
+  function parseField(text, fallbackU, allowZero) {
     var r = text && text.trim() ? parseLength(text, { defaultUnit: state.defaultUnit }) : null;
-    var ok = r && r.dimension === 1 && r.units > 0 && !outOfRange(r.units);
+    var ok = r && r.dimension === 1 && r.units != null && !outOfRange(r.units)
+          && (allowZero ? r.units >= 0 : r.units > 0);
     return { u: ok ? r.units : fallbackU, stated: !!ok, sys: ok ? r.unitSystem : null };
   }
 
   /* ---- the model ----------------------------------------------------------
-     A run of N whole tiles with flexible joints spans
-       lo(N) = F + N·T + joints(N)·Jmin
-       hi(N) = F + N·T + joints(N)·Jmax
-     where joints(N) = N − 1 + (one per trim/lap end) and F is what the end
-     conditions consume. Between consecutive windows the wall forces a cut. */
+     A run of N whole tiles with flexible joints reaches
+       lo(N) = ends + N·T + (N−1)·Jmin
+       hi(N) = ends + N·T + (N−1)·Jmax
+     Between consecutive windows the wall length forces a cut. Each end adds a
+     fixed amount to the run (trim, edge profile, corner lap — preset or typed). */
   function model() {
-    var tile = parseField(state.tileText, 6 * IN);
-    var jmin = parseField(state.jminText, IN / 16);
-    var jmax = parseField(state.jmaxText, 3 * IN / 16);
+    var d = D();
+    var tile = parseField(state.tileText, d.tileU);
+    var jmin = parseField(state.jminText, d.jminU);
+    var jmax = parseField(state.jmaxText, d.jmaxU);
     if (jmax.u < jmin.u) { var t = jmin; jmin = jmax; jmax = t; }
-    var endA = ENDS[state.endA], endB = ENDS[state.endB];
-    var dims = {
-      bw: parseField(state.bwText, END_DIMS.bw.defU),
-      mr: parseField(state.mrText, END_DIMS.mr.defU),
-      lt: parseField(state.ltText, END_DIMS.lt.defU)
-    };
-    var F = 0, extraJ = 0, endFaces = [];
-    [endA, endB].forEach(function (e, i) {
-      var side = i === 0 ? 'left' : 'right';
-      if (e.dim) {
-        F += dims[e.dim].u;
-        endFaces.push(side + ' ' + e.face + ' consumes ' + fmtShort(dims[e.dim].u) + (e.joint ? ' + a joint' : ''));
-      } else if (e.face !== 'plain') {
-        endFaces.push(side + ' ' + e.face);
-      }
-      extraJ += e.joint;
-    });
+    var endA = parseField(state.endAText, 0, true);
+    var endB = parseField(state.endBText, 0, true);
+    var F = endA.u + endB.u;
     var wall = state.wallText.trim() ? parseField(state.wallText, null) : { u: null, stated: false };
     return {
-      T: tile.u, jLo: jmin.u, jHi: jmax.u, F: F, extraJ: extraJ,
-      tile: tile, jmin: jmin, jmax: jmax, wall: wall, endFaces: endFaces,
-      joints: function (N) { return Math.max(0, N - 1 + extraJ); },
+      T: tile.u, jLo: jmin.u, jHi: jmax.u, F: F,
+      tile: tile, jmin: jmin, jmax: jmax, wall: wall, endA: endA, endB: endB,
+      joints: function (N) { return Math.max(0, N - 1); },
       lo: function (N) { return F + N * this.T + this.joints(N) * this.jLo; },
       hi: function (N) { return F + N * this.T + this.joints(N) * this.jHi; }
     };
@@ -249,56 +238,56 @@
 
   function syncDetected(m) {
     var sys = (m.wall.stated && m.wall.sys) || (m.tile.stated && m.tile.sys);
-    if (sys === 'imperial' || sys === 'metric') {
-      state.target = sys;
-      state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
-    }
+    if ((sys === 'imperial' || sys === 'metric') && sys !== state.target) setUnits(sys);
   }
 
-  /* ---- the windows figure: buildable bands on a ruler of the wall --------- */
+  /* ---- the windows figure: buildable zones on a ruler of the wall ---------
+     Zones, not boxes — a tinted stripe is a range of wall lengths, a hatched
+     stripe is where a cut is forced. Nothing here depicts a tile. */
   function windowsFig(o) {
     var W = o.width, H = 150, padL = 8, padR = 8, padT = 34, padB = 36;
     var innerW = W - padL - padR, midY = padT + (H - padT - padB) / 2;
+    var zoneTop = padT, zoneBot = H - padB;
     var span = o.vHi - o.vLo || 1;
     function x(u) { return padL + ((u - o.vLo) / span) * innerW; }
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" '
-            + 'aria-label="Buildable windows: wall lengths where a run of whole tiles lands, gaps where a cut is forced.">';
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl" role="img" '
+            + 'aria-label="Wall lengths where a run of whole tiles fits, and the gaps between where a cut is forced.">';
     svg += '<defs><pattern id="pwhatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/></pattern></defs>';
-    // forced-cut gaps first (hatched), so bands sit on top
+    // forced-cut stripes between windows
     for (var i = 0; i + 1 < o.bands.length; i++) {
       var gL = o.bands[i].hi, gR = o.bands[i + 1].lo;
       if (gR > gL) {
         var xa = Math.max(padL, x(gL)), xb = Math.min(W - padR, x(gR));
-        if (xb > xa) svg += '<rect x="' + xa + '" y="' + (midY - 14) + '" width="' + (xb - xa) + '" height="28" fill="url(#pwhatch)" stroke="none"/>';
+        if (xb > xa) svg += '<rect x="' + xa + '" y="' + zoneTop + '" width="' + (xb - xa) + '" height="' + (zoneBot - zoneTop) + '" fill="url(#pwhatch)" opacity="0.5" stroke="none"/>';
       }
     }
-    // the axis
-    svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + (W - padR) + '" y2="' + midY + '" stroke="var(--nl-tick,#bbb)" stroke-width="1"/>';
-    // buildable bands — every one carries its whole-tile count
+    // uncut-run zones, each carrying its whole-tile count
     o.bands.forEach(function (b) {
       var xa = Math.max(padL, x(b.lo)), xb = Math.min(W - padR, x(b.hi));
       if (xb <= xa) return;
-      svg += '<rect x="' + xa + '" y="' + (midY - 18) + '" width="' + (xb - xa) + '" height="36" fill="var(--accent-soft)" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1"/>';
-      svg += '<text x="' + ((xa + xb) / 2) + '" y="' + (midY - 24) + '" text-anchor="middle" class="nl-snap-val">' + b.n + '</text>';
+      svg += '<rect x="' + xa + '" y="' + zoneTop + '" width="' + (xb - xa) + '" height="' + (zoneBot - zoneTop) + '" fill="var(--accent-soft)" stroke="none"/>';
+      svg += '<text x="' + ((xa + xb) / 2) + '" y="' + (zoneTop - 6) + '" text-anchor="middle" class="nl-snap-val" stroke-width="3" style="paint-order:stroke">' + b.n + '</text>';
     });
-    // the target wall
+    // the axis through the middle
+    svg += '<line x1="' + padL + '" y1="' + midY + '" x2="' + (W - padR) + '" y2="' + midY + '" stroke="var(--nl-tick,#bbb)" stroke-width="1"/>';
+    // the target wall — the line stops at the zone bottom so the annotation
+    // row below stays clear
     if (o.W != null) {
       var xw = x(o.W);
       if (xw >= padL && xw <= W - padR) {
-        svg += '<line x1="' + xw + '" y1="' + (padT - 12) + '" x2="' + xw + '" y2="' + (H - padB + 10) + '" stroke="var(--accent,#004C80)" stroke-width="2"/>';
-        svg += '<text x="' + xw + '" y="' + (padT - 18) + '" text-anchor="middle" class="nl-true-val" style="font-weight:700">' + escapeHtml(o.WLabel) + '</text>';
+        svg += '<line x1="' + xw + '" y1="' + (zoneTop - 2) + '" x2="' + xw + '" y2="' + zoneBot + '" stroke="var(--accent,#004C80)" stroke-width="2"/>';
+        svg += '<text x="' + xw + '" y="' + (zoneTop - 22) + '" text-anchor="middle" class="nl-true-val" stroke-width="3" style="paint-order:stroke;font-weight:700">' + escapeHtml(o.WLabel) + '</text>';
       }
     }
-    // one range label under the band nearest the wall — narrow bands can't
-    // carry two separate edge labels without collision
+    // one range label under the zone nearest the wall
     var near = o.nearBand;
     if (near) {
       var nc = (x(near.lo) + x(near.hi)) / 2;
-      svg += '<text x="' + nc + '" y="' + (H - padB + 14) + '" text-anchor="middle" class="nl-src-val">'
+      svg += '<text x="' + nc + '" y="' + (H - padB + 14) + '" text-anchor="middle" class="nl-src-val" stroke-width="3" style="paint-order:stroke">'
            + escapeHtml(fmtShort(near.lo)) + ' – ' + escapeHtml(fmtShort(near.hi)) + '</text>';
     }
-    svg += '<text x="' + padL + '" y="' + (H - 4) + '" font-size="10" fill="var(--nl-axis,#999)">shaded = uncut run possible · hatched = a cut is forced · numbers = whole tiles</text>';
+    svg += '<text x="' + padL + '" y="' + (H - 4) + '" font-size="10" fill="var(--nl-axis,#999)" stroke-width="3" style="paint-order:stroke">tinted = wall lengths where whole tiles fit · hatched = a cut is forced · numbers = tiles in the run</text>';
     svg += '</svg>';
     return svg;
   }
@@ -310,8 +299,9 @@
     var m = model();
     syncDetected(m);
     syncURL();
+    renderUnits();
     renderTileChips();
-    renderEndDims(m);
+    renderEndPresets();
 
     var Wu = m.wall.u;
     // which N to look at: around the wall if given, else the first handful
@@ -349,11 +339,13 @@
         html += '<span class="eq">=</span><span class="op">no uncut run — </span><span class="result">'
               + (above ? escapeHtml(fmtShort(above.at)) + ' reaches ' + above.n + ' tiles' : '')
               + (above && below ? ' · ' : '')
-              + (below ? escapeHtml(fmtShort(below.at)) + ' holds ' + below.n : '') + '</span>';
+              + (below ? escapeHtml(fmtShort(below.at)) + ' takes ' + below.n : '') + '</span>';
       }
     }
     els.echoLine.innerHTML = html;
-    var asm = m.endFaces.slice();
+    var asm = [];
+    if (m.endA.u > 0) asm.push('beginning of run +' + fmtShort(m.endA.u));
+    if (m.endB.u > 0) asm.push('end of run +' + fmtShort(m.endB.u));
     if (hits.length > 1) asm.push('the joint range is wide enough that ' + hits.join(' and ') + ' tiles both reach this wall');
     els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
     els.echo.style.display = '';
@@ -364,8 +356,8 @@
     var vLo = bands[0].lo - (m.T * 0.35), vHi = bands[bands.length - 1].hi + (m.T * 0.35);
     var nearBand = null, bd = Infinity;
     bands.forEach(function (b) {
-      var d = Wu == null ? Math.abs(b.n - Nc) : Math.max(b.lo - Wu, Wu - b.hi, 0) + (m.lo(b.n) <= Wu && Wu <= m.hi(b.n) ? 0 : 0.0001);
-      if (d < bd) { bd = d; nearBand = b; }
+      var dd = Wu == null ? Math.abs(b.n - Nc) : Math.max(b.lo - Wu, Wu - b.hi, 0);
+      if (dd < bd) { bd = dd; nearBand = b; }
     });
     var width = els.figure.clientWidth;
     if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
@@ -391,24 +383,42 @@
 
     // ---- engine ------------------------------------------------------------
     var lines = ['tile = ' + m.T + ' units · joint ' + m.jLo + '–' + m.jHi + ' units'
-               + (m.F ? ' · ends consume ' + m.F + ' units' : '')
-               + (m.extraJ ? ' · +' + m.extraJ + ' end joint' + (m.extraJ > 1 ? 's' : '') : '')];
-    lines.push('window(N) = ends + N × tile + (N − 1' + (m.extraJ ? ' + ' + m.extraJ : '') + ') × joint');
+               + (m.F ? ' · ends add ' + m.F + ' units' : '')];
+    lines.push('window(N) = ends + N × tile + (N − 1) × joint');
     if (Wu != null) lines.push('wall = ' + Wu + ' units' + (best ? ' · N = ' + best.N + ' · slack = ' + Math.round(best.margin) + ' units' : ' · inside no window'));
     els.engineNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
   }
 
-  /* ---- tile chips ----------------------------------------------------------- */
-  var TILE_CHIPS = ['3"', '4 1/4"', '6"', '12"', '24"'];
+  /* ---- units toggle --------------------------------------------------------- */
+  function setUnits(target) {
+    if (target === state.target) return;
+    var from = D();
+    state.target = target;
+    state.defaultUnit = target === 'metric' ? 'mm' : 'in';
+    var to = D();
+    // prefills still at the old system's default follow the switch
+    [['tileText', 'tile', els.tileInput], ['jminText', 'jmin', els.jminInput],
+     ['jmaxText', 'jmax', els.jmaxInput], ['wallText', 'wall', els.dimInput],
+     ['endAText', 'end', els.endAInput], ['endBText', 'end', els.endBInput]].forEach(function (sw) {
+      if (state[sw[0]] === from[sw[1]]) { state[sw[0]] = to[sw[1]]; sw[2].value = to[sw[1]]; }
+    });
+  }
+  function renderUnits() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-units]'), function (el) {
+      UI.press(el, el.dataset.units === state.target);
+    });
+  }
+
+  /* ---- tile chips (rebuilt when the system flips) --------------------------- */
   function renderTileChips() {
-    if (!els.tileChips.dataset.built) {
+    if (els.tileChips.dataset.target !== state.target) {
       var html = '<div class="grid-row">';
-      TILE_CHIPS.forEach(function (c) {
+      D().chips.forEach(function (c) {
         html += '<button type="button" class="grid-box" aria-pressed="false" data-tile="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>';
       });
       html += '</div>';
       els.tileChips.innerHTML = html;
-      els.tileChips.dataset.built = '1';
+      els.tileChips.dataset.target = state.target;
       Array.prototype.forEach.call(els.tileChips.querySelectorAll('[data-tile]'), function (chip) {
         chip.addEventListener('click', function () {
           els.tileInput.value = chip.dataset.tile;
@@ -422,25 +432,29 @@
     });
   }
 
-  /* ---- contextual end-dimension fields ------------------------------------- */
-  function renderEndDims() {
-    var need = {};
-    [state.endA, state.endB].forEach(function (id) { var d = ENDS[id].dim; if (d) need[d] = true; });
-    var keys = Object.keys(need);
-    if (els.endDims.dataset.keys !== keys.join(',')) {
-      var html = '';
-      keys.forEach(function (k) {
-        html += '<span class="grid-group-label">' + END_DIMS[k].label + '</span>'
-              + '<input type="text" class="small-input" data-edim="' + k + '" spellcheck="false" maxlength="24" '
-              + 'autocomplete="off" autocapitalize="off" value="' + escapeHtml(state[k + 'Text']) + '">';
+  /* ---- end presets: each fills its end's amount ------------------------------ */
+  function renderEndPresets() {
+    [['endAPresets', 'endAText', els.endAInput], ['endBPresets', 'endBText', els.endBInput]].forEach(function (cfg) {
+      var holder = els[cfg[0]];
+      if (holder.dataset.target !== state.target) {
+        var html = '';
+        D().ends.forEach(function (p) {
+          html += '<button type="button" class="mini-pill" aria-pressed="false" data-fill="' + escapeHtml(p[1]) + '">' + escapeHtml(p[0]) + '</button>';
+        });
+        holder.innerHTML = html;
+        holder.dataset.target = state.target;
+        Array.prototype.forEach.call(holder.querySelectorAll('[data-fill]'), function (pill) {
+          pill.addEventListener('click', function () {
+            state[cfg[1]] = pill.dataset.fill;
+            cfg[2].value = pill.dataset.fill;
+            render();
+          });
+        });
+      }
+      Array.prototype.forEach.call(holder.querySelectorAll('[data-fill]'), function (pill) {
+        UI.press(pill, state[cfg[1]] === pill.dataset.fill);
       });
-      els.endDims.innerHTML = html;
-      els.endDims.dataset.keys = keys.join(',');
-      Array.prototype.forEach.call(els.endDims.querySelectorAll('[data-edim]'), function (inp) {
-        inp.addEventListener('input', function () { state[inp.dataset.edim + 'Text'] = inp.value; render(); });
-      });
-    }
-    els.endNote.textContent = keys.length ? '' : '';
+    });
   }
 
   /* ---- shareable URL -------------------------------------------------------- */
@@ -449,16 +463,14 @@
     if (!window.history || !history.replaceState) return;
     clearTimeout(urlTimer);
     urlTimer = setTimeout(function () {
-      var p = new URLSearchParams();
-      if (state.tileText !== '6"') p.set('t', state.tileText);
-      if (state.jminText !== '1/16"') p.set('jl', state.jminText);
-      if (state.jmaxText !== '3/16"') p.set('jh', state.jmaxText);
-      if (state.wallText && state.wallText !== '5\'-1"') p.set('w', state.wallText);
-      if (state.endA !== 'plain') p.set('ea', state.endA);
-      if (state.endB !== 'plain') p.set('eb', state.endB);
-      if (state.bwText !== '3"') p.set('bw', state.bwText);
-      if (state.mrText !== '1/8"') p.set('mr', state.mrText);
-      if (state.ltText !== '3/8"') p.set('lt', state.ltText);
+      var d = D(), p = new URLSearchParams();
+      if (state.target !== 'imperial') p.set('u', state.target);
+      if (state.tileText !== d.tile) p.set('t', state.tileText);
+      if (state.jminText !== d.jmin) p.set('jl', state.jminText);
+      if (state.jmaxText !== d.jmax) p.set('jh', state.jmaxText);
+      if (state.wallText && state.wallText !== d.wall) p.set('w', state.wallText);
+      if (state.endAText !== d.end) p.set('ea', state.endAText);
+      if (state.endBText !== d.end) p.set('eb', state.endBText);
       var q = p.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
       recents.note();
@@ -467,59 +479,50 @@
   function initFromURL() {
     var p = new URLSearchParams(location.search);
     function grab(k, cap) { var v = p.get(k); return v != null ? v.slice(0, cap || 24) : null; }
+    if (p.get('u') === 'metric') {
+      state.target = 'metric';
+      state.defaultUnit = 'mm';
+      var d = DEFAULTS.metric;
+      state.tileText = d.tile; state.jminText = d.jmin; state.jmaxText = d.jmax;
+      state.endAText = d.end; state.endBText = d.end;
+    }
     var t = grab('t'), jl = grab('jl'), jh = grab('jh'), w = grab('w', 120);
     if (t) state.tileText = t;
     if (jl) state.jminText = jl;
     if (jh) state.jmaxText = jh;
-    var ea = p.get('ea'), eb = p.get('eb');
-    if (ea && ENDS[ea]) state.endA = ea;
-    if (eb && ENDS[eb]) state.endB = eb;
-    ['bw', 'mr', 'lt'].forEach(function (k) { var v = grab(k); if (v) state[k + 'Text'] = v; });
+    var ea = grab('ea'), eb = grab('eb');
+    if (ea) state.endAText = ea;
+    if (eb) state.endBText = eb;
     return w;
   }
 
   /* ---- wiring ---------------------------------------------------------------- */
-  function setActive(selector, attr, value) {
-    Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
-      UI.press(el, el.dataset[attr] === value);
-    });
-  }
-  // recent readings — the URL carries tile, joints, ends, and wall
-  var recents = UI.recents({ key: 'precision-window', anchor: els.dimInput, entry: function () {
+  // recent readings — the URL carries units, tile, joints, ends, and wall
+  var recents = UI.recents({ key: 'tile-run', anchor: els.dimInput, entry: function () {
     var r = document.querySelector('#echoLine .result');
     return { face: state.tileText + ' · ' + state.jminText + '–' + state.jmaxText + (state.wallText ? ' · ' + state.wallText : ''),
              result: r ? r.textContent : '' };
   } });
 
-  [['tileInput', 'tileText'], ['jminInput', 'jminText'], ['jmaxInput', 'jmaxText'], ['dimInput', 'wallText']].forEach(function (pair) {
+  [['tileInput', 'tileText'], ['jminInput', 'jminText'], ['jmaxInput', 'jmaxText'],
+   ['endAInput', 'endAText'], ['endBInput', 'endBText'], ['dimInput', 'wallText']].forEach(function (pair) {
     var el = els[pair[0]];
     el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });
     el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
   });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-enda]'), function (el) {
-    el.addEventListener('click', function () {
-      state.endA = el.dataset.enda;
-      setActive('[data-enda]', 'enda', state.endA);
-      render();
-    });
-  });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-endb]'), function (el) {
-    el.addEventListener('click', function () {
-      state.endB = el.dataset.endb;
-      setActive('[data-endb]', 'endb', state.endB);
-      render();
-    });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-units]'), function (el) {
+    el.addEventListener('click', function () { setUnits(el.dataset.units); render(); });
   });
 
   // initial state — URL params override the worked example (6" tile, 5'-1" wall)
   var urlW = initFromURL();
-  state.wallText = urlW != null ? urlW : '5\'-1"';
+  state.wallText = urlW != null ? urlW : D().wall;
   els.tileInput.value = state.tileText;
   els.jminInput.value = state.jminText;
   els.jmaxInput.value = state.jmaxText;
+  els.endAInput.value = state.endAText;
+  els.endBInput.value = state.endBText;
   els.dimInput.value = state.wallText;
-  setActive('[data-enda]', 'enda', state.endA);
-  setActive('[data-endb]', 'endb', state.endB);
   render();
 })();
 </script>

@@ -6,7 +6,7 @@
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
 <title>Scale Resolution -- architecture.tools</title>
-<meta name="description" content="Choose a drawing scale and see the range you actually know. Reading a drawing, sheet error multiplies by the scale into the field; measuring to draw, tape error accumulates across a run and anything finer than the sheet holds disappears into it. Shown, not judged.">
+<meta name="description" content="Choose a drawing scale and see the range you actually know. Reading a drawing, sheet error multiplies by the scale into the field; measuring to draw, tape error accumulates across a run and anything finer than the sheet resolution is not recorded. Shown, not judged.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -71,7 +71,7 @@
     <p>A dimension taken through a scale carries a range, not a number.
        Reading a drawing, sheet error multiplies by the scale into the field.
        Measuring to draw, tape error accumulates across a run, and anything finer
-       than the sheet resolves disappears into it. This shows the range you
+       than the sheet resolution is not recorded. This shows the range you
        actually know — the digits past it are false precision.</p>
   </div>
 
@@ -105,7 +105,7 @@
     <div class="section-label" style="margin-top:var(--space-md);">Read To</div>
     <input type="text" id="readPrec" class="dim-input" spellcheck="false" maxlength="24"
            autocomplete="off" autocapitalize="off" style="max-width:12rem;" value="1/4&quot;">
-    <div class="section-note" style="margin-bottom:0;">Bluebeam standard = 1/4&Prime;.</div>
+    <div class="section-note" id="readNote" style="margin-bottom:0;">Bluebeam standard = 1/4&Prime;.</div>
   </div>
   <div id="tapeBlock" style="display:none;">
     <div class="section-label" style="margin-top:var(--space-md);">Tape Reads To</div>
@@ -276,7 +276,7 @@
 
   var els = {};
   ['dimInput','dimLabel','fieldNote','bareAsk','scalePresets','sourceLabel','sourceChips',
-   'readBlock','readPrec','tapeBlock','tapePrec','relLine',
+   'readBlock','readPrec','readNote','tapeBlock','tapePrec','relLine',
    'echo','echoLine','echoAssume','lengthOut','figure','snapRows',
    'scalesNote','scalesTable',
    'runSection','runPresets','stackFigure','stackLegend','stackTable','stackNote','engineNote'].forEach(function (id) {
@@ -393,12 +393,15 @@
       : '0 <span style="color:var(--ink-3)">(snap)</span>';
     if (state.question === 'read') {
       var r = readUnits(), band = readBand();
-      els.relLine.innerHTML = 'read ±' + fmtShort(r) + ' · sheet holds ' + sheetTxt
+      els.relLine.innerHTML = 'read ±' + fmtShort(r) + ' · sheet resolution ' + sheetTxt
         + ' &rarr; <b>±' + fmtShort(band) + '</b>';
     } else {
       var t = tapeUnits();
-      els.relLine.innerHTML = 'tape ±' + fmtShort(t) + ' · sheet holds ' + sheetTxt;
+      els.relLine.innerHTML = 'tape ±' + fmtShort(t) + ' · sheet resolution ' + sheetTxt;
     }
+    els.readNote.textContent = state.target === 'metric'
+      ? 'Bluebeam standard = 1/4″ = 6.35 mm.'
+      : 'Bluebeam standard = 1/4″.';
   }
 
   /* ---- across the scales: the design half ----------------------------------
@@ -418,12 +421,12 @@
       return;
     }
     els.scalesTable.style.display = '';
-    els.scalesNote.innerHTML = 'What a ' + escapeHtml(src.face) + ' sheet holds at each scale, against your ±'
-      + escapeHtml(fmtShort(p)) + ' ' + pName + '. In the tinted rows the sheet governs — a finer ' + pName
-      + ' adds digits it can’t back.';
+    els.scalesNote.innerHTML = 'The sheet resolution at each scale for ' + escapeHtml(src.face) + ', against your ±'
+      + escapeHtml(fmtShort(p)) + ' ' + pName + '. In the tinted rows the resolution is coarser than the ' + pName
+      + '; the finer digits are false precision.';
     var list = SCALES[state.family].slice();
     if (state.customN != null) list.push({ id: 'custom', n: state.customN, face: '1:' + state.customN });
-    var rows = '<tr><th>Scale</th><th>Sheet Holds</th><th>' + (isRead ? 'You&rsquo;d Know' : 'Drawn Off By') + '</th></tr>';
+    var rows = '<tr><th>Scale</th><th>Sheet Resolution</th><th>' + (isRead ? 'You&rsquo;d Know' : 'Drawn Off By') + '</th></tr>';
     var prevGov = null;
     list.forEach(function (s) {
       var R = src.mm * MM * s.n;
@@ -473,7 +476,7 @@
       if (state.question === 'read' && readUnits() < F) {
         asm.push('digits finer than ±' + fmtShort(F) + ' come from the measuring tool, not the drawing');
       } else if (state.question === 'draw' && tapeUnits() < F) {
-        asm.push('the sheet holds ±' + fmtShort(F) + ' — tape precision finer than that disappears when drawn');
+        asm.push('sheet resolution ±' + fmtShort(F) + ' — tape precision finer than that is not recorded on the sheet');
       }
     }
     els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
@@ -555,7 +558,7 @@
     function yh(mag) { return (mag / maxMag) * (innerH / 2); }
     function xk(k) { return padL + (k / kMax) * innerW; }
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" '
-            + 'aria-label="Error across a run: chain grows with each measurement, baseline stays flat, against what the sheet holds.">';
+            + 'aria-label="Error across a run: chain grows with each measurement, baseline stays flat, against the sheet resolution.">';
     svg += '<defs><pattern id="skhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
          + '<line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/></pattern></defs>';
 
@@ -564,7 +567,7 @@
       var yR = yh(RU);
       svg += '<line x1="' + padL + '" y1="' + (midY - yR) + '" x2="' + (W - padR) + '" y2="' + (midY - yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
       svg += '<line x1="' + padL + '" y1="' + (midY + yR) + '" x2="' + (W - padR) + '" y2="' + (midY + yR) + '" stroke="var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="2 3"/>';
-      svg += '<text x="' + (W - padR) + '" y="' + (midY - yR - 4) + '" text-anchor="end" font-size="10" fill="var(--nl-axis,#999)">the sheet holds ±' + escapeHtml(fmtShort(RU)) + '</text>';
+      svg += '<text x="' + (W - padR) + '" y="' + (midY - yR - 4) + '" text-anchor="end" font-size="10" fill="var(--nl-axis,#999)">sheet resolution ±' + escapeHtml(fmtShort(RU)) + '</text>';
     }
 
     // chain — cumulative wedge (linear), hatched, widening to ±kMax·eU
@@ -690,7 +693,7 @@
     // starts to be drawn. Values, no advice.
     var note = 'Chained, the k-th lay is known to ±k × ' + fmtShort(eU) + ' worst case, ±√k × ' + fmtShort(eU) + ' if the errors randomize. From one baseline every feature stays ±' + fmtShort(eU) + '.';
     if (RU > 0) {
-      note += ' The sheet holds ±' + fmtShort(RU) + ' — drift finer than that disappears into the drawing. With a ' + fmtRun(L) + ' tape the worst-case chain reaches ±' + fmtShort(RU) + ' at lay ' + breachK + ', about ' + fmtRun(breachK * L) + ' of run; past there the drift is drawn.';
+      note += ' The sheet resolution is ±' + fmtShort(RU) + ' — drift finer than that is not drawn. With a ' + fmtRun(L) + ' tape the worst-case chain reaches ±' + fmtShort(RU) + ' at lay ' + breachK + ', about ' + fmtRun(breachK * L) + ' of run; past there the drift is drawn.';
     } else {
       note += ' Drawn in CAD the measured numbers are recorded exactly — the drawing carries the tape drift itself.';
     }
@@ -828,6 +831,38 @@
     el.addEventListener('click', function () {
       state.family = el.dataset.sfam;
       setActive('[data-sfam]', 'sfam', state.family);
+      // the family states a unit system — everything follows: displays,
+      // defaults, and any prefill still sitting at the other system's default.
+      // The worked-example dimension follows too, or its stated units would
+      // pull the target straight back.
+      var metric = state.family === 'metric';
+      var target = metric ? 'metric' : 'imperial';
+      if (target !== state.target) {
+        state.target = target;
+        state.defaultUnit = metric ? 'mm' : 'in';
+        if (state.readText === (metric ? '1/4"' : '5 mm')) {
+          state.readText = metric ? '5 mm' : '1/4"';
+          els.readPrec.value = state.readText;
+        }
+        if (state.tapeText === (metric ? '1/4"' : '5 mm')) {
+          state.tapeText = metric ? '5 mm' : '1/4"';
+          els.tapePrec.value = state.tapeText;
+        }
+        if (state.tapeLen === (metric ? 25 * FT : 10000 * MM)) {
+          state.tapeLen = metric ? 10000 * MM : 25 * FT;
+        }
+        if (state.text === (metric ? '24\'-6"' : '7.5m')) {
+          state.text = metric ? '7.5m' : '24\'-6"';
+          els.dimInput.value = state.text;
+        }
+      }
+      // keep the selected scale inside the chosen family
+      if (familyOf(state.scaleId) !== state.family) {
+        state.scaleId = { architect: '48', engineer: '240', metric: 'm50' }[state.family];
+        state.customN = null;
+        var custom = document.getElementById('scaleCustom');
+        if (custom) custom.value = '';
+      }
       renderScalePresets();
       render();
     });
