@@ -6,7 +6,7 @@
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
 <title>Uncut Tile Run -- architecture.tools</title>
-<meta name="description" content="Find the wall lengths where a run of whole tiles fits: the joints flex between their minimum and maximum, so each tile count reaches a window of wall lengths, not a point. The windows drawn, your dimension located, the slack shown.">
+<meta name="description" content="What dimension does the wall want to be so the tile runs uncut? Type a tile and roughly how long the wall should be; get back the exact dimensions to set — a range for each whole-tile count, since the joints flex — with the slack shown.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -61,11 +61,12 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Uncut Tile Run</span>
     </nav>
     <h1>Uncut Tile Run</h1>
-    <p>A run of whole tiles fits a window of wall lengths, not one length: the
-       joints flex between their minimum and maximum. Give it a tile and a joint
-       range and it draws those windows, locates your wall, and shows the slack.
-       Near the middle of a window, field variation goes into the joints; at an
-       edge, one tight course forces a cut.</p>
+    <p>What dimension does this wall want to be so the tile runs uncut?
+       Type your tile and roughly how long the wall should be, and this returns
+       the exact dimensions to set — a range for each whole-tile count, because
+       the joints flex between their minimum and maximum. The middle of a range
+       gives the installer the most slack; at an edge, one tight course forces
+       a cut.</p>
   </div>
 
   <!-- ================= 1 · UNITS ================= -->
@@ -118,7 +119,7 @@
 
   <!-- ================= 5 · THE WALL ================= -->
   <div class="tool-section" style="margin-top:var(--space-xl);">
-    <div class="section-label">Wall — the dimension you're setting (optional)</div>
+    <div class="section-label">Wall — about how long?</div>
     <div class="field-wrap" style="margin-top:0.4rem;">
       <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="120"
              autocomplete="off" autocapitalize="off" placeholder="e.g. 5'-1&quot;  ·  2.45m">
@@ -322,28 +323,32 @@
     // ---- echo: tokens = result -------------------------------------------
     var html = tok(m.tile, fmtShort(m.T)) + '<span class="op"> tile · joint </span>'
              + tok(m.jmin, fmtShort(m.jLo)) + '<span class="op">–</span>' + tok(m.jmax, fmtShort(m.jHi));
+    var Jstar = null;
     if (Wu != null) {
       html += '<span class="op"> · wall </span>' + tok(m.wall, fmtShort(Wu));
       if (best) {
-        var Jstar = m.joints(best.N) > 0 ? (Wu - m.F - best.N * m.T) / m.joints(best.N) : null;
-        html += '<span class="eq">=</span><span class="result">' + best.N + ' whole tiles'
-              + (Jstar != null ? ' · joint ≈ ' + escapeHtml(fmtShort(Jstar)) : '')
-              + ' · slack ' + escapeHtml(fmtShort(best.margin)) + '</span>';
+        // the answer is the dimension range, not the count
+        if (m.joints(best.N) > 0) Jstar = (Wu - m.F - best.N * m.T) / m.joints(best.N);
+        html += '<span class="eq">=</span><span class="result">set it anywhere '
+              + escapeHtml(fmtShort(m.lo(best.N))) + ' to ' + escapeHtml(fmtShort(m.hi(best.N)))
+              + ' · ' + best.N + ' whole tiles · your ' + escapeHtml(fmtShort(Wu)) + ' has ' + escapeHtml(fmtShort(best.margin)) + ' of slack</span>';
       } else {
-        // in a gap: name both nearest buildable dimensions
+        // in a gap: hand over the nearest set-it-here ranges, both directions
         var below = null, above = null;
         for (var k = 1; k <= Nhi + 1; k++) {
-          if (m.hi(k) < Wu) below = { n: k, at: m.hi(k) };
-          if (above == null && m.lo(k) > Wu) above = { n: k, at: m.lo(k) };
+          if (m.hi(k) < Wu) below = { n: k, lo: m.lo(k), hi: m.hi(k) };
+          if (above == null && m.lo(k) > Wu) above = { n: k, lo: m.lo(k), hi: m.hi(k) };
         }
-        html += '<span class="eq">=</span><span class="op">no uncut run — </span><span class="result">'
-              + (above ? escapeHtml(fmtShort(above.at)) + ' reaches ' + above.n + ' tiles' : '')
-              + (above && below ? ' · ' : '')
-              + (below ? escapeHtml(fmtShort(below.at)) + ' takes ' + below.n : '') + '</span>';
+        var rng = function (b) {
+          return escapeHtml(fmtShort(b.lo)) + '–' + escapeHtml(fmtShort(b.hi)) + ' (' + b.n + (b.n === 1 ? ' tile)' : ' tiles)');
+        };
+        html += '<span class="eq">=</span><span class="op">forces a cut — set it </span><span class="result">'
+              + (below ? rng(below) : '') + (below && above ? ' or ' : '') + (above ? rng(above) : '') + '</span>';
       }
     }
     els.echoLine.innerHTML = html;
     var asm = [];
+    if (Jstar != null) asm.push('at ' + fmtShort(Wu) + ' the joints run ≈ ' + fmtShort(Jstar));
     if (m.endA.u > 0) asm.push('beginning of run +' + fmtShort(m.endA.u));
     if (m.endB.u > 0) asm.push('end of run +' + fmtShort(m.endB.u));
     if (hits.length > 1) asm.push('the joint range is wide enough that ' + hits.join(' and ') + ' tiles both reach this wall');
@@ -367,17 +372,15 @@
       vLo: vLo, vHi: vHi, nearBand: nearBand, width: width
     });
 
-    // ---- table -------------------------------------------------------------
-    var rows = '<tr><th>Whole Tiles</th><th>Window</th><th>Joint At Your Wall</th><th>Slack</th></tr>';
+    // ---- table: a menu of dimensions to set, one row per whole-tile count --
+    var rows = '<tr><th>Whole Tiles</th><th>Set The Wall Between</th><th>Middle — Most Slack</th></tr>';
     bands.forEach(function (b) {
       var inWin = Wu != null && b.lo <= Wu && Wu <= b.hi;
-      var Jr = inWin && m.joints(b.n) > 0 ? (Wu - m.F - b.n * m.T) / m.joints(b.n) : null;
-      var margin = inWin ? Math.min(Wu - b.lo, b.hi - Wu) : null;
+      var mid = (b.lo + b.hi) / 2, half = (b.hi - b.lo) / 2;
       rows += '<tr' + (inWin ? ' class="win-hit"' : '') + '>'
             + '<td>' + b.n + '</td>'
             + '<td>' + escapeHtml(fmtShort(b.lo)) + ' – ' + escapeHtml(fmtShort(b.hi)) + '</td>'
-            + '<td>' + (Jr != null ? '≈ ' + escapeHtml(fmtShort(Jr)) : '—') + '</td>'
-            + '<td>' + (margin != null ? escapeHtml(fmtShort(margin)) : '—') + '</td></tr>';
+            + '<td>' + escapeHtml(fmtShort(mid)) + ' (±' + escapeHtml(fmtShort(half)) + ')</td></tr>';
     });
     els.winTable.innerHTML = rows;
 
