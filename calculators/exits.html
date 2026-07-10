@@ -284,6 +284,13 @@
   }
 
   /* ---- shareable URL ----------------------------------------------------------------- */
+  // recent readings — the URL carries the whole state, so a recent
+  // restores the full reading (shared component: ui.js UI.recents)
+  var recents = UI.recents({ key: 'exits', anchor: document.getElementById('olInput'), entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: 'OL ' + (state.ol || '') + (state.len && state.wid ? ' · ' + state.len + ' x ' + state.wid : ''), result: r ? r.textContent : '' };
+  } });
+
   var urlTimer = null;
   function syncURL() {
     if (!window.history || !history.replaceState) return;
@@ -296,6 +303,7 @@
       if (state.cond !== 'ns') params.set('s', '1');
       var q = params.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
     }, 250);
   }
   function initFromURL() {
