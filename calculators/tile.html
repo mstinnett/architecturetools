@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- dev WIP — remove on promotion to main -->
 <meta name="robots" content="noindex, nofollow">
-<title>Uncut Tile Run -- architecture.tools</title>
-<meta name="description" content="What dimension does the wall want to be so the tile runs uncut? Type a tile and roughly how long the wall should be; get back the exact dimensions to set — a range for each whole-tile count, since the joints flex — with the slack shown.">
+<title>Tile -- architecture.tools</title>
+<meta name="description" content="Size a wall so the tile runs uncut, or lay out the wall as drawn. Whole tiles, joints that flex between minimum and maximum, cuts shown as the ranges they really are, run ends included.">
 <script>
 // Resolve the color scheme before first paint: a stored choice wins, else
 // follow the system. The shared dark tokens key off html[data-scheme="dark"].
@@ -62,15 +62,14 @@
   <div class="page-header">
     <!-- the set trail is a label until a C-0 index earns its page on main -->
     <nav class="page-crumb" aria-label="Breadcrumb">
-      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Uncut Tile Run</span>
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Tile</span>
     </nav>
-    <h1>Uncut Tile Run</h1>
-    <p>What dimension does this wall want to be so the tile runs uncut?
-       Type your tile and roughly how long the wall should be, and this returns
-       the exact dimensions to set — a range for each whole-tile count, because
-       the joints flex between their minimum and maximum. The middle of a range
-       gives the installer the most slack; at an edge, one tight course forces
-       a cut.</p>
+    <h1>Tile</h1>
+    <p>A run of whole tiles fits a window of wall lengths, not one length: the
+       joints flex between their minimum and maximum. Size The Wall returns the
+       exact dimensions where the tile runs uncut, with the slack shown. Lay Out
+       The Wall takes the wall as drawn and shows where the cuts land, flush or
+       centered — each cut a range, because the joints flex.</p>
   </div>
 
   <!-- ================= 1 · UNITS ================= -->
@@ -82,7 +81,15 @@
     </div>
   </div>
 
-  <!-- ================= 2 · TILE ================= -->
+  <!-- ================= 2 · TASK ================= -->
+  <div class="opt-line" style="margin-top:var(--space-sm);">
+    <div class="opt-cluster">
+      <button type="button" class="mini-pill" aria-pressed="false" data-task="size">Size The Wall</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-task="layout">Lay Out The Wall</button>
+    </div>
+  </div>
+
+  <!-- ================= 3 · TILE ================= -->
   <div class="section-label">Tile — the dimension along the run</div>
   <div class="joint-row" style="margin-bottom:var(--space-sm);">
     <input type="text" id="tileInput" class="small-input" spellcheck="false" maxlength="24"
@@ -90,7 +97,7 @@
   </div>
   <div class="grid-presets" id="tileChips" style="margin-bottom:var(--space-lg);"></div>
 
-  <!-- ================= 3 · JOINT RANGE ================= -->
+  <!-- ================= 4 · JOINT RANGE ================= -->
   <div class="section-label">Joint — minimum to maximum</div>
   <div class="joint-row">
     <input type="text" id="jminInput" class="small-input" spellcheck="false" maxlength="24"
@@ -104,7 +111,7 @@
      rectified porcelain runs under 1/16&Prime;, calibrated tile wider. A minimum
      that tight leaves nothing to adjust.</p>
 
-  <!-- ================= 4 · RUN ENDS ================= -->
+  <!-- ================= 5 · RUN ENDS ================= -->
   <div class="section-label">Run Ends — a fixed amount added at each end</div>
   <div class="end-row">
     <span class="end-label">Beginning Of Run</span>
@@ -121,9 +128,9 @@
   <p class="section-note">A preset fills the amount — edit it to match your trim,
      and include the trim's joint in the number if it gets one.</p>
 
-  <!-- ================= 5 · THE WALL ================= -->
+  <!-- ================= 6 · THE WALL ================= -->
   <div class="tool-section" style="margin-top:var(--space-xl);">
-    <div class="section-label">Wall — about how long?</div>
+    <div class="section-label" id="wallLabel">Wall — about how long?</div>
     <div class="field-wrap" style="margin-top:0.4rem;">
       <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="120"
              autocomplete="off" autocapitalize="off" placeholder="e.g. 5'-1&quot;  ·  2.45m">
@@ -140,7 +147,7 @@
         <div class="figure-wrap" id="figure"></div>
       </div>
       <table class="win-table" id="winTable"></table>
-      <p class="section-note" style="margin-top:0.5rem;">Select a row to draw that count on the wall.</p>
+      <p class="section-note" id="tableNote" style="margin-top:0.5rem;"></p>
     </div>
   </div>
 
@@ -187,13 +194,15 @@
     wallText: '',
     endAText: '0"',
     endBText: '0"',
+    task: 'size',                    // 'size' = pick the dimension | 'layout' = the wall as drawn
     selN: null                       // a table row's count, drawn on the wall
   };
   function D() { return DEFAULTS[state.target]; }
 
   var els = {};
   ['tileInput','tileChips','jminInput','jmaxInput','endAInput','endBInput','endAPresets','endBPresets',
-   'dimInput','fieldNote','echo','echoLine','echoAssume','figure','winTable','engineNote'].forEach(function (id) {
+   'dimInput','fieldNote','echo','echoLine','echoAssume','figure','winTable','engineNote',
+   'wallLabel','tableNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
   });
   var escapeHtml = UI.esc;
@@ -373,7 +382,19 @@
     renderUnits();
     renderTileChips();
     renderEndPresets();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-task]'), function (el) {
+      UI.press(el, el.dataset.task === state.task);
+    });
+    els.wallLabel.textContent = state.task === 'size' ? 'Wall — about how long?' : 'Wall — as dimensioned';
+    els.tableNote.textContent = state.task === 'size'
+      ? 'Select a row to draw that count on the wall.'
+      : 'Cut widths are ranges — where the joints land inside their minimum and maximum decides each cut.';
+    if (state.task === 'layout') renderLayout(m);
+    else renderSize(m);
+  }
 
+  /* ---- Size The Wall: pick the dimension ----------------------------------- */
+  function renderSize(m) {
     var Wu = m.wall.u;
     // which N to look at: around the wall if given, else the first handful
     var Nc = Wu != null ? Math.max(1, Math.round((Wu - m.F) / (m.T + (m.jLo + m.jHi) / 2))) : 3;
@@ -470,6 +491,131 @@
     els.engineNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
   }
 
+  /* ---- Lay Out The Wall: the dimension as drawn — where the cuts land ------
+     Joints are laid at the middle of the range for the drawing; each cut is
+     reported as the RANGE it can really be, because every joint ahead of it
+     flexes between the minimum and maximum. */
+  function renderLayout(m) {
+    var Wu = m.wall.u;
+    var html = tok(m.tile, fmtShort(m.T)) + '<span class="op"> tile · joint </span>'
+             + tok(m.jmin, fmtShort(m.jLo)) + '<span class="op">–</span>' + tok(m.jmax, fmtShort(m.jHi));
+    if (Wu == null || Wu - m.F <= 0) {
+      html += '<span class="eq">—</span><span class="op">type the wall as dimensioned</span>';
+      els.echoLine.innerHTML = html;
+      els.echoAssume.innerHTML = '';
+      els.echo.style.display = '';
+      els.figure.innerHTML = '';
+      els.winTable.innerHTML = '';
+      els.engineNote.innerHTML = '';
+      return;
+    }
+    var Wf = Wu - m.F;                        // the field between the run ends
+    var Jm = (m.jLo + m.jHi) / 2;             // laid at the middle of the range
+    var k = Math.max(0, Math.floor((Wf + Jm) / (m.T + Jm)));
+    var cMid = Wf - k * m.T - k * Jm;         // flush: k joints ahead of the cut
+    if (cMid < 0 && k > 0) { k -= 1; cMid = Wf - k * m.T - k * Jm; }
+    var cLo = Math.max(0, Wf - k * m.T - k * m.jHi), cHi = Wf - k * m.T - k * m.jLo;
+    // the wall may sit inside an uncut window — the size model knows
+    var uncutN = null;
+    [k, k + 1].forEach(function (N) {
+      if (uncutN == null && N >= 1 && m.lo(N) <= Wu && Wu <= m.hi(N)) uncutN = N;
+    });
+    // centered: a cut at each end, one more joint in the chain
+    var eTotMid = Math.max(0, Wf - k * m.T - (k + 1) * Jm);
+    var eLo = Math.max(0, (Wf - k * m.T - (k + 1) * m.jHi) / 2);
+    var eHi = Math.max(0, (Wf - k * m.T - (k + 1) * m.jLo) / 2);
+    var oneTile = eTotMid <= m.T;             // both centered cuts from one tile
+    var flushTiles = k + (cMid > 1 ? 1 : 0);
+    var centTiles = k + (eTotMid > 1 ? (oneTile ? 1 : 2) : 0);
+
+    html += '<span class="op"> · wall </span>' + tok(m.wall, fmtShort(Wu))
+          + '<span class="eq">=</span><span class="result">' + k + ' whole tiles · flush cut '
+          + escapeHtml(fmtShort(cLo)) + '–' + escapeHtml(fmtShort(cHi))
+          + ' · centered ' + escapeHtml(fmtShort(eLo)) + '–' + escapeHtml(fmtShort(eHi)) + ' each</span>';
+    els.echoLine.innerHTML = html;
+    var asm = ['joints drawn at ' + fmtShort(Jm) + ' — the middle of the range'];
+    if (uncutN != null) asm.push('this wall can run uncut at ' + uncutN + ' whole tiles — see Size The Wall');
+    asm.push(oneTile ? 'both centered cuts can come from one tile — saw kerf and a directional face not counted'
+                     : 'the centered cuts need a tile each — together they are wider than one tile');
+    if (m.endA.u > 0) asm.push('beginning of run +' + fmtShort(m.endA.u));
+    if (m.endB.u > 0) asm.push('end of run +' + fmtShort(m.endB.u));
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.innerHTML = layoutFig({
+      T: m.T, Jm: Jm, k: k, cut: Math.max(0, cMid), e: eTotMid / 2,
+      fA: m.endA.u, fB: m.endB.u, Wu: Wu, width: width
+    });
+
+    var rows = '<tr><th>Layout</th><th>Whole Tiles</th><th>Cuts</th><th>Tiles Used</th></tr>';
+    rows += '<tr><td>Flush</td><td>' + k + '</td>'
+          + '<td>' + (cHi > 1 ? 'one cut ' + escapeHtml(fmtShort(cLo)) + ' – ' + escapeHtml(fmtShort(cHi)) : 'none') + '</td>'
+          + '<td>' + flushTiles + '</td></tr>';
+    rows += '<tr><td>Centered</td><td>' + k + '</td>'
+          + '<td>' + (eHi > 1 ? 'two cuts ' + escapeHtml(fmtShort(eLo)) + ' – ' + escapeHtml(fmtShort(eHi)) + ' each' : 'none') + '</td>'
+          + '<td>' + centTiles + '</td></tr>';
+    els.winTable.innerHTML = rows;
+
+    var lines = ['field = wall − ends = ' + Math.round(Wf) + ' units · joint middle = ' + Math.round(Jm) + ' units'];
+    lines.push('whole tiles k = floor((field + joint) / (tile + joint)) = <b>' + k + '</b>');
+    lines.push('flush cut = field − k × tile − k × joint ∈ [' + Math.round(Wf - k * m.T - k * m.jHi) + ', ' + Math.round(cHi) + '] units');
+    els.engineNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- the layout elevation: flush and centered, cuts hatched -------------- */
+  function layoutFig(o) {
+    var W = o.width, padL = 8, padR = 8, rowH = 38, gap = 34, yA = 20;
+    var yB = yA + rowH + gap, dimY = yB + rowH + 18, H = dimY + 26;
+    var k = (W - padL - padR) / (o.Wu || 1);
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl" role="img" '
+            + 'aria-label="The wall laid out flush and centered, whole tiles drawn, cuts hatched.">';
+    svg += '<defs><pattern id="pwhatch3" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         + '<line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.7"/></pattern></defs>';
+    function band(y, pieces, label) {
+      var x = padL, out = '';
+      pieces.forEach(function (p) {
+        var w = p.w * k;
+        if (p.t === 'joint') { x += w; return; }
+        if (p.w <= 0) return;
+        var fill = p.t === 'tile' ? 'var(--card,#fff)' : p.t === 'end' ? 'var(--accent-soft)' : 'url(#pwhatch3)';
+        out += '<rect x="' + x + '" y="' + y + '" width="' + Math.max(w, 0.75) + '" height="' + rowH + '" fill="' + fill + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="0.8"/>';
+        x += w;
+      });
+      out += '<text x="' + padL + '" y="' + (y - 6) + '" class="nl-src-val" stroke-width="3" style="paint-order:stroke">' + escapeHtml(label) + '</text>';
+      return out;
+    }
+    function tiles(arr) {
+      for (var i = 0; i < o.k; i++) {
+        arr.push({ t: 'tile', w: o.T });
+        if (i < o.k - 1) arr.push({ t: 'joint', w: o.Jm });
+      }
+      return arr;
+    }
+    var flush = [];
+    if (o.fA > 0) flush.push({ t: 'end', w: o.fA });
+    tiles(flush);
+    if (o.cut > 0) { flush.push({ t: 'joint', w: o.Jm }); flush.push({ t: 'cut', w: o.cut }); }
+    if (o.fB > 0) flush.push({ t: 'end', w: o.fB });
+    var cent = [];
+    if (o.fA > 0) cent.push({ t: 'end', w: o.fA });
+    if (o.e > 0) { cent.push({ t: 'cut', w: o.e }); cent.push({ t: 'joint', w: o.Jm }); }
+    tiles(cent);
+    if (o.e > 0) { cent.push({ t: 'joint', w: o.Jm }); cent.push({ t: 'cut', w: o.e }); }
+    if (o.fB > 0) cent.push({ t: 'end', w: o.fB });
+    svg += band(yA, flush, 'flush — ' + (o.cut > 0 ? 'one cut ' + fmtShort(o.cut) : 'no cut'));
+    svg += band(yB, cent, 'centered — ' + (o.e > 0 ? 'two cuts ' + fmtShort(o.e) + ' each' : 'no cut'));
+    var wallEnd = padL + o.Wu * k;
+    svg += '<line x1="' + padL + '" y1="' + dimY + '" x2="' + wallEnd + '" y2="' + dimY + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+    svg += '<line x1="' + padL + '" y1="' + (dimY - 4) + '" x2="' + padL + '" y2="' + (dimY + 4) + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+    svg += '<line x1="' + wallEnd + '" y1="' + (dimY - 4) + '" x2="' + wallEnd + '" y2="' + (dimY + 4) + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+    svg += '<text x="' + (padL + (wallEnd - padL) / 2) + '" y="' + (dimY + 14) + '" text-anchor="middle" class="nl-src-val" stroke-width="3" style="paint-order:stroke">' + escapeHtml(fmtShort(o.Wu)) + '</text>';
+    svg += '</svg>';
+    return svg;
+  }
+
   /* ---- units toggle --------------------------------------------------------- */
   function setUnits(target) {
     if (target === state.target) return;
@@ -546,6 +692,7 @@
     urlTimer = setTimeout(function () {
       var d = D(), p = new URLSearchParams();
       if (state.target !== 'imperial') p.set('u', state.target);
+      if (state.task !== 'size') p.set('q', state.task);
       if (state.tileText !== d.tile) p.set('t', state.tileText);
       if (state.jminText !== d.jmin) p.set('jl', state.jminText);
       if (state.jmaxText !== d.jmax) p.set('jh', state.jmaxText);
@@ -567,6 +714,7 @@
       state.tileText = d.tile; state.jminText = d.jmin; state.jmaxText = d.jmax;
       state.endAText = d.end; state.endBText = d.end;
     }
+    if (p.get('q') === 'layout') state.task = 'layout';
     var t = grab('t'), jl = grab('jl'), jh = grab('jh'), w = grab('w', 120);
     if (t) state.tileText = t;
     if (jl) state.jminText = jl;
@@ -595,11 +743,19 @@
     el.addEventListener('click', function () { setUnits(el.dataset.units); render(); });
   });
   els.winTable.addEventListener('click', function (e) {
+    if (state.task !== 'size') return;
     var row = e.target.closest ? e.target.closest('tr[data-n]') : null;
     if (!row) return;
     var n = +row.dataset.n;
     state.selN = state.selN === n ? null : n;
     render();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-task]'), function (el) {
+    el.addEventListener('click', function () {
+      state.task = el.dataset.task;
+      state.selN = null;
+      render();
+    });
   });
 
   // initial state — URL params override the worked example (6" tile, 5'-1" wall)
