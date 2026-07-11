@@ -169,18 +169,32 @@ the model is a **translational repeat cell**:
 Tiles may cross the cell boundary (they wrap — the cell is a torus); the
 joint carries the min/nom/max range so the tolerance thesis survives into 2D.
 
-**Units (decided 2026-07-09): the engine's 1/960 mm exact integers,** per the
-suite convention — exact for every stored length, float only where geometry
-forces it, stated in the engine note. Concretely: cell, joint, tile, and
-placement values are integer units; orthogonal layouts clip on axis-aligned
-edges, so whole/cut classification and cut widths come out as **exact integer
-ranges** (tile.html's arithmetic, in 2D — no corner-sampling epsilon); areas
-stay within safe integers for any real room. The honest floats: 45° rotation
-(√2 never lands on the lattice — classified in float, status stated, the
-slope-hypotenuse precedent) and placement expressions that divide (u/3
-quantizes to the nearest unit and is REPORTED, the scale-page precedent).
+**Units (decided 2026-07-09, refined per the operator's rectilinear-ints
+idea): the engine's 1/960 mm exact integers, with transforms stored
+SYMBOLICALLY.** Shapes are axis-aligned integer rectangles in their own
+frame, always; a placement's transform is metadata — translation as ints,
+rotation as the tag 0/90/180/270, a field-level 45 where the layout rotates.
+No √2 is ever stored or computed:
+
+- Cell, joint, tile, placement values: integer units. Orthogonal layouts
+  clip on axis-aligned edges → whole/cut classification and cut widths are
+  **exact integer ranges** (tile.html's arithmetic in 2D, no epsilon).
+- **45° is exact too.** Keep √2 symbolic and the rotation that matters is
+  the integer matrix [[1,1],[−1,1]] (world ints → ints in the √2-scaled
+  field frame). Every incidence test compares a vs b√2, both ints — decided
+  exactly via a² vs 2b². Formally, coordinates live in **Z[√2]**: a value is
+  the int pair (a, b) meaning a + b√2 units — a ring, closed under add and
+  multiply, exact sign tests. Orthogonal work keeps b = 0 and *is* today's
+  integer engine; only 45° fields populate b. (Hex/30-60 would be Z[√3],
+  same pattern — out of scope.)
+- Floats survive only at the **display boundary** (printing k√2 costs one
+  multiplication at format time — the NumberLine precedent) and in dividing
+  placement expressions (u/3 quantizes to the nearest unit and is REPORTED,
+  the scale-page precedent).
+
 The prototypes deliberately run float inches for speed and say so on-page;
-the real build does not.
+the real build does not. This supersedes the earlier note that 45°
+classification would be honest float — it doesn't have to be.
 Overlap of two *placements* is a validation error the editor shows, not
 prevents (show, don't judge).
 
