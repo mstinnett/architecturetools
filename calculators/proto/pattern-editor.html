@@ -118,7 +118,9 @@
 <script>
 (function () {
   'use strict';
-  /* All dimensions in INCHES (prototype). The cell is a torus: tiles wrap. */
+  /* All dimensions in FLOAT INCHES — a prototype shortcut. The real build
+     stores the suite's exact 1/960 mm integer units (decision in
+     docs/In Progress/pattern-surface-toolset.md). The cell is a torus. */
   var state = {
     cellW: 12.25, cellH: 12.25, joint: 0.125, grid: 0.5,
     tiles: [],                 // {w,h,x,y,rot} — x,y = top-left, inches; rot 0|90

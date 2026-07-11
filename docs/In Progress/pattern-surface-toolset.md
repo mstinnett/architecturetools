@@ -168,6 +168,19 @@ the model is a **translational repeat cell**:
 
 Tiles may cross the cell boundary (they wrap — the cell is a torus); the
 joint carries the min/nom/max range so the tolerance thesis survives into 2D.
+
+**Units (decided 2026-07-09): the engine's 1/960 mm exact integers,** per the
+suite convention — exact for every stored length, float only where geometry
+forces it, stated in the engine note. Concretely: cell, joint, tile, and
+placement values are integer units; orthogonal layouts clip on axis-aligned
+edges, so whole/cut classification and cut widths come out as **exact integer
+ranges** (tile.html's arithmetic, in 2D — no corner-sampling epsilon); areas
+stay within safe integers for any real room. The honest floats: 45° rotation
+(√2 never lands on the lattice — classified in float, status stated, the
+slope-hypotenuse precedent) and placement expressions that divide (u/3
+quantizes to the nearest unit and is REPORTED, the scale-page precedent).
+The prototypes deliberately run float inches for speed and say so on-page;
+the real build does not.
 Overlap of two *placements* is a validation error the editor shows, not
 prevents (show, don't judge).
 

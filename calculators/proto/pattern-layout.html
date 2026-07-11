@@ -76,7 +76,9 @@
   <p class="section-note" style="font-size:var(--text-sm);color:var(--ink-2);margin-top:var(--space-md);">
      Tiles are drawn at their lattice module (tile + joint), so herringbone's
      module reads ≈ nominal. Corner-sampling classifies whole vs cut — good
-     enough to prototype the counting; the real engine would clip exactly.</p>
+     enough to prototype the counting. The real engine runs the suite's exact
+     1/960&nbsp;mm integers: orthogonal cuts become exact ranges, and only the
+     45° transform stays floating point, stated.</p>
 
   <div class="page-footer">
     <a class="back-link" href="../index.html">← calculators</a>
