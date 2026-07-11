@@ -55,6 +55,15 @@
   .cand-head .c-n { width: 5.2em; } .cand-head .c-riser { width: 8.5em; }
   .cand-head .c-vs { flex: 1; } .cand-head .c-run { width: 8em; text-align: right; }
   .cite { margin-top: var(--space-sm); font-size: var(--text-xs); color: var(--ink-3); line-height: 1.7; }
+  /* the design inverse: what floor-to-floor closes clean */
+  .ftf-note { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.6; margin: 0.2rem 0 0; max-width: 44em; }
+  .ftf-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin-top: var(--space-sm); }
+  .ftf-table th, .ftf-table td { text-align: right; padding: 0.4rem 0.55rem;
+    border-bottom: var(--border-light); font-variant-numeric: tabular-nums; }
+  .ftf-table th { color: var(--ink-3); font-weight: 400; font-size: var(--text-xs);
+    text-transform: uppercase; letter-spacing: 0.06em; }
+  .ftf-table td:first-child, .ftf-table th:first-child { text-align: left; }
+  .ftf-table tr.sel td { box-shadow: inset 2px 0 0 var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
   @media (max-width: 540px) { .cand-row .c-run, .cand-head .c-run { display: none; } }
 </style>
 </head>
@@ -125,6 +134,14 @@
         <div class="cand-rows" id="candRows"></div>
         <div class="cite" id="citeLine"></div>
       </div>
+
+      <!-- the design inverse: while the floor-to-floor is still yours to set,
+           what each count allows and where the risers close with no drift -->
+      <div class="ratio-box">
+        <div class="section-label">Across The Floor-To-Floor</div>
+        <p class="ftf-note" id="ftfNote"></p>
+        <table class="ftf-table" id="ftfTable"></table>
+      </div>
     </div>
 
     <!-- slot 7 · the engine's auditable footnote -->
@@ -181,7 +198,7 @@
 
   var els = {};
   ['riseInput','treadInput','riseNote','treadNote','bareAsk','echo','echoLine','echoAssume',
-   'stairOut','gridPresets','figLabel','figure','detailRows','candLabel','candRows','citeLine','mathNote']
+   'stairOut','gridPresets','figLabel','figure','detailRows','candLabel','candRows','ftfNote','ftfTable','citeLine','mathNote']
     .forEach(function (id) { els[id] = document.getElementById(id); });
 
   var escapeHtml = UI.esc;
@@ -360,6 +377,7 @@
     var list = c.list;
     if (!list.length) {
       els.candRows.innerHTML = '<div class="cand-row"><span class="c-vs">no count lands between 4" and 8 1/2" — that rise is a ramp or a ladder, not a stair</span></div>';
+      els.ftfNote.textContent = ''; els.ftfTable.innerHTML = '';
       els.figure.innerHTML = ''; els.detailRows.innerHTML = ''; els.figLabel.textContent = '';
       els.citeLine.innerHTML = escapeHtml(ref.cite + CITE_TAIL);
       els.mathNote.innerHTML = '';
@@ -390,6 +408,27 @@
     Array.prototype.forEach.call(els.candRows.querySelectorAll('[data-n]'), function (b) {
       b.addEventListener('click', function () { state.selN = +b.dataset.n; render(); });
     });
+
+    // ---- the design inverse: what floor-to-floor closes clean --------------
+    // For each count: the floor-to-floor the reference allows, and the nearest
+    // floor-to-floor where its risers land exactly on the layout grid — no
+    // drift for the section to absorb. Dimensions to set, not to audit.
+    els.ftfNote.innerHTML = 'While the floor-to-floor is still yours to set: what each count allows under '
+      + escapeHtml(ref.label) + ', and the nearest floor-to-floor where its risers land exactly on the layout grid.';
+    var ftf = '<tr><th>Risers</th><th>' + escapeHtml(ref.label) + ' Allows</th><th>Clean Floor-To-Floor Near Yours</th></tr>';
+    list.forEach(function (r) {
+      var winCell = ref.riserMin != null
+        ? escapeHtml(fmtLen(r.n * ref.riserMin)) + ' – ' + escapeHtml(fmtLen(r.n * ref.riserMax))
+        : 'up to ' + escapeHtml(fmtLen(r.n * ref.riserMax));
+      var rStar = Math.round(riseU / r.n / grid) * grid;
+      if (rStar > ref.riserMax) rStar = Math.floor(ref.riserMax / grid) * grid;
+      if (ref.riserMin != null && rStar < ref.riserMin) rStar = Math.ceil(ref.riserMin / grid) * grid;
+      var Fp = r.n * rStar, dF = Fp - riseU;
+      ftf += '<tr' + (r.n === selN ? ' class="sel"' : '') + '><td>' + r.n + '</td><td>' + winCell + '</td>'
+           + '<td>' + escapeHtml(fmtLen(Fp)) + ' — ' + r.n + ' × ' + escapeHtml(fmtLen(rStar))
+           + (dF === 0 ? ' · yours closes exactly' : ' (' + (dF > 0 ? '+' : '−') + escapeHtml(fmtLen(Math.abs(dF))) + ')') + '</td></tr>';
+    });
+    els.ftfTable.innerHTML = ftf;
 
     // the section + detail for the selected count
     var width = els.figure.clientWidth;
