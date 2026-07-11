@@ -133,6 +133,37 @@ prototype already walks the ladder crudely (seed → edit → JSON → load);
 the real build treats round-tripping as a contract, and EXPLODE joins the
 adopted vocabulary.
 
+### The variation grammar (operator itch, resolved 2026-07-09)
+
+Named patterns vary a lot (chevron peak left/right; running bond in halves,
+thirds, sevenths; double herringbone; basketweave block sizes) — but the
+variation is not free-form, and it is not n checkboxes. Typed, it collapses
+to **five parameters**:
+
+1. **rational offset** — the stagger, p/q of the module (stack = 0, running
+   = 1/2, brick sevenths = 3/7 — one fraction field covers all of it)
+2. **reflection bit** — handedness (the chevron's peak)
+3. **small integer count** — units per step/block (double herringbone,
+   basketweave block)
+4. **rotation tag** — the symbolic 0/90/45 (soldier, sailor, diagonal)
+5. **symmetry group** — from the closed list (pinwheel and kin)
+
+Every family is a generator over a subset of these, so **the form never
+grows per pattern** — same grammar, fixed UI size, enormous coverage.
+
+Exposure has three tiers, two of which are already the house grammar:
+1. **Typed fields with chips** — offset chips for 1/2 and 1/3 plus a free
+   fraction field, exactly the converter's grid-denominator pattern.
+2. **Direct manipulation on the preview** for the spatial parameters — the
+   chevron peak is flipped by clicking the peak, the offset slid by dragging
+   the field. A toggle is what's left when the preview isn't clickable; ours
+   is.
+3. **Explode** — the ladder's bottom rung for anything outside the grammar.
+   The grammar's job is to make this rare, not impossible.
+
+This largely answers doc-foot question 1: the editor is the reachable bottom
+rung, not the workflow — power lives in tiers 1–2.
+
 **The two imports that change the architecture:**
 
 1. **Parametric definitions (the PowerCopy lesson).** The prototype's JSON
