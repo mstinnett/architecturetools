@@ -81,6 +81,44 @@ behaviors done well, not an open-ended CAD.
 
 ---
 
+## Beyond AutoCAD — the reuse/parametric layer (operator catch, 2026-07-09)
+
+AutoCAD's toolbars catalog *direct-manipulation drafting*. CATIA and NX
+formalize a second layer above it — templates, parameters, and instance
+control — and a pattern editor lives mostly in THAT layer. Same method
+applies: each is a closed, documented feature set in the vendor's own docs
+(CATIA's Product Knowledge Template guide; NX's Pattern Feature options page).
+
+| Construct | What it actually is | Ours |
+|---|---|---|
+| **CATIA PowerCopy** | white-box template: geometry + literals + formulas + constraints, instantiated against *declared inputs*, editable after | **ADOPT the declared-inputs idea** — see "parametric definitions" below |
+| **CATIA UserFeature (UDF)** | the same as a black box: only author-exposed parameters visible | ADAPT — our *presets* are sealed UDFs; an editor-made definition is a PowerCopy |
+| CATIA catalogs / NX Reuse Library | the template library mechanism | ADOPT eventually — the pattern library page |
+| **NX Pattern Feature** | layouts (linear/circular/polygon/spiral/along/**boundary fill**) with per-instance **clocking, suppression, variance**, increments by expression, spreadsheet-driven points | **This is our layout engine's formal spec.** Boundary fill = the field; per-instance suppression = the niche/outlet cut-out; variance = the accent tile swapped into the field; clocking = one rotated instance |
+| **NX Expressions** | a named-parameter table driving all geometry | **ADOPT** — one parameter set (tile L, S, joint J) the whole definition references |
+| NX suppression expressions | conditional existence by formula | SKIP v1 — per-instance suppression covers the real cases |
+| Sketch constraints (ACAD parametric / SolidWorks) | *persistent* relationships (aligned, equal, symmetric) vs our *transient* snaps | ADAPT lightly — see open question 4; a full solver is overkill |
+| **Wallpaper groups (mathematics)** | the closed catalog of 2D periodic symmetry — exactly 17 | **ADOPT as a symmetry mode** — place one tile, the group places its mirrors/rotations; pinwheel and herringbone become one-tile definitions |
+| Illustrator pattern editor | grid/brick/hex tile modes, overlap rules, edit-in-context preview | UX prior art for the editor (our ghost tiling = its edit-in-context) |
+| Revit curtain grids / repeat detail | a grid system driving panelization | rhymes with the layout engine; nothing new to import |
+
+**The two imports that change the architecture:**
+
+1. **Parametric definitions (the PowerCopy lesson).** The prototype's JSON
+   bakes inches; a definition should *declare inputs* (tile L × S, joint J)
+   and store placements as expressions of them — then one "herringbone"
+   instantiates for any tile, and changing the joint re-flows the cell. The
+   layout prototype's generators already work this way (they take `g`); the
+   editor's output doesn't yet. That's the v2 data model.
+2. **Instance-level exceptions over the procedural field (the NX Pattern
+   Feature lesson).** The field is generated, but real walls have a niche,
+   an outlet, a feature strip: suppress this tile, swap that one, rotate
+   one. The layout tool needs a per-instance override list on top of the
+   generator — that's the difference between a pattern picture and a layout
+   document.
+
+---
+
 ## Architecture: two tools, one data model
 
 **Editor and layout are separate pages** (operator call, confirmed by the
@@ -129,3 +167,8 @@ Open questions for the operator after playing with the protos:
    (offset %, orientation) cover real work?
 2. Band model: horizontal bands only (v1) or arbitrary rectangles/borders?
 3. Where does offcut reuse live — layout page or Material Coverage?
+4. Constraints vs snaps: is the parametric re-flow (change J, the cell
+   re-solves) worth placements-as-expressions, or is module-unit storage
+   (positions in multiples of tile+joint) the right 80%?
+5. Symmetry mode: worth building the wallpaper-group operations, or do the
+   seeded patterns cover what architects actually spec?
