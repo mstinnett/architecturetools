@@ -102,6 +102,23 @@ applies: each is a closed, documented feature set in the vendor's own docs
 | Illustrator pattern editor | grid/brick/hex tile modes, overlap rules, edit-in-context preview | UX prior art for the editor (our ghost tiling = its edit-in-context) |
 | Revit curtain grids / repeat detail | a grid system driving panelization | rhymes with the layout engine; nothing new to import |
 
+### Nodes vs templates (operator question, 2026-07-09)
+
+PowerCopy/UDF are **not** node-based — they're history-tree captures, the
+dataflow hidden inside the feature tree. That hiding is where their
+overcomplication lives (reference re-binding, "use identical name" hacks,
+black-box instantiation failures). Both vendors later shipped genuine
+Grasshopper-style node systems (CATIA Visual Scripting / xGenerative Design;
+NX Algorithmic Modeling) — the industry conceding that the graph should be
+visible. But a node canvas earns its complexity only when the graph
+**topology varies per problem** (Grasshopper's domain). Ours is fixed:
+params → placements-as-expressions → cell → boundary fill → exceptions →
+counts. **Decision: present the fixed graph as a form + layer list**
+(Photoshop's move), keep the dataflow honesty in the data (declared inputs,
+expressions), adopt neither history capture nor a node canvas. The
+definition JSON is already a graph serialization, so a node view remains a
+possible later layer for power users without a model change.
+
 **The two imports that change the architecture:**
 
 1. **Parametric definitions (the PowerCopy lesson).** The prototype's JSON
