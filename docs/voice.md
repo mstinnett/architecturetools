@@ -3,6 +3,34 @@
 The recommendation copy speaks to one architect, mid-purchase, choosing a machine
 for their work. Not to an audience, about architects.
 
+## Calculator pages (operator rulings, 2026-07)
+
+The calculator voice extends the rules below; these came out of the
+scale/slope/tile redesigns and are the standard for every tool page.
+
+- **Open with the question the tool answers,** in the reader's words, then the
+  mechanism. ("What dimension does this wall want to be so the tile runs
+  uncut?") A tool named for its subject ("Tile"), not its trick ("Precision
+  Window") — the name is the door.
+- **Answer with the thing the reader would set** — a dimension, a range — not
+  an internal quantity. "Set it anywhere 5'-9/16″ to 5'-1 11/16″" leads; the
+  tile count follows.
+- **No metaphor in mechanism copy.** Banned from this family: *holds*, *backs
+  / can't back*, *floor* (except the walking surface), *spec floor*, *what the
+  setter can hold*, *disappears into*. Say the mechanism: **sheet resolution**,
+  *is not recorded*, **false precision** (the named enemy — use it).
+- **Tolerances are ranges, not points.** A cut, a band, a residual gets both
+  ends ("4 5/16″–5 7/16″"), never a single false-precise number.
+- **Show, don't judge.** References are located, never ruled on; no pass/fail,
+  no compliance color. A recommendation-shaped answer is allowed only as a
+  menu of stated options ("set it A or B").
+- **Assumptions live in the echo's assumption lines** (dash-prefixed), one
+  fact each, including every fixed amount and every fallback the tool took.
+- **Metric is first-class.** Choosing metric flips prefills, presets, worked
+  examples, and display formatting — everything, not just the output units.
+- Imperial real-world values read as **native ft-in fractions**, not survey
+  decimals; exact integers live in the engine note.
+
 ## The shape
 
 - **Frame** (the priority line) carries what's true for the *whole workload* —

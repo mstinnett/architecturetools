@@ -56,11 +56,12 @@ Status key: ✅ done · ▶ first pass · ◷ later depth · ⊘ deferred · ✕
 | Node | One-line scope | Consumes | Introduces | Status |
 |------|----------------|----------|------------|--------|
 | Converter | Exact unit conversion w/ min/max + snap | — | P1–P4 | ✅ |
-| **Run / module solver** | Fit a repeating module into a span → full count, remainder, edge cut, sliver flag. Presets: **tile (flagship)**, studs, balusters, ceiling grid, pavers | P1–P4 | P5 | ▶ |
-| Scale & drawing | Drawing scale ↔ real dim, measure-at-scale | P1,P2 | P7 | next |
-| Slope / pitch / grade | Rise·run·%·°·ratio, roof pitch | P1,P2 | P8 | next |
+| **Run / module solver** | Fit a repeating module into a span → full count, remainder, edge cut, sliver flag. Presets: studs, balusters, ceiling grid, pavers (tile graduated to its own node) | P1–P4 | P5 | ▶ exemplar pass queued |
+| Scale & drawing | **Scale Resolution** — the range a scaled dimension knows (crossing model, Across The Scales, tape-run stack-up) | P1,P2 | P7 | ✅ redesigned 2026-07 |
+| Slope / pitch / grade | Rise·run·%·°·ratio; rounding table (shallower-for-max / steeper-for-min); selectable references | P1,P2 | P8 | ✅ redesigned 2026-07 |
 | **Stairs** | Equal risers within code limits, 2R+T, IBC/IRC. *The bridge node.* | P1,P2,P6 | P6,P10 | ▶ |
-| **Area takeoff** | Chained / L / U rooms, subtract openings → area + perimeter. *Keystone.* | P1,P2 | P9 | early |
+| **Area takeoff** | **Material Coverage** — takeoff ÷ unit/rate; waste unbundled (breakage · attic stock · cut-waste-is-the-layout's). *Keystone.* | P1,P2 | P9 | ✅ 2026-07 |
+| **Tile** | One chassis (tile · joint range · run ends); tasks: **Size The Wall** (uncut-run windows → dimensions to set) · **Lay Out The Wall** (flush/centered, cuts as ranges) · patterns later | P1,P2,P5 | — | ✅ built 2026-07 |
 | Triangle / squaring | 3-4-5, diagonal check, area-from-sides | P1,P2 | — | open |
 
 ### 2 · Egress & life safety (~4–5 pages)
