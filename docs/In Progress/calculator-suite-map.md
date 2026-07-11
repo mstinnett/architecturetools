@@ -101,7 +101,7 @@ Status key: ✅ done · ▶ first pass · ◷ later depth · ⊘ deferred · ✕
 | **Material data layer** | Identity-keyed dimensional + property schema. *brickdims, generalized. Labor out, pricing deferred to CAD.* | introduces P11 | foundational |
 | Quantity calcs (concrete, paint, drywall, flooring, framing) | Area/volume → quantity + waste + boxes | P9,P11 | open / mostly ✕ |
 
-> **Tile is not a node here.** It lives in Family 1 as the run-solver flagship. Its material depth — pieces-per-box, coverage area, eventual layout/cutting view — is **depth on that node**, not a new page. (See depth ladder below.)
+> **Tile's material depth lives split** (2026-07-09): counting/boxes/waste are Material Coverage's; the layout and windows are `tile.html`'s. The 2-D pattern/cutting view folds into Tile later if it earns it. (Supersedes the earlier "tile is the run-solver flagship" plan.)
 
 ### 7 · Zoning (~0–4 pages) — danger zone
 FAR · coverage · setback · height · density · parking. Jurisdiction-by-jurisdiction, no single national code, brutal verification, primitives don't transfer. **Default ✕ — out of the "complete" definition.** Any zoning calc is a bonus, never a gap.
