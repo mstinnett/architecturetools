@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Pattern Layout (prototype) -- architecture.tools</title>
+<meta name="description" content="Prototype: a tile pattern laid over a surface with an accent band cutting through — drag the pattern, watch the cuts move, and read whole and cut counts with honest buy bounds.">
+<script>
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../../assets/css/global.css">
+<style>
+  html, body { overflow-x: hidden; }
+  .proto-flag { display: inline-block; font-size: var(--text-xs); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent);
+    border-radius: var(--radius); padding: 0.15rem 0.5rem; margin-bottom: 0.6rem; }
+  svg.lay { display: block; width: 100%; height: auto; background: var(--card);
+    border: 1px solid var(--rule-2); border-radius: var(--radius); touch-action: none; cursor: grab; }
+  .small-input { font-family: 'SF Mono', ui-monospace, monospace; font-size: 0.95rem;
+    width: 4.5em; color: var(--ink); background: var(--card); padding: 0.3rem 0.45rem;
+    border: 1px solid var(--rule-2); border-radius: var(--radius); box-shadow: var(--shadow-well); outline: none; }
+  .lbl { font-size: var(--text-xs); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.07em; }
+  .counts { display: flex; gap: var(--space-lg); flex-wrap: wrap; margin-top: var(--space-md);
+    font-size: var(--text-sm); color: var(--ink-2); line-height: 1.7; font-variant-numeric: tabular-nums; }
+  .counts b { color: var(--ink); font-weight: 600; }
+  .counts .col { min-width: 15em; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Prototypes</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Pattern Layout</span>
+    </nav>
+    <div class="proto-flag">Prototype — exploring, not shipping</div>
+    <h1>Pattern Layout</h1>
+    <p>A pattern laid over a surface, with an accent band cutting through it.
+       Drag the field to slide the pattern under the wall — the cuts move, the
+       counts follow. Whole tiles draw plain; anything the boundary or the band
+       slices is hatched. Counts come with both honest bounds: every offcut
+       reused, and none.</p>
+  </div>
+
+  <div class="opt-line" style="margin-bottom:var(--space-sm);">
+    <div class="opt-cluster"><span class="section-label">Surface</span>
+      <input class="small-input" id="sw" value="96"> <span class="lbl">×</span>
+      <input class="small-input" id="sh" value="60"> <span class="lbl">in</span>
+    </div>
+    <div class="opt-cluster"><span class="section-label">Joint</span>
+      <input class="small-input" id="jt" value="0.125"> <span class="lbl">in</span>
+    </div>
+  </div>
+  <div class="opt-line" style="margin-bottom:var(--space-sm);">
+    <div class="opt-cluster"><span class="section-label">Field</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pat="stack">stack</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pat="run2">running 1/2</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pat="run3">running 1/3</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pat="basket">basketweave</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pat="herring">herringbone</button>
+      <button type="button" class="mini-pill" aria-pressed="false" id="rot45">45°</button>
+    </div>
+    <div class="opt-cluster"><span class="section-label">Band</span>
+      <button type="button" class="mini-pill" aria-pressed="false" id="bandOn">accent band</button>
+      <span class="lbl">drag its edges on the wall</span>
+    </div>
+  </div>
+
+  <div id="svgHost"></div>
+  <div class="counts" id="counts"></div>
+  <p class="section-note" style="font-size:var(--text-sm);color:var(--ink-2);margin-top:var(--space-md);">
+     Tiles are drawn at their lattice module (tile + joint), so herringbone's
+     module reads ≈ nominal. Corner-sampling classifies whole vs cut — good
+     enough to prototype the counting; the real engine would clip exactly.</p>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← calculators</a>
+  </div>
+</div>
+
+<script src="../../assets/js/ui.js"></script>
+<script>
+(function () {
+  'use strict';
+  /* Inches throughout (prototype). Field patterns are generators that yield
+     tile polygons in pattern space; the layout transforms (origin shift +
+     optional 45°), clips by corner test, and counts. */
+  var state = {
+    sw: 96, sh: 60, joint: 0.125,
+    pat: 'run2', rot45: false,
+    ox: 0, oy: 0,                    // pattern origin offset (drag)
+    band: false, bandY1: 24, bandY2: 30.25
+  };
+
+  /* ---- pattern generators: return {tiles:[{pts:[[x,y]..4], area}], tileArea, period} */
+  function rectTile(x, y, w, h) { return { pts: [[x, y], [x + w, y], [x + w, y + h], [x, y + h]], area: w * h }; }
+
+  function genFromCell(cell, place, W, H) {
+    // tile a cell definition over a working box
+    var out = [];
+    for (var cx = -1; cx * cell.w < W + cell.w; cx++)
+      for (var cy = -1; cy * cell.h < H + cell.h; cy++)
+        place(cx * cell.w, cy * cell.h, out);
+    return out;
+  }
+  var GENS = {
+    stack: function (g, W, H) {
+      var u = 6 + g, v = 3 + g;
+      return { tileArea: 18, tiles: genFromCell({ w: u, h: v }, function (x, y, out) {
+        out.push(rectTile(x, y, 6, 3)); }, W, H) };
+    },
+    run2: function (g, W, H) {
+      var u = 6 + g, v = 3 + g;
+      return { tileArea: 18, tiles: genFromCell({ w: u, h: 2 * v }, function (x, y, out) {
+        out.push(rectTile(x, y, 6, 3)); out.push(rectTile(x + u / 2, y + v, 6, 3)); }, W, H) };
+    },
+    run3: function (g, W, H) {
+      var u = 6 + g, v = 3 + g;
+      return { tileArea: 18, tiles: genFromCell({ w: u, h: 3 * v }, function (x, y, out) {
+        out.push(rectTile(x, y, 6, 3)); out.push(rectTile(x + u / 3, y + v, 6, 3));
+        out.push(rectTile(x + 2 * u / 3, y + 2 * v, 6, 3)); }, W, H) };
+    },
+    basket: function (g, W, H) {
+      var v = 3 + g, U = 6 + g;
+      return { tileArea: 18, tiles: genFromCell({ w: 2 * U, h: 2 * U }, function (x, y, out) {
+        out.push(rectTile(x, y, 6, 3)); out.push(rectTile(x, y + v, 6, 3));
+        out.push(rectTile(x + U, y, 3, 6)); out.push(rectTile(x + U + v, y, 3, 6));
+        out.push(rectTile(x + U, y + U, 6, 3)); out.push(rectTile(x + U, y + U + v, 6, 3));
+        out.push(rectTile(x, y + U, 3, 6)); out.push(rectTile(x + v, y + U, 3, 6)); }, W, H) };
+    },
+    herring: function (g, W, H) {
+      // block herringbone on the joint lattice u = short + joint:
+      // cell (i,j): t = (i − j) mod 4 → t=0 starts an H tile (2 slots wide),
+      // t=3 starts a V tile (2 slots tall). Unique cover; steps diagonally.
+      var u = 3 + g, out = [];
+      var ni = Math.ceil(W / u) + 4, nj = Math.ceil(H / u) + 4;
+      for (var i = -4; i < ni; i++) for (var j = -4; j < nj; j++) {
+        var t = ((i - j) % 4 + 4) % 4;
+        if (t === 0) out.push(rectTile(i * u, j * u, 2 * u - g, u - g));
+        if (t === 3) out.push(rectTile(i * u, j * u, u - g, 2 * u - g));
+      }
+      return { tileArea: (2 * u - g) * (u - g), tiles: out };
+    }
+  };
+  var BAND = function (g, W) {   // soldier course: 3×6 verticals across
+    var u = 3 + g, out = [];
+    for (var i = -1; i * u < W + u; i++) out.push(rectTile(i * u, 0, 3, 6));
+    return { tileArea: 18, tiles: out };
+  };
+
+  /* ---- classification: corner sampling against a region ---- */
+  function classify(pts, inRegion) {
+    var inside = 0;
+    pts.forEach(function (p) { if (inRegion(p[0], p[1])) inside++; });
+    // sample edge midpoints too — catches straddles with no corner inside
+    for (var k = 0; k < 4; k++) {
+      var q = pts[(k + 1) % 4];
+      if (inRegion((pts[k][0] + q[0]) / 2, (pts[k][1] + q[1]) / 2)) inside++;
+    }
+    if (inside === 8) return 'whole';
+    if (inside === 0) return 'out';
+    return 'cut';
+  }
+
+  /* ---- render ---- */
+  var VIEW = 680;
+  var host = document.getElementById('svgHost');
+  function render() {
+    var W = state.sw, H = state.sh, g = state.joint;
+    var s = VIEW / (W + 8);
+    var vh = (H + 8) * s;
+    function X(x) { return (x + 4) * s; } function Y(y) { return (y + 4) * s; }
+    var b1 = Math.min(state.bandY1, state.bandY2), b2 = Math.max(state.bandY1, state.bandY2);
+    var hasBand = state.band && b2 - b1 > 1;
+    function inField(x, y) {
+      if (x < 0 || x > W || y < 0 || y > H) return false;
+      if (hasBand && y > b1 && y < b2) return false;
+      return true;
+    }
+
+    // generate field tiles in pattern space over a generous box, then shift/rotate
+    var boxW = state.rot45 ? (W + H) + 24 : W + 24;
+    var boxH = state.rot45 ? (W + H) + 24 : H + 24;
+    var gen = GENS[state.pat](g, boxW, boxH);
+    var cos = Math.SQRT1_2, sin = Math.SQRT1_2;
+    function xf(p) {
+      var x = p[0] + state.ox, y = p[1] + state.oy;
+      if (!state.rot45) return [x, y];
+      return [x * cos - y * sin + W / 2, x * sin + y * cos - (W + H) / 2];
+    }
+    var whole = 0, cut = 0, tilesSvg = '';
+    gen.tiles.forEach(function (t) {
+      var pts = t.pts.map(xf);
+      var cls = classify(pts, inField);
+      if (cls === 'out') return;
+      if (cls === 'whole') whole++; else cut++;
+      var d = 'M' + pts.map(function (p) { return X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1); }).join(' L') + ' Z';
+      tilesSvg += '<path d="' + d + '" fill="' + (cls === 'whole' ? 'var(--card,#fff)' : 'url(#cuthatch)') + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="0.7" clip-path="url(#surf)"/>';
+    });
+
+    // band tiles
+    var bWhole = 0, bCut = 0, bandSvg = '';
+    if (hasBand) {
+      var bg = BAND(g, W + 12);
+      bg.tiles.forEach(function (t) {
+        var pts = t.pts.map(function (p) { return [p[0] - 3, p[1] + b1 + ((b2 - b1) - 6) / 2]; });
+        var cls = classify(pts, function (x, y) { return x >= 0 && x <= W && y >= b1 && y <= b2; });
+        if (cls === 'out') return;
+        if (cls === 'whole') bWhole++; else bCut++;
+        var d = 'M' + pts.map(function (p) { return X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1); }).join(' L') + ' Z';
+        bandSvg += '<path d="' + d + '" fill="' + (cls === 'whole' ? 'var(--accent-soft)' : 'url(#cuthatch)') + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="0.7" clip-path="url(#band)"/>';
+      });
+    }
+
+    var svg = '<svg class="lay" viewBox="0 0 ' + VIEW + ' ' + vh.toFixed(0) + '" width="' + VIEW + '" height="' + vh.toFixed(0) + '">';
+    svg += '<defs><pattern id="cuthatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         + '<line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/></pattern>'
+         + '<clipPath id="surf"><rect x="' + X(0) + '" y="' + Y(0) + '" width="' + (W * s) + '" height="' + (H * s) + '"/></clipPath>'
+         + (hasBand ? '<clipPath id="band"><rect x="' + X(0) + '" y="' + Y(b1) + '" width="' + (W * s) + '" height="' + ((b2 - b1) * s) + '"/></clipPath>' : '')
+         + '</defs>';
+    svg += tilesSvg;
+    if (hasBand) {
+      svg += '<rect x="' + X(0) + '" y="' + Y(b1) + '" width="' + (W * s) + '" height="' + ((b2 - b1) * s) + '" fill="var(--paper,#f4f1ea)" opacity="0.35"/>';
+      svg += bandSvg;
+      ['bandY1', 'bandY2'].forEach(function (k) {
+        var y = Y(state[k]);
+        svg += '<line data-handle="' + k + '" x1="' + X(0) + '" y1="' + y + '" x2="' + X(W) + '" y2="' + y + '" stroke="var(--accent,#004C80)" stroke-width="5" opacity="0.001" style="cursor:ns-resize"/>';
+        svg += '<line x1="' + X(0) + '" y1="' + y + '" x2="' + X(W) + '" y2="' + y + '" stroke="var(--accent,#004C80)" stroke-width="1.4" pointer-events="none"/>';
+      });
+    }
+    svg += '<rect x="' + X(0) + '" y="' + Y(0) + '" width="' + (W * s) + '" height="' + (H * s) + '" fill="none" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.6"/>';
+    svg += '</svg>';
+    host.innerHTML = svg;
+    wire();
+
+    // counts + honest bounds
+    var fieldArea = W * H - (hasBand ? W * (b2 - b1) : 0);
+    var loF = Math.min(Math.ceil(fieldArea / gen.tileArea), whole + cut), hiF = whole + cut;
+    var html = '<div class="col"><span class="lbl">Field — ' + state.pat + (state.rot45 ? ' 45°' : '') + '</span><br>'
+      + '<b>' + whole + '</b> whole · <b>' + cut + '</b> cut<br>'
+      + 'buy between <b>' + loF + '</b> (every offcut reused) and <b>' + hiF + '</b> (no reuse)</div>';
+    if (hasBand) {
+      // a course doesn't fill its band, so the area bound overshoots — the
+      // honest lower bound is cut-pairs sharing a tile
+      var loB = bWhole + Math.ceil(bCut / 2), hiB = bWhole + bCut;
+      html += '<div class="col"><span class="lbl">Band — soldier course, ' + (b2 - b1).toFixed(1) + '″ tall</span><br>'
+        + '<b>' + bWhole + '</b> whole · <b>' + bCut + '</b> cut<br>'
+        + 'buy between <b>' + loB + '</b> and <b>' + hiB + '</b></div>';
+    }
+    html += '<div class="col"><span class="lbl">Drag</span><br>the field slides under the wall — origin '
+      + state.ox.toFixed(2) + '″, ' + state.oy.toFixed(2) + '″' + (hasBand ? '<br>the band edges drag too' : '') + '</div>';
+    document.getElementById('counts').innerHTML = html;
+  }
+
+  /* ---- interaction ---- */
+  var drag = null;
+  function wire() {
+    var svg = host.querySelector('svg');
+    function pt(ev) {
+      var r = svg.getBoundingClientRect();
+      var s = (VIEW / (state.sw + 8)) * (r.width / VIEW);
+      return { x: (ev.clientX - r.left) / s - 4, y: (ev.clientY - r.top) / s - 4 };
+    }
+    svg.addEventListener('pointerdown', function (ev) {
+      var h = ev.target.getAttribute && ev.target.getAttribute('data-handle');
+      var p = pt(ev);
+      drag = h ? { kind: h } : { kind: 'field', x: p.x - state.ox, y: p.y - state.oy };
+      svg.setPointerCapture(ev.pointerId);
+    });
+    svg.addEventListener('pointermove', function (ev) {
+      if (!drag) return;
+      var p = pt(ev);
+      if (drag.kind === 'field') { state.ox = p.x - drag.x; state.oy = p.y - drag.y; }
+      else state[drag.kind] = Math.max(0, Math.min(state.sh, p.y));
+      render();
+    });
+    svg.addEventListener('pointerup', function () { drag = null; });
+  }
+
+  /* ---- controls ---- */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-pat]'), function (b) {
+    b.addEventListener('click', function () {
+      state.pat = b.dataset.pat;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-pat]'), function (x) {
+        UI.press(x, x.dataset.pat === state.pat);
+      });
+      render();
+    });
+  });
+  document.getElementById('rot45').addEventListener('click', function () {
+    state.rot45 = !state.rot45;
+    UI.press(document.getElementById('rot45'), state.rot45);
+    render();
+  });
+  document.getElementById('bandOn').addEventListener('click', function () {
+    state.band = !state.band;
+    UI.press(document.getElementById('bandOn'), state.band);
+    render();
+  });
+  [['sw', 'sw'], ['sh', 'sh'], ['jt', 'joint']].forEach(function (pair) {
+    var el = document.getElementById(pair[0]);
+    el.addEventListener('input', function () {
+      var v = parseFloat(el.value);
+      if (isFinite(v) && v > 0) { state[pair[1]] = v; render(); }
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-pat]'), function (x) {
+    UI.press(x, x.dataset.pat === state.pat);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
