@@ -119,6 +119,20 @@ expressions), adopt neither history capture nor a node canvas. The
 definition JSON is already a graph serialization, so a node view remains a
 possible later layer for power users without a model change.
 
+**Refinement (operator, 2026-07-09): the cluster lesson.** Grasshopper's
+groups/clusters dissolve the spaghetti objection — collapse for
+cleanliness, enter or explode for control, lossless both ways. So
+spaghetti is NOT the load-bearing argument against a node canvas; fixed
+topology is. What clusters add is a REQUIREMENT on our model: a
+**disclosure ladder, lossless in both directions** —
+chip ("herringbone 3×6") ⇄ form (declared parameters) ⇄ placement list
+(the exploded cell, editable) — every rung opens into the one below and
+re-seals into a named definition above. CATIA's UDF gets this wrong
+(one-way, license-gated sealing); clusters get it right. The editor
+prototype already walks the ladder crudely (seed → edit → JSON → load);
+the real build treats round-tripping as a contract, and EXPLODE joins the
+adopted vocabulary.
+
 **The two imports that change the architecture:**
 
 1. **Parametric definitions (the PowerCopy lesson).** The prototype's JSON
