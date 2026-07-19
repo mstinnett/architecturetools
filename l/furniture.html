@@ -533,11 +533,14 @@
 
   var TIER_LABELS = ['mass', 'mid', 'upper'];
 
+  var MARKET_MIN_N = 8;                            // below this a percentage would be noise dressed as a fact
+
   function marketInfo(g, geoms) {
     var mk = g.made.market;
     var MD = window.MarketData;
-    if (!mk || !MD || !MD.classes || !MD.classes[mk.cls] || !MD.classes[mk.cls].n) return null;
+    if (!mk || !MD || !MD.classes || !MD.classes[mk.cls]) return null;
     var cls = MD.classes[mk.cls];
+    if (!cls.n || cls.n < MARKET_MIN_N) return null;
     var obstacles = [];
     geoms.forEach(function (o) {
       if (o.item.id === g.item.id) return;
