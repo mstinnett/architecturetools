@@ -93,7 +93,8 @@
   // input-quantization boundary, like parse-length's parse-time rounding.
   function halfTanForDegrees(deg, maxDen) {
     if (typeof deg !== 'number' || !isFinite(deg)) throw new TypeError('plane: degrees must be a finite number');
-    maxDen = maxDen || 1000000;
+    if (maxDen === undefined) maxDen = 1000000;
+    if (!Number.isSafeInteger(maxDen) || maxDen < 1) throw new TypeError('plane: maxDen must be a positive integer, got ' + maxDen);
     // normalize to (−180, 180] so tan(θ/2) is finite
     var d = deg % 360; if (d > 180) d -= 360; if (d <= -180) d += 360;
     if (d === 180) d = 180 - 1e-9;                 // avoid the pole; 180° = two quarter-turns, prefer rotQuarter(2)
@@ -158,9 +159,13 @@
   function applyAll(T, pts) { return pts.map(function (p) { return apply(T, p); }); }
 
   // a transform is rigid (rotation + translation, no scale/shear/mirror) iff
-  // det = 1 and the columns are unit length: a²+c² = 1. Exact FACT.
+  // BOTH columns are unit length and det = 1: for unit columns |det| equals
+  // the sine of the angle between them, so det = 1 forces orthonormality.
+  // (One unit column alone admits shears — xf(1,1,0,1) has det 1.) Exact FACT.
   function isRigid(T) {
-    return R.eq(det(T), 1) && R.eq(R.add(R.mul(T.a, T.a), R.mul(T.c, T.c)), 1);
+    return R.eq(det(T), 1)
+      && R.eq(R.add(R.mul(T.a, T.a), R.mul(T.c, T.c)), 1)
+      && R.eq(R.add(R.mul(T.b, T.b), R.mul(T.d, T.d)), 1);
   }
 
   /* ---- display-only ---------------------------------------------------------- */
@@ -237,8 +242,13 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   var errX = Math.abs(R.toNumber(moved.x) - 1000000);
   ok('12 × 30° lands within capture error of start (err ' + errX.toFixed(6) + ' units)', errX < 1);
 
+  /* --- rigidity rejects shear (review fix) ----------------------------------- */
+  ok('shear is not rigid despite det 1', !P.isRigid(P.xf(1, 1, 0, 1, 0, 0)));
+  ok('anisotropic scale is not rigid', !P.isRigid(P.scale(rat(1), rat(-1))));
+
   /* --- fail loud ------------------------------------------------------------------ */
   threw('singular invert throws', function () { P.invert(P.scale(0)); });
+  threw('bad maxDen throws', function () { P.halfTanForDegrees(45, 0.5); });
   threw('bad point throws', function () { P.apply(P.IDENTITY, { x: 1, y: 2 }); });
   threw('non-integer quarter throws', function () { P.rotQuarter(1.5); });
 

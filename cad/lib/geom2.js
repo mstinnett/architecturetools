@@ -10,8 +10,9 @@
    orientation is 0, not 1e-13.
 
    WHAT LIVES HERE
-     orient(p,q,r)      sign of the turn p→q→r  (−1 cw · 0 collinear · +1 ccw
-                        in y-down screen coordinates)
+     orient(p,q,r)      sign of the turn p→q→r  (+1 clockwise on screen ·
+                        0 collinear · −1 counter-clockwise; y grows down,
+                        so the sign is flipped from math-convention ccw)
      onSegment(p,a,b)   is p exactly on [a,b]?
      segseg(a,b,c,d)    full classification: point (exact) / none /
                         parallel / collinear (with the exact overlap)
@@ -160,7 +161,7 @@
       minX = R.min(minX, pts[i].x); maxX = R.max(maxX, pts[i].x);
       minY = R.min(minY, pts[i].y); maxY = R.max(maxY, pts[i].y);
     }
-    var g = gridCount || 1;
+    var g = gridCount === undefined ? 1 : gridCount;   // 0 is an error, not a default
     return {
       exact: { minX: minX, maxX: maxX, minY: minY, maxY: maxY },
       minX: R.toLattice(minX, g, 'floor'), maxX: R.toLattice(maxX, g, 'ceil'),
@@ -236,6 +237,7 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   /* --- fail loud --------------------------------------------------------------- */
   threw('two-point polygon throws', function () { G.polyArea2([pt(0, 0), pt(1, 1)]); });
   threw('bad point throws', function () { G.orient({ x: 1, y: 2 }, pt(0, 0), pt(1, 1)); });
+  threw('zero bbox grid throws (not silently 1)', function () { G.bboxLattice(tri, 0); });
 
   console.log('=== geom2: ' + pass + ' passed, ' + fail + ' failed ===');
   process.exit(fail === 0 ? 0 : 1);

@@ -46,10 +46,16 @@
 
   /* ---- local box → world rectangle, by quarter turns ----------------------- */
 
+  function reqTurns(item) {
+    var t = item.turns === undefined ? 0 : item.turns;
+    if (!Number.isSafeInteger(t)) throw new TypeError('fitmath: item.turns must be an integer, got ' + item.turns);
+    return ((t % 4) + 4) % 4;
+  }
+
   function worldBox(box, item) {
     reqBox('box', box);
     reqInt('item.x', item.x); reqInt('item.y', item.y);
-    var k = ((item.turns || 0) % 4 + 4) % 4;
+    var k = reqTurns(item);
     var x = box.x, y = box.y, w = box.w, d = box.d;
     var out;
     if (k === 0)      out = { x: x,          y: y,          w: w, d: d };
@@ -77,7 +83,7 @@
       (room.y + room.d) - (bodyWorld.y + bodyWorld.d),        // bottom
       bodyWorld.x - room.x                                    // left
     ];
-    var k = ((item.turns || 0) % 4 + 4) % 4;
+    var k = reqTurns(item);
     var names = ['back', 'right', 'front', 'left'];
     var out = { back: false, right: false, front: false, left: false };
     for (var i = 0; i < 4; i++) out[names[i]] = dist[(i + k) % 4] <= threshold;
@@ -104,9 +110,11 @@
      snap(moving, targets, radius) — moving is the world rect at the drag
      candidate; targets are rects tagged { kind: 'body' | 'clear' | 'room' }.
      Both abutment (my left face to your right face) and alignment (my left
-     to your left) attract; the room attracts inner faces only. Nearest
-     wins per axis, independently. Returns { dx, dy, x: guide | null,
-     y: guide | null } where a guide is { at, to, kind } — `at` the world
+     to your left) attract. The room's edges are its wall faces — they
+     attract from either side (a piece just outside the room snaps flush to
+     the wall line, where the 'outside' conflict then names the problem).
+     Nearest wins per axis, independently. Returns { dx, dy, x: guide |
+     null, y: guide | null } where a guide is { at, kind } — `at` the world
      coordinate of the line to flash, `kind` what was snapped to.          */
 
   function axisEdges(rect, axis) {
@@ -151,11 +159,20 @@
   //   'collision'  solid on solid — furniture through furniture
   //   'encroach'   a solid stands in someone's clearance zone
   //   'pinch'      a clearance zone runs past the room walls
+  //   'outside'    a solid itself runs past the room walls
   function conflicts(placed, room) {
     reqBox('room', room);
     var out = [];
     for (var i = 0; i < placed.length; i++) {
       var A = placed[i];
+      // furniture through the wall — one report per object
+      for (var so = 0; so < A.solids.length; so++) {
+        var s0 = A.solids[so];
+        if (s0.x < room.x || s0.y < room.y || s0.x + s0.w > room.x + room.w || s0.y + s0.d > room.y + room.d) {
+          out.push({ kind: 'outside', a: A.id, note: A.label + ' runs past the room walls' });
+          break;
+        }
+      }
       // zones clipped by the walls — one report per (object, purpose), even
       // when several zones of the same purpose pinch (a double-sided aisle)
       var pinched = {};
@@ -282,10 +299,20 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   ok('collision reported once per pair', conf.filter(function (c) { return c.kind === 'collision'; }).length === 1);
   var pinched = F.conflicts([{ id: 'd', label: 'Dining', solids: [], clears: [{ x: -10 * IN, y: 10 * IN, w: 40 * IN, d: 40 * IN, purpose: 'chair zone' }] }], room);
   ok('zone through the wall pinches', pinched.length === 1 && pinched[0].kind === 'pinch');
+  // two zones of one purpose pinching (a double-sided aisle) report once
+  var pinch2 = F.conflicts([{ id: 'g', label: 'Gondola', solids: [], clears: [
+    { x: 0, y: -10 * IN, w: 40 * IN, d: 8 * IN, purpose: 'aisle' },
+    { x: 0, y: 145 * IN, w: 40 * IN, d: 8 * IN, purpose: 'aisle' }] }], room);
+  ok('double pinch of one purpose reports once', pinch2.length === 1);
+  // furniture through the wall is flagged, once per object
+  var thru = F.conflicts([{ id: 'e', label: 'Sofa', solids: [
+    { x: -5 * IN, y: 10 * IN, w: 84 * IN, d: 38 * IN }, { x: -5 * IN, y: 50 * IN, w: 10 * IN, d: 10 * IN }], clears: [] }], room);
+  ok('solid past the wall flags outside, once', thru.length === 1 && thru[0].kind === 'outside');
   ok('clean layouts stay quiet', F.conflicts([placed[0]], room).length === 0);
 
   /* --- fail loud --------------------------------------------------------------------- */
   threw('non-integer box throws', function () { F.worldBox({ x: 0.5, y: 0, w: 1, d: 1 }, { x: 0, y: 0 }); });
+  threw('fractional turns throws', function () { F.worldBox(box, { x: 0, y: 0, turns: 1.5 }); });
   threw('missing room throws', function () { F.conflicts([], null); });
 
   console.log('=== fitmath: ' + pass + ' passed, ' + fail + ' failed ===');

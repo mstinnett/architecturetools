@@ -203,6 +203,13 @@
     if (r.units < 0 || (r.units === 0 && !zeroOk)) return null;
     return r.units;
   }
+  // place fields accept any signed length — an overhang shows as negative
+  // and must round-trip through the field
+  function parsePlace(text) {
+    var r = window.parseLength(text, { defaultUnit: 'in' });
+    if (!r || r.dimension !== 1 || r.units == null) return null;
+    return r.units;
+  }
   function quant(u) { return Math.round(u / EIGHTH) * EIGHTH; }
 
   /* ================= geometry ================= */
@@ -372,10 +379,8 @@
     h += '</div>';
 
     // what the object just did (wall reconfiguration) + derived facts
-    h += '<div class="panel-section" id="objNotes">' + made.notes.map(function (n) { return '<div class="obj-note">' + esc(n) + '</div>'; }).join('') + '</div>';
-    h += '<div class="panel-section" id="objInfo">';
-    made.info.forEach(function (r) { h += '<div class="info-row"><span class="l">' + esc(r.label) + '</span><span class="v">' + esc(r.value) + '</span></div>'; });
-    h += '</div>';
+    h += '<div class="panel-section" id="objNotes">' + notesHtml(made) + '</div>';
+    h += '<div class="panel-section" id="objInfo">' + infoHtml(made) + '</div>';
 
     // placement: exact fields + the push pad
     h += '<div class="panel-section"><div class="panel-label">Place</div><div class="place-grid">'
@@ -423,16 +428,48 @@
     return h;
   }
 
-  function panelChecks(confs) {
-    var h = '<div class="panel-section"><div class="panel-label">Checks</div><div id="checkList">';
+  function checksRows(confs) {
+    var h = '';
     if (!confs.length) h += '<div class="check-row">clear — nothing stands in a zone</div>';
     confs.forEach(function (c) {
+      var k = c.kind === 'collision' ? 'overlap' : c.kind === 'pinch' || c.kind === 'outside' ? 'wall' : 'zone';
       h += '<div class="check-row' + (c.kind === 'collision' ? ' is-collision' : '') + '"><span class="k">'
-        + (c.kind === 'collision' ? 'overlap' : c.kind === 'pinch' ? 'wall' : 'zone') + '</span>' + esc(c.note) + '</div>';
+        + k + '</span>' + esc(c.note) + '</div>';
     });
-    h += '</div></div>';
     return h;
   }
+  function notesHtml(made) { return made.notes.map(function (n) { return '<div class="obj-note">' + esc(n) + '</div>'; }).join(''); }
+  function infoHtml(made) {
+    return made.info.map(function (r) {
+      return '<div class="info-row"><span class="l">' + esc(r.label) + '</span><span class="v">' + esc(r.value) + '</span></div>';
+    }).join('');
+  }
+
+  function panelChecks(confs) {
+    return '<div class="panel-section"><div class="panel-label">Checks</div><div id="checkList">' + checksRows(confs) + '</div></div>';
+  }
+
+  // refresh the live sections of the panel WITHOUT rebuilding it — keeps a
+  // focused field alive and lets the click that blurred it land
+  function refreshSelSections() {
+    var geoms = allGeoms();
+    var confs = F.conflicts(geoms.map(function (g) {
+      return { id: g.item.id, label: g.made.label, solids: g.solids, clears: g.clears };
+    }), roomRect());
+    var checks = document.getElementById('checkList');
+    if (checks) checks.innerHTML = checksRows(confs);
+    if (state.sel == null) return;
+    var g = null;
+    geoms.forEach(function (x) { if (x.item.id === state.sel) g = x; });
+    if (!g) return;
+    var notes = document.getElementById('objNotes');
+    if (notes) notes.innerHTML = notesHtml(g.made);
+    var info = document.getElementById('objInfo');
+    if (info) info.innerHTML = infoHtml(g.made);
+  }
+
+  // any canvas interaction ends the life of half-typed field text
+  function flushDimText() { for (var k in paramText) delete paramText[k]; }
 
   function renderPanel(geoms, confs) {
     var h = '';
@@ -480,25 +517,39 @@
         var u = parseDim(inp.value);
         var note = els.panel.querySelector('[data-dimnote="' + inp.dataset.dim + '"]');
         if (u == null) { if (note) note.textContent = inp.value.trim() ? 'needs a length' : ''; return; }
-        u = quant(u);
-        if (note) note.textContent = '';
-        g.item.params[inp.dataset.dim] = u;
+        // quantize, then hold to the object's own bounds — the field and the
+        // drawing must never disagree (and 0 must never reach the catalog)
+        var spec = null;
+        C.get(g.item.key).params.forEach(function (s) { if (s.key === inp.dataset.dim) spec = s; });
+        var q8 = Math.max(EIGHTH, quant(u));
+        if (spec && spec.min) q8 = Math.max(spec.min, q8);
+        if (spec && spec.max) q8 = Math.min(spec.max, q8);
+        if (note) note.textContent = q8 !== quant(u) ? 'held at ' + fmtUnits(q8) : '';
+        g.item.params[inp.dataset.dim] = q8;
         render(false);                              // canvas only — keep focus here
+        refreshSelSections();
       });
       inp.addEventListener('blur', function () {
         if (paramText[g.item.id]) delete paramText[g.item.id][inp.dataset.dim];
-        render(true);
+        // reformat in place — no panel rebuild, so a click that caused this
+        // blur still lands on the button it aimed at
+        inp.value = fmtUnits(g.item.params[inp.dataset.dim]);
+        var note = els.panel.querySelector('[data-dimnote="' + inp.dataset.dim + '"]');
+        if (note) note.textContent = '';
       });
     });
     q('[data-place]').forEach(function (inp) {
       inp.addEventListener('change', function () {
-        var u = parseDim(inp.value, true);          // 0 parks it at the wall
-        if (u == null) return;
+        var u = parsePlace(inp.value);              // 0 parks at the wall; negatives overhang it
+        if (u == null) { inp.value = fmtUnits(inp.dataset.place === 'x' ? geomOf(g.item).body.x : geomOf(g.item).body.y); return; }
         u = quant(u);
         var cur = geomOf(g.item).body;
         if (inp.dataset.place === 'x') g.item.x += u - cur.x;
         else g.item.y += u - cur.y;
-        render(true);
+        render(false);                              // no panel rebuild mid-blur
+        var now = geomOf(g.item).body;
+        q('[data-place]').forEach(function (f) { f.value = fmtUnits(f.dataset.place === 'x' ? now.x : now.y); });
+        refreshSelSections();
       });
     });
     q('[data-nudge]').forEach(function (b) {
@@ -528,9 +579,11 @@
     q('[data-room]').forEach(function (inp) {
       inp.addEventListener('change', function () {
         var u = parseDim(inp.value);
-        if (u == null) return;
+        if (u == null) { inp.value = fmtUnits(state.room[inp.dataset.room]); return; }
         state.room[inp.dataset.room] = Math.max(4 * FT, Math.min(200 * FT, quant(u)));
-        fitView(); render(true);
+        inp.value = fmtUnits(state.room[inp.dataset.room]);
+        fitView(); render(false);                   // no panel rebuild mid-blur
+        refreshSelSections();
       });
     });
     q('[data-preset]').forEach(function (b) {
@@ -595,7 +648,7 @@
   var lastTap = { t: 0, id: null };
 
   function hitTest(w) {
-    var slop = 6 / view.scale;
+    var slop = Math.min(6 / view.scale, 6 * IN);   // capped: zoomed far out, 6px must not swallow the room
     var geoms = allGeoms();
     for (var i = geoms.length - 1; i >= 0; i--) {
       var g = geoms[i];
@@ -609,11 +662,12 @@
 
   els.plan.addEventListener('pointerdown', function (ev) {
     if (els.plan.setPointerCapture) { try { els.plan.setPointerCapture(ev.pointerId); } catch (e) { /* synthetic events */ } }
+    flushDimText();                                // a canvas touch ends field editing
     pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
     if (Object.keys(pointers).length === 2) {      // pinch takes over
       var ids = Object.keys(pointers);
       var a = pointers[ids[0]], b = pointers[ids[1]];
-      drag = { pinch: true, d0: Math.hypot(a.x - b.x, a.y - b.y), scale0: view.scale,
+      drag = { pinch: true, d0: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), scale0: view.scale,
                cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2, ox0: view.ox, oy0: view.oy };
       guides = null;
       return;
@@ -622,9 +676,10 @@
     var hit = hitTest(w);
     if (hit) {
       state.sel = hit.item.id;
-      // the grab remembers where in the piece you touched — the piece never jumps to the finger
+      // the grab remembers where in the piece you touched — the piece never
+      // jumps to the finger; a dead zone keeps jittery taps from dragging
       drag = { id: hit.item.id, dx: w.x - hit.item.x, dy: w.y - hit.item.y, moved: false,
-               touch: ev.pointerType === 'touch' };
+               sx: ev.clientX, sy: ev.clientY, touch: ev.pointerType === 'touch' };
       render(true);
     } else {
       drag = { pan: true, sx: ev.clientX, sy: ev.clientY, ox0: view.ox, oy0: view.oy, moved: false };
@@ -640,9 +695,11 @@
       var a = pointers[ids[0]], b = pointers[ids[1]];
       var d1 = Math.hypot(a.x - b.x, a.y - b.y);
       var f = Math.max(0.2, Math.min(5, d1 / drag.d0));
+      var ns = clampScale(drag.scale0 * f);
+      f = ns / drag.scale0;
       var r = els.plan.getBoundingClientRect();
       var px = drag.cx - r.left, py = drag.cy - r.top;
-      view.scale = drag.scale0 * f;
+      view.scale = ns;
       view.ox = px - (px - drag.ox0) * f;
       view.oy = py - (py - drag.oy0) * f;
       render(false);
@@ -657,11 +714,11 @@
     }
     var item = findItem(drag.id);
     if (!item) return;
-    var w = toWorld(ev.clientX, ev.clientY);
-    var nx = quant(w.x - drag.dx), ny = quant(w.y - drag.dy);
-    if (nx === item.x && ny === item.y && drag.moved) return;
+    // dead zone: a jittery tap must stay a tap (double-tap rotate depends on it)
+    if (!drag.moved && Math.hypot(ev.clientX - drag.sx, ev.clientY - drag.sy) < 5) return;
     drag.moved = true;
-    item.x = nx; item.y = ny;
+    var w = toWorld(ev.clientX, ev.clientY);
+    item.x = quant(w.x - drag.dx); item.y = quant(w.y - drag.dy);
 
     // aggressive snapping — wider net for a finger than a mouse
     var radiusPx = drag.touch ? 14 : 8;
@@ -708,14 +765,19 @@
   els.plan.addEventListener('pointerup', endPointer);
   els.plan.addEventListener('pointercancel', endPointer);
 
+  // zoom bounds: ~1px per 8' at the far end, ~1px per 1/100" up close —
+  // keeps the hit-test slop meaningful and the drawing legible
+  function clampScale(s) { return Math.max(0.00001, Math.min(0.01, s)); }
+
   els.plan.addEventListener('wheel', function (ev) {
     ev.preventDefault();
     var r = els.plan.getBoundingClientRect();
     var px = ev.clientX - r.left, py = ev.clientY - r.top;
-    var f = ev.deltaY < 0 ? 1.12 : 1 / 1.12;
+    var ns = clampScale(view.scale * (ev.deltaY < 0 ? 1.12 : 1 / 1.12));
+    var f = ns / view.scale;
     view.ox = px - (px - view.ox) * f;
     view.oy = py - (py - view.oy) * f;
-    view.scale *= f;
+    view.scale = ns;
     render(false);
   }, { passive: false });
 
@@ -769,14 +831,20 @@
       var r = p.get('r');
       if (r) {
         var m = /^(\d+)x(\d+)$/.exec(r);
-        if (m) { state.room.w = Math.min(200 * FT, +m[1]); state.room.d = Math.min(200 * FT, +m[2]); }
+        if (m) {
+          state.room.w = Math.max(4 * FT, Math.min(200 * FT, +m[1]));
+          state.room.d = Math.max(4 * FT, Math.min(200 * FT, +m[2]));
+        }
       }
       var i = p.get('i');
       if (i) i.split('|').forEach(function (tok) {
-        var mm = /^([a-z-]+)@(-?\d+),(-?\d+),([0-3])((~[a-zA-Z]+:[^~]*)*)$/.exec(tok);
+        var mm = /^([a-z-]+)@(-?\d+),(-?\d+),([0-3])((~[a-zA-Z0-9]+:[^~]*)*)$/.exec(tok);
         if (!mm) return;
         var key = mm[1];
         try { C.get(key); } catch (e) { return; }
+        var ix0 = +mm[2], iy0 = +mm[3];
+        if (!Number.isSafeInteger(ix0) || !Number.isSafeInteger(iy0)
+            || Math.abs(ix0) > 400 * FT || Math.abs(iy0) > 400 * FT) return;
         var params = C.defaultsFor(key);
         if (mm[5]) mm[5].split('~').forEach(function (kv) {
           if (!kv) return;
@@ -788,7 +856,7 @@
           else params[k] = v;
         });
         try { C.make(key, params); } catch (e) { return; }   // reject bad combos whole
-        state.items.push({ id: nextId++, key: key, x: +mm[2], y: +mm[3], turns: +mm[4], params: params });
+        state.items.push({ id: nextId++, key: key, x: ix0, y: iy0, turns: +mm[4], params: params });
       });
     } catch (e) { /* a malformed share never breaks the page */ }
   }

@@ -159,9 +159,12 @@
       + ' <span>(holds ' + esc(R.toString(L.rem)) + ' u)</span>';
   }
 
-  function parseDim(text) {
+  var MAX_UNITS = 96000000000;          // 100 km — same input cap as the converter
+  function parseDim(text, zeroOk) {
     var r = window.parseLength(text, { defaultUnit: 'in' });
-    if (!r || r.dimension !== 1 || r.units == null || r.units <= 0) return null;
+    if (!r || r.dimension !== 1 || r.units == null) return null;
+    if (r.units < 0 || (r.units === 0 && !zeroOk)) return null;
+    if (r.units > MAX_UNITS) return null;
     return r.units;
   }
 
@@ -191,11 +194,20 @@
   /* ---- 1 · fit array --------------------------------------------------------- */
   var TILE = { params: ['w'], nodes: [{ kind: 'rect', w: { param: 'w' }, h: { param: 'w' } }] };
 
+  var MAX_FIT_ITEMS = 400;              // beyond this the figure is noise and the eval is slow
+
   function renderFit() {
     var run = parseDim(el('fitRun').value), item = parseDim(el('fitItem').value);
     var gapT = el('fitGap').value.trim();
-    var gap = gapT === '' || gapT === '0' ? 0 : parseDim(gapT);
+    var gap = gapT === '' ? 0 : parseDim(gapT, true);   // any spelling of zero is a valid joint
     if (run == null || item == null || gap == null) { el('fitLabel').textContent = 'waiting for three lengths'; el('fitFig').innerHTML = ''; el('fitProof').innerHTML = ''; return null; }
+    // cap the count BEFORE the exact evaluation — a 100' run of 1/8" items
+    // is thousands of BigInt children and would stall the tab
+    if (Math.floor((run + gap) / (item + gap)) > MAX_FIT_ITEMS) {
+      el('fitLabel').textContent = 'more than ' + MAX_FIT_ITEMS + ' items — too many to draw legibly';
+      el('fitFig').innerHTML = ''; el('fitProof').innerHTML = 'shorten the run or use a larger item.';
+      return null;
+    }
     var node = { kind: 'fitArray', run: rat(run), item: rat(item), gap: rat(gap),
                  of: { kind: 'insert', template: TILE, args: { w: rat(item) } } };
     var r = M.evalNode(node);
@@ -262,8 +274,9 @@
         }
       });
     });
+    var bands = r.residuals.map(function (b) { return fmtExact(b.value); }).join(' and ');
     el('haProof').innerHTML = 'angle captured once as the rational t = <span class="fact">' + esc(R.toString(t)) + '</span>'
-      + ' (exact from here on) &middot; edge bands ' + fmtExact(r.residuals[0].value) + ' and ' + fmtExact(r.residuals[1].value)
+      + ' (exact from here on) &middot; edge band' + (r.residuals.length > 1 ? 's ' : ' ') + bands
       + '<br>watertight, verified live: <span class="fact is-answer">' + onEdge + ' / ' + checked + '</span> endpoints lie exactly on the boundary — zero epsilon.';
     return { deg: deg, t: t, r: r };
   }

@@ -57,7 +57,7 @@ _Last updated: 2026-07-19 (two new product threads landed as first drafts, opera
   `parking-ratio.html` (zoning-adjacent, default out).
 - **Furniture Fit (`l/furniture.html` + `l/lib/`) — the L-series' first
   working page (2026-07-19, first draft, noindexed).** Parametric furniture
-  MAKERS with clearances as included geometry: `catalog.js` (15 objects,
+  MAKERS with clearances as included geometry: `catalog.js` (16 objects,
   params → parts + clearance zones + wall-rule reconfiguration + derived
   info; all integer units), `fitmath.js` (quarter-turn world boxes, wall-side
   detection, edge snapping to furniture/zones/walls, conflict sweep with

@@ -245,7 +245,9 @@
       for (var i = 0; i < ROUND_SIZES.length; i++) if (ROUND_SIZES[i].key === p.size) size = ROUND_SIZES[i];
       if (!size) throw new TypeError('catalog: round size "' + p.size + '" unknown');
       var dia = size.custom ? p.dia : inches(size.dia);
-      var seats = size.custom ? Math.max(2, Math.floor((dia * 355) / (113 * inches(24)))) :  // ~ circumference / 24"
+      // custom: ~circumference / 28" (elbow room on a curve) — chosen so a
+      // custom diameter equal to a preset seats the preset's count
+      var seats = size.custom ? Math.max(2, Math.floor((dia * 355) / (113 * inches(28)))) :
                   (size.key === 'four' ? 4 : size.key === 'six' ? 6 : 8);
       var zone = inches(42);
       var parts = [part(0, 0, dia, dia, 'body', 'round table', 'round')];
@@ -374,7 +376,7 @@
     { key: 'six',    label: 'Seats 6',  w: 72,  d: 36 },
     { key: 'eight',  label: 'Seats 8',  w: 96,  d: 48 },
     { key: 'ten',    label: 'Seats 10', w: 120, d: 48 },
-    { key: 'twelve', label: 'Seats 12', w: 144, d: 48 },
+    { key: 'twelve', label: 'Seats 12', w: 168, d: 48 },   // 5 per side + ends at 30″/person
     { key: 'custom', label: 'Custom', custom: true }
   ];
 
@@ -657,7 +659,7 @@
     var def = get(key);
     var p = defaultsFor(key);
     if (params) for (var k in params) {
-      if (!(k in p) && def.params.length) throw new TypeError('catalog: "' + key + '" has no parameter "' + k + '"');
+      if (!(k in p)) throw new TypeError('catalog: "' + key + '" has no parameter "' + k + '"');
       p[k] = params[k];
     }
     def.params.forEach(function (spec) {
@@ -770,10 +772,20 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   // facings: floor(48/3 × 0.9)=14 per shelf-section × 3 × 4 × 2 = 336
   ok('facings math', /336/.test(g.info[1].value));
 
+  /* --- review fixes ------------------------------------------------------------------ */
+  var c12 = C.make('conference', { size: 'twelve' });
+  ok('Seats 12 preset seats 12', c12.seats === 12);
+  var rdCustom = C.make('dining-round', { size: 'custom', dia: 54 * IN });
+  var rdPreset = C.make('dining-round', { size: 'six' });
+  ok('custom 54″ round seats like the 54″ preset',
+     rdCustom.parts.filter(function (p) { return p.kind === 'chair'; }).length ===
+     rdPreset.parts.filter(function (p) { return p.kind === 'chair'; }).length);
+
   /* --- API hygiene ------------------------------------------------------------------ */
   threw('unknown object throws', function () { C.make('hovercraft'); });
   threw('unknown variant throws', function () { C.make('bed', { size: 'emperor' }); });
   threw('non-integer dim throws', function () { C.make('dresser', { w: 60.5 }); });
+  threw('junk key on a zero-param object throws', function () { C.make('armchair', { bogus: 1 }); });
   ok('defaultsFor returns the declared defaults', C.defaultsFor('bed').size === 'queen');
   ok('categories cover all defs', C.DEFS.every(function (d) {
     return C.CATEGORIES.some(function (c) { return c.key === d.category; });

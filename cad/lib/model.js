@@ -94,7 +94,8 @@
   /* ---- primitives -------------------------------------------------------------- */
 
   function evalLine(node, env) {
-    return result([seg(resolvePt(node.a, env), resolvePt(node.b, env), node.role)]);
+    var s = seg(resolvePt(node.a, env), resolvePt(node.b, env), node.role);
+    return result(mapSegs(placement(node, env), [s]));
   }
 
   function evalRect(node, env) {
@@ -166,7 +167,9 @@
   function evalArray(node, env) {
     if (!node.of) throw new TypeError('model: array needs a child node in .of');
     var count = node.count;
-    if (!Number.isSafeInteger(count) || count < 1) return infeasible('empty-array', 'count must be at least 1');
+    // a malformed count is a programmer error; an empty array is a domain state
+    if (!Number.isSafeInteger(count)) throw new TypeError('model: array count must be a safe integer, got ' + count);
+    if (count < 1) return infeasible('empty-array', 'count must be at least 1');
     var sx = resolveScalar(node.step ? node.step.x : 0, env), sy = resolveScalar(node.step ? node.step.y : 0, env);
     var T = placement(node, env);
     var segs = [], residuals = [];
@@ -206,15 +209,16 @@
     var residual = R.sub(run, used);
 
     var T = placement(node, env);
-    var segs = [];
+    var segs = [], residuals = [];
     for (var i = 0; i < count; i++) {
       var e = tweenEnv(node.tween, i, count, env);
       var r = evalNode(node.of, e);
       if (!r.feasible) return r;
       segs = segs.concat(mapSegs(P.mul(T, P.translate(R.mul(module_, rat(i)), rat(0))), r.segments));
+      residuals = residuals.concat(r.residuals);        // children keep their residuals too
     }
-    return result(segs,
-      [{ code: 'end-cut', value: residual, note: 'the part of the run the whole items do not fill' }],
+    residuals.push({ code: 'end-cut', value: residual, note: 'the part of the run the whole items do not fill' });
+    return result(segs, residuals,
       { count: count, item: item, gap: gap, used: used, residual: residual, exact: R.isZero(residual) });
   }
 
@@ -224,9 +228,11 @@
      Lines run along the rotated x-axis, anchored to the GLOBAL pattern
      origin (y' = k·spacing), so adjacent regions hatch in phase — CAD
      pattern-origin behavior. Crossings pair even-odd; the half-open rule
-     makes vertices unambiguous; a line grazing the boundary contributes no
-     area band and is skipped. Residuals report the partial band at each
-     edge of the region — the hatch's "end cut".                              */
+     makes vertices unambiguous. The rule is one-sided by construction: a
+     pattern line ON the min-side boundary edge still draws (its crossings
+     exist), one ON the max-side boundary grazes out with no crossings.
+     Residuals report the partial band at each edge of the region — the
+     hatch's "end cut" — or the whole height when no line lands at all.       */
 
   function evalHatch(node, env) {
     if (!Array.isArray(node.poly) || node.poly.length < 3) throw new TypeError('model: hatch needs a polygon of ≥ 3 points');
@@ -271,6 +277,11 @@
     if (firstY !== null) {
       residuals.push({ code: 'edge-band', value: R.sub(firstY, minY), note: 'partial band before the first line' });
       residuals.push({ code: 'edge-band', value: R.sub(maxY, lastY), note: 'partial band after the last line' });
+    } else {
+      // no pattern line lands in the region (its height across the hatch
+      // direction is shorter than one spacing, or every candidate grazes):
+      // the whole height is the uncovered band — surfaced, not silent
+      residuals.push({ code: 'edge-band', value: R.sub(maxY, minY), note: 'no line lands — the whole region is one partial band' });
     }
     return result(segs, residuals, { lines: lines, spacing: S });
   }
@@ -410,9 +421,25 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   ok('non-convex: the notched line has one span', spans3.length === 1);
   ok('…and it starts at the notch wall', R.eq(spans3[0].a.x, rat(5 * IN)) || R.eq(spans3[0].b.x, rat(5 * IN)));
 
+  /* --- review fixes ----------------------------------------------------------------- */
+  // line honors placement like rect/polygon
+  var pl = M.evalNode({ kind: 'line', a: { x: 0, y: 0 }, b: { x: 10, y: 0 }, at: { x: 100, y: 100 }, turns: 1 });
+  ok('line honors at + turns', P.ptEq(pl.segments[0].a, pt(100, 100)) && P.ptEq(pl.segments[0].b, pt(100, 110)));
+  // fitArray keeps its children's residuals (a hatched tile keeps its bands)
+  var HTILE = { params: [], nodes: [{ kind: 'hatch', poly: [pt(0, IN / 2), pt(2 * IN, IN / 2), pt(2 * IN, 2 * IN), pt(0, 2 * IN)], spacing: rat(IN) }] };
+  var fr = M.evalNode({ kind: 'fitArray', run: rat(5 * IN), item: rat(2 * IN), of: { kind: 'insert', template: HTILE, args: {} } });
+  ok('fitArray keeps child residuals + its end cut', fr.residuals.length === 2 * 2 + 1
+     && fr.residuals[fr.residuals.length - 1].code === 'end-cut');
+  // a region narrower than one spacing: feasible, zero lines, whole band reported
+  var narrow = M.evalNode({ kind: 'hatch', poly: [pt(0, IN / 4), pt(4 * IN, IN / 4), pt(4 * IN, 3 * (IN / 4)), pt(0, 3 * (IN / 4))], spacing: rat(IN) });
+  ok('narrow region: 0 lines, still feasible', narrow.feasible && narrow.lines === 0 && narrow.segments.length === 0);
+  ok('narrow region reports the whole band', narrow.residuals.length === 1 && R.eq(narrow.residuals[0].value, rat(IN / 2)));
+
   /* --- flags vs throws ------------------------------------------------------------ */
   ok('fitArray flags item-exceeds-run', M.evalNode({ kind: 'fitArray', run: rat(IN), item: rat(2 * IN), of: { kind: 'rect', w: rat(1), h: rat(1) } }).reason === 'item-exceeds-run');
   ok('hatch flags a flat region', M.evalNode({ kind: 'hatch', poly: [pt(0, 0), pt(IN, 0), pt(2 * IN, 0)], spacing: rat(IN) }).reason === 'empty-extent');
+  ok('array count 0 flags empty-array', M.evalNode({ kind: 'array', count: 0, of: { kind: 'rect', w: rat(1), h: rat(1) } }).reason === 'empty-array');
+  threw('array count 2.5 throws (programmer error)', function () { M.evalNode({ kind: 'array', count: 2.5, of: { kind: 'rect', w: rat(1), h: rat(1) } }); });
   threw('unknown kind throws', function () { M.evalNode({ kind: 'squiggle' }); });
   threw('unbound param throws', function () { M.evalNode({ kind: 'rect', w: { param: 'ghost' }, h: rat(1) }); });
 
