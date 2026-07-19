@@ -142,7 +142,10 @@
         parts: parts, clears: clears, notes: notes,
         info: [{ label: 'mattress', value: Math.round(w / IN) + '″ × ' + Math.round(d / IN) + '″ (frame adds 2–5″)' },
                { label: 'walkways drawn', value: 'sides 30″ (24″ tight) · foot 36″ (30″ tight)' }],
-        orientBackToWall: true, wallThreshold: inches(6)
+        orientBackToWall: true, wallThreshold: inches(6),
+        // the market catalog measures FRAMES (what actually stands in the
+        // room), keyed by the mattress class; custom sizes have no market
+        market: size.custom ? null : { cls: 'bed-frame-' + p.size, rotate: false }
       };
     }
   });
@@ -208,7 +211,8 @@
       parts: parts, clears: clears, notes: notes,
       info: [{ label: 'seats as placed', value: String(seats) },
              { label: 'zone drawn', value: Math.round(zone / IN) + '″ pull-out + walk (36″ is the tight minimum)' }],
-      orientBackToWall: false, wallThreshold: inches(30), seats: seats
+      orientBackToWall: false, wallThreshold: inches(30), seats: seats,
+      market: kindLabel === 'dining table' ? { cls: 'dining-rect', rotate: true } : null
     };
   }
 
@@ -313,7 +317,9 @@
         parts: [part(0, 0, w, d, 'body', 'sofa')],
         clears: clears, notes: notes,
         info: [{ label: 'coffee table gap', value: '16″ (14–18″ works)' }],
-        orientBackToWall: true, wallThreshold: inches(12)
+        orientBackToWall: true, wallThreshold: inches(12),
+        // a sofa's orientation is fixed by its back — no rotate in the fit
+        market: { cls: (p.size === 'love' || (size.custom && w < inches(72))) ? 'loveseat' : 'sofa-3', rotate: false }
       };
     }
   });
@@ -780,6 +786,15 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   ok('custom 54″ round seats like the 54″ preset',
      rdCustom.parts.filter(function (p) { return p.kind === 'chair'; }).length ===
      rdPreset.parts.filter(function (p) { return p.kind === 'chair'; }).length);
+
+  /* --- market classes route correctly -------------------------------------------- */
+  ok('queen bed → bed-frame-queen', C.make('bed').market.cls === 'bed-frame-queen');
+  ok('custom bed has no market', C.make('bed', { size: 'custom', w: 50 * IN, d: 70 * IN }).market === null);
+  ok('3-seat sofa → sofa-3, no rotate', C.make('sofa').market.cls === 'sofa-3' && C.make('sofa').market.rotate === false);
+  ok('loveseat routes', C.make('sofa', { size: 'love' }).market.cls === 'loveseat');
+  ok('narrow custom sofa reads as loveseat', C.make('sofa', { size: 'custom', w: 60 * IN }).market.cls === 'loveseat');
+  ok('dining rect rotates in the fit', C.make('dining').market.rotate === true);
+  ok('conference has no market entry', C.make('conference').market === null);
 
   /* --- API hygiene ------------------------------------------------------------------ */
   threw('unknown object throws', function () { C.make('hovercraft'); });

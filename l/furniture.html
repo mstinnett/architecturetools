@@ -57,6 +57,23 @@
   .plan .lbl-dim  { font-family: 'SF Mono', ui-monospace, monospace; fill: var(--accent); }
   .plan .hatchline { stroke: var(--nl-hatch); stroke-width: 0.6; opacity: 0.5; }
   .plan .hint     { font-family: var(--font-body); fill: var(--ink-3); }
+  .plan .slot-guide { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 4; }
+  .plan .slot-tick  { stroke: var(--accent); stroke-width: 1.5; }
+
+  /* the market figure — converter hatch conventions on a population:
+     solid = the market that fits the slot, hatch = the part you give up */
+  svg.mkt text { stroke: none; }
+  .mkt .mkt-whisker { stroke: var(--nl-axis); stroke-width: 1; }
+  .mkt .mkt-body { fill: var(--accent-soft); }
+  .mkt .mkt-hatchline { stroke: var(--nl-hatch); stroke-width: 0.8; opacity: 0.8; }
+  .mkt .mkt-body-frame { fill: none; stroke: var(--nl-ink); stroke-width: 0.9; }
+  .mkt .mkt-median { stroke: var(--nl-ink); stroke-width: 1.5; }
+  .mkt .mkt-slot { stroke: var(--accent); stroke-width: 2; }
+  .mkt .mkt-slot-val { font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; fill: var(--accent); }
+  .mkt .mkt-quant { font-family: var(--font-body); font-size: 9.5px; fill: var(--ink-2); }
+  .mkt-headline { font-size: var(--text-md); font-weight: 300; margin-bottom: 0.3rem; }
+  .mkt-headline .pct { font-size: var(--text-lg); font-weight: 400; color: var(--accent); }
+  .mkt-note { font-size: var(--text-xs); color: var(--ink-2); line-height: 1.6; margin-top: 0.3rem; }
 
   /* panel — the parameter language */
   .fit-panel .panel-section { margin-bottom: var(--space-lg); }
@@ -146,6 +163,8 @@
 <script src="../calculators/lib/parse-length.js"></script>
 <script src="lib/catalog.js"></script>
 <script src="lib/fitmath.js"></script>
+<script src="lib/marketbar.js"></script>
+<script src="lib/market-data.js"></script>
 <script>
 (function () {
   'use strict';
@@ -161,7 +180,8 @@
     sel: null,
     showClears: true,
     libCat: 'bedroom',
-    fine: false                                   // nudge step: 1″ coarse · 1/8″ fine
+    fine: false,                                  // nudge step: 1″ coarse · 1/8″ fine
+    market: { tier: 'all', ext: false }           // market-fit facets: price tier · leaves in
   };
   var nextId = 1;
   var view = { scale: 0.004, ox: 20, oy: 20 };    // world→screen: s = w·scale + o
@@ -312,7 +332,8 @@
       }
     });
 
-    // selection ring + live dimensions
+    // selection ring + live dimensions + the market convention: the measured
+    // slot drawn as a dashed span, the market bar compact under the piece
     if (state.sel != null) {
       geoms.forEach(function (g) {
         if (g.item.id !== state.sel) return;
@@ -320,6 +341,28 @@
         out += rectSvg(b, 'sel-ring');
         out += '<text class="lbl-dim" text-anchor="middle" font-size="11" x="' + X(g.body.x + g.body.w / 2).toFixed(1)
              + '" y="' + (Y(g.body.y) - 6).toFixed(1) + '">' + esc(fmtUnits(g.body.w) + ' × ' + fmtUnits(g.body.d)) + '</text>';
+
+        var mi = marketInfo(g, geoms);
+        if (mi && mi.fit) {
+          if (!mi.vert) {
+            var gy = Y(g.body.y + Math.floor(g.body.d / 2)).toFixed(1);
+            var xf = X(mi.runs.x.from).toFixed(1), xt = X(mi.runs.x.to).toFixed(1);
+            out += '<line class="slot-guide" x1="' + xf + '" y1="' + gy + '" x2="' + xt + '" y2="' + gy + '"/>'
+                 + '<line class="slot-tick" x1="' + xf + '" y1="' + (gy - 5) + '" x2="' + xf + '" y2="' + (+gy + 5) + '"/>'
+                 + '<line class="slot-tick" x1="' + xt + '" y1="' + (gy - 5) + '" x2="' + xt + '" y2="' + (+gy + 5) + '"/>';
+          } else {
+            var gx = X(g.body.x + Math.floor(g.body.w / 2)).toFixed(1);
+            var yf = Y(mi.runs.y.from).toFixed(1), yt = Y(mi.runs.y.to).toFixed(1);
+            out += '<line class="slot-guide" x1="' + gx + '" y1="' + yf + '" x2="' + gx + '" y2="' + yt + '"/>'
+                 + '<line class="slot-tick" x1="' + (gx - 5) + '" y1="' + yf + '" x2="' + (+gx + 5) + '" y2="' + yf + '"/>'
+                 + '<line class="slot-tick" x1="' + (gx - 5) + '" y1="' + yt + '" x2="' + (+gx + 5) + '" y2="' + yt + '"/>';
+          }
+          var bw = Math.round(Math.max(120, Math.min(200, g.body.w * view.scale)));
+          var bx = X(g.body.x).toFixed(1), by = (Y(g.body.y + g.body.d) + 8).toFixed(1);
+          out += '<g transform="translate(' + bx + ',' + by + ')">'
+               + MarketBar.marketbar({ widths: mi.pts.map(function (p) { return p[0]; }), slot: mi.figSlot, width: bw, compact: true, id: 'cv' })
+               + '<text class="lbl-dim" font-size="10" x="' + (bw + 6) + '" y="17">' + mi.fit.pct + '% fit here</text></g>';
+        }
       });
     }
 
@@ -345,7 +388,7 @@
     return '<button type="button" class="grid-box' + (on ? ' active' : '') + '" aria-pressed="' + !!on + '" ' + attrs + '>' + label + '</button>';
   }
 
-  function panelObject(g) {
+  function panelObject(g, geoms) {
     var item = g.item, def = C.get(item.key), made = g.made;
     var h = '<div class="panel-section"><div class="panel-label">' + esc(made.label) + '</div>';
 
@@ -381,6 +424,13 @@
     // what the object just did (wall reconfiguration) + derived facts
     h += '<div class="panel-section" id="objNotes">' + notesHtml(made) + '</div>';
     h += '<div class="panel-section" id="objInfo">' + infoHtml(made) + '</div>';
+
+    // the market gauge — only for classes with a seeded catalog
+    var mi = marketInfo(g, geoms);
+    if (mi) {
+      h += '<div class="panel-section" id="objMarket"><div class="panel-label">Market fit</div>'
+         + '<div id="objMarketBody">' + marketSectionInner(mi) + '</div></div>';
+    }
 
     // placement: exact fields + the push pad
     h += '<div class="panel-section"><div class="panel-label">Place</div><div class="place-grid">'
@@ -466,16 +516,83 @@
     if (notes) notes.innerHTML = notesHtml(g.made);
     var info = document.getElementById('objInfo');
     if (info) info.innerHTML = infoHtml(g.made);
+    var mkt = document.getElementById('objMarketBody');
+    if (mkt) mkt.innerHTML = marketSectionInner(marketInfo(g, geoms));
   }
 
   // any canvas interaction ends the life of half-typed field text
   function flushDimText() { for (var k in paramText) delete paramText[k]; }
 
+  /* ================= market fit =================
+     The slot is measured, not assumed: wall-or-neighbor to wall-or-neighbor
+     through the selected piece, both axes (fitmath.measureRun). The market
+     is a snapshot of real SKUs (market-data.js, GENERATED from
+     data/market/*.csv) counted against the slot with exact integer
+     comparisons. Facets filter the same distribution — tier is a price
+     statement, never a different dataset. */
+
+  var TIER_LABELS = ['mass', 'mid', 'upper'];
+
+  function marketInfo(g, geoms) {
+    var mk = g.made.market;
+    var MD = window.MarketData;
+    if (!mk || !MD || !MD.classes || !MD.classes[mk.cls] || !MD.classes[mk.cls].n) return null;
+    var cls = MD.classes[mk.cls];
+    var obstacles = [];
+    geoms.forEach(function (o) {
+      if (o.item.id === g.item.id) return;
+      o.solids.forEach(function (s) { obstacles.push(s); });
+    });
+    var runs = F.measureRun(g.body, obstacles, roomRect());
+    var vert = g.item.turns % 2 === 1;             // the piece's width axis runs along world y
+    var slotW = vert ? runs.y.span : runs.x.span;
+    var slotD = vert ? runs.x.span : runs.y.span;
+    var pts = cls.points.filter(function (p) {
+      if (state.market.tier !== 'all' && p[2] !== +state.market.tier) return false;
+      if (mk.cls === 'dining-rect') {
+        var st = p.length > 3 ? p[3] : 0;
+        if (state.market.ext ? st === 1 : st === 2) return false;   // parked hides extended; leaves-in hides closed
+      }
+      return true;
+    });
+    if (!pts.length) return { cls: cls, mk: mk, runs: runs, vert: vert, slotW: slotW, slotD: slotD, pts: pts, fit: null };
+    // rotation (tables) measures the figure against the slot's LONGER run
+    var figSlot = mk.rotate ? Math.max(slotW, slotD) : slotW;
+    var fit = F.marketFit(slotW, slotD, pts.map(function (p) { return [p[0], p[1]]; }), mk.rotate);
+    return { cls: cls, mk: mk, runs: runs, vert: vert, slotW: slotW, slotD: slotD, figSlot: figSlot, pts: pts, fit: fit };
+  }
+
+  function marketSectionInner(mi) {
+    if (!mi) return '';
+    var h = '';
+    if (!mi.fit) {
+      h += '<div class="mkt-note">no SKUs in this view — widen the tier filter</div>';
+    } else {
+      h += '<div class="mkt-headline"><span class="pct">' + mi.fit.pct + '%</span> of ' + esc(mi.cls.label)
+         + ' fit this slot <span class="param-note" style="display:inline">· ' + mi.fit.fits + ' of ' + mi.fit.n + '</span></div>';
+      if (mi.fit.depthBinds) h += '<div class="mkt-note">width alone would pass ' + mi.fit.pctW + '% — the depth is what cuts</div>';
+      h += MarketBar.marketbar({ widths: mi.pts.map(function (p) { return p[0]; }), slot: mi.figSlot, width: 264, fmt: fmtUnits, id: 'pn' });
+      h += '<div class="mkt-note">slot measured ' + esc(fmtUnits(mi.slotW)) + ' × ' + esc(fmtUnits(mi.slotD))
+         + ' — wall or neighbor to wall or neighbor' + (mi.mk.rotate ? ' · either orientation' : '') + '</div>';
+    }
+    h += '<div class="pill-wrap" style="margin-top:0.45rem;">'
+       + pill('data-mtier="all"', 'all tiers', state.market.tier === 'all');
+    TIER_LABELS.forEach(function (t, i) { h += pill('data-mtier="' + i + '"', esc(t), state.market.tier === String(i)); });
+    h += '</div>';
+    if (mi.mk.cls === 'dining-rect') {
+      h += '<div class="pill-wrap" style="margin-top:0.3rem;">'
+         + pill('data-mext="0"', 'as parked', !state.market.ext)
+         + pill('data-mext="1"', 'leaves in', state.market.ext) + '</div>';
+    }
+    h += '<div class="mkt-note">snapshot ' + esc(String(window.MarketData.snapshot)) + ' · dimensions of real SKUs, counted — not a recommendation</div>';
+    return h;
+  }
+
   function renderPanel(geoms, confs) {
     var h = '';
     var g = null;
     if (state.sel != null) geoms.forEach(function (x) { if (x.item.id === state.sel) g = x; });
-    if (g) h += panelObject(g);
+    if (g) h += panelObject(g, geoms);
     h += panelRoom();
     h += panelLibrary();
     h += panelChecks(confs);
@@ -878,6 +995,16 @@
   }
 
   /* ================= boot ================= */
+
+  // market facet pills live inside a section that refreshes in place, so
+  // they are wired by delegation once, not per render
+  els.panel.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-mtier],[data-mext]') : null;
+    if (!t) return;
+    if (t.dataset.mtier !== undefined) state.market.tier = t.dataset.mtier;
+    if (t.dataset.mext !== undefined) state.market.ext = t.dataset.mext === '1';
+    render(true);
+  });
 
   els.btnFit.addEventListener('click', function () { fitView(); render(false); });
   els.btnClears.addEventListener('click', function () {

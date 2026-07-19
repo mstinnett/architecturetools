@@ -216,9 +216,70 @@
     return out;
   }
 
+  /* ---- the slot: how much room the market has to work with --------------------
+     measureRun(body, obstacles, room) — the open span the body sits in, per
+     axis. Along x: obstacles whose y-band overlaps the body's clamp the span
+     from each side; the walls always do. Same along y. This is the number
+     the MARKET question needs: not "does the drawn sofa fit" but "how wide
+     a sofa could stand HERE" — from the wall or neighbor on the left to the
+     wall or neighbor on the right. Pure integers; obstacles are solids
+     (clearance zones warn separately, they don't shrink the slot). */
+
+  function bandsOverlap(a1, a2, b1, b2) { return a1 < b2 && b1 < a2; }
+
+  function measureRun(body, obstacles, room) {
+    reqBox('body', body); reqBox('room', room);
+    var xFrom = room.x, xTo = room.x + room.w;
+    var yFrom = room.y, yTo = room.y + room.d;
+    for (var i = 0; i < obstacles.length; i++) {
+      var o = obstacles[i];
+      reqBox('obstacle', o);
+      if (bandsOverlap(o.y, o.y + o.d, body.y, body.y + body.d)) {
+        if (o.x + o.w <= body.x && o.x + o.w > xFrom) xFrom = o.x + o.w;   // wholly left
+        if (o.x >= body.x + body.w && o.x < xTo) xTo = o.x;                // wholly right
+      }
+      if (bandsOverlap(o.x, o.x + o.w, body.x, body.x + body.w)) {
+        if (o.y + o.d <= body.y && o.y + o.d > yFrom) yFrom = o.y + o.d;   // wholly above
+        if (o.y >= body.y + body.d && o.y < yTo) yTo = o.y;                // wholly below
+      }
+    }
+    return {
+      x: { from: xFrom, to: xTo, span: xTo - xFrom },
+      y: { from: yFrom, to: yTo, span: yTo - yFrom }
+    };
+  }
+
+  /* ---- market fit: the slot against the point cloud ---------------------------
+     points: [[w, d], …] integer units — one real SKU each, pre-filtered by
+     the caller (tier, size class, extension state). A point fits if it
+     stands in the slot: w ≤ slotW and d ≤ slotD (rotate: either
+     orientation). Returns counts, not judgments — the percentage is a fact
+     about a snapshot of the market, and n travels with it so it can't
+     pretend to more precision than it has. */
+
+  function marketFit(slotW, slotD, points, rotate) {
+    reqInt('slotW', slotW); reqInt('slotD', slotD);
+    if (!Array.isArray(points)) throw new TypeError('fitmath: points must be an array of [w, d]');
+    var fits = 0, fitsW = 0;
+    for (var i = 0; i < points.length; i++) {
+      var w = points[i][0], d = points[i][1];
+      if (!Number.isSafeInteger(w) || !Number.isSafeInteger(d)) throw new TypeError('fitmath: market point ' + i + ' is not integer units');
+      var ok = (w <= slotW && d <= slotD) || (rotate && d <= slotW && w <= slotD);
+      if (ok) fits++;
+      if (w <= slotW || (rotate && d <= slotW)) fitsW++;
+    }
+    return {
+      n: points.length, fits: fits, fitsW: fitsW,
+      pct: points.length ? Math.round(fits * 100 / points.length) : null,
+      pctW: points.length ? Math.round(fitsW * 100 / points.length) : null,
+      depthBinds: fitsW > fits            // the depth, not the width, is what's cutting
+    };
+  }
+
   return {
     worldBox: worldBox, wallSides: wallSides, nearestWall: nearestWall,
-    snap: snap, overlapArea: overlapArea, conflicts: conflicts
+    snap: snap, overlapArea: overlapArea, conflicts: conflicts,
+    measureRun: measureRun, marketFit: marketFit
   };
 });
 
@@ -309,6 +370,34 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
     { x: -5 * IN, y: 10 * IN, w: 84 * IN, d: 38 * IN }, { x: -5 * IN, y: 50 * IN, w: 10 * IN, d: 10 * IN }], clears: [] }], room);
   ok('solid past the wall flags outside, once', thru.length === 1 && thru[0].kind === 'outside');
   ok('clean layouts stay quiet', F.conflicts([placed[0]], room).length === 0);
+
+  /* --- measureRun: the slot the market gets ------------------------------------ */
+  // sofa mid-room; a bookcase to its left, a door-side table to its right,
+  // but the table's y-band doesn't overlap — only the bookcase clamps x
+  var sofaBody = { x: 60 * IN, y: 100 * IN, w: 84 * IN, d: 38 * IN };
+  var runs = F.measureRun(sofaBody, [
+    { x: 10 * IN, y: 90 * IN, w: 30 * IN, d: 60 * IN },     // left, overlapping band → clamps
+    { x: 170 * IN, y: 10 * IN, w: 20 * IN, d: 20 * IN }     // right, but above the sofa's band → ignored
+  ], room);
+  ok('left neighbor clamps the run', runs.x.from === 40 * IN);
+  ok('non-overlapping band is ignored', runs.x.to === 200 * IN);
+  ok('span is the difference', runs.x.span === 160 * IN);
+  var runEmpty = F.measureRun(sofaBody, [], room);
+  ok('empty room: the slot is the room', runEmpty.x.span === 200 * IN && runEmpty.y.span === 150 * IN);
+
+  /* --- marketFit: counting the catalog ------------------------------------------- */
+  var pts = [[80 * IN, 36 * IN], [84 * IN, 38 * IN], [90 * IN, 40 * IN], [96 * IN, 42 * IN]];
+  var mf = F.marketFit(86 * IN, 39 * IN, pts, false);
+  ok('two of four fit', mf.fits === 2 && mf.n === 4 && mf.pct === 50);
+  ok('width-only count separate', mf.fitsW === 2 && mf.depthBinds === false);
+  // depth binding: wide-enough slot, shallow room
+  var mf2 = F.marketFit(100 * IN, 37 * IN, pts, false);
+  ok('depth binds when width would pass', mf2.fitsW === 4 && mf2.fits === 1 && mf2.depthBinds === true);
+  // rotation admits the turned orientation (tables can rotate; sofas don't)
+  var mf3 = F.marketFit(40 * IN, 90 * IN, [[84 * IN, 36 * IN]], true);
+  ok('rotate fits the turned point', mf3.fits === 1);
+  ok('empty catalog: pct null, not 0', F.marketFit(IN, IN, [], false).pct === null);
+  threw('non-integer point throws', function () { F.marketFit(IN, IN, [[1.5, 2]], false); });
 
   /* --- fail loud --------------------------------------------------------------------- */
   threw('non-integer box throws', function () { F.worldBox({ x: 0.5, y: 0, w: 1, d: 1 }, { x: 0, y: 0 }); });
