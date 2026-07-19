@@ -212,7 +212,11 @@
         var n = fr / g, d = 16;
         while (n % 2 === 0) { n /= 2; d /= 2; }
         frTxt = ' ' + n + '/' + d;
-      } else frTxt = ' ' + (fr / IN).toFixed(3).replace(/^0/, '');
+      } else {
+        // off-lattice (market SKU decimals): plain decimal inches, no space
+        var dec = (rem / IN).toFixed(2).replace(/0$/, '');
+        return neg + (ft === 0 ? dec + '"' : ft + "'-" + dec + '"');
+      }
     }
     if (ft === 0) return neg + inch + frTxt + '"';
     return neg + ft + "'-" + inch + frTxt + '"';

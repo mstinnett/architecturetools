@@ -73,11 +73,17 @@
     var p50 = quantile(widths, 0.50), p75 = quantile(widths, 0.75), p95 = quantile(widths, 0.95);
     var lo = widths[0], hi = widths[n - 1];
 
-    // the axis window: the data's own range, stretched to include the slot
-    var winLo = Math.min(lo, spec.slot), winHi = Math.max(hi, spec.slot);
+    // the axis window is the DATA's own range (small pad) — never stretched
+    // by the slot. A slot beyond the market pins to the edge with an arrow;
+    // stretching would squash the whole distribution into a corner to make
+    // room for empty axis.
+    var pad = Math.max(Math.round((hi - lo) * 0.04), IN / 2);
+    var winLo = lo - pad, winHi = hi + pad;
     if (winHi === winLo) { winLo -= IN; winHi += IN; }   // degenerate: one value
     var span = winHi - winLo;
     function X(u) { return padL + (u - winLo) * (W - padL - padR) / span; }
+    var slotOff = spec.slot > winHi ? 1 : spec.slot < winLo ? -1 : 0;
+    var slotDraw = Math.max(winLo, Math.min(winHi, spec.slot));
 
     var fits = 0;
     for (var i = 0; i < n; i++) if (widths[i] <= spec.slot) fits++;
@@ -98,18 +104,21 @@
     out += '<rect class="mkt-body-frame" x="' + X(p25).toFixed(1) + '" y="' + bodyY + '" width="' + (X(p75) - X(p25)).toFixed(1) + '" height="' + bodyH + '"/>';
     out += '<line class="mkt-median" x1="' + X(p50).toFixed(1) + '" y1="' + bodyY + '" x2="' + X(p50).toFixed(1) + '" y2="' + (bodyY + bodyH) + '"/>';
 
-    // the slot: the strong true-value tick
-    var sx = X(spec.slot);
-    out += '<line class="mkt-slot" x1="' + sx.toFixed(1) + '" y1="' + (bodyY - (compact ? 3 : 6)) + '" x2="' + sx.toFixed(1) + '" y2="' + (bodyY + bodyH + (compact ? 3 : 6)) + '"/>';
+    // the slot: the strong true-value tick — pinned with an arrow when the
+    // slot lies beyond the market either way
+    var sx = X(slotDraw);
+    out += '<line class="mkt-slot' + (slotOff ? ' is-off' : '') + '" x1="' + sx.toFixed(1) + '" y1="' + (bodyY - (compact ? 3 : 6)) + '" x2="' + sx.toFixed(1) + '" y2="' + (bodyY + bodyH + (compact ? 3 : 6)) + '"/>';
 
     if (!compact) {
       var labelY = bodyY + bodyH + 14;
       // slot label hugs its tick, clamped into the frame
       var anchor = sx < 40 ? 'start' : sx > W - 40 ? 'end' : 'middle';
-      out += '<text class="mkt-slot-val" text-anchor="' + anchor + '" x="' + sx.toFixed(1) + '" y="' + (bodyY - 9) + '">' + esc(fmt(spec.slot)) + '</text>';
+      var slotTxt = slotOff > 0 ? fmt(spec.slot) + ' →' : slotOff < 0 ? '← ' + fmt(spec.slot) : fmt(spec.slot);
+      out += '<text class="mkt-slot-val" text-anchor="' + anchor + '" x="' + sx.toFixed(1) + '" y="' + (bodyY - 9) + '">' + esc(slotTxt) + '</text>';
+      // quantile labels yield to each other when the scale packs them close
       out += '<text class="mkt-quant" text-anchor="middle" x="' + X(p50).toFixed(1) + '" y="' + labelY + '">median ' + esc(fmt(p50)) + '</text>';
-      out += '<text class="mkt-quant" text-anchor="start" x="' + X(p5).toFixed(1) + '" y="' + labelY + '">' + esc(fmt(p5)) + '</text>';
-      out += '<text class="mkt-quant" text-anchor="end" x="' + X(p95).toFixed(1) + '" y="' + labelY + '">' + esc(fmt(p95)) + '</text>';
+      if (X(p50) - X(p5) >= 64) out += '<text class="mkt-quant" text-anchor="start" x="' + X(p5).toFixed(1) + '" y="' + labelY + '">' + esc(fmt(p5)) + '</text>';
+      if (X(p95) - X(p50) >= 64) out += '<text class="mkt-quant" text-anchor="end" x="' + X(p95).toFixed(1) + '" y="' + labelY + '">' + esc(fmt(p95)) + '</text>';
     }
     out += '</svg>';
     return out;
@@ -143,15 +152,22 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   ok('median label present', /median 84/.test(svg));
   ok('slot tick drawn', /mkt-slot"/.test(svg));
 
-  // slot beyond every SKU: nothing hatched inside the body
+  // slot beyond every SKU: nothing hatched, tick pinned at the edge with an
+  // arrow, and the axis window NOT stretched (the data keeps the full width)
   var all = M.marketbar({ widths: widths, slot: 200 * IN, id: 'u' });
   ok('slot past the market: no lost band', !/is-lost/.test(all));
   ok('aria says all fit', /fits 10 of 10/.test(all));
+  ok('off-scale slot is pinned + arrowed', /is-off/.test(all) && /→/.test(all));
+  var tickX = parseFloat(/mkt-slot is-off" x1="([\d.]+)/.exec(all)[1]);
+  ok('pinned tick sits at the right edge', tickX > 300);
+  var p5x = parseFloat(/mkt-quant" text-anchor="start" x="([\d.]+)/.exec(all)[1]);
+  ok('distribution still spans the axis (window not stretched)', p5x < 40);
 
-  // slot below every SKU: the whole body is lost
+  // slot below every SKU: the whole body is lost, pinned left
   var none = M.marketbar({ widths: widths, slot: 60 * IN, id: 'v' });
   ok('slot under the market: lost band drawn', /is-lost/.test(none));
   ok('aria says none fit', /fits 0 of 10/.test(none));
+  ok('pinned left with arrow', /← /.test(none));
 
   // compact variant: no text labels
   var mini = M.marketbar({ widths: widths, slot: 85 * IN, compact: true, id: 'w' });

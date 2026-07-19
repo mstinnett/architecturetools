@@ -1,0 +1,54 @@
+# sofas — market seed, snapshot 2026-07 · one row per real SKU · see README.md
+class,size,state,retailer,tier,model,w_in,d_in,url,note
+loveseat,,,IKEA,mass,GLOSTAD 2-seat sofa,47.64,30.71,https://www.ikea.com/us/en/p/glostad-sofa-knisa-dark-gray-40595942/,"121x78cm; compact 2-seat, width 47.6in just under typical loveseat range"
+loveseat,,,Target,mass,Threshold Tufted Loveseat,53,32.5,https://www.aptdeco.com/product/target-threshold-grey-tufted-loveseat,compact tufted loveseat; spec via AptDeco aggregator
+loveseat,,,West Elm,mid,"Andes Loveseat 60""",60,40,https://www.westelm.com/products/andes-sofa-h1844/,60in size of Andes line; standard 40in depth (35in poly option exists)
+loveseat,,,Burrow,mid,Nomad Loveseat,61,36,https://www.dimensions.com/element/burrow-nomad-loveseat,dimensions.com element
+loveseat,,,Ashley,mass,Darcy Loveseat,64,37,https://www.ashleyfurniture.com/p/darcy_loveseat/7500535.html,official Ashley 64x37
+loveseat,,,IKEA,mass,PARUP loveseat (2-seat),64.96,31.5,https://www.ikea.com/us/en/p/paerup-loveseat-vissle-gray-s19389166/,165x80cm; shallow depth
+loveseat,,,IKEA,mass,VIMLE 2-seat sofa,67.32,38.58,https://www.ikea.com/gb/en/p/vimle-2-seat-sofa-gunnared-beige-s79398974/,171x98cm
+loveseat,,,IKEA,mass,FINNALA loveseat (2-seat),67.32,38.58,https://www.ikea.com/us/en/p/finnala-loveseat-gunnared-beige-s79319019/,171x98cm
+loveseat,,,CB2,mid,Gybson Loveseat,70,42,https://www.aptdeco.com/product/cb2-gybson-loveseat,deep loveseat (42in); spec via AptDeco aggregator
+loveseat,,,IKEA,mass,KLIPPAN loveseat,70.87,34.65,https://www.ikea.com/us/en/p/klippan-loveseat-vissle-gray-s09010617/,180x88cm; dimensions.com confirms 70.875x34.625
+loveseat,,,Room & Board,upper,"Jasper 71"" Loveseat",71,36,https://www.roomandboard.com/catalog/living/sofas-and-loveseats/jasper-sofas,71in loveseat size (60in size also offered)
+loveseat,,,IKEA,mass,UPPLAND loveseat (2-seat),71.65,36.22,https://www.ikea.com/us/en/p/uppland-loveseat-blekinge-white-s69384114/,182x92cm
+loveseat,,,Article,mid,"Sven 72"" Loveseat",72,38,https://www.article.com/product/27057/sven-72-tufted-loveseat-stone-gray,
+loveseat,,,Castlery,mid,Adams Loveseat,72,35.4,https://www.castlery.com/us/products/adams-loveseat,
+loveseat,,,IKEA,mass,KIVIK loveseat (2-seat),74.8,37.4,https://www.ikea.com/us/en/p/kivik-loveseat-gunnared-beige-s69499681/,190x95cm
+sofa-3,,,West Elm,mid,"Andes Sofa 76""",76,40,https://www.westelm.com/products/andes-sofa-h1844/,"76in size of Andes line (offered 60-96in), standard 40in depth"
+sofa-3,,,IKEA,mass,SODERHAMN 3-seat sofa,77.95,38.98,https://www.ikea.com/nl/en/p/soderhamn-3-seat-sofa-gunnared-beige-s79305423/,198x99cm; intl IKEA page (US currently lists sectional configs)
+sofa-3,,,IKEA,mass,VINLIDEN 3-seat sofa,79.92,38.19,https://www.ikea.com/gb/en/p/vinliden-3-seat-sofa-hakebo-beige-s89304649/,203x97cm
+sofa-3,,,Castlery,mid,Owen 3-Seater Sofa,79.92,38.98,https://www.castlery.com/us/products/owen-3-seater-sofa,203x99cm
+sofa-3,,,Castlery,mid,Hamilton 3-Seater Sofa,80.12,39.37,https://www.castlery.com/us/products/hamilton-3-seater-sofa,203.5x100cm
+sofa-3,,,IKEA,mass,LANDSKRONA 3-seat sofa,80.31,35.04,https://www.ikea.com/in/en/p/landskrona-3-seat-sofa-gunnared-dark-grey-wood-s39270312/,204x89cm
+sofa-3,,,IKEA,mass,SMEDSTORP 3-seat sofa,80.71,37.01,https://www.ikea.com/se/en/p/smedstorp-3-seat-sofa-viarp-beige-brown-black-s59418609/,205x94cm
+sofa-3,,,IKEA,mass,BACKSALEN 3-seat sofa,80.71,37.01,https://www.ikea.com/gb/en/p/backsaelen-3-seat-sofa-katorp-natural-s79393165/,205x94cm
+sofa-3,,,West Elm,mid,"Hamilton Sofa 81""",81,35.8,https://www.westelm.com/products/hamilton-upholstered-sofa-h1469/,81in size (offered 70-91in)
+sofa-3,,,IKEA,mass,PARUP 3-seat sofa,81.1,31.5,https://www.ikea.com/sg/en/p/paerup-3-seat-sofa-vissle-grey-s79389470/,"206x80cm; shallow depth (31.5in), low end of range"
+sofa-3,,,West Elm,mid,"Harmony Sofa 82""",82,41,https://www.westelm.com/products/harmony-sofa-h2479/,82in size (offered 66-104in)
+sofa-3,,,West Elm,mid,"Haven Sofa 82""",82,39,https://www.westelm.com/products/haven-sofa-84-h3421/,82in size (offered 60-108in)
+sofa-3,,,CB2,mid,"Piazza Sofa 82""",82,44,https://www.aptdeco.com/product/cb2-piazza-sofa-82,deep-seat sofa (44in depth); spec via AptDeco aggregator
+sofa-3,,,Wayfair,mass,"Somerville 82"" Sofa",82,37,https://www.aptdeco.com/product/wayfair-sand-stable-gray-somerville-sofa,Wayfair house brand; spec via AptDeco aggregator
+sofa-3,,,Article,mid,"Ceni 83"" Sofa",83,35,https://www.article.com/product/25356/ceni-83-sofa-quarry-gray,
+sofa-3,,,Crate & Barrel,mid,"Lounge Deep 83"" Sofa",83,46,https://www.crateandbarrel.com/lounge-deep-sofa-83/s302850,"extra-deep (46in), above typical depth range - flagged"
+sofa-3,,,Arhaus,upper,Beale Sofa,85,39,https://www.arhaus.com/products/beale-sofa,"85in width option, Standard 39in depth (Deep 43in also offered)"
+sofa-3,,,IKEA,mass,EKTORP sofa (3-seat),85.83,34.65,https://www.ikea.com/us/en/p/ektorp-sofa-lofallet-beige-s89129207/,218x88cm; separate EKTORP 3.5-seat (250cm) also exists
+sofa-3,,,Burrow,mid,Nomad 3-Seat Sofa,86,36,https://www.dimensions.com/element/burrow-nomad-sofa,dimensions.com element; Burrow lists ~84.5-86in across configs
+sofa-3,,,Floyd,mid,The Sofa 2.0 (3-seat),86,34,https://floydhome.com/products/the-sofa-2-0,official Floyd dims 86x34
+sofa-3,,,Design Within Reach,upper,"Reid Sofa 86""",86,39,https://www.dwr.com/living-sofas/reid-sofa/2198.html,
+sofa-3,,,Ashley,mass,Darcy Sofa,87,37,https://www.ashleyfurniture.com/p/darcy_sofa/7500538.html,official Ashley 87x37
+sofa-3,,,Article,mid,"Sven 88"" Sofa",88,38,https://www.article.com/product/24178/sven-88-tufted-leather-sofa-charme-tan,3-seat; same footprint in fabric/leather
+sofa-3,,,Crate & Barrel,mid,"Axis 3-Seat 88"" Sofa",88,43,https://www.crateandbarrel.com/axis-3-seat-88-sofa/s543685,
+sofa-3,,,Room & Board,upper,Metro Sofa,88,38,https://www.roomandboard.com/catalog/living/sofas-and-loveseats/metro-sofas,
+sofa-3,,,Arhaus,upper,Dune Sofa,88,40,https://www.arhaus.com/products/dune-sofa-2,
+sofa-3,,,IKEA,mass,UPPLAND sofa (3-seat),88.19,36.22,https://www.ikea.com/us/en/p/uppland-sofa-blekinge-white-s19384116/,224x92cm; EKTORP successor
+sofa-3,,,IKEA,mass,KIVIK 3-seat sofa,89.76,37.4,https://itemfits.com/dimensions/ikea/ikea-kivik,228x95cm; verified via itemfits/dimensions.com and IKEA US KIVIK series
+sofa-3,,,Castlery,mid,Dawson 3-Seater Sofa,89.76,44.88,https://www.castlery.com/au/products/dawson-3-seater-sofa,228x114cm; deep sofa; dims from Castlery intl listing
+sofa-3,,,IKEA,mass,APPLARYD 3-seat sofa,90.94,36.61,https://www.ikea.com/gb/en/p/aepplaryd-3-seat-sofa-lejde-grey-black-80506246/,231x93cm
+sofa-3,,,CB2,mid,Lenyx Sofa,91,37,https://www.cb2.com/lenyx-sofa/f17570,large 3-seat
+sofa-3,,,IKEA,mass,HYLTARP 3-seat sofa,91.34,36.61,https://www.ikea.com/in/en/p/hyltarp-3-seat-sofa-hallarp-white-s29489641/,232x93cm (no chaise)
+sofa-3,,,IKEA,mass,VIMLE 3-seat sofa,94.88,38.58,https://www.ikea.com/gb/en/p/vimle-3-seat-sofa-gunnared-beige-s59399031/,"241x98cm; wide modular 3-seater, top of 3-seat width range"
+sofa-3,,,IKEA,mass,FINNALA sofa (3-seat),94.88,38.58,https://www.ikea.com/us/en/p/finnala-sofa-gunnared-beige-s19319060/,241x~98-99cm; wide modular 3-seater
+sofa-3,,,Room & Board,upper,Jasper Sofa,96,36,https://www.roomandboard.com/catalog/living/sofas-and-loveseats/jasper-sofas,large 3-seat (96in wide)
+sofa-3,,,RH,upper,Maxwell 2-Cushion Sofa (8ft),96,40,https://rh.com/us/en/catalog/product/product.jsp/prod20240025,"8ft width, Classic 40in depth (Petite 37 / Luxe 46 also offered)"
+sofa-3,,,IKEA,mass,GRONLID 3-seat sofa,97.24,38.58,https://www.ikea.com/gb/en/p/groenlid-3-seat-sofa-tallmyra-medium-grey-s19409065/,247x98cm; wide modular 3-seater

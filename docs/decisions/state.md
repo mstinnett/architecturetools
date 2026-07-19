@@ -65,6 +65,16 @@ _Last updated: 2026-07-19 (two new product threads landed as first drafts, opera
   its touch-interaction reference (commit-on-lift drag, aggressive snap,
   pinch/pan, panel as one declarative parameter language). Dimension
   provenance: docs/In Progress/furniture-field-scan.md + REFERENCES.md.
+  **Market-fit layer (2026-07-19):** the tool measures the open slot around
+  a placed piece and counts a snapshot of real SKUs against it ("73% of
+  3-seat sofas fit this slot · 27 of 37"). Pipeline is a documented
+  contract: `data/market/*.csv` (source of truth, one row per SKU with URL
+  provenance — see `data/market/README.md`) → `tools/build-market.mjs` →
+  GENERATED `l/lib/market-data.js`. Figure module `l/lib/marketbar.js`
+  (converter hatch language on a population). Honesty rules: percentages
+  always carry n; classes under 8 SKUs draw no gauge; the compiler drops
+  bad rows loudly. Seeded 149 SKUs: sofas/loveseats, rect dining with
+  extension states, queen/king bed frames.
 - **CAD basis (`cad/lib/` + `cad/index.html`) — a NEW second engine lineage
   (2026-07-19, first draft, noindexed).** Exact rationals (BigInt) over the
   same 1/960 mm lattice for what the integer engine cannot hold: exact

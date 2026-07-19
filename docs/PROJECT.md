@@ -83,7 +83,9 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── furniture.html              # Furniture Fit — parametric furniture w/ clearances, first draft (dev, noindexed)
 │   └── lib/
 │       ├── catalog.js              # Parametric furniture makers (params → parts + clearance zones + wall rules)
-│       └── fitmath.js              # Placement math: world boxes, wall sides, edge snapping, conflict sweep
+│       ├── fitmath.js              # Placement math: world boxes, wall sides, snapping, conflicts, slot + market fit
+│       ├── marketbar.js            # Market distribution figure (converter hatch convention on a population)
+│       └── market-data.js          # GENERATED from data/market/*.csv — do not hand-edit
 ├── cad/
 │   ├── index.html                  # CAD Basis — exact-kernel demo page (dev, noindexed)
 │   └── lib/                        # The EXACT kernel (BigInt rationals; see docs/In Progress/cad-basis.md)
@@ -105,9 +107,15 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── specs-mac.csv               # Mac spec matrix (one row per cell)
 │   ├── priorities.csv              # Per-profile "where the money matters" note
 │   ├── extras.json                 # Non-tabular data (apps, prebuilts, monitors…)
-│   └── README.md                   # The authoritative data-pipeline contract
+│   ├── README.md                   # The authoritative data-pipeline contract
+│   └── market/                     # Market dimension seed — real SKU footprints (see its README.md)
+│       ├── sofas.csv               # sofa-3 + loveseat rows
+│       ├── dining-tables.csv       # dining-rect rows (fixed / closed / extended states)
+│       ├── beds.csv                # bed-frame rows by mattress size
+│       └── README.md               # Column contract, tiers, provenance, honesty rules
 ├── tools/
 │   ├── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
+│   ├── build-market.mjs            # Compiles data/market/ → l/lib/market-data.js
 │   └── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
 ├── calculators/                    # convert.html + the 3 lib modules it uses are LIVE on main; the rest is dev-only
 │   ├── index.html                  # C-0 — the calculators set cover (dev, noindexed)
