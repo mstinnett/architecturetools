@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en" data-family="material">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Furniture Fit -- architecture.tools</title>
+<meta name="description" content="Parametric furniture with the clearances built in. Drag a bed set, dining table, bench desks, or a gondola run into a room — the zones snap, the layout reconfigures at walls, and every dimension is exact.">
+<script>
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The shell (title block, labels, pills, wells) is global.css. Local rules
+     cover the plan canvas, the side panel — the tool's working surface — and
+     the SVG plan classes. */
+  html, body { overflow-x: hidden; }
+
+  .fit-layout { display: flex; gap: var(--space-lg); align-items: flex-start; }
+  .fit-canvas-wrap { flex: 1 1 auto; min-width: 0; }
+  .fit-panel { flex: 0 0 300px; max-width: 300px; }
+  @media (max-width: 900px) {
+    .fit-layout { flex-direction: column; }
+    .fit-panel { flex: 1 1 auto; max-width: none; width: 100%; }
+  }
+
+  /* the plan sheet — a recessed well the room sits in */
+  .planbox { background: var(--answer-surface); border: 1px solid color-mix(in srgb, var(--rule) 58%, transparent);
+             border-radius: var(--radius); box-shadow: var(--shadow-well); position: relative; }
+  svg.plan { display: block; width: 100%; height: 62vh; min-height: 340px; max-height: 720px;
+             touch-action: none; cursor: default; }
+  .canvasbar { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: var(--space-sm); }
+  .canvasbar .spacer { flex: 1; }
+  .canvas-note { font-size: var(--text-xs); color: var(--ink-3); margin-top: 0.4rem; line-height: 1.6; }
+
+  /* plan classes — tokens keep the drawing scheme-correct in dark */
+  .plan .floor    { fill: var(--card); stroke: none; }
+  .plan .gridline { stroke: var(--rule); stroke-width: 0.5; opacity: 0.55; }
+  .plan .wall     { fill: none; stroke: var(--ink); stroke-width: 3; }
+  .plan .zone     { fill: url(#clearhatch); stroke: var(--nl-axis); stroke-width: 0.75;
+                    stroke-dasharray: 4 3; opacity: 0.85; }
+  .plan .zone.is-warn { stroke: var(--accent); stroke-width: 1.25; opacity: 1; }
+  .plan .solid    { fill: var(--card-2); stroke: var(--ink); stroke-width: 1.4; }
+  .plan .solid.is-chair { fill: var(--card); stroke-width: 1; }
+  .plan .solid.is-aux   { fill: var(--card); }
+  .plan .solid.is-warn  { stroke: var(--accent); stroke-width: 2; }
+  .plan .sel-ring { fill: none; stroke: var(--accent); stroke-width: 1.75; stroke-dasharray: 6 3; }
+  .plan .guide    { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 5 3; }
+  .plan .lbl      { font-family: var(--font-body); fill: var(--ink-2); }
+  .plan .lbl-dim  { font-family: 'SF Mono', ui-monospace, monospace; fill: var(--accent); }
+  .plan .hatchline { stroke: var(--nl-hatch); stroke-width: 0.6; opacity: 0.5; }
+  .plan .hint     { font-family: var(--font-body); fill: var(--ink-3); }
+
+  /* panel — the parameter language */
+  .fit-panel .panel-section { margin-bottom: var(--space-lg); }
+  .pill-wrap { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .pill-wrap .grid-box { min-width: 2.2rem; }
+  .param { display: flex; flex-direction: column; margin-bottom: var(--space-sm); }
+  .param > label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+                   text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .param-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+                 font-size: 1rem; font-weight: 400; width: 100%;
+                 color: var(--ink); background: var(--card);
+                 padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+                 box-shadow: var(--shadow-well); border-radius: var(--radius);
+                 outline: none; -webkit-appearance: none; appearance: none; }
+  .param-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .param-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1em; margin-top: 0.2rem; }
+  .stepper { display: flex; align-items: center; gap: 0.4rem; }
+  .stepper .grid-box { min-width: 2.4rem; }
+  .stepper .step-val { font-family: 'SF Mono', ui-monospace, monospace; font-size: 1rem; min-width: 2.2em; text-align: center; }
+
+  .place-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 0.8rem; }
+  .nudge-row { display: flex; gap: 0.3rem; align-items: center; margin-top: var(--space-sm); flex-wrap: wrap; }
+  .nudge-row .grid-box { min-width: 2.4rem; }
+
+  .obj-note { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.5; padding: 0.4rem 0.6rem;
+              background: var(--card-2); border: 1px solid var(--rule); border-radius: var(--radius);
+              margin-bottom: 0.35rem; }
+  .obj-note::before { content: '↺ '; color: var(--accent); }
+  .check-row { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.5; padding: 0.3rem 0;
+               border-bottom: var(--border-light); }
+  .check-row:last-child { border-bottom: none; }
+  .check-row.is-collision { color: var(--ink); }
+  .check-row .k { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
+                  color: var(--ink-3); margin-right: 0.4em; }
+  .info-row { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.25rem 0; font-size: var(--text-sm); }
+  .info-row .l { color: var(--ink-3); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; width: 7.5em; flex-shrink: 0; }
+  .info-row .v { color: var(--ink); }
+
+  .lib-cats { margin-bottom: 0.5rem; }
+  .lib-items .option-pill { width: 100%; margin-bottom: 0.3rem; }
+
+  @media (pointer: coarse) { .plan { cursor: default; } .param-input { font-size: 16px; } }
+</style>
+</head>
+<body>
+<div class="page-wide">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Library</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Furniture Fit</span>
+    </nav>
+    <h1>Furniture Fit</h1>
+    <p>Parametric furniture with the clearances built in. Add a bed set, a dining
+       table, bench desks, a gondola run — pick a size or type your own, drag it,
+       and it snaps to furniture, to clearance zones, and to walls. Push a table
+       against a wall and the wall-side chairs step aside. The zones are drawn,
+       never assumed.</p>
+  </div>
+
+  <div class="fit-layout">
+    <div class="fit-canvas-wrap">
+      <div class="canvasbar">
+        <button type="button" class="mini-pill" id="btnFit">fit view</button>
+        <button type="button" class="mini-pill" id="btnClears" aria-pressed="true">clearances</button>
+        <span class="spacer"></span>
+        <span class="grid-group-label" id="roomReadout"></span>
+      </div>
+      <div class="planbox">
+        <svg class="plan" id="plan" role="application" aria-label="Room plan. Drag furniture to arrange it."></svg>
+      </div>
+      <div class="canvas-note">Solid outline = furniture · hatched = its clearance zone (included geometry — it
+        snaps and it warns) · drag to move, double-tap to rotate · pinch or scroll to zoom · grid squares are 12″.</div>
+    </div>
+
+    <aside class="fit-panel" id="panel" aria-label="Parameters"></aside>
+  </div>
+
+  <div class="mathnote" id="mathNote"></div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="../calculators/lib/parse-length.js"></script>
+<script src="lib/catalog.js"></script>
+<script src="lib/fitmath.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = window.Catalog, F = window.FitMath, esc = window.UI.esc;
+  var IN = C.IN, FT = C.FT;
+  var EIGHTH = IN / 8;
+
+  /* ================= state ================= */
+
+  var state = {
+    room: { w: 168 * IN, d: 144 * IN },          // 14′ × 12′
+    items: [],                                    // { id, key, x, y, turns, params }
+    sel: null,
+    showClears: true,
+    libCat: 'bedroom',
+    fine: false                                   // nudge step: 1″ coarse · 1/8″ fine
+  };
+  var nextId = 1;
+  var view = { scale: 0.004, ox: 20, oy: 20 };    // world→screen: s = w·scale + o
+  var drag = null;                                 // { id, dx, dy, moved } | { pan } | null
+  var guides = null;                               // snap guides during a drag
+  var pointers = {};                               // live pointers, for pinch
+  var paramText = {};                              // per-item raw text of dim fields
+
+  var els = {
+    plan: document.getElementById('plan'),
+    panel: document.getElementById('panel'),
+    btnFit: document.getElementById('btnFit'),
+    btnClears: document.getElementById('btnClears'),
+    roomReadout: document.getElementById('roomReadout'),
+    mathNote: document.getElementById('mathNote')
+  };
+
+  /* ================= exact display helpers ================= */
+
+  function fmtUnits(u) {
+    var neg = u < 0 ? '-' : ''; u = Math.abs(u);
+    var ft = Math.floor(u / FT), rem = u % FT;
+    var inch = Math.floor(rem / IN), fr = rem % IN;
+    var frTxt = '';
+    if (fr !== 0) {
+      var g = IN / 16;                      // the tool quantizes to 1/8″; 1/16 covers halves of steps
+      if (fr % g === 0) {
+        var n = fr / g, d = 16;
+        while (n % 2 === 0) { n /= 2; d /= 2; }
+        frTxt = ' ' + n + '/' + d;
+      } else frTxt = ' ' + (fr / IN).toFixed(3).replace(/^0/, '');
+    }
+    if (ft === 0) return neg + inch + frTxt + '"';
+    return neg + ft + "'-" + inch + frTxt + '"';
+  }
+  function parseDim(text, zeroOk) {
+    var r = window.parseLength(text, { defaultUnit: 'in' });
+    if (!r || r.dimension !== 1 || r.units == null) return null;
+    if (r.units < 0 || (r.units === 0 && !zeroOk)) return null;
+    return r.units;
+  }
+  function quant(u) { return Math.round(u / EIGHTH) * EIGHTH; }
+
+  /* ================= geometry ================= */
+
+  function roomRect() { return { x: 0, y: 0, w: state.room.w, d: state.room.d }; }
+
+  // catalog make → world geometry, with the wall rules fed back in
+  function geomOf(item) {
+    var made0 = C.make(item.key, item.params);
+    var body0 = F.worldBox({ x: 0, y: 0, w: made0.w, d: made0.d }, item);
+    var atWall = F.wallSides(body0, item, roomRect(), made0.wallThreshold);
+    var made = C.make(item.key, item.params, { atWall: atWall });
+    var body = F.worldBox({ x: 0, y: 0, w: made.w, d: made.d }, item);
+    return {
+      item: item, made: made, body: body,
+      solids: made.parts.map(function (p) { return F.worldBox(p, item); }),
+      clears: made.clears.map(function (c) { return F.worldBox(c, item); })
+    };
+  }
+  function allGeoms() { return state.items.map(geomOf); }
+
+  function findItem(id) {
+    for (var i = 0; i < state.items.length; i++) if (state.items[i].id === id) return state.items[i];
+    return null;
+  }
+
+  /* ================= view mapping ================= */
+
+  function X(w) { return w * view.scale + view.ox; }
+  function Y(w) { return w * view.scale + view.oy; }
+  function toWorld(clientX, clientY) {
+    var r = els.plan.getBoundingClientRect();
+    return { x: (clientX - r.left - view.ox) / view.scale, y: (clientY - r.top - view.oy) / view.scale };
+  }
+  function fitView() {
+    var r = els.plan.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var margin = 30;
+    view.scale = Math.min((r.width - 2 * margin) / state.room.w, (r.height - 2 * margin) / state.room.d);
+    view.ox = (r.width - state.room.w * view.scale) / 2;
+    view.oy = (r.height - state.room.d * view.scale) / 2;
+  }
+
+  /* ================= plan rendering ================= */
+
+  function rectSvg(b, cls) {
+    return '<rect class="' + cls + '" x="' + X(b.x).toFixed(1) + '" y="' + Y(b.y).toFixed(1)
+      + '" width="' + (b.w * view.scale).toFixed(1) + '" height="' + (b.d * view.scale).toFixed(1) + '"/>';
+  }
+  function shapeSvg(b, cls, shape) {
+    if (shape === 'round') {
+      return '<ellipse class="' + cls + '" cx="' + X(b.x + b.w / 2).toFixed(1) + '" cy="' + Y(b.y + b.d / 2).toFixed(1)
+        + '" rx="' + (b.w * view.scale / 2).toFixed(1) + '" ry="' + (b.d * view.scale / 2).toFixed(1) + '"/>';
+    }
+    return rectSvg(b, cls);
+  }
+
+  function renderPlan(geoms, confs) {
+    var out = '';
+    out += '<defs><pattern id="clearhatch" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">'
+         + '<line class="hatchline" x1="0" y1="0" x2="0" y2="7"/></pattern></defs>';
+
+    // floor + 12″ grid + walls
+    var rm = roomRect();
+    out += rectSvg(rm, 'floor');
+    var step = 12 * IN;
+    for (var gx = step; gx < rm.w; gx += step) out += '<line class="gridline" x1="' + X(gx).toFixed(1) + '" y1="' + Y(0).toFixed(1) + '" x2="' + X(gx).toFixed(1) + '" y2="' + Y(rm.d).toFixed(1) + '"/>';
+    for (var gy = step; gy < rm.d; gy += step) out += '<line class="gridline" x1="' + X(0).toFixed(1) + '" y1="' + Y(gy).toFixed(1) + '" x2="' + X(rm.w).toFixed(1) + '" y2="' + Y(gy).toFixed(1) + '"/>';
+    out += rectSvg(rm, 'wall');
+
+    // which zones / solids are in conflict (for the warn tint)
+    var warnZone = {}, warnSolid = {};
+    confs.forEach(function (c) {
+      if (c.kind === 'encroach') { warnZone[c.b + '/' + c.purpose] = true; warnSolid[c.a] = true; }
+      if (c.kind === 'collision') { warnSolid[c.a] = true; warnSolid[c.b] = true; }
+      if (c.kind === 'pinch') warnZone[c.a + '/' + c.purpose] = true;
+    });
+
+    // clearance zones first (under everything)
+    if (state.showClears) geoms.forEach(function (g) {
+      g.clears.forEach(function (cb) {
+        var warn = warnZone[g.item.id + '/' + cb.purpose];
+        out += rectSvg(cb, 'zone' + (warn ? ' is-warn' : ''));
+      });
+    });
+
+    // solids
+    geoms.forEach(function (g) {
+      var warn = warnSolid[g.item.id];
+      g.solids.forEach(function (sb) {
+        var cls = 'solid' + (sb.kind === 'chair' ? ' is-chair' : sb.kind === 'aux' ? ' is-aux' : '') + (warn && sb.kind === 'body' ? ' is-warn' : '');
+        out += shapeSvg(sb, cls, sb.shape);
+      });
+      // label the body when there's room
+      var pw = g.body.w * view.scale;
+      if (pw > 56) {
+        var fs = Math.max(9, Math.min(13, pw / 9));
+        out += '<text class="lbl" text-anchor="middle" font-size="' + fs.toFixed(1) + '" x="' + X(g.body.x + g.body.w / 2).toFixed(1)
+             + '" y="' + (Y(g.body.y + g.body.d / 2) + fs * 0.35).toFixed(1) + '">' + esc(g.made.label) + '</text>';
+      }
+    });
+
+    // selection ring + live dimensions
+    if (state.sel != null) {
+      geoms.forEach(function (g) {
+        if (g.item.id !== state.sel) return;
+        var b = { x: g.body.x - 2 / view.scale, y: g.body.y - 2 / view.scale, w: g.body.w + 4 / view.scale, d: g.body.d + 4 / view.scale };
+        out += rectSvg(b, 'sel-ring');
+        out += '<text class="lbl-dim" text-anchor="middle" font-size="11" x="' + X(g.body.x + g.body.w / 2).toFixed(1)
+             + '" y="' + (Y(g.body.y) - 6).toFixed(1) + '">' + esc(fmtUnits(g.body.w) + ' × ' + fmtUnits(g.body.d)) + '</text>';
+      });
+    }
+
+    // snap guides while dragging
+    if (guides) {
+      if (guides.x) out += '<line class="guide" x1="' + X(guides.x.at).toFixed(1) + '" y1="0" x2="' + X(guides.x.at).toFixed(1) + '" y2="100%"/>';
+      if (guides.y) out += '<line class="guide" x1="0" y1="' + Y(guides.y.at).toFixed(1) + '" x2="100%" y2="' + Y(guides.y.at).toFixed(1) + '"/>';
+    }
+
+    if (!state.items.length) {
+      out += '<text class="hint" font-size="13" text-anchor="middle" x="' + X(rm.w / 2).toFixed(1) + '" y="' + Y(rm.d / 2).toFixed(1) + '">tap an object in the library to place it</text>';
+    }
+
+    els.plan.innerHTML = out;
+  }
+
+  /* ================= panel rendering =================
+     The panel is generated from the catalog's parameter specs — variant
+     pills, dimension wells, steppers, toggles. One language for every
+     object; the catalog, not the page, decides what an object offers. */
+
+  function pill(attrs, label, on) {
+    return '<button type="button" class="grid-box' + (on ? ' active' : '') + '" aria-pressed="' + !!on + '" ' + attrs + '>' + label + '</button>';
+  }
+
+  function panelObject(g) {
+    var item = g.item, def = C.get(item.key), made = g.made;
+    var h = '<div class="panel-section"><div class="panel-label">' + esc(made.label) + '</div>';
+
+    def.params.forEach(function (spec) {
+      if (spec.showIf && !spec.showIf(item.params)) return;
+      var v = item.params[spec.key];
+      if (spec.kind === 'variant') {
+        h += '<div class="param"><label>' + esc(spec.label) + '</label><div class="pill-wrap">';
+        spec.options.forEach(function (o) {
+          h += pill('data-var="' + spec.key + '" data-opt="' + o.key + '"', esc(o.label), v === o.key);
+        });
+        h += '</div></div>';
+      } else if (spec.kind === 'dim') {
+        var txt = (paramText[item.id] && paramText[item.id][spec.key] != null) ? paramText[item.id][spec.key] : fmtUnits(v);
+        h += '<div class="param"><label>' + esc(spec.label) + '</label>'
+           + '<input class="param-input" data-dim="' + spec.key + '" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="40" value="' + esc(txt) + '">'
+           + '<div class="param-note" data-dimnote="' + spec.key + '"></div></div>';
+      } else if (spec.kind === 'count') {
+        h += '<div class="param"><label>' + esc(spec.label) + '</label><div class="stepper">'
+           + pill('data-step="' + spec.key + '" data-d="-1"', '−', false)
+           + '<span class="step-val">' + v + '</span>'
+           + pill('data-step="' + spec.key + '" data-d="1"', '+', false)
+           + '</div></div>';
+      } else if (spec.kind === 'toggle') {
+        h += '<div class="param"><label>' + esc(spec.label) + '</label><div class="pill-wrap">'
+           + pill('data-tog="' + spec.key + '" data-v="1"', 'on', !!v)
+           + pill('data-tog="' + spec.key + '" data-v="0"', 'off', !v)
+           + '</div></div>';
+      }
+    });
+    h += '</div>';
+
+    // what the object just did (wall reconfiguration) + derived facts
+    h += '<div class="panel-section" id="objNotes">' + made.notes.map(function (n) { return '<div class="obj-note">' + esc(n) + '</div>'; }).join('') + '</div>';
+    h += '<div class="panel-section" id="objInfo">';
+    made.info.forEach(function (r) { h += '<div class="info-row"><span class="l">' + esc(r.label) + '</span><span class="v">' + esc(r.value) + '</span></div>'; });
+    h += '</div>';
+
+    // placement: exact fields + the push pad
+    h += '<div class="panel-section"><div class="panel-label">Place</div><div class="place-grid">'
+       + '<div class="param"><label>from left wall</label><input class="param-input" data-place="x" type="text" spellcheck="false" autocomplete="off" maxlength="40" value="' + esc(fmtUnits(g.body.x)) + '"></div>'
+       + '<div class="param"><label>from top wall</label><input class="param-input" data-place="y" type="text" spellcheck="false" autocomplete="off" maxlength="40" value="' + esc(fmtUnits(g.body.y)) + '"></div>'
+       + '</div>'
+       + '<div class="nudge-row">'
+       + pill('data-nudge="-1,0"', '←', false) + pill('data-nudge="0,-1"', '↑', false)
+       + pill('data-nudge="0,1"', '↓', false) + pill('data-nudge="1,0"', '→', false)
+       + '<span class="grid-group-label">step</span>'
+       + pill('data-fine="0"', '1″', !state.fine) + pill('data-fine="1"', '1/8″', state.fine)
+       + '</div>'
+       + '<div class="nudge-row">'
+       + '<button type="button" class="mini-pill" data-act="rotate">rotate 90°</button>'
+       + '<button type="button" class="mini-pill" data-act="dupe">duplicate</button>'
+       + '<button type="button" class="mini-pill" data-act="remove">remove</button>'
+       + '</div></div>';
+    return h;
+  }
+
+  function panelRoom() {
+    var presets = [
+      { label: 'bedroom 12×14', w: 144, d: 168 }, { label: 'living 16×14', w: 192, d: 168 },
+      { label: 'office 30×24', w: 360, d: 288 }, { label: 'retail 40×30', w: 480, d: 360 }
+    ];
+    var h = '<div class="panel-section"><div class="panel-label">Room</div><div class="place-grid">'
+      + '<div class="param"><label>width</label><input class="param-input" data-room="w" type="text" spellcheck="false" autocomplete="off" maxlength="40" value="' + esc(fmtUnits(state.room.w)) + '"></div>'
+      + '<div class="param"><label>depth</label><input class="param-input" data-room="d" type="text" spellcheck="false" autocomplete="off" maxlength="40" value="' + esc(fmtUnits(state.room.d)) + '"></div>'
+      + '</div><div class="pill-wrap" style="margin-top:0.4rem;">';
+    presets.forEach(function (p, i) { h += pill('data-preset="' + i + '"', esc(p.label), false); });
+    h += '</div></div>';
+    panelRoom.presets = presets;
+    return h;
+  }
+
+  function panelLibrary() {
+    var h = '<div class="panel-section"><div class="panel-label">Library</div><div class="pill-wrap lib-cats">';
+    C.CATEGORIES.forEach(function (c) { h += pill('data-cat="' + c.key + '"', esc(c.label), state.libCat === c.key); });
+    h += '</div><div class="lib-items">';
+    C.DEFS.forEach(function (d) {
+      if (d.category !== state.libCat) return;
+      h += '<button type="button" class="option-pill" data-add="' + d.key + '">' + esc(d.label) + '<span class="pill-detail">tap to place</span></button>';
+    });
+    h += '</div></div>';
+    return h;
+  }
+
+  function panelChecks(confs) {
+    var h = '<div class="panel-section"><div class="panel-label">Checks</div><div id="checkList">';
+    if (!confs.length) h += '<div class="check-row">clear — nothing stands in a zone</div>';
+    confs.forEach(function (c) {
+      h += '<div class="check-row' + (c.kind === 'collision' ? ' is-collision' : '') + '"><span class="k">'
+        + (c.kind === 'collision' ? 'overlap' : c.kind === 'pinch' ? 'wall' : 'zone') + '</span>' + esc(c.note) + '</div>';
+    });
+    h += '</div></div>';
+    return h;
+  }
+
+  function renderPanel(geoms, confs) {
+    var h = '';
+    var g = null;
+    if (state.sel != null) geoms.forEach(function (x) { if (x.item.id === state.sel) g = x; });
+    if (g) h += panelObject(g);
+    h += panelRoom();
+    h += panelLibrary();
+    h += panelChecks(confs);
+    els.panel.innerHTML = h;
+    wirePanel(g);
+  }
+
+  /* ---- panel wiring (rebuilt with the panel) ------------------------------- */
+
+  function wirePanel(g) {
+    var q = function (sel) { return Array.prototype.slice.call(els.panel.querySelectorAll(sel)); };
+
+    q('[data-var]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        g.item.params[b.dataset.var] = b.dataset.opt;
+        delete paramText[g.item.id];
+        render(true);
+      });
+    });
+    q('[data-step]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var spec = null;
+        C.get(g.item.key).params.forEach(function (s) { if (s.key === b.dataset.step) spec = s; });
+        var v = g.item.params[spec.key] + (+b.dataset.d) * (spec.step || 1);
+        g.item.params[spec.key] = Math.max(spec.min, Math.min(spec.max, v));
+        render(true);
+      });
+    });
+    q('[data-tog]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        g.item.params[b.dataset.tog] = b.dataset.v === '1';
+        render(true);
+      });
+    });
+    q('[data-dim]').forEach(function (inp) {
+      inp.addEventListener('input', function () {
+        if (!paramText[g.item.id]) paramText[g.item.id] = {};
+        paramText[g.item.id][inp.dataset.dim] = inp.value;
+        var u = parseDim(inp.value);
+        var note = els.panel.querySelector('[data-dimnote="' + inp.dataset.dim + '"]');
+        if (u == null) { if (note) note.textContent = inp.value.trim() ? 'needs a length' : ''; return; }
+        u = quant(u);
+        if (note) note.textContent = '';
+        g.item.params[inp.dataset.dim] = u;
+        render(false);                              // canvas only — keep focus here
+      });
+      inp.addEventListener('blur', function () {
+        if (paramText[g.item.id]) delete paramText[g.item.id][inp.dataset.dim];
+        render(true);
+      });
+    });
+    q('[data-place]').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        var u = parseDim(inp.value, true);          // 0 parks it at the wall
+        if (u == null) return;
+        u = quant(u);
+        var cur = geomOf(g.item).body;
+        if (inp.dataset.place === 'x') g.item.x += u - cur.x;
+        else g.item.y += u - cur.y;
+        render(true);
+      });
+    });
+    q('[data-nudge]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var v = b.dataset.nudge.split(','), step = state.fine ? EIGHTH : IN;
+        g.item.x += (+v[0]) * step; g.item.y += (+v[1]) * step;
+        render(true);
+      });
+    });
+    q('[data-fine]').forEach(function (b) {
+      b.addEventListener('click', function () { state.fine = b.dataset.fine === '1'; render(true); });
+    });
+    q('[data-act]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (b.dataset.act === 'rotate') rotateItem(g.item);
+        if (b.dataset.act === 'dupe') {
+          var copy = { id: nextId++, key: g.item.key, x: g.item.x + 12 * IN, y: g.item.y + 12 * IN, turns: g.item.turns, params: JSON.parse(JSON.stringify(g.item.params)) };
+          state.items.push(copy); state.sel = copy.id;
+        }
+        if (b.dataset.act === 'remove') {
+          state.items = state.items.filter(function (it) { return it.id !== g.item.id; });
+          state.sel = null;
+        }
+        render(true);
+      });
+    });
+    q('[data-room]').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        var u = parseDim(inp.value);
+        if (u == null) return;
+        state.room[inp.dataset.room] = Math.max(4 * FT, Math.min(200 * FT, quant(u)));
+        fitView(); render(true);
+      });
+    });
+    q('[data-preset]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var p = panelRoom.presets[+b.dataset.preset];
+        state.room.w = p.w * IN; state.room.d = p.d * IN;
+        fitView(); render(true);
+      });
+    });
+    q('[data-cat]').forEach(function (b) {
+      b.addEventListener('click', function () { state.libCat = b.dataset.cat; render(true); });
+    });
+    q('[data-add]').forEach(function (b) {
+      b.addEventListener('click', function () { addItem(b.dataset.add); });
+    });
+  }
+
+  /* ================= actions ================= */
+
+  function addItem(key) {
+    var params = C.defaultsFor(key);
+    var made = C.make(key, params);
+    var item = {
+      id: nextId++, key: key, turns: 0,
+      x: quant((state.room.w - made.w) / 2), y: quant((state.room.d - made.d) / 2),
+      params: params
+    };
+    state.items.push(item);
+    state.sel = item.id;
+    render(true);
+  }
+
+  // rotate 90° about the body center, so the piece pivots in place
+  function rotateItem(item) {
+    var before = geomOf(item).body;
+    var cx = before.x + before.w / 2, cy = before.y + before.d / 2;
+    item.turns = (item.turns + 1) % 4;
+    var after = geomOf(item).body;
+    item.x += Math.round(cx - (after.x + after.w / 2));
+    item.y += Math.round(cy - (after.y + after.d / 2));
+    item.x = quant(item.x); item.y = quant(item.y);
+  }
+
+  // orient-back-to-wall: applied on drop, reported in the panel notes
+  function orientRule(item) {
+    var g = geomOf(item);
+    if (!g.made.orientBackToWall) return;
+    var nw = F.nearestWall(g.body, roomRect());
+    if (nw.dist > g.made.wallThreshold) return;
+    var want = ((nw.turnsForBack % 4) + 4) % 4;
+    if (item.turns === want) return;
+    var before = g.body;
+    var cx = before.x + before.w / 2, cy = before.y + before.d / 2;
+    item.turns = want;
+    var after = geomOf(item).body;
+    item.x = quant(item.x + Math.round(cx - (after.x + after.w / 2)));
+    item.y = quant(item.y + Math.round(cy - (after.y + after.d / 2)));
+  }
+
+  /* ================= pointer interaction ================= */
+
+  var lastTap = { t: 0, id: null };
+
+  function hitTest(w) {
+    var slop = 6 / view.scale;
+    var geoms = allGeoms();
+    for (var i = geoms.length - 1; i >= 0; i--) {
+      var g = geoms[i];
+      for (var s = 0; s < g.solids.length; s++) {
+        var b = g.solids[s];
+        if (w.x >= b.x - slop && w.x <= b.x + b.w + slop && w.y >= b.y - slop && w.y <= b.y + b.d + slop) return g;
+      }
+    }
+    return null;
+  }
+
+  els.plan.addEventListener('pointerdown', function (ev) {
+    if (els.plan.setPointerCapture) { try { els.plan.setPointerCapture(ev.pointerId); } catch (e) { /* synthetic events */ } }
+    pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+    if (Object.keys(pointers).length === 2) {      // pinch takes over
+      var ids = Object.keys(pointers);
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      drag = { pinch: true, d0: Math.hypot(a.x - b.x, a.y - b.y), scale0: view.scale,
+               cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2, ox0: view.ox, oy0: view.oy };
+      guides = null;
+      return;
+    }
+    var w = toWorld(ev.clientX, ev.clientY);
+    var hit = hitTest(w);
+    if (hit) {
+      state.sel = hit.item.id;
+      // the grab remembers where in the piece you touched — the piece never jumps to the finger
+      drag = { id: hit.item.id, dx: w.x - hit.item.x, dy: w.y - hit.item.y, moved: false,
+               touch: ev.pointerType === 'touch' };
+      render(true);
+    } else {
+      drag = { pan: true, sx: ev.clientX, sy: ev.clientY, ox0: view.ox, oy0: view.oy, moved: false };
+    }
+  });
+
+  els.plan.addEventListener('pointermove', function (ev) {
+    if (pointers[ev.pointerId]) pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+    if (!drag) return;
+    if (drag.pinch) {
+      var ids = Object.keys(pointers);
+      if (ids.length < 2) return;
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      var d1 = Math.hypot(a.x - b.x, a.y - b.y);
+      var f = Math.max(0.2, Math.min(5, d1 / drag.d0));
+      var r = els.plan.getBoundingClientRect();
+      var px = drag.cx - r.left, py = drag.cy - r.top;
+      view.scale = drag.scale0 * f;
+      view.ox = px - (px - drag.ox0) * f;
+      view.oy = py - (py - drag.oy0) * f;
+      render(false);
+      return;
+    }
+    if (drag.pan) {
+      view.ox = drag.ox0 + (ev.clientX - drag.sx);
+      view.oy = drag.oy0 + (ev.clientY - drag.sy);
+      if (Math.abs(ev.clientX - drag.sx) + Math.abs(ev.clientY - drag.sy) > 4) drag.moved = true;
+      render(false);
+      return;
+    }
+    var item = findItem(drag.id);
+    if (!item) return;
+    var w = toWorld(ev.clientX, ev.clientY);
+    var nx = quant(w.x - drag.dx), ny = quant(w.y - drag.dy);
+    if (nx === item.x && ny === item.y && drag.moved) return;
+    drag.moved = true;
+    item.x = nx; item.y = ny;
+
+    // aggressive snapping — wider net for a finger than a mouse
+    var radiusPx = drag.touch ? 14 : 8;
+    var radius = Math.max(Math.round(radiusPx / view.scale), EIGHTH);
+    var g = geomOf(item);
+    var targets = [];
+    var rm = roomRect(); rm.kind = 'room';
+    targets.push(rm);
+    state.items.forEach(function (other) {
+      if (other.id === item.id) return;
+      var og = geomOf(other);
+      og.solids.forEach(function (s) { s.kind = 'body'; targets.push(s); });
+      og.clears.forEach(function (c) { c.kind = 'clear'; targets.push(c); });
+    });
+    var snap = F.snap(g.body, targets, radius);
+    item.x += snap.dx; item.y += snap.dy;
+    guides = (snap.x || snap.y) ? snap : null;
+    render(false);
+  });
+
+  function endPointer(ev) {
+    delete pointers[ev.pointerId];
+    if (!drag) return;
+    if (drag.pinch) { if (Object.keys(pointers).length < 2) drag = null; return; }
+    if (drag.pan) {
+      if (!drag.moved && state.sel != null) { state.sel = null; render(true); }
+      drag = null;
+      return;
+    }
+    var item = findItem(drag.id);
+    var wasDrag = drag.moved;
+    drag = null; guides = null;
+    if (!item) return;
+    if (wasDrag) {
+      orientRule(item);
+    } else {
+      // a tap — double-tap rotates
+      var now = Date.now();
+      if (lastTap.id === item.id && now - lastTap.t < 400) { rotateItem(item); lastTap = { t: 0, id: null }; }
+      else lastTap = { t: now, id: item.id };
+    }
+    render(true);
+  }
+  els.plan.addEventListener('pointerup', endPointer);
+  els.plan.addEventListener('pointercancel', endPointer);
+
+  els.plan.addEventListener('wheel', function (ev) {
+    ev.preventDefault();
+    var r = els.plan.getBoundingClientRect();
+    var px = ev.clientX - r.left, py = ev.clientY - r.top;
+    var f = ev.deltaY < 0 ? 1.12 : 1 / 1.12;
+    view.ox = px - (px - view.ox) * f;
+    view.oy = py - (py - view.oy) * f;
+    view.scale *= f;
+    render(false);
+  }, { passive: false });
+
+  // keyboard parity: arrows nudge, r rotates, delete removes
+  document.addEventListener('keydown', function (ev) {
+    if (state.sel == null) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+    var item = findItem(state.sel);
+    if (!item) return;
+    var step = ev.shiftKey ? EIGHTH : IN;
+    var used = true;
+    if (ev.key === 'ArrowLeft') item.x -= step;
+    else if (ev.key === 'ArrowRight') item.x += step;
+    else if (ev.key === 'ArrowUp') item.y -= step;
+    else if (ev.key === 'ArrowDown') item.y += step;
+    else if (ev.key === 'r' || ev.key === 'R') rotateItem(item);
+    else if (ev.key === 'Delete' || ev.key === 'Backspace') { state.items = state.items.filter(function (it) { return it.id !== item.id; }); state.sel = null; }
+    else used = false;
+    if (used) { ev.preventDefault(); render(true); }
+  });
+
+  /* ================= shareable URL ================= */
+
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var p = new URLSearchParams();
+      if (state.room.w !== 168 * IN || state.room.d !== 144 * IN) p.set('r', state.room.w + 'x' + state.room.d);
+      if (state.items.length) {
+        p.set('i', state.items.map(function (it) {
+          var s = it.key + '@' + it.x + ',' + it.y + ',' + it.turns;
+          var defs = C.defaultsFor(it.key);
+          for (var k in it.params) {
+            if (it.params[k] === defs[k]) continue;
+            var v = it.params[k];
+            s += '~' + k + ':' + (v === true ? 1 : v === false ? 0 : v);
+          }
+          return s;
+        }).join('|'));
+      }
+      var q = p.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed */ }
+    }, 300);
+  }
+
+  function initFromURL() {
+    try {
+      var p = new URLSearchParams(location.search);
+      var r = p.get('r');
+      if (r) {
+        var m = /^(\d+)x(\d+)$/.exec(r);
+        if (m) { state.room.w = Math.min(200 * FT, +m[1]); state.room.d = Math.min(200 * FT, +m[2]); }
+      }
+      var i = p.get('i');
+      if (i) i.split('|').forEach(function (tok) {
+        var mm = /^([a-z-]+)@(-?\d+),(-?\d+),([0-3])((~[a-zA-Z]+:[^~]*)*)$/.exec(tok);
+        if (!mm) return;
+        var key = mm[1];
+        try { C.get(key); } catch (e) { return; }
+        var params = C.defaultsFor(key);
+        if (mm[5]) mm[5].split('~').forEach(function (kv) {
+          if (!kv) return;
+          var ix = kv.indexOf(':');
+          var k = kv.slice(0, ix), v = kv.slice(ix + 1);
+          if (!(k in params)) return;
+          if (typeof params[k] === 'boolean') params[k] = v === '1';
+          else if (typeof params[k] === 'number') { var n = parseInt(v, 10); if (Number.isSafeInteger(n)) params[k] = n; }
+          else params[k] = v;
+        });
+        try { C.make(key, params); } catch (e) { return; }   // reject bad combos whole
+        state.items.push({ id: nextId++, key: key, x: +mm[2], y: +mm[3], turns: +mm[4], params: params });
+      });
+    } catch (e) { /* a malformed share never breaks the page */ }
+  }
+
+  /* ================= main render ================= */
+
+  function render(panelToo) {
+    var geoms = allGeoms();
+    var confs = F.conflicts(geoms.map(function (g) {
+      return { id: g.item.id, label: g.made.label, solids: g.solids, clears: g.clears };
+    }), roomRect());
+    renderPlan(geoms, confs);
+    if (panelToo !== false) renderPanel(geoms, confs);
+    els.roomReadout.textContent = fmtUnits(state.room.w) + ' × ' + fmtUnits(state.room.d);
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm: every position and size on this page '
+      + 'is a lattice point (placement quantized to 1/8″); snapping is integer arithmetic against furniture faces, '
+      + 'clearance boundaries, and walls — never a float tolerance. Objects: l/lib/catalog.js · math: l/lib/fitmath.js.';
+    syncURL();
+  }
+
+  /* ================= boot ================= */
+
+  els.btnFit.addEventListener('click', function () { fitView(); render(false); });
+  els.btnClears.addEventListener('click', function () {
+    state.showClears = !state.showClears;
+    window.UI.press(els.btnClears, state.showClears);
+    render(false);
+  });
+  window.addEventListener('resize', function () { fitView(); render(false); });
+
+  initFromURL();
+  if (!state.items.length) {
+    // a worked example, like every tool on the site: a queen bed set placed
+    // against the top wall — the wall rules already in action
+    var params = C.defaultsFor('bed');
+    state.items.push({ id: nextId++, key: 'bed', x: 54 * IN, y: 0, turns: 0, params: params });
+    state.sel = state.items[0].id;
+  }
+  window.UI.press(els.btnClears, true);
+  fitView();
+  render(true);
+  // the svg had no size until first layout on some engines — fit once more
+  requestAnimationFrame(function () { fitView(); render(false); });
+})();
+</script>
+</body>
+</html>
