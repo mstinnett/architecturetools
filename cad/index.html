@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>CAD Basis -- architecture.tools</title>
+<meta name="description" content="The exact drafting kernel, demonstrated live: rational coordinates, exact transforms, arrays with tweens, watertight hatches — every rounding shows its remainder.">
+<script>
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The shell (labels, answer cards, mathnote) is global.css; the kernel is
+     the cad/lib modules. Local rules cover the demo parameter fields and the
+     drawing surfaces. */
+  html, body { overflow-x: hidden; }
+
+  .param-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-md); }
+  .param { display: flex; flex-direction: column; }
+  .param label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+                 text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .param-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+                 font-size: 1.05rem; font-weight: 400; width: 8.5em;
+                 color: var(--ink); background: var(--card);
+                 padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+                 box-shadow: var(--shadow-well); border-radius: var(--radius);
+                 outline: none; -webkit-appearance: none; appearance: none; }
+  .param-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .param-input.num { width: 5em; }
+  .param-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; }
+
+  .demo-figure { margin: var(--space-md) 0; }
+  .demo-figure svg { display: block; max-width: 100%; }
+  .demo-figure .geo    { stroke: var(--nl-ink); stroke-width: 1.4; fill: none; }
+  .demo-figure .hatchl { stroke: var(--nl-hatch); stroke-width: 0.9; fill: none; }
+  .demo-figure .resid  { stroke: var(--accent); stroke-width: 1.2; fill: none; }
+  .demo-figure .ghost  { stroke: var(--nl-tick); stroke-width: 1; stroke-dasharray: 4 3; fill: none; }
+
+  .fact { color: var(--ink); font-weight: 400; }
+  .proof { font-size: var(--text-sm); color: var(--ink-2); margin-top: var(--space-sm); line-height: 1.6; }
+  .proof .fact.is-answer { color: var(--accent); }
+  .divider { margin: var(--space-xl) 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Workbench</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">CAD Basis</span>
+    </nav>
+    <h1>CAD Basis</h1>
+    <p>The exact drafting kernel, run live. Coordinates are rational numbers on
+       the engine lattice (1 unit = 1/960&nbsp;mm), transforms and intersections
+       are exact, and rounding happens only at output — with the remainder kept,
+       never discarded. Three nodes below: a run fit, a graded array, a hatch.</p>
+  </div>
+
+  <!-- ============ 1 · FIT ARRAY — the tile module as a live node ============ -->
+  <div class="section-label">Fit array — a run instead of a count</div>
+  <div class="param-row">
+    <div class="param"><label for="fitRun">run</label>
+      <input class="param-input" id="fitRun" type="text" spellcheck="false" maxlength="60" autocomplete="off" autocapitalize="off" value="10'"></div>
+    <div class="param"><label for="fitItem">item</label>
+      <input class="param-input" id="fitItem" type="text" spellcheck="false" maxlength="60" autocomplete="off" autocapitalize="off" value="12&quot;"></div>
+    <div class="param"><label for="fitGap">gap</label>
+      <input class="param-input" id="fitGap" type="text" spellcheck="false" maxlength="60" autocomplete="off" autocapitalize="off" value="1/4&quot;"></div>
+  </div>
+  <div class="answer-card">
+    <div class="answer-card-label" id="fitLabel"></div>
+    <div class="demo-figure" id="fitFig"></div>
+    <div class="proof" id="fitProof"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ============ 2 · ARRAY WITH A TWEEN — powercopy inputs, graded ============ -->
+  <div class="section-label">Array with a tween — one template, graded inputs</div>
+  <div class="param-row">
+    <div class="param"><label for="twCount">count</label>
+      <input class="param-input num" id="twCount" type="number" inputmode="numeric" min="1" max="60" step="1" value="7"></div>
+    <div class="param"><label for="twFrom">width from</label>
+      <input class="param-input" id="twFrom" type="text" spellcheck="false" maxlength="60" autocomplete="off" autocapitalize="off" value="1&quot;"></div>
+    <div class="param"><label for="twTo">width to</label>
+      <input class="param-input" id="twTo" type="text" spellcheck="false" maxlength="60" autocomplete="off" autocapitalize="off" value="4&quot;"></div>
+  </div>
+  <div class="answer-card">
+    <div class="answer-card-label" id="twLabel"></div>
+    <div class="demo-figure" id="twFig"></div>
+    <div class="proof" id="twProof"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ============ 3 · HATCH — watertight by construction ============ -->
+  <div class="section-label">Hatch — exact clipping, remainder bands shown</div>
+  <div class="param-row">
+    <div class="param"><label for="haAngle">angle °</label>
+      <input class="param-input num" id="haAngle" type="number" inputmode="decimal" step="any" value="30"></div>
+    <div class="param"><label for="haSpace">spacing</label>
+      <input class="param-input" id="haSpace" type="text" spellcheck="false" maxlength="60" autocomplete="off" autocapitalize="off" value="3/4&quot;"></div>
+  </div>
+  <div class="answer-card">
+    <div class="answer-card-label" id="haLabel"></div>
+    <div class="demo-figure" id="haFig"></div>
+    <div class="proof" id="haProof"></div>
+  </div>
+
+  <div class="mathnote" id="mathNote"></div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../calculators/lib/parse-length.js"></script>
+<script src="lib/rat.js"></script>
+<script src="lib/plane.js"></script>
+<script src="lib/geom2.js"></script>
+<script src="lib/model.js"></script>
+<script>
+(function () {
+  'use strict';
+  var R = window.Rat, P = window.Plane, G = window.Geom2, M = window.Model;
+  var rat = R.rat, pt = P.pt;
+  var IN = 24384, MM = 960;
+
+  function el(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  /* ---- display: exact units → architect language -------------------------- */
+  // whole/64ths formatter for a lattice value; falls back to decimal inches
+  function fmtUnits(u) {
+    var neg = u < 0 ? '−' : ''; u = Math.abs(u);
+    var whole = Math.floor(u / IN), rem = u % IN;
+    if (rem === 0) return neg + whole + '"';
+    var g = IN / 64;
+    if (rem % g === 0) {
+      var num = rem / g, den = 64;
+      while (num % 2 === 0) { num /= 2; den /= 2; }
+      return neg + (whole ? whole + ' ' : '') + num + '/' + den + '"';
+    }
+    return neg + (u / IN).toFixed(4) + '"';
+  }
+  // an exact rational in units → snapped 64ths + the held remainder
+  function fmtExact(x) {
+    var L = R.toLattice(x, IN / 64, 'nearest');
+    if (L.exact) return '<span class="fact">' + esc(fmtUnits(L.units)) + '</span>';
+    return '<span class="fact">' + esc(fmtUnits(L.units)) + '</span>'
+      + ' <span>(holds ' + esc(R.toString(L.rem)) + ' u)</span>';
+  }
+
+  function parseDim(text) {
+    var r = window.parseLength(text, { defaultUnit: 'in' });
+    if (!r || r.dimension !== 1 || r.units == null || r.units <= 0) return null;
+    return r.units;
+  }
+
+  /* ---- rendering: segments → SVG (toNumber is display-only, by contract) --- */
+  function draw(elFig, segments, extras, widthPx) {
+    var xs = [], ys = [];
+    segments.concat(extras || []).forEach(function (s) {
+      xs.push(R.toNumber(s.a.x), R.toNumber(s.b.x)); ys.push(R.toNumber(s.a.y), R.toNumber(s.b.y));
+    });
+    if (!xs.length) { elFig.innerHTML = ''; return; }
+    var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+    var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+    var w = Math.max(maxX - minX, 1), h = Math.max(maxY - minY, 1);
+    var W = Math.min(widthPx || 640, (elFig.clientWidth || 640)), pad = 8;
+    var sc = (W - 2 * pad) / w, H = Math.max(48, Math.ceil(h * sc) + 2 * pad);
+    function X(v) { return (pad + (R.toNumber(v) - minX) * sc).toFixed(2); }
+    function Y(v) { return (pad + (R.toNumber(v) - minY) * sc).toFixed(2); }
+    var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img">';
+    (extras || []).concat(segments).forEach(function (s) {
+      out += '<line class="' + (s.cls || (s.role === 'hatch' ? 'hatchl' : 'geo')) + '" x1="' + X(s.a.x) + '" y1="' + Y(s.a.y) + '" x2="' + X(s.b.x) + '" y2="' + Y(s.b.y) + '"/>';
+    });
+    out += '</svg>';
+    elFig.innerHTML = out;
+  }
+  function mark(a, b, cls) { return { a: a, b: b, cls: cls }; }
+
+  /* ---- 1 · fit array --------------------------------------------------------- */
+  var TILE = { params: ['w'], nodes: [{ kind: 'rect', w: { param: 'w' }, h: { param: 'w' } }] };
+
+  function renderFit() {
+    var run = parseDim(el('fitRun').value), item = parseDim(el('fitItem').value);
+    var gapT = el('fitGap').value.trim();
+    var gap = gapT === '' || gapT === '0' ? 0 : parseDim(gapT);
+    if (run == null || item == null || gap == null) { el('fitLabel').textContent = 'waiting for three lengths'; el('fitFig').innerHTML = ''; el('fitProof').innerHTML = ''; return null; }
+    var node = { kind: 'fitArray', run: rat(run), item: rat(item), gap: rat(gap),
+                 of: { kind: 'insert', template: TILE, args: { w: rat(item) } } };
+    var r = M.evalNode(node);
+    if (!r.feasible) { el('fitLabel').textContent = 'no fit'; el('fitFig').innerHTML = ''; el('fitProof').textContent = r.note; return null; }
+    el('fitLabel').textContent = r.count + ' whole items — the leftover is drawn, not hidden';
+    var extras = [];
+    // the residual, marked at the far end at half item height
+    if (!r.exact) {
+      var y = R.div(rat(item), 2);
+      extras.push(mark(pt(r.used, y), pt(rat(run), y), 'resid'));
+    }
+    extras.push(mark(pt(rat(0), rat(item)), pt(rat(run), rat(item)), 'ghost'));   // the run line
+    draw(el('fitFig'), r.segments, extras);
+    el('fitProof').innerHTML = 'count = floor((run + gap) / (item + gap)) = <span class="fact">' + r.count + '</span>'
+      + ' &middot; end cut ' + fmtExact(r.residual)
+      + '<br>run identity, exact: count·item + (count−1)·gap + cut = run — '
+      + '<span class="fact is-answer">' + esc(fmtUnits(run)) + '</span>';
+    return { run: run, item: item, gap: gap, r: r };
+  }
+
+  /* ---- 2 · tween array --------------------------------------------------------- */
+  var BAR = { params: ['w'], nodes: [{ kind: 'rect', w: { param: 'w' }, h: rat(2 * IN) }] };
+
+  function renderTween() {
+    var n = parseInt(el('twCount').value, 10);
+    var from = parseDim(el('twFrom').value), to = parseDim(el('twTo').value);
+    if (!Number.isInteger(n) || n < 1 || n > 60 || from == null || to == null) { el('twLabel').textContent = 'waiting for a count and two widths'; el('twFig').innerHTML = ''; el('twProof').innerHTML = ''; return null; }
+    var step = Math.max(from, to) + IN / 2;
+    var r = M.evalNode({
+      kind: 'array', count: n, step: { x: rat(step), y: rat(0) },
+      of: { kind: 'insert', template: BAR, args: { w: { param: 'w' } } },
+      tween: { w: { from: rat(from), to: rat(to) } }
+    });
+    el('twLabel').textContent = n + ' instances of one template — width graded exactly across the array';
+    draw(el('twFig'), r.segments);
+    // the interior widths are exact rationals; show the second one snapped + held
+    var mid = n > 2 ? R.add(rat(from), R.div(R.mul(R.sub(rat(to), rat(from)), rat(1)), rat(n - 1))) : rat(from);
+    el('twProof').innerHTML = 'instance i takes width from + (to − from)·i/(n−1), an exact rational.'
+      + (n > 2 ? '<br>instance 1: ' + fmtExact(mid) + ' — held, not rounded away' : '');
+    return { n: n, from: from, to: to };
+  }
+
+  /* ---- 3 · hatch ------------------------------------------------------------------ */
+  function renderHatch() {
+    var deg = parseFloat(el('haAngle').value);
+    var sp = parseDim(el('haSpace').value);
+    if (!isFinite(deg) || sp == null) { el('haLabel').textContent = 'waiting for an angle and a spacing'; el('haFig').innerHTML = ''; el('haProof').innerHTML = ''; return null; }
+    var t = P.halfTanForDegrees(deg);
+    // the region: an 8×5" sheet with a notch — non-convex on purpose
+    var poly = [pt(0, 0), pt(8 * IN, 0), pt(8 * IN, 5 * IN), pt(5 * IN, 5 * IN), pt(5 * IN, 3 * IN), pt(0, 3 * IN)];
+    var r = M.evalNode({ kind: 'hatch', poly: poly, spacing: rat(sp), t: t });
+    var outline = [];
+    for (var i = 0; i < poly.length; i++) outline.push(mark(poly[i], poly[(i + 1) % poly.length], 'geo'));
+    if (!r.feasible) { el('haLabel').textContent = 'no hatch'; draw(el('haFig'), [], outline); el('haProof').textContent = r.note; return null; }
+    el('haLabel').textContent = r.lines + ' lines · pattern anchored to the shared origin';
+    draw(el('haFig'), r.segments, outline);
+    // live watertightness proof: every endpoint exactly on the boundary
+    var checked = 0, onEdge = 0;
+    r.segments.forEach(function (s) {
+      [s.a, s.b].forEach(function (p) {
+        checked++;
+        for (var i = 0; i < poly.length; i++) {
+          if (G.onSegment(p, poly[i], poly[(i + 1) % poly.length])) { onEdge++; return; }
+        }
+      });
+    });
+    el('haProof').innerHTML = 'angle captured once as the rational t = <span class="fact">' + esc(R.toString(t)) + '</span>'
+      + ' (exact from here on) &middot; edge bands ' + fmtExact(r.residuals[0].value) + ' and ' + fmtExact(r.residuals[1].value)
+      + '<br>watertight, verified live: <span class="fact is-answer">' + onEdge + ' / ' + checked + '</span> endpoints lie exactly on the boundary — zero epsilon.';
+    return { deg: deg, t: t, r: r };
+  }
+
+  /* ---- the engine footnote ----------------------------------------------------------- */
+  function note() {
+    el('mathNote').innerHTML = '<b>kernel</b> — cad/lib on the engine lattice, 1 unit = 1/960 mm:<br>'
+      + 'rat.js exact rationals (BigInt) · plane.js exact transforms (rotation = rational half-angle tangent) · '
+      + 'geom2.js exact predicates &amp; intersections · model.js parametric nodes (insert / array / fitArray / hatch).<br>'
+      + 'Rounding happens only at display, to 1/64" — and each rounded value shows the remainder it holds.';
+  }
+
+  function renderAll() { renderFit(); renderTween(); renderHatch(); note(); }
+  ['fitRun', 'fitItem', 'fitGap', 'twCount', 'twFrom', 'twTo', 'haAngle', 'haSpace'].forEach(function (id) {
+    el(id).addEventListener('input', renderAll);
+    el(id).addEventListener('focus', function () { setTimeout(function () { el(id).select(); }, 0); });
+  });
+  renderAll();
+})();
+</script>
+</body>
+</html>
