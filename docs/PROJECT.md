@@ -79,7 +79,18 @@ They are part of the site structure, but they do not need premature renaming or 
 ├── c/
 │   └── index.html                  # C-0 calculators cover/index (future or alias)
 ├── l/
-│   └── index.html                  # L-0 library/reference cover (future)
+│   ├── index.html                  # L-0 library/reference cover (future — deferred until a second L item)
+│   ├── furniture.html              # Furniture Fit — parametric furniture w/ clearances, first draft (dev, noindexed)
+│   └── lib/
+│       ├── catalog.js              # Parametric furniture makers (params → parts + clearance zones + wall rules)
+│       └── fitmath.js              # Placement math: world boxes, wall sides, edge snapping, conflict sweep
+├── cad/
+│   ├── index.html                  # CAD Basis — exact-kernel demo page (dev, noindexed)
+│   └── lib/                        # The EXACT kernel (BigInt rationals; see docs/In Progress/cad-basis.md)
+│       ├── rat.js                  # Exact rationals over the lattice; toLattice = snap + held remainder
+│       ├── plane.js                # Exact points/transforms; rational half-angle-tangent rotations
+│       ├── geom2.js                # Exact predicates + intersections; outward lattice bbox
+│       └── model.js                # Parametric nodes: insert (powercopy) / array+tweens / fitArray / hatch
 ├── assets/
 │   ├── css/
 │   │   ├── global.css              # Shared theme + components (imports tokens.css)

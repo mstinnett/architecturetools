@@ -82,6 +82,14 @@ of standards behind the tools with editions, access, and source links — is
 |---|---|---|---|
 | ANSI A108.02 | named as the spec-check pointer for tile joint-width variation — **no values quoted** | run (tiles mode, joint-relaxation note) | pointer only, by design |
 | ANSI/ASME Y14.1 sheet series | ANSI A–E sheet dimensions (8.5×11 … 34×44) | sheet-sizes | memory — standard published sizes; ARCH series is customary practice, no single standard cited |
+| ADA 2010 Standards §403.5.1 | 36″ minimum clear width of walking surfaces — the "36″ ADA floor" on the gondola aisle, checkout queue, and garment-rack info lines | l/furniture (catalog info lines) | **verified** 2026-07-19 — provision wording returned ([corada.com §403.5.1](https://www.corada.com/documents/2010ADAStandards/403-5-1), access-board.gov ch. 4) |
+| NKBA Kitchen Planning Guidelines | work aisle ≥42″ one cook / ≥48″ multi-cook; 36″ pass-only walkway — the kitchenette run's drawn 48″ aisle and note | l/furniture (kitchenette) | **verified** 2026-07-19 — guideline PDF ([media.nkba.org](https://media.nkba.org/uploads/2022/05/Kitchen-Planning-Guidelines.pdf)) |
+
+The furniture catalog's remaining dimensions (mattress sizes, table sizing,
+cubicle footprints, Lozier gondola modules, clearance bands) are **trade
+standards, not code** — each was cross-checked against an independent source
+in the 2026-07-19 research pass; the per-value list and sources live in
+`docs/In Progress/furniture-field-scan.md`.
 
 ## Deliberately uncited — named figures without a pinned section
 

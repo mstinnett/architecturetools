@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value provenance tags, sheet-sizes restyled; headless-Chromium render sweep green over all 14 pages — operator taste pass is what's left before promotions)_
+_Last updated: 2026-07-19 (two new product threads landed as first drafts, operator-directed: the Furniture Fit tool opens the L-series (`l/`), and the exact CAD kernel opens `cad/`; research pass behind both is in docs/In Progress. The calculator promotions still await the operator taste pass.)_
 
 ## Live architectural picture
 
@@ -55,8 +55,31 @@ _Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value pro
   `slope-calculator`, `stair-calculator`, and the pre-engine
   `occupant-load`/`egress-width`/`fixture-calc` lookups. Still off-engine:
   `parking-ratio.html` (zoning-adjacent, default out).
+- **Furniture Fit (`l/furniture.html` + `l/lib/`) — the L-series' first
+  working page (2026-07-19, first draft, noindexed).** Parametric furniture
+  MAKERS with clearances as included geometry: `catalog.js` (15 objects,
+  params → parts + clearance zones + wall-rule reconfiguration + derived
+  info; all integer units), `fitmath.js` (quarter-turn world boxes, wall-side
+  detection, edge snapping to furniture/zones/walls, conflict sweep with
+  stable kinds). The page is the site's first canvas + side-panel tool and
+  its touch-interaction reference (commit-on-lift drag, aggressive snap,
+  pinch/pan, panel as one declarative parameter language). Dimension
+  provenance: docs/In Progress/furniture-field-scan.md + REFERENCES.md.
+- **CAD basis (`cad/lib/` + `cad/index.html`) — a NEW second engine lineage
+  (2026-07-19, first draft, noindexed).** Exact rationals (BigInt) over the
+  same 1/960 mm lattice for what the integer engine cannot hold: exact
+  transforms (rational half-angle-tangent rotations), exact intersections,
+  parametric nodes (powercopy insert / tweened arrays / fitArray = the tile
+  module on rationals / watertight hatch). Late conversion only, via
+  `toLattice` → snapped integer + EXACT remainder; policy parity with
+  snap.js enforced by test. `calculators/lib` untouched; BigInt is the one
+  documented extension to the engine range convention. Design + roadmap:
+  docs/In Progress/cad-basis.md; interaction language: touch-cad-ui.md.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
-  C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
+  C-series (calculators), L-series (library — now real: `l/` exists with the
+  Fit tool; L-0 cover deferred until the set has a second item, the C-0
+  precedent). `cad/` is a named workbench product outside the lettered sets
+  for now. Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
   warm sheet theme; imports `assets/css/tokens.css`, the canonical color
   palette; owns the per-family accent system selected via `data-family` on
@@ -103,6 +126,19 @@ _Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value pro
 
 ## Recent decisions
 
+- 2026-07-19 — **Two product threads opened as first drafts** (operator-
+  directed; detail in backlog "Done"). (a) Furniture Fit: parametric
+  primitives over fixed blocks, clearances as first-class snap-and-warn
+  geometry, wall intelligence in the catalog data not the page code, drawn
+  zones = the comfortable tier with minimums stated in prose. (b) CAD basis:
+  a second engine lineage on BigInt rationals — exactness held through
+  transforms/intersections, rounding only at output with the remainder kept
+  (the engine's residual contract lifted to geometry); rotations stored as
+  rational half-angle tangents, arbitrary angles quantized ONCE at input.
+  Both noindexed on the claude/furniture-fit-tool branch pending operator
+  review; a 7-agent research pass (field scan, dimension verification,
+  touch UI, exact-geometry practice) backs both — products in
+  docs/In Progress/ (furniture-field-scan, touch-cad-ui, cad-basis).
 - 2026-06-10 — **The calculator build-out** (operator-directed, three passes in
   one day; per-tool records live in backlog "Done"). Eleven tool pages + five
   engine/figure modules + the C-0 cover, all on the shell conventions; the
@@ -144,6 +180,12 @@ _Last updated: 2026-06-10 (third pass: fixtures + exits built with per-value pro
 
 ## Active concerns
 
+- **The two new first drafts await the operator: taste pass + real-device
+  touch review.** Fit tool and CAD demo are gate-green and smoke-tested but
+  have not been touched on an actual tablet; snap radii and pinch feel are
+  tuned from research figures, not device testing. Follow-up thread lives at
+  the top of the backlog (tiered clearance ranges, layout templates, undo +
+  marking menu, interval-on-curve, the feet-inch keypad).
 - **Eleven new tools + C-0 await the operator's taste pass, then promotion.**
   Gate-green, 185 jsdom checks, and now RENDERED: a Puppeteer/headless-Chromium
   sweep (installed in the session sandbox via npm; harness in /tmp/smoke, not
