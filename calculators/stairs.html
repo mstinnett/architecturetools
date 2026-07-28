@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Stairs -- architecture.tools</title>
+<meta name="description" content="Equal risers from a total rise: every workable count with its riser height, its distance from the IRC or IBC limit, comfort-rule treads, and the layout drift drawn on a true-scale section.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover the two-field input row, the
+     candidate table, and the citation line. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .duo-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-lg); }
+  .duo { display: flex; flex-direction: column; }
+  .duo label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+               text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .duo-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+               font-size: 1.05rem; font-weight: 400; width: 10.5em; max-width: 100%;
+               color: var(--ink); background: var(--card);
+               padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+               box-shadow: var(--shadow-well); border-radius: var(--radius);
+               outline: none; -webkit-appearance: none; appearance: none; }
+  .duo-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .duo-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 14em; }
+
+  /* candidate table — one row per riser count; the rows are buttons */
+  .cand-rows { margin-top: var(--space-sm); }
+  .cand-row { display: flex; align-items: baseline; width: 100%; text-align: left;
+              padding: 0.45rem 0.3rem; border: none; border-bottom: var(--border-light);
+              background: none; cursor: pointer; font-weight: 300; }
+  .cand-row:hover { background: var(--card-2); }
+  .cand-row.sel { background: var(--accent-soft); }
+  .cand-row .c-n { width: 5.2em; flex-shrink: 0; font-size: var(--text-sm); color: var(--ink-2); }
+  .cand-row.sel .c-n { color: var(--ink); font-weight: 400; }
+  .cand-row .c-riser { width: 8.5em; flex-shrink: 0; font-size: var(--text-md); }
+  .cand-row .c-vs { flex: 1; font-size: var(--text-sm); color: var(--ink-2); }
+  .cand-row .c-run { width: 8em; text-align: right; font-size: var(--text-sm); color: var(--ink-2); }
+  .cand-head { display: flex; padding: 0 0.3rem 0.3rem; border-bottom: 1px solid var(--ink-2); }
+  .cand-head span { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .cand-head .c-n { width: 5.2em; } .cand-head .c-riser { width: 8.5em; }
+  .cand-head .c-vs { flex: 1; } .cand-head .c-run { width: 8em; text-align: right; }
+  .cite { margin-top: var(--space-sm); font-size: var(--text-xs); color: var(--ink-3); line-height: 1.7; }
+  /* the design inverse: what floor-to-floor closes clean */
+  .ftf-note { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.6; margin: 0.2rem 0 0; max-width: 44em; }
+  .ftf-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin-top: var(--space-sm); }
+  .ftf-table th, .ftf-table td { text-align: right; padding: 0.4rem 0.55rem;
+    border-bottom: var(--border-light); font-variant-numeric: tabular-nums; }
+  .ftf-table th { color: var(--ink-3); font-weight: 400; font-size: var(--text-xs);
+    text-transform: uppercase; letter-spacing: 0.06em; }
+  .ftf-table td:first-child, .ftf-table th:first-child { text-align: left; }
+  .ftf-table tr.sel td { box-shadow: inset 2px 0 0 var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+  @media (max-width: 540px) { .cand-row .c-run, .cand-head .c-run { display: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Stairs</span>
+    </nav>
+    <h1>Stairs</h1>
+    <p>Type the floor-to-floor rise. Every workable riser count is a row — its
+       riser height, where that sits against the reference limit you choose,
+       and the run it needs. Pick a row and the section draws to scale, drift
+       included. The choice stays yours.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: total rise + optional tread -->
+  <div class="duo-row">
+    <div class="duo">
+      <label for="riseInput">total rise — floor to floor</label>
+      <input type="text" id="riseInput" class="duo-input dim-input" style="width:12em;" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 9'-1 1/8&quot;  ·  2.75m" autofocus>
+      <div class="duo-note" id="riseNote"></div>
+    </div>
+    <div class="duo">
+      <label for="treadInput">tread depth (optional)</label>
+      <input type="text" id="treadInput" class="duo-input" spellcheck="false" maxlength="40"
+             autocomplete="off" autocapitalize="off" placeholder="reference min if blank">
+      <div class="duo-note" id="treadNote"></div>
+    </div>
+  </div>
+  <div class="bare-ask" id="bareAsk"></div>
+
+  <!-- slot 2 · tool controls: the reference (edition pill) + layout grid -->
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Read against</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-ref="irc">IRC 2021</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-ref="ibc">IBC 2021</button>
+    </div>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <div id="stairOut" style="display:none;">
+      <div class="section-label">Lay out risers to</div>
+      <div class="grid-presets" id="gridPresets"></div>
+
+      <!-- slot 5 · ANSWER CARD: the section for the selected count -->
+      <div class="answer-card">
+        <div class="answer-card-label" id="figLabel"></div>
+        <div class="figure-wrap" id="figure"></div>
+        <div class="snap-rows" id="detailRows"></div>
+      </div>
+
+      <!-- slot 6 · every candidate count, yours to pick -->
+      <div class="ratio-box">
+        <div class="section-label" id="candLabel">Riser counts that land between 4&Prime; and 8 1/2&Prime;</div>
+        <div class="cand-head"><span class="c-n">risers</span><span class="c-riser">each</span><span class="c-vs">against the limit</span><span class="c-run">run needed</span></div>
+        <div class="cand-rows" id="candRows"></div>
+        <div class="cite" id="citeLine"></div>
+      </div>
+
+      <!-- the design inverse: while the floor-to-floor is still yours to set,
+           what each count allows and where the risers close with no drift -->
+      <div class="ratio-box">
+        <div class="section-label">Across The Floor-To-Floor</div>
+        <p class="ftf-note" id="ftfNote"></p>
+        <table class="ftf-table" id="ftfTable"></table>
+      </div>
+    </div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/partition.js"></script>
+<script src="lib/stairfig.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+  var MAX_ROWS = 30;
+
+  /* The references — facts with citations, selected by the edition pill.
+     Limits live as EXACT inch lattice values; the page locates each
+     candidate against them and never colors a verdict. */
+  var REFS = {
+    irc: {
+      label: 'IRC 2021', riserMax: 7 * IN + 3 * (IN / 4), riserMin: null, treadMin: 10 * IN,
+      cite: 'IRC 2021 — R311.7.5.1 riser height max 7 3/4"; R311.7.5.2 tread depth min 10".'
+    },
+    ibc: {
+      label: 'IBC 2021', riserMax: 7 * IN, riserMin: 4 * IN, treadMin: 11 * IN,
+      cite: 'IBC 2021 — 1011.5.2 riser height 4" min / 7" max; tread depth min 11".'
+    }
+  };
+  var CITE_TAIL = ' Local amendments and exceptions (spiral, dwelling-unit, existing) change these — verify the edition that governs your project.';
+
+  // the band of risers worth listing at all (display bound, not a rule)
+  var SHOW_MIN = 4 * IN, SHOW_MAX = 8 * IN + IN / 2;
+
+  var state = {
+    rise: '', tread: '',
+    defaultUnit: 'in',
+    ref: 'irc',
+    selN: null,                 // selected riser count; null → the anchor row
+    target: 'imperial',
+    gridUiSystem: null,
+    grid: { imperial: { denom: 16 }, metric: { mm: 1 } }
+  };
+
+  var els = {};
+  ['riseInput','treadInput','riseNote','treadNote','bareAsk','echo','echoLine','echoAssume',
+   'stairOut','gridPresets','figLabel','figure','detailRows','candLabel','candRows','ftfNote','ftfTable','citeLine','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+
+  function fmtLen(u) {
+    if (state.target === 'metric') return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+  function currentGridCount() {
+    if (state.target === 'imperial') return Math.round(IN / state.grid.imperial.denom);
+    return Math.round(state.grid.metric.mm * MM);
+  }
+
+  function parseDim(text) { return parseLength(text, { defaultUnit: state.defaultUnit }); }
+  function readDim(text) {
+    if (!text.trim()) return null;
+    var r = parseDim(text);
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length', result: r };
+    if (outOfRange(r.units) || r.units <= 0) return { error: r.units <= 0 ? 'must be more than zero' : 'out of range', result: r };
+    return { units: r.units, result: r };
+  }
+
+  function renderBareAsk(res) {
+    els.bareAsk.innerHTML = '';
+    if (!res || res.error || !res.result) return;
+    var terms = res.result.interpretation.terms || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;
+    function pick(u, label) {
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+    Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+    });
+  }
+
+  /* ---- grid presets (riser layout precision) -------------------------------- */
+  function buildGridPresets() {
+    var html = '';
+    function box(attr, v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-' + attr + '="' + v + '">' + label + '</button>'; }
+    if (state.target === 'imperial') {
+      var labels = { 8: '1/8', 16: '1/16', 32: '1/32' };
+      html += '<div class="grid-row">';
+      [8, 16, 32].forEach(function (d) { html += box('denom', d, labels[d]); });
+      html += '</div>';
+    } else {
+      html += '<div class="grid-row"><span class="grid-group-label">mm</span>';
+      [0.5, 1, 5].forEach(function (m) { html += box('mm', m, m); });
+      html += '</div>';
+    }
+    els.gridPresets.innerHTML = html;
+    state.gridUiSystem = state.target;
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      box.addEventListener('click', function () {
+        if (box.dataset.denom) state.grid.imperial.denom = +box.dataset.denom;
+        if (box.dataset.mm) state.grid.metric.mm = +box.dataset.mm;
+        render();
+      });
+    });
+  }
+  function renderGridPresets() {
+    if (state.gridUiSystem !== state.target) buildGridPresets();
+    var active = state.target === 'imperial' ? state.grid.imperial.denom : state.grid.metric.mm;
+    var attr = state.target === 'imperial' ? 'denom' : 'mm';
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      UI.press(box, +box.dataset[attr] === active);
+    });
+  }
+
+  /* ---- echo -------------------------------------------------------------------- */
+  function tokensOf(result) {
+    var parts = (result && result.interpretation && result.interpretation.parts) || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op' || p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+    return html;
+  }
+  function renderEcho(rise, tread, treadUsedNote) {
+    if (!rise) { els.echo.style.display = 'none'; return; }
+    var html = '<span class="op">rise </span>' + tokensOf(rise.result);
+    if (rise.error) html += '<span class="eq">—</span><span class="op">' + escapeHtml(rise.error) + '</span>';
+    else html += '<span class="eq">=</span><span class="result">' + escapeHtml(fmtLen(rise.units)) + '</span>';
+    if (tread && !tread.error) html += '<span class="op"> · tread </span>' + tokensOf(tread.result);
+    els.echoLine.innerHTML = html;
+    var asm = [];
+    if (rise.result && rise.result.interpretation) asm = asm.concat(rise.result.interpretation.assumptions || []);
+    if (treadUsedNote) asm.push(treadUsedNote);
+    var seen = {};
+    asm = asm.filter(function (a) { if (seen[a]) return false; seen[a] = true; return true; });
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- the candidates ------------------------------------------------------------ */
+  function candidates(riseU, grid) {
+    var nMin = Math.max(1, Math.ceil(riseU / SHOW_MAX));
+    var nMax = Math.max(nMin, Math.floor(riseU / SHOW_MIN));
+    var capped = false;
+    if (nMax - nMin + 1 > MAX_ROWS) { nMax = nMin + MAX_ROWS - 1; capped = true; }
+    var list = [];
+    for (var n = nMin; n <= nMax; n++) {
+      var L = Partition.sections(riseU, n, { grid: grid, dir: 'nearest' });
+      if (!L.feasible) continue;
+      list.push({ n: n, riser: L.item, residual: L.residual });
+    }
+    return { list: list, capped: capped };
+  }
+
+  // the anchor: the fewest risers whose height is at or under the reference max
+  // — a stated, factual basis for which row leads, not a recommendation
+  function anchorN(list, ref) {
+    for (var i = 0; i < list.length; i++) if (list[i].riser <= ref.riserMax) return list[i].n;
+    return list.length ? list[list.length - 1].n : null;
+  }
+
+  function vsLimit(riser, ref) {
+    var d = riser - ref.riserMax;
+    var s;
+    if (d === 0) s = 'exactly the ' + ref.label + ' max';
+    else if (d < 0) s = escapeHtml(NumberLine.formatResidual(d, state.target)) + ' under the max';
+    else s = 'over the max by ' + escapeHtml(NumberLine.formatResidual(d, state.target).replace('+', ''));
+    if (ref.riserMin != null && riser < ref.riserMin) s = 'under the ' + ref.label + ' 4" minimum';
+    return s;
+  }
+
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  function render() {
+    var rise = readDim(state.rise);
+    var tread = readDim(state.tread);
+    if (rise && !rise.error && rise.result) {
+      var sys = rise.result.unitSystem;
+      var stated = (rise.result.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+      if (stated && (sys === 'imperial' || sys === 'metric')) {
+        state.target = sys;
+        state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+      }
+    }
+    syncURL();
+    els.riseNote.innerHTML = rise && rise.error ? escapeHtml(rise.error) : '';
+    els.treadNote.innerHTML = tread && tread.error ? escapeHtml(tread.error) : '';
+    renderBareAsk(rise);
+
+    var ref = REFS[state.ref];
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ref]'), function (el) {
+      UI.press(el, el.dataset.ref === state.ref);
+    });
+
+    var treadU = tread && !tread.error ? tread.units : null;
+    var treadUsedNote = null;
+    if (treadU == null) treadUsedNote = 'run estimated at the ' + ref.label + ' minimum tread, ' + fmtLen(ref.treadMin) + ' — type a tread to use yours';
+    var treadUsed = treadU != null ? treadU : ref.treadMin;
+
+    renderEcho(rise, tread, rise && !rise.error ? treadUsedNote : null);
+    if (!rise || rise.error) {
+      els.stairOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    els.stairOut.style.display = '';
+    renderGridPresets();
+
+    var riseU = rise.units;
+    var grid = currentGridCount();
+    var c = candidates(riseU, grid);
+    var list = c.list;
+    if (!list.length) {
+      els.candRows.innerHTML = '<div class="cand-row"><span class="c-vs">no count lands between 4" and 8 1/2" — that rise is a ramp or a ladder, not a stair</span></div>';
+      els.ftfNote.textContent = ''; els.ftfTable.innerHTML = '';
+      els.figure.innerHTML = ''; els.detailRows.innerHTML = ''; els.figLabel.textContent = '';
+      els.citeLine.innerHTML = escapeHtml(ref.cite + CITE_TAIL);
+      els.mathNote.innerHTML = '';
+      return;
+    }
+
+    var anchor = anchorN(list, ref);
+    var selN = state.selN;
+    if (!list.some(function (r) { return r.n === selN; })) selN = anchor;
+    var sel = list.filter(function (r) { return r.n === selN; })[0];
+
+    // the candidate table
+    var rows = '';
+    list.forEach(function (r) {
+      var runU = (r.n - 1) * treadUsed;
+      rows += '<button type="button" class="cand-row' + (r.n === selN ? ' sel' : '') + '" data-n="' + r.n + '" aria-pressed="' + (r.n === selN) + '">'
+        + '<span class="c-n">' + r.n + (r.n === anchor ? ' ·' : '') + '</span>'
+        + '<span class="c-riser">' + escapeHtml(fmtLen(r.riser)) + '</span>'
+        + '<span class="c-vs">' + vsLimit(r.riser, ref) + '</span>'
+        + '<span class="c-run">' + escapeHtml(fmtLen(runU)) + '</span>'
+        + '</button>';
+    });
+    els.candRows.innerHTML = rows;
+    els.candLabel.innerHTML = 'Riser counts that land between 4&Prime; and 8 1/2&Prime;'
+      + (c.capped ? ' — first ' + MAX_ROWS + ' shown' : '')
+      + ' <span style="text-transform:none;letter-spacing:0;">(· marks the fewest at or under the ' + ref.label + ' max)</span>';
+    els.citeLine.innerHTML = escapeHtml(ref.cite + CITE_TAIL);
+    Array.prototype.forEach.call(els.candRows.querySelectorAll('[data-n]'), function (b) {
+      b.addEventListener('click', function () { state.selN = +b.dataset.n; render(); });
+    });
+
+    // ---- the design inverse: what floor-to-floor closes clean --------------
+    // For each count: the floor-to-floor the reference allows, and the nearest
+    // floor-to-floor where its risers land exactly on the layout grid — no
+    // drift for the section to absorb. Dimensions to set, not to audit.
+    els.ftfNote.innerHTML = 'While the floor-to-floor is still yours to set: what each count allows under '
+      + escapeHtml(ref.label) + ', and the nearest floor-to-floor where its risers land exactly on the layout grid.';
+    var ftf = '<tr><th>Risers</th><th>' + escapeHtml(ref.label) + ' Allows</th><th>Clean Floor-To-Floor Near Yours</th></tr>';
+    list.forEach(function (r) {
+      var winCell = ref.riserMin != null
+        ? escapeHtml(fmtLen(r.n * ref.riserMin)) + ' – ' + escapeHtml(fmtLen(r.n * ref.riserMax))
+        : 'up to ' + escapeHtml(fmtLen(r.n * ref.riserMax));
+      var rStar = Math.round(riseU / r.n / grid) * grid;
+      if (rStar > ref.riserMax) rStar = Math.floor(ref.riserMax / grid) * grid;
+      if (ref.riserMin != null && rStar < ref.riserMin) rStar = Math.ceil(ref.riserMin / grid) * grid;
+      var Fp = r.n * rStar, dF = Fp - riseU;
+      ftf += '<tr' + (r.n === selN ? ' class="sel"' : '') + '><td>' + r.n + '</td><td>' + winCell + '</td>'
+           + '<td>' + escapeHtml(fmtLen(Fp)) + ' — ' + r.n + ' × ' + escapeHtml(fmtLen(rStar))
+           + (dF === 0 ? ' · yours closes exactly' : ' (' + (dF > 0 ? '+' : '−') + escapeHtml(fmtLen(Math.abs(dF))) + ')') + '</td></tr>';
+    });
+    els.ftfTable.innerHTML = ftf;
+
+    // the section + detail for the selected count
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    var resid = sel.residual;
+    els.figLabel.textContent = sel.n + ' risers of ' + fmtLen(sel.riser) + ' — section to scale';
+    els.figure.innerHTML = StairFig.stairfig({
+      riser: sel.riser, tread: treadUsed, count: sel.n, rise: riseU,
+      riserLabel: fmtLen(sel.riser), treadLabel: fmtLen(treadUsed),
+      riseLabel: fmtLen(riseU), runLabel: fmtLen((sel.n - 1) * treadUsed),
+      residLabel: resid === 0 ? null : NumberLine.formatResidual(resid, state.target) + ' drift',
+      width: width, height: 240
+    });
+
+    var exact = riseU / sel.n;
+    var html = '';
+    html += rowHtml('Riser', sel.n + ' equal, laid out to the grid', '<span class="fact">' + escapeHtml(fmtLen(sel.riser)) + '</span>',
+                    resid === 0 ? 'closes exactly' : escapeHtml(NumberLine.formatResidual(resid, state.target)) + ' drift', true);
+    if (resid !== 0) html += rowHtml('That drift', 'absorb it in one riser or spread it — yours to place',
+                    escapeHtml(fmtLen(Math.abs(resid))) + ' across ' + sel.n + ' risers', '—', false, 'is-ref');
+    html += rowHtml('Unsnapped riser', 'exactly equal, off any grid', escapeHtml(NumberLine.formatTrue(Math.round(exact), state.target)), '—', false, 'is-ref');
+    html += rowHtml('Tread', treadU != null ? 'as typed' : ref.label + ' minimum, assumed', escapeHtml(fmtLen(treadUsed)), '—', false);
+    html += rowHtml('Total run', (sel.n - 1) + ' treads', escapeHtml(fmtLen((sel.n - 1) * treadUsed)), '—', false);
+    // the classic comfort rules — located, labelled as rules of thumb
+    var rIn = sel.riser / IN, tIn = treadUsed / IN;
+    var c1 = 2 * rIn + tIn, c2 = rIn + tIn, c3 = rIn * tIn;
+    function locate(v, lo, hi, unit) {
+      var s = v.toFixed(1) + (unit || '');
+      if (v < lo) return s + ' — under the ' + lo + '–' + hi + ' band';
+      if (v > hi) return s + ' — over the ' + lo + '–' + hi + ' band';
+      return s + ' — inside the ' + lo + '–' + hi + ' band';
+    }
+    html += rowHtml('Comfort rules', 'rules of thumb, not code',
+      '<span style="font-size:var(--text-sm);">2R+T ' + escapeHtml(locate(c1, 24, 26, '"')) + '<br>R+T ' + escapeHtml(locate(c2, 17, 18, '"'))
+      + '<br>R×T ' + escapeHtml(locate(c3, 70, 75, '')) + '</span>', '—', false, 'is-ref');
+    els.detailRows.innerHTML = html;
+
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + 'rise = <b>' + riseU + '</b> units · ' + sel.n + ' risers → ' + riseU + ' / ' + sel.n + ' = ' + (riseU / sel.n).toFixed(2) + ' units'
+      + ' → snapped to grid ' + grid + ' = <b>' + sel.riser + '</b> units<br>'
+      + 'identity: ' + sel.n + '·' + sel.riser + ' + <b>' + resid + '</b> = ' + riseU + ' units ('
+      + escapeHtml(NumberLine.formatResidual(resid, state.target)) + ' drift)';
+  }
+
+  /* ---- shareable URL ----------------------------------------------------------------- */
+  // recent readings — the URL carries the whole state, so a recent
+  // restores the full reading (shared component: ui.js UI.recents)
+  var recents = UI.recents({ key: 'stairs', anchor: document.getElementById('riseInput'), entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: (state.rise || '') + (state.tread ? ' · ' + state.tread : ''), result: r ? r.textContent : '' };
+  } });
+
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.rise && state.rise !== "9'-1 1/8\"") params.set('d', state.rise);
+      if (state.tread) params.set('t', state.tread);
+      if (state.ref !== 'irc') params.set('c', state.ref);
+      if (state.selN != null) params.set('n', String(state.selN));
+      if (state.target === 'imperial' ? state.grid.imperial.denom !== 16 : state.grid.metric.mm !== 1) {
+        params.set('g', state.target === 'imperial' ? String(state.grid.imperial.denom) : state.grid.metric.mm + 'mm');
+      }
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    if (params.get('c') === 'ibc') state.ref = 'ibc';
+    var n = parseInt(params.get('n') || '', 10);
+    if (Number.isInteger(n) && n >= 1 && n <= 1000) state.selN = n;
+    var g = params.get('g');
+    if (g) {
+      var mm = /^([\d.]+)mm$/.exec(g);
+      if (mm && +mm[1] > 0) state.grid.metric.mm = Math.min(100000, Math.max(0.2, +mm[1]));
+      else if (/^\d+$/.test(g)) state.grid.imperial.denom = Math.min(256, Math.max(1, +g));
+    }
+    return {
+      d: params.get('d') != null ? params.get('d').slice(0, 80) : null,
+      t: params.get('t') != null ? params.get('t').slice(0, 40) : null
+    };
+  }
+
+  /* ---- wiring -------------------------------------------------------------------------- */
+  els.riseInput.addEventListener('input', function () { state.rise = els.riseInput.value; state.selN = null; render(); });
+  els.riseInput.addEventListener('focus', function () { setTimeout(function () { els.riseInput.select(); }, 0); });
+  els.treadInput.addEventListener('input', function () { state.tread = els.treadInput.value; render(); });
+  els.treadInput.addEventListener('focus', function () { setTimeout(function () { els.treadInput.select(); }, 0); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ref]'), function (el) {
+    el.addEventListener('click', function () { state.ref = el.dataset.ref; render(); });
+  });
+
+  // initial state — URL params override the worked example (9'-1 1/8" rise)
+  var u = initFromURL();
+  els.riseInput.value = u.d != null ? u.d : "9'-1 1/8\"";
+  els.treadInput.value = u.t != null ? u.t : '';
+  state.rise = els.riseInput.value;
+  state.tread = els.treadInput.value;
+  render();
+})();
+</script>
+</body>
+</html>

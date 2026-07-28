@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" data-family="accessibility">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Ramp -- architecture.tools</title>
+<meta name="description" content="Ramp length from a rise: runs at 1:12, 1:16, 1:20 with the 30-inch rise-per-run limit segmenting the ramp, landings counted and drawn, every reference cited — the layout drift shown, the choice yours.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover the citation line. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+  .cite { margin-top: var(--space-sm); font-size: var(--text-xs); color: var(--ink-3); line-height: 1.7; }
+  .fact { color: var(--ink); font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Ramp</span>
+    </nav>
+    <h1>Ramp</h1>
+    <p>Type the rise. Each reference slope turns it into a run; the 30&Prime;
+       rise-per-run limit breaks long ramps into segments with landings between,
+       counted and drawn in plan. The slope is yours to pick — each one says
+       where it stands.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the rise -->
+  <div class="section-label">Rise — level change to overcome</div>
+  <div class="field-wrap">
+    <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="80"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 30&quot;  ·  4'-2&quot;  ·  650mm" autofocus>
+    <div class="field-note" id="fieldNote"></div>
+    <div class="bare-ask" id="bareAsk"></div>
+  </div>
+
+  <!-- slot 2 · tool controls: the slope -->
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Slope</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-slope="12">1:12<span style="opacity:.7;"> — the 405.2 max</span></button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-slope="16">1:16</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-slope="20">1:20<span style="opacity:.7;"> — below this it's a walk</span></button>
+    </div>
+    <div class="opt-cluster">
+      <span class="grid-group-label">custom 1:</span>
+      <input class="grid-custom" id="customSlope" type="number" inputmode="numeric" min="2" max="100" step="1" placeholder="n" style="width:64px;">
+    </div>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 5 · ANSWER CARD: the plan figure + the numbers -->
+    <div class="answer-card" id="rampCard" style="display:none;">
+      <div class="answer-card-label" id="rampLabel"></div>
+      <div class="figure-wrap" id="figure"></div>
+      <div class="snap-rows" id="rampRows"></div>
+    </div>
+    <div class="cite" id="citeLine" style="display:none;"></div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/partition.js"></script>
+<script src="lib/runbar.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+
+  /* The reference figures (ADA 2010 Standards / ICC A117.1 §405; IBC §1012
+     mirrors them): running slope max 1:12 (405.2), rise per run max 30"
+     (405.6), landings 60" long minimum at top, bottom, and between runs
+     (405.7), cross slope max 1:48 (405.3). Alterations may go steeper where
+     space won't allow: 1:10 for rises to 6", 1:8 for rises to 3"
+     (405.2 Exception) — surfaced in the citation, never auto-applied. */
+  var MAX_SEG_RISE = 30 * IN;          // 30" rise per run
+  var LANDING = 60 * IN;               // 60" landing length
+  var CITE = 'ADA 2010 / ICC A117.1 §405 (IBC §1012 mirrors): running slope max 1:12 (405.2); rise per run max 30" (405.6); landings 60" long min at top, bottom, and between runs, at least as wide as the ramp, 60"×60" where the ramp turns (405.7); cross slope max 1:48 (405.3); handrails on rises over 6" (405.8). Alterations only, where space won\'t allow 1:12: up to 1:10 for rises ≤ 6", 1:8 for rises ≤ 3" (405.2 Exception). Verify the edition and scoping that govern your project.';
+
+  var state = {
+    text: '',
+    defaultUnit: 'in',
+    n: 12,                        // slope 1:n
+    customN: null,
+    target: 'imperial'
+  };
+  function currentN() { return state.customN != null ? state.customN : state.n; }
+
+  var els = {};
+  ['dimInput','fieldNote','bareAsk','customSlope','echo','echoLine','echoAssume',
+   'rampCard','rampLabel','figure','rampRows','citeLine','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+  function fmtLen(u) {
+    if (state.target === 'metric') return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+
+  /* ---- field notes + bare ask (as the converter) --------------------------- */
+  function pendingNote(text, result) {
+    if (!text || !result || !result.spans) return '';
+    var lines = [];
+    result.spans.forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = text.slice(sp.start, sp.end).trim();
+      if (!frag) return;
+      lines.push('ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : ''));
+    });
+    return lines.join('<br>');
+  }
+  function renderBareAsk(result) {
+    els.bareAsk.innerHTML = '';
+    if (!result || result.dimension !== 1 || result.units == null) return;
+    var terms = result.interpretation.terms || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;
+    function pick(u, label) {
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+    Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+    });
+  }
+
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  function render() {
+    var result = state.text ? parseLength(state.text, { defaultUnit: state.defaultUnit }) : null;
+    if (result && result.interpretation) {
+      var sys = result.unitSystem;
+      var stated = (result.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+      if (stated && (sys === 'imperial' || sys === 'metric')) {
+        state.target = sys;
+        state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+      }
+    }
+    syncURL();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-slope]'), function (b) {
+      UI.press(b, state.customN == null && +b.dataset.slope === state.n);
+    });
+    els.fieldNote.innerHTML = pendingNote(state.text, result);
+    renderBareAsk(result);
+
+    var n = currentN();
+    var ok = result && result.dimension === 1 && result.units != null
+          && !outOfRange(result.units) && result.units > 0;
+
+    // echo
+    if (!result) {
+      els.echo.style.display = 'none';
+    } else {
+      var html = '';
+      var parts = (result.interpretation && result.interpretation.parts) || [];
+      parts.forEach(function (p) {
+        if (p.type === 'op' || p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+        else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+      });
+      if (ok) {
+        html += '<span class="op"> at 1:' + n + ' </span><span class="eq">=</span><span class="result">'
+              + escapeHtml(fmtLen(result.units * n)) + '</span><span class="op"> of run</span>';
+      } else if (result.dimension !== 1 || result.units == null) {
+        html += '<span class="eq">—</span><span class="op">the rise needs to be a single length</span>';
+      } else if (result.units <= 0) {
+        html += '<span class="eq">—</span><span class="op">must be more than zero</span>';
+      } else {
+        html += '<span class="eq">=</span><span class="op">out of range</span>';
+      }
+      els.echoLine.innerHTML = html;
+      var asm = ((result.interpretation && result.interpretation.assumptions) || []).slice();
+      els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+      els.echo.style.display = '';
+    }
+
+    if (!ok || result.units * n > MAX_UNITS) {
+      els.rampCard.style.display = 'none';
+      els.citeLine.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+
+    var riseU = result.units;
+    var runU = riseU * n;                                     // exact: integer × integer
+    // segmentation: 405.6 caps each run at 30" of rise → k equal segments
+    // (equal is the buildable layout; the drift across segments is shown)
+    var k = Math.max(1, Math.ceil(riseU / MAX_SEG_RISE));
+    var grid = state.target === 'metric' ? MM : IN / 16;      // segment rises laid out to 1mm / 1/16"
+    var seg = Partition.sections(riseU, k, { grid: grid, dir: 'nearest' });
+    var segRise = seg.item, drift = seg.residual;
+    var segRun = segRise * n;                                 // exact per-segment run
+    var landings = k - 1;
+    var totalU = runU + landings * LANDING;
+
+    els.rampCard.style.display = '';
+    els.citeLine.style.display = '';
+    els.citeLine.innerHTML = escapeHtml(CITE);
+    els.rampLabel.textContent = '1:' + n + (k > 1 ? ' — ' + k + ' runs, ' + landings + (landings === 1 ? ' landing' : ' landings') + ' between' : ' — one run, no intermediate landing');
+
+    // the plan figure: run segments as items, landings as gaps (runbar's
+    // segment sum must close on the drawn total exactly)
+    var segs = [];
+    var drawn = 0;
+    for (var i = 0; i < k; i++) {
+      // distribute the run remainder exactly: give each segment segRun, the
+      // last one absorbs what's left of the exact total
+      var w = (i === k - 1) ? (runU - segRun * (k - 1)) : segRun;
+      segs.push({ w: w, kind: 'item', label: i === 0 ? 'run' : null });
+      drawn += w;
+      if (i < k - 1) { segs.push({ w: LANDING, kind: 'gap', label: i === 0 ? 'landing' : null }); drawn += LANDING; }
+    }
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    try {
+      els.figure.innerHTML = RunBar.runbar({
+        run: drawn, segments: segs, targetSystem: state.target,
+        denom: 16, width: width, caption: 'in plan — top and bottom landings not shown'
+      });
+    } catch (e) {
+      els.figure.innerHTML = '';
+    }
+
+    var html2 = '';
+    html2 += rowHtml('Sloped run', 'rise × ' + n + ' — exact', '<span class="fact">' + escapeHtml(fmtLen(runU)) + '</span>', '—', true);
+    if (k > 1) {
+      html2 += rowHtml('Runs', 'rise per run capped at 30" (405.6), split equally',
+                       k + ' × ' + escapeHtml(fmtLen(segRun)) + ' run <span class="snap-gloss">' + escapeHtml(fmtLen(segRise)) + ' rise each' + (drift !== 0 ? ' · ' + escapeHtml(NumberLine.formatResidual(drift, state.target)) + ' drift to place' : '') + '</span>', '—', false);
+      html2 += rowHtml('Landings between', '60" long each (405.7), level', landings + ' × ' + escapeHtml(fmtLen(LANDING)), '—', false);
+    } else {
+      html2 += rowHtml('Rise per run', 'under the 30" cap (405.6) — one run does it', escapeHtml(fmtLen(riseU)) + ' <span class="snap-gloss">of 30" allowed</span>', '—', false, 'is-ref');
+    }
+    html2 += rowHtml('Overall in plan', (k > 1 ? 'runs + intermediate landings; ' : '') + 'add a 60" landing at top and bottom (405.7)',
+                     escapeHtml(fmtLen(totalU)) + ' <span class="snap-gloss">+ 2 × ' + escapeHtml(fmtLen(LANDING)) + ' end landings = ' + escapeHtml(fmtLen(totalU + 2 * LANDING)) + '</span>', '—', false);
+    if (riseU > 6 * IN) html2 += rowHtml('Handrails', 'rise over 6" — both sides (405.8)', 'required', '—', false, 'is-ref');
+    els.rampRows.innerHTML = html2;
+
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + 'rise = <b>' + riseU + '</b> units · run = ' + riseU + ' × ' + n + ' = <b>' + runU + '</b> units — exact<br>'
+      + 'runs = ceil(' + riseU + ' / ' + MAX_SEG_RISE + ') = <b>' + k + '</b>'
+      + (k > 1 ? ' · segment rise = snap(' + riseU + ' / ' + k + ' → grid ' + grid + ') = <b>' + segRise + '</b>, drift <b>' + drift + '</b>' : '')
+      + '<br>overall = ' + runU + ' + ' + landings + ' × ' + LANDING + ' = <b>' + totalU + '</b> units between end landings';
+  }
+
+  /* ---- shareable URL ----------------------------------------------------------------- */
+  // recent readings — the URL carries the whole state, so a recent
+  // restores the full reading (shared component: ui.js UI.recents)
+  var recents = UI.recents({ key: 'ramp', anchor: document.getElementById('dimInput'), entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: (state.text || '') + ' · 1:' + currentN(), result: r ? r.textContent : '' };
+  } });
+
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.text && state.text !== '30"') params.set('d', state.text);
+      if (state.customN != null) params.set('s', 'c' + state.customN);
+      else if (state.n !== 12) params.set('s', String(state.n));
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var s = params.get('s');
+    if (s) {
+      var c = /^c(\d+)$/.exec(s);
+      if (c && +c[1] >= 2 && +c[1] <= 100) state.customN = +c[1];
+      else if (s === '12' || s === '16' || s === '20') state.n = +s;
+    }
+    var d = params.get('d');
+    return d != null ? d.slice(0, 80) : null;
+  }
+
+  /* ---- wiring -------------------------------------------------------------------------- */
+  els.dimInput.addEventListener('input', function () { state.text = els.dimInput.value; render(); });
+  els.dimInput.addEventListener('focus', function () { setTimeout(function () { els.dimInput.select(); }, 0); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-slope]'), function (b) {
+    b.addEventListener('click', function () {
+      state.n = +b.dataset.slope;
+      state.customN = null;
+      els.customSlope.value = '';
+      render();
+    });
+  });
+  els.customSlope.addEventListener('input', function () {
+    var v = parseInt(els.customSlope.value, 10);
+    state.customN = (Number.isInteger(v) && v >= 2 && v <= 100) ? v : null;
+    render();
+  });
+
+  // initial state — URL params override the worked example (a 30" rise)
+  var urlDim = initFromURL();
+  if (state.customN != null) els.customSlope.value = String(state.customN);
+  els.dimInput.value = urlDim != null ? urlDim : '30"';
+  state.text = els.dimInput.value;
+  render();
+})();
+</script>
+</body>
+</html>

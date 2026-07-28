@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-family="egress">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Occupant Load -- architecture.tools</title>
+<meta name="description" content="Occupant load from a typed area takeoff and an IBC Table 1004.5 factor — the exact quotient, the round-up the code's 'not less than' implies, and the gross/net basis surfaced, never silently applied.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover the factor picker and the
+     carry-forward link. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .use-box { min-width: 0; text-align: left; line-height: 1.3; }
+  .use-box .uf { display: block; font-size: var(--text-xs); opacity: 0.75; }
+  .custom-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.5rem; }
+  .cite { margin-top: var(--space-sm); font-size: var(--text-xs); color: var(--ink-3); line-height: 1.7; }
+  .carry { margin-top: var(--space-md); font-size: var(--text-sm); }
+  .fact { color: var(--ink); font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Occupant Load</span>
+    </nav>
+    <h1>Occupant Load</h1>
+    <p>Type the floor area the way you'd say it — chain spaces, subtract what
+       doesn't count — and pick the use. You get the exact quotient, the count
+       the code's &ldquo;not less than&rdquo; implies, and the gross-or-net basis of the
+       factor, said out loud instead of assumed.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the area, parser-fed -->
+  <div class="section-label" id="areaLabel">Floor area</div>
+  <div class="field-wrap">
+    <input type="text" id="dimInput" class="dim-input" spellcheck="false" maxlength="160"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 60' x 40'  ·  60'x40' − 12'x8'  ·  30m x 12m" autofocus>
+    <div class="field-note" id="fieldNote"></div>
+    <div class="bare-ask" id="bareAsk"></div>
+  </div>
+
+  <!-- slot 2 · tool controls: the use (the factor), grouped as the table groups them -->
+  <div class="section-label">Use — IBC 2021 Table 1004.5</div>
+  <div class="grid-presets" id="usePresets"></div>
+  <div class="custom-row">
+    <span class="grid-group-label">custom · 1 occupant per</span>
+    <input class="grid-custom" id="customFactor" type="number" inputmode="numeric" min="1" max="10000" step="1" placeholder="ft²" style="width:70px;">
+    <span class="grid-group-label">ft²</span>
+    <button type="button" class="grid-box" aria-pressed="false" data-cnet="gross">gross</button>
+    <button type="button" class="grid-box" aria-pressed="false" data-cnet="net">net</button>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 5 · ANSWER CARD -->
+    <div class="answer-card" id="olCard" style="display:none;">
+      <div class="answer-card-label" id="olLabel"></div>
+      <div class="snap-rows" id="olRows"></div>
+      <div class="carry" id="carry"></div>
+    </div>
+    <div class="cite" id="citeLine" style="display:none;"></div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script>
+(function () {
+  'use strict';
+  var MAX_AREA_MM2 = 1e16;
+  var FT2_MM2 = 92903.04;
+  function areaOutOfRange(mm2) { return !Number.isFinite(mm2) || Math.abs(mm2) > MAX_AREA_MM2; }
+
+  /* IBC 2021 Table 1004.5 — a curated set of the factors architects reach for.
+     Each is ft² per occupant with its gross/net basis; the basis is SURFACED
+     (echoed as an assumption about what area to feed in), never silently
+     applied. Mercantile is the flat 60 gross the code moved to in 2015 (the
+     old 30/60 floor split is gone). Anything not here goes in the custom
+     field. */
+  var GROUPS = [
+    { label: 'assembly', uses: [
+      { id: 'a-conc', use: 'concentrated — chairs only', f: 7, net: true },
+      { id: 'a-stand', use: 'standing space', f: 5, net: true },
+      { id: 'a-unconc', use: 'unconcentrated — tables + chairs', f: 15, net: true },
+      { id: 'a-exhibit', use: 'exhibit / museum', f: 30, net: true },
+      { id: 'a-gaming', use: 'gaming floors', f: 11, net: false },
+      { id: 'a-stage', use: 'stages + platforms', f: 15, net: true },
+      { id: 'a-pool', use: 'pool — water surface', f: 50, net: false },
+      { id: 'a-deck', use: 'pool / rink decks', f: 15, net: false },
+      { id: 'a-exercise', use: 'exercise rooms', f: 50, net: false }
+    ]},
+    { label: 'business', uses: [
+      { id: 'b', use: 'business areas', f: 150, net: false },
+      { id: 'b-conc', use: 'concentrated business — call centers, trading', f: 50, net: false },
+      { id: 'b-kitchen', use: 'commercial kitchens', f: 200, net: false }
+    ]},
+    { label: 'educational', uses: [
+      { id: 'e-class', use: 'classroom', f: 20, net: true },
+      { id: 'e-shop', use: 'shops / vocational', f: 50, net: true },
+      { id: 'e-daycare', use: 'day care', f: 35, net: true },
+      { id: 'lib-read', use: 'library reading rooms', f: 50, net: true },
+      { id: 'lib-stack', use: 'library stacks', f: 100, net: false }
+    ]},
+    { label: 'mercantile · storage', uses: [
+      { id: 'm', use: 'mercantile', f: 60, net: false },
+      { id: 'm-stock', use: 'storage / stock / shipping', f: 300, net: false },
+      { id: 's-warehouse', use: 'warehouses', f: 500, net: false },
+      { id: 's-mech', use: 'accessory storage / mechanical', f: 300, net: false },
+      { id: 's-parking', use: 'parking garages', f: 200, net: false }
+    ]},
+    { label: 'institutional · residential', uses: [
+      { id: 'i-in', use: 'inpatient treatment', f: 240, net: false },
+      { id: 'i-out', use: 'outpatient', f: 100, net: false },
+      { id: 'i-sleep', use: 'institutional sleeping', f: 120, net: false },
+      { id: 'r', use: 'residential', f: 200, net: false },
+      { id: 'r-dorm', use: 'dormitories', f: 50, net: false },
+      { id: 'r-locker', use: 'locker rooms', f: 50, net: false }
+    ]},
+    { label: 'industrial', uses: [
+      { id: 'f', use: 'industrial areas', f: 100, net: false },
+      { id: 'f-hangar', use: 'aircraft hangars', f: 500, net: false },
+      { id: 'f-agri', use: 'agricultural', f: 300, net: false }
+    ]}
+  ];
+  function findUse(id) {
+    var hit = null;
+    GROUPS.forEach(function (g) { g.uses.forEach(function (u) { if (u.id === id) hit = u; }); });
+    return hit;
+  }
+
+  var CITE = 'IBC 2021 — Table 1004.5 occupant load factors; §1004.5 requires a load "not less than" area ÷ factor, so a fractional result reads up. Fixed-seating spaces count seats instead (§1004.6); the building official can approve an actual lower number (§1004.5.1). Local amendments vary — verify the edition and amendments that govern your project.';
+
+  var state = {
+    text: '',
+    defaultUnit: 'in',
+    useId: 'b',
+    customF: null,                 // a typed custom factor (wins while set)
+    customNet: 'gross',
+    target: 'imperial'
+  };
+  function currentFactor() {
+    if (state.customF != null) return { use: 'custom', f: state.customF, net: state.customNet === 'net', custom: true };
+    return findUse(state.useId);
+  }
+
+  var els = {};
+  ['dimInput','fieldNote','bareAsk','usePresets','customFactor','echo','echoLine','echoAssume',
+   'olCard','olLabel','olRows','carry','citeLine','mathNote','areaLabel']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+  function sig(n, d) {
+    if (n === 0) return '0';
+    if (d == null) d = Math.max(0, 4 - Math.floor(Math.log(Math.abs(n)) / Math.LN10) - 1);
+    return String(parseFloat(n.toFixed(Math.min(6, d))));
+  }
+  function areaBoth(mm2) {
+    var m2 = mm2 / 1e6, ft2 = mm2 / FT2_MM2;
+    return state.target === 'metric'
+      ? sig(m2) + ' m² (' + sig(ft2) + ' ft²)'
+      : sig(ft2) + ' ft² (' + sig(m2) + ' m²)';
+  }
+
+  /* ---- field notes + bare ask (as the converter) --------------------------- */
+  function pendingNote(text, result) {
+    if (!text || !result || !result.spans) return '';
+    var lines = [];
+    result.spans.forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = text.slice(sp.start, sp.end).trim();
+      if (!frag) return;
+      lines.push('ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : ''));
+    });
+    return lines.join('<br>');
+  }
+  function renderBareAsk(result) {
+    els.bareAsk.innerHTML = '';
+    if (!result) return;
+    var terms = (result.interpretation && result.interpretation.terms) || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;
+    function pick(u, label) {
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+    Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+    });
+  }
+
+  /* ---- the use picker -------------------------------------------------------- */
+  function buildUses() {
+    var html = '';
+    GROUPS.forEach(function (g) {
+      html += '<div class="grid-row"><span class="grid-group-label">' + g.label + '</span>';
+      g.uses.forEach(function (u) {
+        html += '<button type="button" class="grid-box use-box" aria-pressed="false" data-use="' + u.id + '">'
+              + escapeHtml(u.use) + '<span class="uf">1 / ' + u.f + ' ' + (u.net ? 'net' : 'gross') + '</span></button>';
+      });
+      html += '</div>';
+    });
+    els.usePresets.innerHTML = html;
+    Array.prototype.forEach.call(els.usePresets.querySelectorAll('[data-use]'), function (box) {
+      box.addEventListener('click', function () {
+        state.useId = box.dataset.use;
+        state.customF = null;
+        els.customFactor.value = '';
+        render();
+      });
+    });
+  }
+  function updateUseActive() {
+    Array.prototype.forEach.call(els.usePresets.querySelectorAll('[data-use]'), function (box) {
+      UI.press(box, state.customF == null && box.dataset.use === state.useId);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-cnet]'), function (b) {
+      UI.press(b, state.customNet === b.dataset.cnet);
+    });
+  }
+
+  /* ---- echo -------------------------------------------------------------------- */
+  var OP_GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+  function tokensOf(result) {
+    var parts = (result && result.interpretation && result.interpretation.parts) || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op') html += '<span class="op">' + (OP_GLYPH[p.text] || escapeHtml(p.text)) + '</span>';
+      else if (p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+    return html;
+  }
+  function renderEcho(result, fx, count) {
+    if (!result) { els.echo.style.display = 'none'; return; }
+    var html = tokensOf(result);
+    if (result.dimension === 2 && result.area_mm2 != null && !areaOutOfRange(result.area_mm2) && result.area_mm2 > 0) {
+      html += '<span class="op"> ÷ ' + fx.f + ' ft² </span><span class="eq">=</span><span class="result">'
+            + count + (count === 1 ? ' occupant' : ' occupants') + '</span>';
+    } else if (result.dimension === 1) {
+      html += '<span class="eq">—</span><span class="op">that\'s a length. An area is length × length (60\' x 40\')</span>';
+    } else if (result.dimension === 2 && result.area_mm2 != null && areaOutOfRange(result.area_mm2)) {
+      html += '<span class="eq">=</span><span class="op">area out of range</span>';
+    } else if (result.dimension === 2 && result.area_mm2 != null) {
+      html += '<span class="eq">—</span><span class="op">the area came out ' + (result.area_mm2 === 0 ? 'zero' : 'negative') + '</span>';
+    } else {
+      html += '<span class="eq">—</span><span class="op">unresolved</span>';
+    }
+    els.echoLine.innerHTML = html;
+    var asm = ((result.interpretation && result.interpretation.assumptions) || []).slice();
+    asm.push(fx.net
+      ? 'this factor uses NET area — the occupiable space only, excluding corridors, walls, fixed equipment'
+      : 'this factor uses GROSS area — within the exterior walls, corridors and all');
+    var seen = {};
+    asm = asm.filter(function (a) { if (seen[a]) return false; seen[a] = true; return true; });
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- rows ---------------------------------------------------------------------- */
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  function render() {
+    var result = state.text ? parseLength(state.text, { defaultUnit: state.defaultUnit }) : null;
+    if (result && result.interpretation) {
+      var sys = result.unitSystem;
+      var stated = (result.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+      if (stated && (sys === 'imperial' || sys === 'metric')) {
+        state.target = sys;
+        state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+      }
+    }
+    syncURL();
+    updateUseActive();
+    els.fieldNote.innerHTML = pendingNote(state.text, result);
+    renderBareAsk(result);
+
+    var fx = currentFactor();
+    els.areaLabel.textContent = 'Floor area — ' + (fx.net ? 'net occupiable' : 'gross, within the exterior walls');
+
+    var ok = result && result.dimension === 2 && result.area_mm2 != null
+          && !areaOutOfRange(result.area_mm2) && result.area_mm2 > 0 && fx.f > 0;
+    var ft2 = ok ? result.area_mm2 / FT2_MM2 : 0;
+    var exact = ok ? ft2 / fx.f : 0;
+    var up = Math.ceil(exact), down = Math.floor(exact);
+
+    renderEcho(result, fx, up);
+    if (!ok) {
+      els.olCard.style.display = 'none';
+      els.citeLine.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+
+    els.olCard.style.display = '';
+    els.citeLine.style.display = '';
+    els.olLabel.textContent = (fx.custom ? 'Custom factor' : 'Table 1004.5 · ' + fx.use) + ' — 1 occupant per ' + fx.f + ' ft² ' + (fx.net ? 'net' : 'gross');
+
+    var html = '';
+    if (exact === up) {
+      html += rowHtml('Occupant load', 'divides evenly — no rounding in play', '<span class="fact">' + up + '</span>', '—', true, 'is-exact');
+      html += rowHtml('Next person at', 'one more occupant the moment the area passes this', escapeHtml(sig((up + 1) * fx.f, 1)) + ' ft²', '—', false, 'is-ref');
+    } else {
+      html += rowHtml('Occupant load', '§1004.5 says "not less than" the quotient — fractions read up', '<span class="fact">' + up + '</span>', '+' + sig(up - exact, 2) + ' person of rounding', true);
+      html += rowHtml('Exact quotient', areaBoth(result.area_mm2) + ' ÷ ' + fx.f + ' ft²', escapeHtml(sig(exact, 2)), '—', false);
+      html += rowHtml('Rounded down', 'below the "not less than" floor — the arithmetic, not a usable count', String(down), '−' + sig(exact - down, 2), false, 'is-ref');
+      html += rowHtml('Headroom', 'area you could add before the count reaches ' + (up + 1), escapeHtml(sig(up * fx.f - ft2, 1)) + ' ft²', '—', false, 'is-ref');
+    }
+    els.olRows.innerHTML = html;
+    els.carry.innerHTML = 'Carry it forward: <a class="card-link" href="egress-width.html?ol=' + up + '">egress width →</a>'
+      + '<a class="card-link" href="exits.html?ol=' + up + '">exits →</a>'
+      + '<a class="card-link" href="fixture-calc.html?ol=' + up + '">fixtures →</a>';
+    els.citeLine.innerHTML = escapeHtml(CITE);
+
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + escapeHtml(result.interpretation.work) + ' (unit²) = ' + sig(result.area_mm2) + ' mm² = ' + sig(ft2, 2) + ' ft²<br>'
+      + sig(ft2, 2) + ' ÷ ' + fx.f + ' = ' + sig(exact, 4) + ' → not less than → <b>' + up + '</b><br>'
+      + 'lengths are exact lattice integers; the area product and this quotient are floating point';
+  }
+
+  /* ---- shareable URL ----------------------------------------------------------------- */
+  // recent readings — the URL carries the whole state, so a recent
+  // restores the full reading (shared component: ui.js UI.recents)
+  var recents = UI.recents({ key: 'occupant-load', anchor: document.getElementById('dimInput'), entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: (state.text || '') + ' · ' + state.useId, result: r ? r.textContent : '' };
+  } });
+
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.text && state.text !== "60' x 40'") params.set('d', state.text);
+      if (state.customF != null) params.set('u', 'c' + state.customF + (state.customNet === 'net' ? 'n' : 'g'));
+      else if (state.useId !== 'b') params.set('u', state.useId);
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var u = params.get('u');
+    if (u) {
+      var c = /^c(\d+)([ng])$/.exec(u);
+      if (c && +c[1] >= 1 && +c[1] <= 10000) { state.customF = +c[1]; state.customNet = c[2] === 'n' ? 'net' : 'gross'; }
+      else if (findUse(u)) state.useId = u;
+    }
+    var d = params.get('d');
+    return d != null ? d.slice(0, 160) : null;
+  }
+
+  /* ---- wiring -------------------------------------------------------------------------- */
+  els.dimInput.addEventListener('input', function () { state.text = els.dimInput.value; render(); });
+  els.dimInput.addEventListener('focus', function () { setTimeout(function () { els.dimInput.select(); }, 0); });
+  els.customFactor.addEventListener('input', function () {
+    var v = parseInt(els.customFactor.value, 10);
+    state.customF = (Number.isInteger(v) && v >= 1 && v <= 10000) ? v : null;
+    render();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cnet]'), function (b) {
+    b.addEventListener('click', function () { state.customNet = b.dataset.cnet; render(); });
+  });
+
+  // initial state — URL params override the worked example (a 60'×40' office)
+  buildUses();
+  var urlDim = initFromURL();
+  if (state.customF != null) els.customFactor.value = String(state.customF);
+  els.dimInput.value = urlDim != null ? urlDim : "60' x 40'";
+  state.text = els.dimInput.value;
+  render();
+})();
+</script>
+</body>
+</html>

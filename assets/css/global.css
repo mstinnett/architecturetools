@@ -278,6 +278,34 @@ body {
 .field-note .pending { color: var(--ink-2); }
 .field-note .why { color: var(--ink-2); font-style: italic; }
 
+/* recents — per-tool history of saved readings (ui.js UI.recents). The
+   component wraps the page's main field; the button sits inside its right
+   edge, the panel drops below. A recent restores by URL, so the whole
+   reading comes back. */
+.rec-anchor { position: relative; display: block; }
+.rec-btn { position: absolute; right: 0.45rem; top: 50%; transform: translateY(-50%);
+           width: 1.8rem; height: 1.8rem; line-height: 1; font-size: 1.05rem;
+           color: var(--ink-3); background: none; border: none; border-radius: var(--radius);
+           cursor: pointer; padding: 0; }
+.rec-btn:hover { color: var(--accent); background: var(--accent-soft); }
+.rec-panel { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 40;
+             background: var(--card); border: 1px solid var(--rule-2); border-radius: var(--radius);
+             box-shadow: var(--shadow-card); max-height: min(320px, 60vh); overflow-y: auto; }
+.rec-row { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.45rem 0.6rem;
+           border-bottom: var(--border-light); cursor: pointer; }
+.rec-row:hover { background: var(--accent-soft); }
+.rec-face { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace; font-size: var(--text-sm);
+            color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.rec-result { font-size: var(--text-xs); color: var(--ink-2); white-space: nowrap;
+              max-width: 45%; overflow: hidden; text-overflow: ellipsis; }
+.rec-pin { background: none; border: none; cursor: pointer; color: var(--rule-2);
+           font-size: 0.9rem; padding: 0 0.1rem; line-height: 1; }
+.rec-pin.on, .rec-pin:hover { color: var(--accent); }
+.rec-empty { padding: 0.6rem 0.7rem; font-size: var(--text-sm); color: var(--ink-3); }
+.rec-foot { padding: 0.35rem 0.6rem; text-align: right; }
+.rec-clear { background: none; border: none; color: var(--ink-3); font-size: var(--text-xs); cursor: pointer; }
+.rec-clear:hover { color: var(--accent); }
+
 /* contextual bare-number unit choice — only when a number has no unit */
 .bare-ask { margin-top: 0.4rem; font-size: var(--text-sm); color: var(--ink-2); }
 .bare-ask:empty { display: none; }

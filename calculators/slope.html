@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Slope -- architecture.tools</title>
+<meta name="description" content="Enter any two of rise, run, and slope: the missing sides and the slope come back as values — percent, ratio, roof pitch, degrees — with what rounding each to a whole number costs in rise across your run, and common slopes drawn for comparison.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover this tool's three-field input
+     row, the answer subgroups, and the reference list. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  /* the slope figure reads as a diagram — larger labels than the number line
+     (scoped to svg.sf so the shared number-line sizing is untouched) */
+  svg.sf text { font-size: 14px; }
+  svg.sf .nl-true-val { font-size: 16px; font-weight: 500; }
+  svg.sf .nl-snap-val { font-size: 15px; }
+  svg.sf .nl-src-val  { font-size: 13px; }
+
+  .tri-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-sm); }
+  .tri { display: flex; flex-direction: column; }
+  .tri label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+               text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .tri-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+               font-size: 1.05rem; font-weight: 400; width: 10.5em; max-width: 100%;
+               color: var(--ink); background: var(--card);
+               padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+               box-shadow: var(--shadow-well); border-radius: var(--radius);
+               outline: none; -webkit-appearance: none; appearance: none; }
+  .tri-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .tri-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 13em; }
+
+  /* subgroup labels inside the answer card */
+  .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
+                color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
+  .rows-label:first-child { margin-top: 0.2rem; }
+
+  /* the rounding table — shallower (for a max) vs steeper (for a min) */
+  .round-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin-top: 0.3rem; }
+  .round-table th, .round-table td { text-align: left; padding: 0.4rem 0.55rem; border-bottom: var(--border-light); vertical-align: baseline; font-variant-numeric: tabular-nums; }
+  .round-table th { color: var(--ink-3); font-weight: 400; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; }
+  .round-table th span { display: block; text-transform: none; letter-spacing: 0; }
+  .round-table td:first-child, .round-table th:first-child { color: var(--ink-2); width: 6em; }
+  .round-table .cost { color: var(--ink-3); font-size: var(--text-xs); margin-left: 0.35rem; }
+  .round-table .on-step { color: var(--ink-2); }
+  /* selectable cells drive the figure's hatch */
+  .round-table td.rc { cursor: pointer; }
+  .round-table td.rc:hover { background: var(--accent-soft); }
+  .round-table td.rc.sel { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); color: var(--ink); }
+  .round-table td.rc.sel .cost { color: var(--ink-2); }
+
+  /* common slopes — selectable, each toggles a comparison line on the figure */
+  .ref-rows { margin-top: var(--space-sm); }
+  .ref-row { display: flex; align-items: baseline; padding: 0.4rem 0.4rem; border-bottom: var(--border-light); font-size: var(--text-sm); cursor: pointer; }
+  .ref-row:last-child { border-bottom: none; }
+  .ref-row:hover { background: var(--accent-soft); }
+  .ref-row.sel { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+  .ref-what { flex: 1; color: var(--ink-2); }
+  .ref-slope { width: 9em; color: var(--ink); }
+  .ref-delta { width: 11em; text-align: right; color: var(--ink-2); }
+
+  /* the engine audit — kept apart from content, at the very bottom */
+  .engine-note { margin-top: var(--space-xl); padding-top: var(--space-md);
+    border-top: var(--border-light); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <!-- the set trail is a label until a C-0 index earns its page on main -->
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Slope</span>
+    </nav>
+    <h1>Slope</h1>
+    <p>Enter any two of rise, run, and slope. The missing sides and the slope
+       come back as values, with what rounding each to a whole number costs in
+       rise across your run.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the triangle, two of three -->
+  <div class="section-label">Rise · run · slope — enter any two</div>
+  <div class="tri-row">
+    <div class="tri">
+      <label for="riseInput">rise</label>
+      <input type="text" id="riseInput" class="tri-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 7'  ·  30&quot;  ·  150mm" autofocus>
+      <div class="tri-note" id="riseNote"></div>
+    </div>
+    <div class="tri">
+      <label for="runInput">run</label>
+      <input type="text" id="runInput" class="tri-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 22'  ·  3.6m">
+      <div class="tri-note" id="runNote"></div>
+    </div>
+    <div class="tri">
+      <label for="slopeInput">slope</label>
+      <input type="text" id="slopeInput" class="tri-input" spellcheck="false" maxlength="40"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 2%  ·  4:12  ·  1:20  ·  5°">
+      <div class="tri-note" id="slopeNote"></div>
+    </div>
+  </div>
+  <div class="bare-ask" id="bareAsk"></div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <div id="slopeOut" style="display:none;">
+      <!-- slot 5 · ANSWER CARD: triangle (linear precision) + the slope every
+           way with its rounding, and the three sides -->
+      <div class="answer-card">
+        <div class="figure-wrap" id="figure"></div>
+        <div class="snap-rows" id="snapRows"></div>
+      </div>
+
+      <!-- slot 6 · common slopes — selectable, drawn as comparison lines -->
+      <div class="ratio-box" id="refBox">
+        <div class="section-label">Common Slopes</div>
+        <div class="ref-rows" id="refRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- slot 7 · the engine's auditable footnote — bottom of page, never mixed -->
+  <div class="engine-note">
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/slopefig.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+
+  var state = {
+    rise: '', run: '', slope: '',
+    defaultUnit: 'in',
+    sel: null,                // {fam, dir} — which rounding cell drives the figure hatch
+    compareRefs: {},          // which common slopes are drawn as comparison lines
+    target: 'imperial'
+  };
+
+  var els = {};
+  ['riseInput','runInput','slopeInput','riseNote','runNote','slopeNote','bareAsk',
+   'echo','echoLine','echoAssume','slopeOut','figure','snapRows','refBox','refRows','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+
+  /* ---- slope text: %, x:12, 1:n, degrees, or a bare ratio ----------------- */
+  // returns { ratio, kind, text } or null; never throws
+  function parseSlope(text) {
+    if (!text) return null;
+    var t = text.trim().toLowerCase().replace(/\s+/g, '');
+    var m;
+    if ((m = /^(\d+(?:\.\d+)?)%$/.exec(t))) return { ratio: +m[1] / 100, kind: 'percent', v: +m[1] };
+    if ((m = /^(\d+(?:\.\d+)?)(?:°|deg)$/.exec(t))) {
+      var deg = +m[1];
+      if (deg <= 0 || deg >= 90) return { error: 'angle must be between 0° and 90°' };
+      return { ratio: Math.tan(deg * Math.PI / 180), kind: 'deg', v: deg };
+    }
+    if ((m = /^(\d+(?:\.\d+)?)(?::|in|\/)(\d+(?:\.\d+)?)$/.exec(t))) {
+      var p = +m[1], q = +m[2];
+      if (!(p > 0 && q > 0)) return { error: 'both numbers must be positive' };
+      return { ratio: p / q, kind: q === 12 ? 'pitch' : 'ratio', p: p, q: q };
+    }
+    if ((m = /^(0?\.\d+)$/.exec(t))) return { ratio: +m[1], kind: 'bare' };
+    return { error: 'use 2%, 4:12, 1:20, or 5°' };
+  }
+
+  function parseDim(text) { return parseLength(text, { defaultUnit: state.defaultUnit }); }
+
+  // one field's reading: null (empty) | {units} | {error}
+  function readDim(text) {
+    if (!text.trim()) return null;
+    var r = parseDim(text);
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length', result: r };
+    if (outOfRange(r.units) || r.units <= 0) return { error: r.units <= 0 ? 'must be more than zero' : 'out of range', result: r };
+    return { units: r.units, result: r };
+  }
+
+  /* ---- formatting ---------------------------------------------------------- */
+  function fmtLen(u) {
+    if (state.target === 'metric') return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  // the along-slope length is irrational — show it short (2 dp, trimmed), the
+  // suite's band formatting, not 4-decimal lattice noise
+  function fmtShort(u) {
+    var a = Math.abs(u);
+    if (state.target === 'metric') { var mm = a / MM; return mm >= 1000 ? sig(mm / 1000, 2) + ' m' : sig(mm, 1) + ' mm'; }
+    if (a >= 12 * IN) { var f = Math.floor(a / (12 * IN)), rin = (a - f * 12 * IN) / IN; return f + "'" + (rin ? '-' + sig(rin, 2) + '"' : ''); }
+    return sig(a / IN, 2) + '"';
+  }
+  // a signed rise cost, at a practical scale (not the lattice-fine residual):
+  // decimal inches under a foot, ft-in above, mm for metric
+  function fmtDelta(u) {
+    if (u === 0) return '0';
+    var sign = u < 0 ? '−' : '+', a = Math.abs(u);
+    if (state.target === 'metric') return sign + sig(a / MM, 1) + ' mm';
+    return sign + (a >= 12 * IN ? fmtLen(a) : sig(a / IN, 2) + '"');
+  }
+
+  /* ---- main render ----------------------------------------------------------- */
+  function syncDetected(res) {
+    if (!res || !res.result || !res.result.interpretation) return;
+    var sys = res.result.unitSystem;
+    if (sys !== 'imperial' && sys !== 'metric') return;
+    var stated = (res.result.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!stated) return;
+    state.target = sys;
+    state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+  }
+
+  function fieldNote(el, res) {
+    if (!res) { el.innerHTML = ''; return; }
+    if (res.error) { el.innerHTML = escapeHtml(res.error); return; }
+    el.innerHTML = '';
+  }
+
+  function render() {
+    var rise = readDim(state.rise);
+    var run = readDim(state.run);
+    var slope = state.slope.trim() ? parseSlope(state.slope) : null;
+    syncDetected(rise && !rise.error ? rise : (run && !run.error ? run : null));
+    syncURL();
+
+    fieldNote(els.riseNote, rise);
+    fieldNote(els.runNote, run);
+
+    var riseU = rise && !rise.error ? rise.units : null;
+    var runU = run && !run.error ? run.units : null;
+    var ratio = slope && !slope.error ? slope.ratio : null;
+
+    // solve the third — and SAY which two governed (solved.leg marks the
+    // projected leg, so the answer rows can lead with it). All three given and
+    // inconsistent is flagged, not silently resolved.
+    var solved = null, derivedNote = null, quant = null, conflict = false;
+    if (riseU != null && runU != null) {
+      solved = { rise: riseU, run: runU, leg: null };
+      if (ratio != null) conflict = Math.abs(riseU / runU - ratio) > 0.005 * Math.max(riseU / runU, ratio);
+    } else if (riseU != null && ratio != null) {
+      var runX = riseU / ratio;
+      if (!outOfRange(Math.round(runX))) { solved = { rise: riseU, run: Math.round(runX), leg: 'run' }; quant = runX - solved.run; derivedNote = 'run solved from rise and slope'; }
+    } else if (runU != null && ratio != null) {
+      var riseX = runU * ratio;
+      if (!outOfRange(Math.round(riseX))) { solved = { rise: Math.round(riseX), run: runU, leg: 'rise' }; quant = riseX - solved.rise; derivedNote = 'rise solved from run and slope'; }
+    } else if (ratio != null && riseU == null && runU == null) {
+      // slope only — a pure conversion. A nominal one-foot run gives the angle
+      // for the figure; no real lengths, so no sides are shown.
+      var rr = 12 * IN;
+      solved = { rise: Math.round(rr * ratio), run: rr, leg: 'slopeonly' };
+    }
+
+    // the slope field's note: a parse error, or a clear conflict flag when all
+    // three are given and the slope disagrees with rise ÷ run
+    els.slopeNote.innerHTML = slope && slope.error ? escapeHtml(slope.error)
+      : (conflict ? 'doesn\'t match rise ÷ run = ' + escapeHtml(sig(100 * riseU / runU, 1)) + '%' : '');
+
+    renderEcho(rise, run, slope, solved, derivedNote);
+    if (!solved || solved.rise <= 0 || solved.run <= 0) {
+      els.slopeOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    els.slopeOut.style.display = '';
+    renderAnswer(solved, quant, derivedNote);
+  }
+
+  function tokensOf(result) {
+    var parts = (result && result.interpretation && result.interpretation.parts) || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op' || p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+    return html;
+  }
+
+  function renderEcho(rise, run, slope, solved, derivedNote) {
+    var any = (rise || run || (slope && !slope.error));
+    if (!any) { els.echo.style.display = 'none'; return; }
+    var html = '';
+    if (rise && rise.result) html += '<span class="op">rise </span>' + tokensOf(rise.result);
+    if (run && run.result) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">run </span>' + tokensOf(run.result);
+    if (slope && !slope.error && state.slope.trim()) html += (html ? '<span class="op"> · </span>' : '') + '<span class="op">slope </span><span class="tok stated">' + escapeHtml(state.slope.trim()) + '</span>';
+
+    // the answer, on the converter's grammar: tokens = result — the values you
+    // did NOT enter (the solved leg and the slope's forms), with the along-slope
+    // length as a quiet suffix (it also lives on the figure and in no rows)
+    if (solved) {
+      var riseU = solved.rise, runU = solved.run;
+      var g = gcd(riseU, runU), p = riseU / g, q = runU / g;
+      var deg = Math.atan2(riseU, runU) * 180 / Math.PI, pc = 100 * riseU / runU, pitch = 12 * riseU / runU;
+      var hypU = Math.round(Math.sqrt(riseU * riseU + runU * runU));
+      var parts = [];
+      if (solved.leg === 'rise') parts.push('rise ' + fmtLen(riseU));
+      else if (solved.leg === 'run') parts.push('run ' + fmtLen(runU));
+      parts.push(sig(pc, pc < 1 ? 3 : 2) + '%', '1:' + sig(q / p, q / p >= 100 ? 1 : 2), sig(pitch, 2) + ':12', sig(deg, deg < 1 ? 3 : 2) + '°');
+      html += '<span class="eq">=</span><span class="result">' + escapeHtml(parts.join(' · ')) + '</span>';
+      if (solved.leg !== 'slopeonly') html += '<span class="op"> · along slope ' + escapeHtml(fmtShort(hypU)) + '</span>';
+    } else {
+      html += '<span class="eq">—</span><span class="op">two of the three, and the rest follow</span>';
+    }
+    els.echoLine.innerHTML = html;
+    var asm = [];
+    [rise, run].forEach(function (f) {
+      if (f && f.result && f.result.interpretation) asm = asm.concat(f.result.interpretation.assumptions || []);
+    });
+    if (derivedNote) asm.push(derivedNote);
+    var seen = {};
+    asm = asm.filter(function (a) { if (seen[a]) return false; seen[a] = true; return true; });
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- the answer: figure, whole-number rounding, common slopes ------------- */
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+  function groupLabel(t) { return '<div class="rows-label">' + t + '</div>'; }
+
+  // the two bracketing standard steps in a family — shallower (lo) and steeper
+  // (hi) — as {face, ratio}, plus `exact` when the slope lands on a step.
+  // Which side to build to depends on the constraint: a maximum (accessibility)
+  // rounds shallower, a minimum (roofing) rounds steeper.
+  // near-integer, tolerant of the lattice rounding in a solved leg (which can
+  // push a clean 2% or 1:50 a millionth off exact); tolerance scales with v
+  // because 1/s amplifies it for shallow ratios
+  function whole(v) { return Math.abs(v - Math.round(v)) < Math.max(1e-4, Math.abs(v) * 1e-5); }
+  function famSteps(s, fam) {
+    if (fam === 'pitch') { var x = 12 * s; return { lo: { face: Math.floor(x) + ':12', ratio: Math.floor(x) / 12 }, hi: { face: Math.ceil(x) + ':12', ratio: Math.ceil(x) / 12 }, exact: whole(x) }; }
+    if (fam === 'ratio') { var n = 1 / s; return { lo: { face: '1:' + Math.ceil(n), ratio: 1 / Math.ceil(n) }, hi: { face: '1:' + Math.max(1, Math.floor(n)), ratio: 1 / Math.max(1, Math.floor(n)) }, exact: whole(n) }; }
+    if (fam === 'degree') { var a = Math.atan(s) * 180 / Math.PI; return { lo: { face: Math.floor(a) + '°', ratio: Math.tan(Math.floor(a) * Math.PI / 180) }, hi: { face: Math.ceil(a) + '°', ratio: Math.tan(Math.ceil(a) * Math.PI / 180) }, exact: whole(a) }; }
+    var p = 100 * s; return { lo: { face: Math.floor(p) + '%', ratio: Math.floor(p) / 100 }, hi: { face: Math.ceil(p) + '%', ratio: Math.ceil(p) / 100 }, exact: whole(p) };
+  }
+
+  // type marks whether the figure is a ceiling (max — round shallower to stay
+  // under) or a floor (min — round steeper to stay over). Located, not ruled.
+  var REFS = [
+    { label: 'Accessible cross slope · 1/4" per foot', ratio: 1 / 48, face: '1:48 (2.08%)', type: 'max' },
+    { label: 'Walkway / ramp boundary', ratio: 1 / 20, face: '1:20 (5%)', type: 'max' },
+    { label: 'Ramp running slope', ratio: 1 / 12, face: '1:12 (8.33%)', type: 'max' },
+    { label: 'Low-slope shingle minimum', ratio: 2 / 12, face: '2:12 (16.67%)', type: 'min' }
+  ];
+
+  function renderAnswer(solved, quant, derivedNote) {
+    var riseU = solved.rise, runU = solved.run;
+    var s = riseU / runU;
+    var g = gcd(riseU, runU);
+    var p = riseU / g, q = runU / g;
+    var deg = Math.atan2(riseU, runU) * 180 / Math.PI;
+    var pc = 100 * s;
+    var pitch = 12 * s;
+    var overOne = s > 1;
+    // the true length along the slope — the one value here that is Pythagorean,
+    // not rational; quantized for display
+    var hypU = Math.round(Math.sqrt(riseU * riseU + runU * runU));
+
+    // figure — a clean true-angle triangle. The solved leg carries its own
+    // linear precision (the lattice residual). Slope-only shows the angle with
+    // no lengths (a pure conversion has no real sides).
+    var isConv = solved.leg === 'slopeonly';
+    var solvedResid = quant ? ' (' + NumberLine.formatResidual(quant, state.target) + ')' : '';
+
+    // families curated to the slope's regime (no 0:12 pitch on a drainage fall,
+    // no 1:0.6 ratio on a steep roof)
+    var fams = [['Percent', 'percent']];
+    if (s <= 1) fams.push(['Ratio', 'ratio']);
+    if (12 * s >= 1) fams.push(['Pitch', 'pitch']);
+    fams.push(['Angle', 'degree']);
+
+    // the selected rounding drives the figure's hatch. Default = the family
+    // that fits the regime (pitch for roofs, ratio for shallow) at its nearer
+    // bracket — a legible wedge; a click on any cell re-pins it.
+    function defaultSel() {
+      var fam = (12 * s >= 1) ? 'pitch' : (s <= 1 ? 'ratio' : 'pitch');
+      if (!fams.some(function (f) { return f[1] === fam; })) fam = 'percent';
+      var st = famSteps(s, fam);
+      if (st.exact) return { fam: fam, dir: 'on' };
+      return { fam: fam, dir: Math.abs(s - st.lo.ratio) <= Math.abs(s - st.hi.ratio) ? 'lo' : 'hi' };
+    }
+    var sel = state.sel;
+    var selOk = sel && fams.some(function (f) { return f[1] === sel.fam; }) &&
+      (famSteps(s, sel.fam).exact ? sel.dir === 'on' : (sel.dir === 'lo' || sel.dir === 'hi'));
+    if (!selOk) sel = defaultSel();
+
+    // the triangle carries the precision hatch: the exact slope wedged between
+    // the SELECTED family's two bracketing steps, hatched to the selected one —
+    // the angular residual, drawn the way the converters hatch the linear one.
+    var ss = famSteps(s, sel.fam), wedge = !ss.exact;
+    var hatchTo = sel.dir === 'lo' ? ss.lo.ratio : ss.hi.ratio;
+    // selected common slopes → comparison rays
+    var compare = [];
+    REFS.forEach(function (r, i) { if (state.compareRefs[i]) compare.push({ ratio: r.ratio, label: r.face.split(' ')[0] }); });
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.innerHTML = SlopeFig.slopefig({
+      rise: riseU, run: runU,
+      riseLabel: isConv ? '' : fmtLen(riseU) + (solved.leg === 'rise' ? solvedResid : ''),
+      runLabel: isConv ? '' : fmtLen(runU) + (solved.leg === 'run' ? solvedResid : ''),
+      angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
+      hypoLabel: isConv ? '' : fmtShort(hypU),
+      refLo: wedge ? ss.lo.ratio : null, refHi: wedge ? ss.hi.ratio : null,
+      refLoLabel: wedge ? ss.lo.face : null, refHiLabel: wedge ? ss.hi.face : null,
+      hatchTo: wedge ? hatchTo : null,
+      compare: compare,
+      width: width, height: 360
+    });
+
+    // the rounding table — shallower (for a max) vs steeper (for a min), each
+    // cell selectable to drive the figure. Cost per cell (rise, or % for a
+    // pure conversion with no run to cost against).
+    function cost(stepRatio) {
+      if (isConv) { var dp = (stepRatio - s) * 100; return (dp >= 0 ? '+' : '−') + sig(Math.abs(dp), Math.abs(dp) < 1 ? 3 : 1) + '%'; }
+      return fmtDelta(Math.round(runU * stepRatio) - riseU);
+    }
+    function rc(fam, dir, step) {
+      var on = sel.fam === fam && sel.dir === dir;
+      return '<td class="rc' + (on ? ' sel' : '') + '" data-fam="' + fam + '" data-dir="' + dir + '">'
+        + escapeHtml(step.face) + '<span class="cost">' + escapeHtml(cost(step.ratio)) + '</span></td>';
+    }
+    var t = '<div class="rows-label">Rounded to a whole number</div>'
+          + '<table class="round-table"><tr><th></th><th>shallower<span>for a max</span></th><th>steeper<span>for a min</span></th></tr>';
+    fams.forEach(function (f) {
+      var st = famSteps(s, f[1]);
+      if (st.exact) {
+        var onSel = sel.fam === f[1] && sel.dir === 'on';
+        t += '<tr><td>' + f[0] + '</td><td class="rc on-step' + (onSel ? ' sel' : '') + '" data-fam="' + f[1] + '" data-dir="on" colspan="2">' + escapeHtml(st.hi.face) + ' · exact</td></tr>';
+      } else {
+        t += '<tr><td>' + f[0] + '</td>' + rc(f[1], 'lo', st.lo) + rc(f[1], 'hi', st.hi) + '</tr>';
+      }
+    });
+    t += '</table>';
+    if (overOne) t += '<div class="rows-label" style="text-transform:none;color:var(--ink-2);">Steeper than 1:1 — past 45°.</div>';
+    els.snapRows.innerHTML = t;
+
+    // common slopes — located, tagged max/min, selectable into the figure
+    var refs = '';
+    REFS.forEach(function (r, i) {
+      var d = s - r.ratio;
+      var side = d === 0 ? 'exact' : sig(Math.abs(d) * 100, Math.abs(d) * 100 < 1 ? 3 : 1) + '% ' + (d > 0 ? 'steeper' : 'shallower');
+      refs += '<div class="ref-row' + (state.compareRefs[i] ? ' sel' : '') + '" data-ref="' + i + '"><div class="ref-what">' + escapeHtml(r.label) + '</div>'
+            + '<div class="ref-slope">' + escapeHtml(r.face) + ' · ' + r.type + '</div>'
+            + '<div class="ref-delta">' + escapeHtml(side) + '</div></div>';
+    });
+    els.refRows.innerHTML = refs;
+
+    var lines;
+    if (isConv) {
+      lines = ['slope = ' + p + '/' + q + ' exactly = ' + sig(s, 6),
+               'percent = 100·' + p + '/' + q + ' = ' + sig(pc, 4) + '% · pitch = 12·' + p + '/' + q + ' = ' + sig(pitch, 4) + ':12 · angle = ' + sig(deg, 4) + '°'];
+    } else {
+      lines = [
+        'rise = <b>' + riseU + '</b> units · run = <b>' + runU + '</b> units (1 unit = 1/960 mm)',
+        'gcd ' + g + ' → slope = ' + p + '/' + q + ' exactly = ' + sig(s, 6),
+        'percent = 100·' + p + '/' + q + ' = ' + sig(pc, 4) + '% · pitch = 12·' + p + '/' + q + ' = ' + sig(pitch, 4) + ':12',
+        'slope length = √(' + riseU + '² + ' + runU + '²) ≈ <b>' + hypU + '</b> units, Pythagorean, floating point, quantized to the lattice for display'
+      ];
+      if (quant) lines.push('solved leg quantized to the lattice (true value off by ' + escapeHtml(NumberLine.formatResidual(quant, state.target)) + ')');
+    }
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- shareable URL ---------------------------------------------------------- */
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.rise) params.set('a', state.rise);
+      if (state.run && state.run !== "9'") params.set('b', state.run);
+      if (state.slope && state.slope !== "8:12") params.set('s', state.slope);
+      var qq = params.toString();
+      try { history.replaceState(null, '', qq ? '?' + qq : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var a = params.get('a'), b = params.get('b'), sl = params.get('s');
+    return {
+      rise: a != null ? a.slice(0, 80) : null,
+      run: b != null ? b.slice(0, 80) : null,
+      slope: sl != null ? sl.slice(0, 40) : null
+    };
+  }
+
+  /* ---- wiring ------------------------------------------------------------------ */
+  // recent readings — the URL carries all three fields, so a recent restores
+  // the whole triangle
+  var recents = UI.recents({ key: 'slope', anchor: els.riseInput, entry: function () {
+    var face = [state.rise, state.run, state.slope].filter(Boolean).join(' · ');
+    var r = document.querySelector('#echoLine .result');
+    return { face: face, result: r ? r.textContent : '' };
+  } });
+
+  [['riseInput', 'rise'], ['runInput', 'run'], ['slopeInput', 'slope']].forEach(function (pair) {
+    var el = els[pair[0]];
+    el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });
+    el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
+  });
+  // selecting a rounding cell re-pins the figure's hatch (delegated — the table
+  // is rebuilt every render)
+  els.snapRows.addEventListener('click', function (e) {
+    var cell = e.target.closest ? e.target.closest('.rc') : null;
+    if (!cell) return;
+    state.sel = { fam: cell.dataset.fam, dir: cell.dataset.dir };
+    render();
+  });
+  // toggling a common slope draws (or clears) its comparison line on the figure
+  els.refRows.addEventListener('click', function (e) {
+    var row = e.target.closest ? e.target.closest('.ref-row') : null;
+    if (!row) return;
+    var i = row.dataset.ref;
+    if (state.compareRefs[i]) delete state.compareRefs[i]; else state.compareRefs[i] = true;
+    render();
+  });
+
+  // initial state — URL params override the worked example (9' run at 8:12)
+  var u = initFromURL();
+  var anyURL = u.rise != null || u.run != null || u.slope != null;
+  els.riseInput.value = u.rise != null ? u.rise : '';
+  els.runInput.value = u.run != null ? u.run : (anyURL ? '' : "9'");
+  els.slopeInput.value = u.slope != null ? u.slope : (anyURL ? '' : "8:12");
+  state.rise = els.riseInput.value;
+  state.run = els.runInput.value;
+  state.slope = els.slopeInput.value;
+  render();
+})();
+</script>
+</body>
+</html>

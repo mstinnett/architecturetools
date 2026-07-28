@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Sheet Sizes -- architecture.tools</title>
+<meta name="description" content="ARCH and ANSI sheet sizes with what fits on each at every standard scale — type a footprint and see the smallest scale that carries it, drawn on the sheet.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The shell is shared via global.css. Local rules cover the sheet diagram
+     row and the fit table's highlight. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .sheet-display { display: flex; gap: 2rem; align-items: flex-start; margin: var(--space-lg) 0; flex-wrap: wrap; }
+  .sheet-visual svg { display: block; max-width: 100%; }
+  .sheet-info { flex: 1; min-width: 240px; }
+
+  .dims-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin: var(--space-md) 0 var(--space-lg); }
+  .dims-row .df { display: flex; flex-direction: column; }
+  .dims-row label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+                    text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+
+  .scale-table tr.fits td { background: var(--accent-soft); color: var(--ink); font-weight: 400; }
+  .size-row { display: flex; align-items: baseline; width: 100%; text-align: left; padding: 0.4rem 0.3rem;
+              border: none; border-bottom: var(--border-light); background: none; cursor: pointer; font-weight: 300; }
+  .size-row:hover { background: var(--card-2); }
+  .size-name { flex: 1; font-size: var(--text-sm); color: var(--ink); }
+  .size-dim { font-size: var(--text-sm); color: var(--ink-2); width: 8em; text-align: right; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Sheet Sizes</span>
+    </nav>
+    <h1>Sheet Sizes</h1>
+    <p>ARCH and ANSI sheets, with what fits on each at every standard scale.
+       Type a footprint and every scale that carries it lights up — the
+       largest flagged, the footprint drawn on the sheet to scale.</p>
+  </div>
+
+  <!-- slot 1-2 · the sheet + the footprint -->
+  <div class="section-label">Sheet</div>
+  <div class="grid-presets" id="sheetPresets"></div>
+  <div class="dims-row">
+    <div class="df">
+      <label for="userWidth">footprint width (ft)</label>
+      <input class="grid-custom" id="userWidth" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 60" style="width: 7em;">
+    </div>
+    <div class="df">
+      <label for="userDepth">footprint depth (ft)</label>
+      <input class="grid-custom" id="userDepth" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 40" style="width: 7em;">
+    </div>
+  </div>
+
+  <!-- the sheet drawn + its numbers -->
+  <div class="answer-card">
+    <div class="sheet-display">
+      <div class="sheet-visual" id="sheetVisual"></div>
+      <div class="sheet-info snap-rows" style="margin-top:0; padding-top:0; border-top:none;" id="sheetInfo"></div>
+    </div>
+    <div id="scaleTableContainer"></div>
+  </div>
+
+  <div class="ratio-box">
+    <div class="section-label">Common footprints — tap to load</div>
+    <div id="commonList"></div>
+    <div style="margin-top:.5rem;font-size:var(--text-xs);color:var(--ink-3);">
+      The title-block strip width is this page's assumption, not a standard —
+      adjust your reading if your block differs.</div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<script src="../assets/js/ui.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* Sheet sizes in inches. ARCH and ANSI series are the standard published
+     dimensions; the title-block strip (tb) is a working assumption, surfaced
+     on the page. */
+  var SHEETS = [
+    { id: 'A',  name: 'ARCH A',  w: 12, h: 9,  tb: 1.5 },
+    { id: 'B',  name: 'ARCH B',  w: 18, h: 12, tb: 2 },
+    { id: 'C',  name: 'ARCH C',  w: 24, h: 18, tb: 2.5 },
+    { id: 'D',  name: 'ARCH D',  w: 36, h: 24, tb: 3 },
+    { id: 'E1', name: 'ARCH E1', w: 42, h: 30, tb: 3 },
+    { id: 'E',  name: 'ARCH E',  w: 48, h: 36, tb: 3.5 },
+    { id: 'nA', name: 'ANSI A',  w: 11, h: 8.5, tb: 1.5 },
+    { id: 'nB', name: 'ANSI B',  w: 17, h: 11,  tb: 2 },
+    { id: 'nC', name: 'ANSI C',  w: 22, h: 17,  tb: 2.5 },
+    { id: 'nD', name: 'ANSI D',  w: 34, h: 22,  tb: 3 },
+    { id: 'nE', name: 'ANSI E',  w: 44, h: 34,  tb: 3.5 }
+  ];
+  function findSheet(id) {
+    for (var i = 0; i < SHEETS.length; i++) if (SHEETS[i].id === id) return SHEETS[i];
+    return SHEETS[3];
+  }
+
+  // standard scales: inches on paper per real foot
+  var SCALES = [
+    { label: '3" = 1\'-0"',     factor: 3 },
+    { label: '1 1/2" = 1\'-0"', factor: 1.5 },
+    { label: '1" = 1\'-0"',     factor: 1 },
+    { label: '3/4" = 1\'-0"',   factor: 0.75 },
+    { label: '1/2" = 1\'-0"',   factor: 0.5 },
+    { label: '3/8" = 1\'-0"',   factor: 0.375 },
+    { label: '1/4" = 1\'-0"',   factor: 0.25 },
+    { label: '3/16" = 1\'-0"',  factor: 0.1875 },
+    { label: '1/8" = 1\'-0"',   factor: 0.125 },
+    { label: '3/32" = 1\'-0"',  factor: 0.09375 },
+    { label: '1/16" = 1\'-0"',  factor: 0.0625 },
+    { label: '1" = 10\'',       factor: 1/10 },
+    { label: '1" = 20\'',       factor: 1/20 },
+    { label: '1" = 30\'',       factor: 1/30 },
+    { label: '1" = 40\'',       factor: 1/40 },
+    { label: '1" = 50\'',       factor: 1/50 },
+    { label: '1" = 100\'',      factor: 1/100 },
+    { label: '1" = 200\'',      factor: 1/200 }
+  ];
+
+  var COMMON = [
+    { name: 'Single-family house (typical)', w: 60, d: 40 },
+    { name: 'Residential lot (50 × 100)', w: 100, d: 50 },
+    { name: 'Quarter-acre lot', w: 104, d: 104 },
+    { name: 'Townhouse unit', w: 20, d: 50 },
+    { name: 'Small commercial (retail)', w: 100, d: 60 },
+    { name: 'Medium office building', w: 200, d: 150 },
+    { name: 'Warehouse / industrial', w: 300, d: 200 },
+    { name: 'City block (typical)', w: 660, d: 330 }
+  ];
+
+  var state = { sheetId: 'D' };
+  var esc = UI.esc;
+
+  function fmtFt(feet) {
+    if (feet >= 1000) return Math.round(feet).toLocaleString() + "'";
+    if (feet === Math.floor(feet)) return feet + "'";
+    return feet.toFixed(1) + "'";
+  }
+
+  function buildSheets() {
+    var html = '<div class="grid-row"><span class="grid-group-label">arch</span>';
+    SHEETS.slice(0, 6).forEach(function (s) {
+      html += '<button type="button" class="grid-box" aria-pressed="false" data-sheet="' + s.id + '">' + s.name.replace('ARCH ', '') + '<span style="display:block;font-size:var(--text-xs);opacity:.7;">' + s.w + '×' + s.h + '</span></button>';
+    });
+    html += '</div><div class="grid-row"><span class="grid-group-label">ansi</span>';
+    SHEETS.slice(6).forEach(function (s) {
+      html += '<button type="button" class="grid-box" aria-pressed="false" data-sheet="' + s.id + '">' + s.name.replace('ANSI ', '') + '<span style="display:block;font-size:var(--text-xs);opacity:.7;">' + s.w + '×' + s.h + '</span></button>';
+    });
+    html += '</div>';
+    document.getElementById('sheetPresets').innerHTML = html;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-sheet]'), function (b) {
+      b.addEventListener('click', function () { state.sheetId = b.dataset.sheet; update(); });
+    });
+  }
+
+  // the sheet drawn through the theme's figure strokes, so it inverts with
+  // the scheme like every other figure
+  function drawSheet(sheet, userW, userD, bestScale) {
+    var maxPx = 280;
+    var k = maxPx / Math.max(sheet.w, sheet.h);
+    var pw = sheet.w * k, ph = sheet.h * k, ptb = sheet.tb * k;
+    var pad = 24, svgW = pw + pad * 2, svgH = ph + pad * 2 + 8;
+    var x0 = pad, y0 = pad;
+
+    var svg = '<svg class="nl" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">';
+    svg += '<rect x="' + x0 + '" y="' + y0 + '" width="' + pw + '" height="' + ph + '" style="fill:var(--card);stroke:var(--nl-ink,#0a0a0a)" stroke-width="1.5"/>';
+    svg += '<rect x="' + (x0 + pw - ptb) + '" y="' + y0 + '" width="' + ptb + '" height="' + ph + '" style="fill:var(--card-2);stroke:var(--nl-tick,#bbb)" stroke-width="0.5"/>';
+    svg += '<text x="' + (x0 + pw - ptb / 2) + '" y="' + (y0 + ph / 2) + '" text-anchor="middle" class="nl-axis-label" transform="rotate(-90 ' + (x0 + pw - ptb / 2) + ' ' + (y0 + ph / 2) + ')">title block</text>';
+
+    var drawW = pw - ptb - 4, drawH = ph - 4, drawX = x0 + 2, drawY = y0 + 2;
+    svg += '<rect x="' + drawX + '" y="' + drawY + '" width="' + drawW + '" height="' + drawH + '" fill="none" style="stroke:var(--nl-tick,#bbb)" stroke-width="0.5" stroke-dasharray="3 2"/>';
+
+    if (userW && userD && bestScale) {
+      var fpW = userW * bestScale.factor * k, fpD = userD * bestScale.factor * k;
+      var drawableInW = sheet.w - sheet.tb - 0.5, drawableInH = sheet.h - 0.5;
+      var rW = userW * bestScale.factor, rD = userD * bestScale.factor;
+      var fits = false;
+      if (rW <= drawableInW && rD <= drawableInH) fits = true;
+      else if (rD <= drawableInW && rW <= drawableInH) { fits = true; var t = fpW; fpW = fpD; fpD = t; }
+      if (fits && fpW > 2 && fpD > 2) {
+        var cx = drawX + drawW / 2, cy = drawY + drawH / 2;
+        svg += '<rect x="' + (cx - fpW / 2) + '" y="' + (cy - fpD / 2) + '" width="' + fpW + '" height="' + fpD + '" style="fill:var(--accent-soft);stroke:var(--nl-ink,#0a0a0a)" stroke-width="1" stroke-dasharray="4 2"/>';
+        svg += '<text x="' + cx + '" y="' + (cy + 3) + '" text-anchor="middle" class="nl-src-val">' + esc(userW + "' × " + userD + "'") + '</text>';
+      }
+    }
+    svg += '<text x="' + (x0 + pw / 2) + '" y="' + (y0 + ph + 16) + '" text-anchor="middle" class="nl-true-val">' + sheet.w + '" × ' + sheet.h + '"</text>';
+    svg += '</svg>';
+    return svg;
+  }
+
+  function update() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-sheet]'), function (b) {
+      UI.press(b, b.dataset.sheet === state.sheetId);
+    });
+    var sheet = findSheet(state.sheetId);
+    var userW = parseFloat(document.getElementById('userWidth').value) || 0;
+    var userD = parseFloat(document.getElementById('userDepth').value) || 0;
+    var drawableW = sheet.w - sheet.tb - 0.5, drawableH = sheet.h - 0.5;
+
+    var info = '';
+    function row(l, v) {
+      return '<div class="snap-row"><div class="snap-name">' + l + '</div><div class="snap-value">' + v + '</div></div>';
+    }
+    info += row('Sheet', '<span style="font-weight:400;">' + sheet.name + '</span>');
+    info += row('Dimensions', sheet.w + '" × ' + sheet.h + '" (' + sheet.w / 12 + "' × " + sheet.h / 12 + "')");
+    info += row('Drawable area', drawableW.toFixed(1) + '" × ' + drawableH.toFixed(1) + '"');
+    info += row('Title block', sheet.tb + '" strip, right — assumed');
+    document.getElementById('sheetInfo').innerHTML = info;
+
+    var bestScale = null;
+    var t = '<div class="section-label">What fits at each scale</div>'
+          + '<p class="section-note" style="font-size:var(--text-sm);color:var(--ink-2);margin:0.2rem 0 0.6rem;">Extent is half of choosing a scale. <a href="scale.html">Scale Resolution</a> shows the other half — the precision each scale carries.</p>';
+    t += '<table class="scale-table"><thead><tr><th>Scale</th><th>Max width</th><th>Max depth</th>';
+    if (userW && userD) t += '<th>Your ' + esc(userW + "' × " + userD + "'") + '</th>';
+    t += '</tr></thead><tbody>';
+    for (var i = 0; i < SCALES.length; i++) {
+      var sc = SCALES[i];
+      var maxW = drawableW / sc.factor, maxH = drawableH / sc.factor;
+      var fits = false;
+      if (userW && userD) {
+        fits = (userW <= maxW && userD <= maxH) || (userD <= maxW && userW <= maxH);
+        if (fits && !bestScale) bestScale = sc;
+      }
+      if (maxW < 1 || maxW > 100000) continue;
+      t += '<tr class="' + (fits ? 'fits' : '') + '"><td>' + esc(sc.label) + '</td><td>' + fmtFt(maxW) + '</td><td>' + fmtFt(maxH) + '</td>';
+      if (userW && userD) t += '<td>' + (fits ? 'fits' + (bestScale === sc ? ' <span class="fit-badge">largest that fits</span>' : '') : '—') + '</td>';
+      t += '</tr>';
+    }
+    t += '</tbody></table>';
+    document.getElementById('scaleTableContainer').innerHTML = t;
+    document.getElementById('sheetVisual').innerHTML = drawSheet(sheet, userW, userD, bestScale);
+  }
+
+  // common footprints
+  var cHTML = '';
+  COMMON.forEach(function (c) {
+    cHTML += '<button type="button" class="size-row" data-w="' + c.w + '" data-d="' + c.d + '">'
+      + '<span class="size-name">' + esc(c.name) + '</span>'
+      + '<span class="size-dim">' + c.w + "' × " + c.d + "'</span></button>";
+  });
+  document.getElementById('commonList').innerHTML = cHTML;
+  document.getElementById('commonList').addEventListener('click', function (e) {
+    var b = e.target.closest('.size-row');
+    if (!b) return;
+    document.getElementById('userWidth').value = b.dataset.w;
+    document.getElementById('userDepth').value = b.dataset.d;
+    update();
+  });
+
+  document.getElementById('userWidth').addEventListener('input', update);
+  document.getElementById('userDepth').addEventListener('input', update);
+
+  buildSheets();
+  update();
+})();
+</script>
+</body>
+</html>

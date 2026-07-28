@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-family="egress">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Egress Width -- architecture.tools</title>
+<meta name="description" content="Required egress width from an occupant load — IBC 1005.3 factors with the sprinkler condition stated, located against the component minimums; or a provided width read back as capacity.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover the two-field input row and the
+     citation line. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .duo-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-lg); }
+  .duo { display: flex; flex-direction: column; }
+  .duo label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+               text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .duo-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+               font-size: 1.05rem; font-weight: 400; width: 10.5em; max-width: 100%;
+               color: var(--ink); background: var(--card);
+               padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+               box-shadow: var(--shadow-well); border-radius: var(--radius);
+               outline: none; -webkit-appearance: none; appearance: none; }
+  .duo-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .duo-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 14em; }
+  .cite { margin-top: var(--space-sm); font-size: var(--text-xs); color: var(--ink-3); line-height: 1.7; }
+  .fact { color: var(--ink); font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Egress Width</span>
+    </nav>
+    <h1>Egress Width</h1>
+    <p>An occupant load times a factor is a width; a width divided by the factor
+       is a capacity. Both directions, the sprinkler condition stated instead of
+       assumed, and every result placed against the component minimums — which
+       often govern, and the page says when they do.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the load + an optional provided width -->
+  <div class="duo-row">
+    <div class="duo">
+      <label for="olInput">occupant load</label>
+      <input type="number" id="olInput" class="duo-input" inputmode="numeric" min="1" max="100000" step="1"
+             placeholder="from the occupant load calc" autofocus>
+      <div class="duo-note"><a class="card-link" href="occupant-load.html" style="margin-right:0;">need the count? →</a></div>
+    </div>
+    <div class="duo">
+      <label for="widthInput">provided width (optional)</label>
+      <input type="text" id="widthInput" class="duo-input" spellcheck="false" maxlength="60"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 44&quot;  ·  2 x 36&quot;">
+      <div class="duo-note" id="widthNote"></div>
+    </div>
+  </div>
+
+  <!-- slot 2 · tool controls: the component and the condition -->
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Component</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-comp="stair">stairways</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-comp="level">doors · corridors · ramps</button>
+    </div>
+    <div class="opt-cluster">
+      <span class="section-label">Condition</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-cond="ns">non-sprinklered</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-cond="s">sprinklered + voice alarm</button>
+    </div>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 5 · ANSWER CARD -->
+    <div class="answer-card" id="ewCard" style="display:none;">
+      <div class="answer-card-label" id="ewLabel"></div>
+      <div class="snap-rows" id="ewRows"></div>
+    </div>
+    <div class="cite" id="citeLine" style="display:none;"></div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/numberline.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+
+  /* IBC 2021 §1005.3 width factors, held as HUNDREDTHS of an inch per occupant
+     so required width = load × factor is EXACT integer arithmetic (the page's
+     one lattice-independent exactness: hundredths of inches, not 1/960 mm).
+     Base: stairways 0.3 (1005.3.1), other components 0.2 (1005.3.2).
+     Exceptions: 0.2 / 0.15 where the building is sprinklered per 903.3.1.1
+     AND has emergency voice/alarm communication — and the exception is not
+     available in Group H or I-2. The condition is a stated user choice. */
+  var FACTORS = {
+    stair: { ns: 30, s: 20, label: 'stairways', cite: '1005.3.1' },
+    level: { ns: 20, s: 15, label: 'doors, corridors, ramps — level components', cite: '1005.3.2' }
+  };
+  var CITE = 'IBC 2021 — §1005.3.1 stairways 0.3" per occupant, §1005.3.2 other components 0.2"; the 0.2"/0.15" exceptions need sprinklers per 903.3.1.1 AND emergency voice/alarm, and are not available in Groups H and I-2. Minimums: stairways 44" (36" serving fewer than 50) §1011.2; door clear width 32" min §1010.1.1; corridors §1020. Where two or more exits serve a space, losing one cannot cut capacity below half (§1005.5). Local amendments vary — verify what governs your project.';
+
+  var state = {
+    ol: '',                       // occupant load text (number field)
+    width: '',                    // provided width text (dim parse)
+    comp: 'stair',
+    cond: 'ns',
+    target: 'imperial'
+  };
+
+  var els = {};
+  ['olInput','widthInput','widthNote','echo','echoLine','echoAssume',
+   'ewCard','ewLabel','ewRows','citeLine','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+
+  var escapeHtml = UI.esc;
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 2 : d))); }
+
+  // a width in hundredths of an inch, shown in inches + exact mm (×0.254)
+  function fmtHun(hun) {
+    var inches = hun / 100;
+    var mm = hun * 0.254;
+    return sig(inches, 2) + '" (' + sig(mm, 1) + ' mm)';
+  }
+  function fmtLen(u) {
+    if (state.target === 'metric') return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+
+  function readOL() {
+    var n = parseInt(state.ol, 10);
+    return (Number.isInteger(n) && n >= 1 && n <= 100000) ? n : null;
+  }
+  function readWidth() {
+    if (!state.width.trim()) return null;
+    var r = parseLength(state.width, { defaultUnit: 'in' });
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length', result: r };
+    if (outOfRange(r.units) || r.units <= 0) return { error: r.units <= 0 ? 'must be more than zero' : 'out of range', result: r };
+    if (r.unitSystem === 'metric') state.target = 'metric';
+    return { units: r.units, result: r };
+  }
+
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  function render() {
+    syncURL();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-comp]'), function (b) { UI.press(b, b.dataset.comp === state.comp); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-cond]'), function (b) { UI.press(b, b.dataset.cond === state.cond); });
+
+    var ol = readOL();
+    var width = readWidth();
+    els.widthNote.innerHTML = width && width.error ? escapeHtml(width.error) : '';
+
+    var fdef = FACTORS[state.comp];
+    var f100 = fdef[state.cond];                              // hundredths of an inch per occupant
+
+    // echo
+    var any = ol != null || (width && !width.error);
+    if (!any) {
+      els.echo.style.display = 'none';
+      els.ewCard.style.display = 'none';
+      els.citeLine.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    var echoHtml = '';
+    if (ol != null) {
+      echoHtml += '<span class="tok stated">' + ol + '</span><span class="op"> occupants × ' + (f100 / 100) + '" </span>'
+        + '<span class="eq">=</span><span class="result">' + escapeHtml(fmtHun(ol * f100)) + '</span>';
+    } else {
+      echoHtml += '<span class="op">a width alone reads back as capacity</span>';
+    }
+    els.echoLine.innerHTML = echoHtml;
+    var asm = [fdef.label + ' at ' + (f100 / 100) + '" per occupant (§' + fdef.cite + ')'];
+    asm.push(state.cond === 's'
+      ? 'sprinklered + emergency voice/alarm assumed — the reduced factors; not available in Groups H and I-2'
+      : 'non-sprinklered base factors — the conservative reading');
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+
+    els.ewCard.style.display = '';
+    els.citeLine.style.display = '';
+    els.citeLine.innerHTML = escapeHtml(CITE);
+    els.ewLabel.textContent = fdef.label + ' · ' + (f100 / 100) + '" per occupant';
+
+    var html = '';
+    var mathLines = [];
+
+    if (ol != null) {
+      var reqHun = ol * f100;                                 // exact integer hundredths
+      html += rowHtml('Required width', 'load × factor — exact in hundredths of an inch',
+                      '<span class="fact">' + escapeHtml(fmtHun(reqHun)) + '</span>', '—', true);
+      // locate against the component minimums — and say which number is larger
+      if (state.comp === 'stair') {
+        var minIn = ol < 50 ? 36 : 44;
+        var minGloss = ol < 50 ? '36" floor — serving fewer than 50 (§1011.2)' : '44" floor (§1011.2)';
+        if (reqHun < minIn * 100) {
+          html += rowHtml('Stair minimum', minGloss + ' — larger than the calculated width, so it governs',
+                          minIn + '" (' + sig(minIn * 25.4, 0) + ' mm)', '+' + sig(minIn - reqHun / 100, 2) + '" over calc', false);
+        } else {
+          html += rowHtml('Stair minimum', minGloss + ' — the calculated width is larger',
+                          minIn + '"', '—', false, 'is-ref');
+        }
+      } else {
+        html += rowHtml('Door clear minimum', '32" clear per leaf (§1010.1.1) — each door must make this regardless',
+                        '32" (813 mm)', '—', false, 'is-ref');
+        var minC = ol < 50 ? 36 : 44;
+        if (reqHun < minC * 100) {
+          html += rowHtml('Corridor minimum', minC + '" floor (§1020) — larger than the calculated width, so it governs',
+                          minC + '" (' + sig(minC * 25.4, 0) + ' mm)', '+' + sig(minC - reqHun / 100, 2) + '" over calc', false);
+        } else {
+          html += rowHtml('Corridor minimum', minC + '" floor (§1020) — the calculated width is larger',
+                          minC + '"', '—', false, 'is-ref');
+        }
+      }
+      mathLines.push('required = ' + ol + ' × ' + f100 + ' = <b>' + reqHun + '</b> hundredths of an inch = ' + sig(reqHun / 100, 2) + '" — exact integer arithmetic');
+    }
+
+    if (width && !width.error) {
+      // capacity = floor(width / factor) — exact integer division on the
+      // lattice: floor(100·units / (f100·IN))
+      var cap = Math.floor(100 * width.units / (f100 * IN));
+      var capGloss = 'floor(width ÷ factor) — partial persons don\'t count';
+      html += rowHtml('Capacity of ' + escapeHtml(fmtLen(width.units)), capGloss,
+                      '<span class="fact">' + cap + '</span> occupants', '—', ol == null);
+      if (ol != null) {
+        var diff = cap - ol;
+        if (diff >= 0) {
+          html += rowHtml('Against your load', 'capacity minus the ' + ol + ' occupants',
+                          'carries the load', '+' + diff + ' spare', false, diff === 0 ? 'is-exact' : '');
+        } else {
+          html += rowHtml('Against your load', 'capacity minus the ' + ol + ' occupants',
+                          'short', String(diff) + ' occupants', false);
+        }
+        // and the width gap itself
+        html += rowHtml('Width margin', 'provided minus required',
+                        escapeHtml(NumberLine.formatResidual(Math.round(width.units - (ol * f100 / 100) * IN), state.target)), '—', false, 'is-ref');
+      }
+      mathLines.push('capacity = floor(100·' + width.units + ' / (' + f100 + '·' + IN + ')) = <b>' + cap + '</b> — exact integer division (width in 1/960 mm units)');
+    }
+
+    els.ewRows.innerHTML = html;
+    els.mathNote.innerHTML = mathLines.length
+      ? '<b>engine</b> — factors in hundredths of an inch; lengths exact integers, 1 unit = 1/960 mm:<br>' + mathLines.join('<br>')
+      : '';
+  }
+
+  /* ---- shareable URL ----------------------------------------------------------------- */
+  // recent readings — the URL carries the whole state, so a recent
+  // restores the full reading (shared component: ui.js UI.recents)
+  var recents = UI.recents({ key: 'egress-width', anchor: document.getElementById('olInput'), entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: 'OL ' + (state.ol || '') + (state.width ? ' · ' + state.width : '') + ' · ' + state.comp, result: r ? r.textContent : '' };
+  } });
+
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.ol) params.set('ol', state.ol);
+      if (state.width) params.set('w', state.width);
+      if (state.comp !== 'stair') params.set('c', state.comp);
+      if (state.cond !== 'ns') params.set('s', '1');
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var ol = params.get('ol');
+    if (ol != null && /^\d{1,6}$/.test(ol)) state.ol = ol;
+    var w = params.get('w');
+    if (w != null) state.width = w.slice(0, 60);
+    if (params.get('c') === 'level') state.comp = 'level';
+    if (params.get('s') === '1') state.cond = 's';
+  }
+
+  /* ---- wiring -------------------------------------------------------------------------- */
+  els.olInput.addEventListener('input', function () { state.ol = els.olInput.value; render(); });
+  els.widthInput.addEventListener('input', function () { state.width = els.widthInput.value; render(); });
+  els.widthInput.addEventListener('focus', function () { setTimeout(function () { els.widthInput.select(); }, 0); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-comp]'), function (b) {
+    b.addEventListener('click', function () { state.comp = b.dataset.comp; render(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cond]'), function (b) {
+    b.addEventListener('click', function () { state.cond = b.dataset.cond; render(); });
+  });
+
+  // initial state — URL params (incl. ?ol= carried from the occupant load
+  // calc) override the worked example (240 occupants on a stair)
+  initFromURL();
+  els.olInput.value = state.ol || '240';
+  state.ol = els.olInput.value;
+  els.widthInput.value = state.width;
+  render();
+})();
+</script>
+</body>
+</html>

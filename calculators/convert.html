@@ -486,6 +486,7 @@
       }
       var q = params.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
     }, 250);
   }
   function initFromURL() {
@@ -506,6 +507,12 @@
       UI.press(el, el.dataset[attr] === value);
     });
   }
+
+  // recent readings — the URL is the whole state, so a recent restores it all
+  var recents = UI.recents({ key: 'convert', anchor: els.input, entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: state.text, result: r ? r.textContent : '' };
+  } });
 
   els.input.addEventListener('input', function () { state.text = els.input.value; render(); });
   // selecting the field selects its text, so a new entry overwrites the old one

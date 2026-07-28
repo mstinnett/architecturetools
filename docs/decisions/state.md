@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-09 (UI review pass landed; converter promoted to main — the live site is now picker + converter)_
+_Last updated: 2026-07-09 (**`tile.html` ("Tile")** is now the tile node: one chassis, verb-named tasks — Size The Wall (the uncut-run solver; answers with dimensions to set, elevation figure, selectable rows) and Lay Out The Wall (flush/centered drawn, cuts as ranges). **Recents on every engine tool.** The **design-vs-construction frame** adopted into the suite map. Scale: Across The Scales + false-precision reveal, metric family flip, "sheet resolution" vocabulary. `area.html` → **Material Coverage** (rate divisor, waste unbundled). A per-tool exemplar-pass queue for the remaining tools is in the backlog. All on branch `claude/calculator-converter-promotion-qcbhgv`, noindexed — operator moves to `main` manually.)_
 
 ## Live architectural picture
 
@@ -28,26 +28,51 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
     the moment it's on `main`.
 - **Calculator engine (`calculators/lib/`):** the spine of the calculator
   family. Model: **parse a dimension expression → resolve it against a discrete
-  constraint → show the residual.** Modules: `parse-length.js` (never throws),
-  `snap.js` (fails loud, floor/nearest/ceil to a grid), `numberline.js` (pure
-  SVG string), and `partition.js` (fails loud; divides a run into a whole number
-  of equal parts — sections, tiles, on-center, balusters — and exposes the
-  residual; reuses snap's integer division). `convert.html`, the Precise Unit
-  Converter, is the only **tool page** yet built on the engine — **shipped and
-  frozen**; it uses parse/snap/numberline. `partition.js` is landed and tested
-  but has no tool page yet. Every other `calculators/*.html` is older,
-  standalone, and does **not** use the engine.
+  constraint → show the residual.** Compute modules: `parse-length.js` (never
+  throws), `snap.js` (fails loud, floor/nearest/ceil to a grid), `partition.js`
+  (fails loud; divides a run into equal parts — sections, tiles, on-center,
+  balusters — and exposes the residual). Figure modules (pure SVG strings,
+  same conventions): `numberline.js`, `runbar.js` (a partition layout to scale,
+  residual hatched, overruns drawn past the dimension line), `slopefig.js`
+  (true-angle triangle, angular residual hatched as a wedge), `stairfig.js`
+  (stair section, layout drift hatched at the floor line).
+- **Twelve engine tool pages, three families.** `convert.html` (shipped on
+  `main`, frozen) plus eleven on `dev` (2026-06-10, noindexed, awaiting the
+  operator's taste pass then one-at-a-time promotion). Drafting family:
+  `run.html` (the partition tool), `scale.html` (**"Scale Resolution"** — rebuilt
+  2026-07-08 on the crossing model: a dimension crosses between sheet and world
+  through an instrument, scale `n` converts sheet error to real error; see Recent
+  decisions), `slope.html` (any-two-of-three; coherence-passed 2026-07-08,
+  answer surface matched to the converter), `area.html` (**"Material
+  Coverage"** — rate divisor, waste unbundled into breakage/attic-stock/
+  cut-waste-is-the-layout's), `tile.html` (**"Tile"** — Size The Wall:
+  the uncut-run solver, dimensions-to-set answers, windows + elevation figures;
+  Lay Out The Wall: flush/centered, cuts as ranges), `stairs.html` (introduces the edition pill + citation
+  pattern), `sheet-sizes.html` (the fit reference, restyled onto the theme,
+  ANSI added). Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table
+  1004.5, gross/net surfaced), `egress-width.html` (load×factor both
+  directions, minimums located), `exits.html` (count thresholds + the
+  half-diagonal separation, both verified), `fixture-calc.html` (banded
+  ratios via `lib/bands.js`, per-value verified/draft provenance tags) —
+  chained: area ?d=→ OL ?ol=→ egress width / exits / fixtures. Accessibility
+  family: `ramp.html` (rise → runs + landings, §405 cited). `index.html` is
+  the C-0 cover; tool crumbs route through it. Each page has a jsdom wiring
+  smoke and a headless-Chromium render check (`/tmp/smoke` harness, not
+  committed). Retired/rebuilt as superseded: `dimension-converter`,
+  `slope-calculator`, `stair-calculator`, and the pre-engine
+  `occupant-load`/`egress-width`/`fixture-calc` lookups. Still off-engine:
+  `parking-ratio.html` (zoning-adjacent, default out).
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
   warm sheet theme; imports `assets/css/tokens.css`, the canonical color
   palette; owns the per-family accent system selected via `data-family` on
-  `<html>` and the one shared dark scheme). The picker and converter use it
-  fully; `components.html` and `dimension-converter.html` link it and inherit
-  the theme (the old cool-neutral sheet of the same name was replaced —
-  same class/token vocabulary, re-valued). `assets/data/hardware-data.json`
-  (the picker's runtime data, generated from the `data/` CSV tables — see the
-  pipeline contract below).
+  `<html>` and the one shared dark scheme). The picker and every
+  `calculators/` page except `parking-ratio.html` use it fully;
+  `components.html` links it and inherits the theme but hasn't been reviewed
+  against it; `site-screen.html` still carries its own inline styles.
+  `assets/data/hardware-data.json` (the picker's runtime data, generated from
+  the `data/` CSV tables — see the pipeline contract below).
 - **Verification gate:** `.claude/gate/run.sh` — htmlhint + stylelint +
   internal-link check. A dependency carve-out under `.claude/gate/`; not
   shipped with the site.
@@ -78,99 +103,100 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
   New tools follow them (`docs/HANDOFF.md` §3).
 - The provenance rule: never serve WIP on `architecture.tools` or a subdomain
   of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
+- The citation ledger: every external code/standard a tool cites has a row in
+  `docs/REFERENCES.md` with a per-value status (verified / cross-checked /
+  memory); a new citation lands there in the same commit, and a page's
+  draft tags must agree with the ledger.
 
 ## Recent decisions
 
-- 2026-06-09 — Interim nav revised after operator review: every title block
-  opens with a breadcrumb (site title linking home + the set trail as a
-  label — "Calculators → Precise Unit Converter"), in place of routing the
-  two live pages through a C-0 cover. C-0 deferred until the set has a
-  second shipped tool (a one-item index is less deliberate than a labeled
-  trail); footer cross-links kept. Rule in SITE_FRAMEWORK "Hierarchy".
-- 2026-06-09 — UI review pass (operator-directed, "act on all of them"), then
-  the converter promoted to `main`. One base font size site-wide (18px, the
-  picker's iterated scale, set once in global.css). The calculator shell
-  graduated into global.css ("CALCULATOR SHELL": input well, echo, constraint
-  dial, debossed answer card, snap rows, figure text classes, mathnote) with
-  the slots labeled in convert.html and the convention recorded in HANDOFF §3.
-  All interactive pills on both pages are now real `<button>`s with
-  `aria-pressed` (synced via the new shared `assets/js/ui.js`, which also owns
-  `esc()`), one focus-visible ring, and coarse-pointer hit-height bumps; the
-  picker's markup order now matches its visual order (CSS `order` removed) and
-  ~10 dead inline CSS classes from earlier iterations were trimmed. Converter
-  gained a shareable URL (`?d=&t=&g=`) and an echo assumption line announcing
-  the auto-flipped target; the picker footer date now derives from
-  `Meta.dataUpdated` (build-data stamps the last data/ commit date). Interim
-  nav nailed down in SITE_FRAMEWORK and wired (footer link ↔ back-link).
-- 2026-06-09 — Shared CSS consolidated to one sheet (operator-directed).
-  `global2.css` renamed over `assets/css/global.css`, replacing the old
-  cool-neutral sheet (same class/token vocabulary, so its two consumers —
-  `components.html`, `dimension-converter.html` — re-theme without edits).
-  The `--paper` repetition resolved: tokens.css is its only definer (the
-  brand's warm-white anchor, like `--lightbox` for dark); the theme's grounds
-  are `--card` (the sheet) and `--gray-100` (the field behind it), and the
-  unused `--page-bg` alias was dropped. Picker + converter verified
-  computed-style identical in both schemes.
-- 2026-06-09 — Shared CSS refactor (operator-directed). The canonical palette
-  graduated from `docs/In Progress/tokens.css` to `assets/css/tokens.css`;
-  `global2.css` imports it and now owns the family-accent system (pages
-  declare `<html data-family="picker|drafting|…">`) plus the single shared
-  dark scheme that `index.html` and `convert.html` had each been carrying
-  inline. Both pages' duplicated `:root` mirrors and dark blocks were
-  deleted; rendering verified pixel-identical (computed-style diff, both
-  schemes). Future tool pages adopt the look with one link + one attribute.
-- 2026-06-07 — `partition.js` shipped: the layout primitive (sibling to
-  `snap.js`) that divides a run into a whole number of equal parts and exposes
-  the residual, unifying four tools (sections / tiles / on-center / balusters)
-  behind one module. Pure integer math, fails loud, 35 inline `node` tests
-  passing. No tool page consumes it yet — that is the next build.
-- 2026-06-07 — Engine hardened after a review of `convert.html` + the lib:
-  `numberline.js` and `partition.js` now **delegate** the floor/nearest/ceil
-  kernel to `snap.js` (one source of truth, no duplicated `snapTriple`/`pick`);
-  `numberline()` validates its public inputs; `partition` infeasibility carries
-  stable `reason` codes; the `Number`-range bound is documented. Conventions
-  updated in `docs/HANDOFF.md` §3. Also fixed the flagged convert.html UI bugs
-  (mobile-CSS selector, area out-of-range guard, Min/Max row wording). Open
-  follow-ups in the backlog: parser `reason` codes, and convert.html
-  pending-span policy + area/ratio polish.
-- 2026-06-07 — `noindex` added to all 11 `dev` WIP pages (provenance §4).
-- 2026-06-07 — Precise Unit Converter shipped (frozen), and the calculator
-  **engine** (`calculators/lib/`) established as the spine for the family. Build
-  plan and provenance rule captured in `docs/HANDOFF.md`. These agent docs
-  (`state.md`, `backlog.md`) were reconciled to match — they previously omitted
-  the engine entirely and still listed removed pages as live.
-- 2026-06-07 — `main` trimmed to picker-only (`f01b200`): `components.html`,
-  `site-screen.html`, and `calculators/` removed from the live branch and kept
-  on `dev`. The two-branch promotion model (above) is the working arrangement.
-- 2026-06-05 — Deployment moved in-repo. `CNAME` points the custom domain
-  (architecture.tools) at the site; `.github/workflows/build-data.yml`
-  recompiles `hardware-data.json` on push and commits it back. With `.nojekyll`
-  this is a GitHub Pages setup serving `main`, not an external pipeline.
-- 2026-06-03 — Hardware data split into per-table CSVs. The single `catalog.csv`
-  became `cpus.csv` + `gpus.csv` + `chips.csv`; the spec matrices reference
-  catalog keys, compiled by `tools/build-data.mjs`. `data/README.md` is
-  authoritative. (Supersedes the earlier Pages-CMS / `.pages.yml` idea, which
-  never shipped.)
-- 2026-05-29 — Picker-only launch revision (operator-directed). The picker
-  became the site home page; live pricing was removed from the picker UI (price
-  data retained, unrendered).
-- 2026-05-22 — Autonomous work system bootstrapped. Setup choices recorded
-  in `docs/decisions/OPERATING_GUIDE.md`.
+- 2026-07-08 — **`scale.html` rebuilt on the crossing model; `slope.html`
+  coherence pass; both answer surfaces matched to `convert.html`** (operator-
+  directed, branch `claude/calculator-converter-promotion-qcbhgv`; not a
+  promotion). The 2026-07-07 two-mode Scale Resolution ("Scaled Drawing Of
+  Object" / "Physical Object") **stopped reading** and was rebuilt around one
+  unifying idea: **a dimension crosses between sheet and world through an
+  instrument; scale `n` converts sheet error to real error.** Five quantities —
+  drawing scale `n`, sheet resolution `R` (source sheet-precision × `n`), read
+  resolution `r`, tape resolution `t`, run accumulation. Two rules: reading →
+  `value ± max(r, R)`; measuring to draw → known to ±(accumulated tape error),
+  drawn off by `max(that, R)`. Page order is fixed: **scale → verb-named task
+  toggle (Read A Drawing / Measure To Draw) → precisions → dimension → run.**
+  The **sheet resolution is a knob** — a source-fidelity spectrum (Revit/CAD `snap`
+  · PDF/Revu ≈0.3 mm · Print/Scale-rule ≈0.5 mm · Hand-drawn ≈0.8 mm) — so the
+  resolution is set without a second length field. The run section now takes a
+  **physical tape length** (12/25/50 ft, metric 5/10/30 m, custom); each lay
+  covers one tape length, the table carries a Run column and highlights the lay
+  where the worst-case chain first exceeds what the sheet holds (`N ≈ R/t`), with a marker
+  on the stack-up figure. Imperial real-measurement displays read as native
+  ft-in fractions, not survey decimals. **Slope**: any-two-of-three inputs; the
+  three redundant sides collapsed to the solved ones; a rounding table
+  (shallower-for-a-max / steeper-for-a-min) whose cells are selectable and drive
+  the figure's hatch and comparison rays; regime-aware curation (pitch only when
+  12s≥1, ratio only when s≤1); conflict validation on non-triangular inputs; a
+  larger, more diagrammatic true-angle triangle with steep-tip label stacking.
+  **Both** tools now use the converter's echo grammar — stated/inferred tokens,
+  `tokens = result`, three registers (echo / figure / rows). **Show-don't-judge**
+  held throughout. Standing takeaway (unchanged): a genuine promotion here is a
+  **redesign**, not a noindex-drop.
+- 2026-06-10 — **The calculator build-out** (operator-directed, three passes in
+  one day; per-tool records live in backlog "Done"). Eleven tool pages + five
+  engine/figure modules + the C-0 cover, all on the shell conventions; the
+  superseded standalones retired or rebuilt in place. Governing principle,
+  operator-stated: **surface information, don't decide for the user.** Two
+  durable sub-decisions: (a) code TABLE values ship only with per-value
+  provenance — verified / cross-checked / memory, rendered as visible tags
+  (`docs/REFERENCES.md` is the ledger); fixtures was deferred for exactly this
+  until the banded engine + tagged-draft approach made it shippable honestly.
+  (b) A real-browser render sweep (Puppeteer/Chromium in the session sandbox)
+  is now part of verification alongside the jsdom smokes and the gate.
+- 2026-06-10 — `main` merged into `dev` (operator-directed: main's picker +
+  converter are the approved versions). Main's side won every overlapping file
+  — it had absorbed dev's palette work and moved past it. Dev kept its unique
+  files; stale `global2.css` removed.
+- 2026-06-09 — **UI/CSS consolidation + converter promotion** (operator-
+  directed; full detail in backlog "Done" + HANDOFF §3). One 18px base size;
+  the calculator shell graduated into `global.css`; `tokens.css` promoted as
+  the canonical palette with the `data-family` accent system and one shared
+  dark scheme; all pills real `<button>`s via shared `assets/js/ui.js`;
+  interim nav nailed (title-block crumb, no C-0 until the set earned it);
+  `convert.html` + lib promoted to `main`.
+- 2026-06-07 — **Engine established.** Precise Unit Converter shipped
+  (frozen); `calculators/lib/` set as the family's spine with its conventions
+  (HANDOFF §3); then hardened after review — one rounding kernel in `snap.js`
+  with others delegating, public-input validation, stable infeasibility
+  `reason` codes. `partition.js` landed. `noindex` on all dev WIP pages.
+- 2026-06-07 — `main` trimmed to picker-only (`f01b200`); the two-branch
+  promotion model (above) is the working arrangement.
+- 2026-06-05 — Deployment moved in-repo: `CNAME`, the `build-data` workflow,
+  `.nojekyll` — GitHub Pages serving `main`, no external pipeline.
+- 2026-06-03 — Hardware data split into per-table CSVs compiled by
+  `tools/build-data.mjs`; `data/README.md` authoritative. (Supersedes the
+  Pages-CMS idea, never shipped.)
+- 2026-05-29 — Picker-only launch revision (operator-directed): picker became
+  the home page; live pricing removed from the UI (data retained).
+- 2026-05-22 — Autonomous work system bootstrapped
+  (`docs/decisions/OPERATING_GUIDE.md`).
 
 ## Active concerns
 
-- **Next build:** a **tool page** on `partition.js` — a convert.html-style page
-  (figure + parsed input + residual) exposing tile cuts / n-sections / on-center
-  / balusters. The primitive is done; this is the UI layer. Then slope,
-  area+coverage, scale. See `docs/HANDOFF.md` §5 and the backlog.
-- **Provenance loose end:** `noindex` is now on all 11 `dev` WIP pages
-  (`components`, `site-screen`, every `calculators/*.html`) — remove on
+- **Eleven new tools + C-0 await the operator's taste pass, then promotion.**
+  Gate-green, 185 jsdom checks, and now RENDERED: a Puppeteer/headless-Chromium
+  sweep (installed in the session sandbox via npm; harness in /tmp/smoke, not
+  committed) covered all 14 pages × light/dark × desktop/phone — zero page
+  errors, zero horizontal overflow, dark figures inverting. Remaining risk is
+  taste and real-device behavior, not wiring. Promotion drops each page's
+  `noindex`; the C-0 promotion also wires convert.html's crumb.
+- **Two draft-data pointers carry visible tags until checked:** fixture ratios
+  beyond the verified business/A-1 values, and exits' Table 1006.2.1 +
+  travel-distance tables (left out entirely). Backlog records the
+  replace-from-a-checked-copy procedure.
+- **Provenance loose end:** `noindex` is on every `dev` WIP page — remove on
   promotion. Still open: no neutral preview host is configured, so WIP can only
   be viewed locally until one is stood up.
-- **Legacy calculators are off-engine.** `slope`, `stair`, `sheet-sizes` get
-  rebuilt onto the engine; `dimension-converter.html` is superseded by
-  `convert.html` and should be retired, not ported. The code-compliance
-  calculators (`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`)
-  are a different lineage (table lookups) — out of scope for the engine thread.
+- **Next calc thread:** exits & arrangement (the last life-safety node besides
+  fixtures), and plumbing fixtures once its IPC table is verified — both in
+  the backlog with their preconditions. `sheet-sizes.html`'s home (C reference
+  vs L-series) is an open backlog item.
 - The richer AT-0 master cover (a multi-set index) is deferred behind the
   picker-only launch — tracked in the backlog.
