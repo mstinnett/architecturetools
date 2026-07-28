@@ -136,6 +136,20 @@
              autocomplete="off" autocapitalize="off" placeholder="e.g. 5'-1&quot;  ·  2.45m">
       <div class="field-note" id="fieldNote"></div>
     </div>
+    <!-- the run can TURN: more walls chain through inside corners. Each corner
+         takes a fixed amount (the lap) + a joint; the corner cut's offcut is
+         offered as the next wall's starter. Lay Out The Wall only. -->
+    <div class="joint-row" id="moreWalls" style="display:none;margin:-0.6rem 0 var(--space-md);">
+      <span class="lbl">then wall 2</span>
+      <input type="text" id="wall2Input" class="small-input" spellcheck="false" maxlength="24"
+             autocomplete="off" autocapitalize="off" placeholder="—">
+      <span class="lbl">then wall 3</span>
+      <input type="text" id="wall3Input" class="small-input" spellcheck="false" maxlength="24"
+             autocomplete="off" autocapitalize="off" placeholder="—">
+      <span class="lbl">corner takes</span>
+      <input type="text" id="cornerInput" class="small-input" spellcheck="false" maxlength="24"
+             autocomplete="off" autocapitalize="off" value="3/8&quot;">
+    </div>
 
     <div id="results">
       <div class="echo" id="echo" style="display:none;">
@@ -176,10 +190,12 @@
      to the other's when the units flip; typed values are never touched. */
   var DEFAULTS = {
     imperial: { tile: '6"', jmin: '1/16"', jmax: '3/16"', wall: '5\'-1"', end: '0"',
+                corner: '3/8"', cornerU: 3 * IN / 8,
                 tileU: 6 * IN, jminU: IN / 16, jmaxU: 3 * IN / 16,
                 chips: ['3"', '4 1/4"', '6"', '12"', '24"'],
                 ends: [['None', '0"'], ['Bullnose', '3"'], ['Metal Edge', '1/8"'], ['Lapped', '3/8"']] },
     metric:   { tile: '150 mm', jmin: '2 mm', jmax: '5 mm', wall: '2.45 m', end: '0 mm',
+                corner: '10 mm', cornerU: 10 * MM,
                 tileU: 150 * MM, jminU: 2 * MM, jmaxU: 5 * MM,
                 chips: ['100 mm', '150 mm', '300 mm', '600 mm'],
                 ends: [['None', '0 mm'], ['Bullnose', '75 mm'], ['Metal Edge', '3 mm'], ['Lapped', '10 mm']] }
@@ -192,6 +208,9 @@
     jminText: '1/16"',
     jmaxText: '3/16"',
     wallText: '',
+    wall2Text: '',
+    wall3Text: '',
+    cornerText: '3/8"',
     endAText: '0"',
     endBText: '0"',
     task: 'size',                    // 'size' = pick the dimension | 'layout' = the wall as drawn
@@ -202,7 +221,7 @@
   var els = {};
   ['tileInput','tileChips','jminInput','jmaxInput','endAInput','endBInput','endAPresets','endBPresets',
    'dimInput','fieldNote','echo','echoLine','echoAssume','figure','winTable','engineNote',
-   'wallLabel','tableNote'].forEach(function (id) {
+   'wallLabel','tableNote','moreWalls','wall2Input','wall3Input','cornerInput'].forEach(function (id) {
     els[id] = document.getElementById(id);
   });
   var escapeHtml = UI.esc;
@@ -243,9 +262,13 @@
     var endB = parseField(state.endBText, 0, true);
     var F = endA.u + endB.u;
     var wall = state.wallText.trim() ? parseField(state.wallText, null) : { u: null, stated: false };
+    var wall2 = state.wall2Text.trim() ? parseField(state.wall2Text, null) : { u: null, stated: false };
+    var wall3 = state.wall3Text.trim() ? parseField(state.wall3Text, null) : { u: null, stated: false };
+    var corner = parseField(state.cornerText, d.cornerU, true);
     return {
       T: tile.u, jLo: jmin.u, jHi: jmax.u, F: F,
       tile: tile, jmin: jmin, jmax: jmax, wall: wall, endA: endA, endB: endB,
+      wall2: wall2, wall3: wall3, corner: corner,
       joints: function (N) { return Math.max(0, N - 1); },
       lo: function (N) { return F + N * this.T + this.joints(N) * this.jLo; },
       hi: function (N) { return F + N * this.T + this.joints(N) * this.jHi; }
@@ -385,7 +408,8 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-task]'), function (el) {
       UI.press(el, el.dataset.task === state.task);
     });
-    els.wallLabel.textContent = state.task === 'size' ? 'Wall — about how long?' : 'Wall — as dimensioned';
+    els.wallLabel.textContent = state.task === 'size' ? 'Wall — about how long?' : 'Wall — as dimensioned (turns corners: add walls)';
+    els.moreWalls.style.display = state.task === 'layout' ? '' : 'none';
     els.tableNote.textContent = state.task === 'size'
       ? 'Select a row to draw that count on the wall.'
       : 'Cut widths are ranges — where the joints land inside their minimum and maximum decides each cut.';
@@ -396,6 +420,7 @@
   /* ---- Size The Wall: pick the dimension ----------------------------------- */
   function renderSize(m) {
     var Wu = m.wall.u;
+    var extraWalls = (m.wall2.u != null && m.wall2.u > 0) || (m.wall3.u != null && m.wall3.u > 0);
     // which N to look at: around the wall if given, else the first handful
     var Nc = Wu != null ? Math.max(1, Math.round((Wu - m.F) / (m.T + (m.jLo + m.jHi) / 2))) : 3;
     var Nlo = Math.max(1, Nc - 2), Nhi = Nc + 2;
@@ -439,6 +464,7 @@
     }
     els.echoLine.innerHTML = html;
     var asm = [];
+    if (extraWalls) asm.push('sizing reads wall 1 — walls 2 and 3 apply to Lay Out The Wall');
     if (Jstar != null) asm.push('at ' + fmtShort(Wu) + ' the joints run ≈ ' + fmtShort(Jstar));
     if (m.endA.u > 0) asm.push('beginning of run +' + fmtShort(m.endA.u));
     if (m.endB.u > 0) asm.push('end of run +' + fmtShort(m.endB.u));
@@ -509,6 +535,11 @@
       els.engineNote.innerHTML = '';
       return;
     }
+    var segs = [Wu];
+    if (m.wall2.u != null && m.wall2.u > 0) segs.push(m.wall2.u);
+    if (m.wall3.u != null && m.wall3.u > 0 && segs.length > 1) segs.push(m.wall3.u);
+    if (segs.length > 1) { renderLayoutChain(m, segs); return; }
+
     var Wf = Wu - m.F;                        // the field between the run ends
     var Jm = (m.jLo + m.jHi) / 2;             // laid at the middle of the range
     var k = Math.max(0, Math.floor((Wf + Jm) / (m.T + Jm)));
@@ -563,6 +594,122 @@
     lines.push('whole tiles k = floor((field + joint) / (tile + joint)) = <b>' + k + '</b>');
     lines.push('flush cut = field − k × tile − k × joint ∈ [' + Math.round(Wf - k * m.T - k * m.jHi) + ', ' + Math.round(cHi) + '] units');
     els.engineNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- the run TURNS: walls chained through inside corners -----------------
+     Unfolded left to right. Each corner takes a fixed amount (the lap) plus a
+     joint off the next wall; the corner cut's offcut is offered as that wall's
+     starter. Counts run both ways — corner reuse taken, and not. Whole-tile
+     counts are chosen at the middle of the joint range; cut widths carry the
+     full range (every joint upstream flexes). */
+  function chainCalc(m, segs) {
+    var Jm = (m.jLo + m.jHi) / 2, T = m.T;
+    var walls = [], whole = 0, cuts = 0;
+    for (var i = 0; i < segs.length; i++) {
+      var F = segs[i] - (i === 0 ? m.endA.u : 0) - (i === segs.length - 1 ? m.endB.u : 0)
+            - (i > 0 ? m.corner.u : 0);
+      var avail = F - (i > 0 ? Jm : 0);              // the corner joint
+      var k = Math.max(0, Math.floor((avail + Jm) / (T + Jm)));
+      var c = avail - k * (T + Jm);
+      if (c < 0 && k > 0) { k -= 1; c = avail - k * (T + Jm); }
+      var hasCut = c > 1;
+      var pieces = k + (hasCut ? 1 : 0);
+      var nJ = Math.max(0, pieces - 1) + (i > 0 ? 1 : 0);
+      var cLo = Math.max(0, F - nJ * m.jHi - k * T);
+      var cHi = Math.max(0, F - nJ * m.jLo - k * T);
+      whole += k; if (hasCut) cuts++;
+      walls.push({ W: segs[i], k: k, cNom: hasCut ? c : 0, cLo: cLo, cHi: cHi, hasCut: hasCut, from: null });
+    }
+    // reuse: each cut takes the smallest prior offcut that covers it, else a
+    // new tile (whose offcut joins the pool). Saw kerf and direction not
+    // counted — stated in the assumptions.
+    var pool = [], tilesReuse = whole, tilesNo = whole;
+    walls.forEach(function (w, i) {
+      if (!w.hasCut) return;
+      tilesNo += 1;
+      var best = -1;
+      pool.forEach(function (p, j) {
+        if (p.o >= w.cNom && (best < 0 || p.o < pool[best].o)) best = j;
+      });
+      if (best >= 0) { w.from = pool[best].wall; pool.splice(best, 1); }
+      else { tilesReuse += 1; pool.push({ o: T - w.cNom, wall: i + 1 }); }
+    });
+    return { walls: walls, whole: whole, cuts: cuts, tilesReuse: tilesReuse, tilesNo: tilesNo };
+  }
+
+  function renderLayoutChain(m, segs) {
+    var Jm = (m.jLo + m.jHi) / 2;
+    var C = chainCalc(m, segs);
+
+    var html = tok(m.tile, fmtShort(m.T)) + '<span class="op"> tile · joint </span>'
+             + tok(m.jmin, fmtShort(m.jLo)) + '<span class="op">–</span>' + tok(m.jmax, fmtShort(m.jHi))
+             + '<span class="op"> · walls </span>' + tok(m.wall, fmtShort(segs[0]));
+    if (segs[1] != null) html += '<span class="op"> + </span>' + tok(m.wall2, fmtShort(segs[1]));
+    if (segs[2] != null) html += '<span class="op"> + </span>' + tok(m.wall3, fmtShort(segs[2]));
+    html += '<span class="eq">=</span><span class="result">' + C.whole + ' whole · ' + C.cuts + (C.cuts === 1 ? ' cut' : ' cuts')
+          + ' · ' + C.tilesReuse + ' tiles reusing offcuts' + (C.tilesNo !== C.tilesReuse ? ', ' + C.tilesNo + ' without' : ' — reuse saves none here') + '</span>';
+    els.echoLine.innerHTML = html;
+    var asm = ['joints drawn at ' + fmtShort(Jm) + ' — the middle of the range',
+      'each corner takes ' + fmtShort(m.corner.u) + ' + a joint off the next wall — the earlier wall runs through',
+      'a cut is taken from an earlier offcut when one is wide enough — saw kerf and a directional face not counted'];
+    if (m.endA.u > 0) asm.push('beginning of run +' + fmtShort(m.endA.u));
+    if (m.endB.u > 0) asm.push('end of run +' + fmtShort(m.endB.u));
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.innerHTML = chainFig({ m: m, segs: segs, calc: C, Jm: Jm, width: width });
+
+    var rows = '<tr><th>Wall</th><th>Whole Tiles</th><th>Corner / End Cut</th><th>Cut From</th></tr>';
+    C.walls.forEach(function (w, i) {
+      rows += '<tr><td>' + (i + 1) + ' — ' + escapeHtml(fmtShort(w.W)) + '</td>'
+            + '<td>' + w.k + '</td>'
+            + '<td>' + (w.hasCut ? escapeHtml(fmtShort(w.cLo)) + ' – ' + escapeHtml(fmtShort(w.cHi)) : 'none') + '</td>'
+            + '<td>' + (w.hasCut ? (w.from != null ? 'wall ' + w.from + '\u2019s offcut' : 'a new tile') : '—') + '</td></tr>';
+    });
+    els.winTable.innerHTML = rows;
+
+    var lines = ['walls = ' + segs.map(function (w) { return Math.round(w); }).join(' + ') + ' units · corner = ' + Math.round(m.corner.u) + ' units + joint'];
+    lines.push('tiles = ' + C.whole + ' whole + cut tiles · reusing offcuts <b>' + C.tilesReuse + '</b> · without <b>' + C.tilesNo + '</b>');
+    els.engineNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- the chained elevation: walls unfolded, corners marked ---------------- */
+  function chainFig(o) {
+    var W = o.width, padL = 8, padR = 8, yT = 22, hT = 42, dimY = yT + hT + 18, H = dimY + 28;
+    var total = 0; o.segs.forEach(function (w) { total += w; });
+    var k = (W - padL - padR) / total;
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" class="nl" role="img" '
+            + 'aria-label="The walls unfolded: courses chained through the corners, cuts hatched, reused cuts outlined.">';
+    svg += '<defs><pattern id="pwhatch4" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         + '<line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.7"/></pattern></defs>';
+    var x0 = padL;
+    o.calc.walls.forEach(function (w, i) {
+      var x = x0 + (i === 0 ? o.m.endA.u : 0) * k + (i > 0 ? (o.m.corner.u + o.Jm) * k : 0);
+      function piece(wid, fill, accent) {
+        if (wid <= 0) return;
+        svg += '<rect x="' + x + '" y="' + yT + '" width="' + Math.max(wid * k, 0.75) + '" height="' + hT + '" fill="' + fill
+             + '" stroke="' + (accent ? 'var(--accent,#004C80)' : 'var(--nl-ink,#0a0a0a)') + '" stroke-width="' + (accent ? 1.8 : 0.8) + '"/>';
+        x += wid * k;
+      }
+      for (var t = 0; t < w.k; t++) { piece(o.m.T, 'var(--card,#fff)'); if (t < w.k - 1) x += o.Jm * k; }
+      if (w.hasCut) { if (w.k > 0) x += o.Jm * k; piece(w.cNom, 'url(#pwhatch4)', w.from != null); }
+      var wx0 = x0, wx1 = x0 + w.W * k;
+      svg += '<line x1="' + wx0 + '" y1="' + dimY + '" x2="' + wx1 + '" y2="' + dimY + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+      svg += '<line x1="' + wx0 + '" y1="' + (dimY - 4) + '" x2="' + wx0 + '" y2="' + (dimY + 4) + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+      svg += '<line x1="' + wx1 + '" y1="' + (dimY - 4) + '" x2="' + wx1 + '" y2="' + (dimY + 4) + '" stroke="var(--nl-axis,#999)" stroke-width="1"/>';
+      svg += '<text x="' + ((wx0 + wx1) / 2) + '" y="' + (dimY + 14) + '" text-anchor="middle" class="nl-src-val" stroke-width="3" style="paint-order:stroke">' + escapeHtml(fmtShort(w.W)) + '</text>';
+      x0 = wx1;
+      if (i < o.calc.walls.length - 1) {
+        svg += '<line x1="' + x0 + '" y1="' + (yT - 8) + '" x2="' + x0 + '" y2="' + (yT + hT + 8) + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="2.4"/>';
+        svg += '<text x="' + x0 + '" y="' + (yT - 12) + '" text-anchor="middle" class="nl-src-val" stroke-width="3" style="paint-order:stroke">corner</text>';
+      }
+    });
+    svg += '<text x="' + padL + '" y="' + (H - 2) + '" font-size="10" fill="var(--nl-axis,#999)" stroke-width="3" style="paint-order:stroke">walls unfolded · hatched = cut · accent outline = cut taken from an earlier offcut</text>';
+    svg += '</svg>';
+    return svg;
   }
 
   /* ---- the layout elevation: flush and centered, cuts hatched -------------- */
@@ -626,7 +773,8 @@
     // prefills still at the old system's default follow the switch
     [['tileText', 'tile', els.tileInput], ['jminText', 'jmin', els.jminInput],
      ['jmaxText', 'jmax', els.jmaxInput], ['wallText', 'wall', els.dimInput],
-     ['endAText', 'end', els.endAInput], ['endBText', 'end', els.endBInput]].forEach(function (sw) {
+     ['endAText', 'end', els.endAInput], ['endBText', 'end', els.endBInput],
+     ['cornerText', 'corner', els.cornerInput]].forEach(function (sw) {
       if (state[sw[0]] === from[sw[1]]) { state[sw[0]] = to[sw[1]]; sw[2].value = to[sw[1]]; }
     });
   }
@@ -699,6 +847,9 @@
       if (state.wallText && state.wallText !== d.wall) p.set('w', state.wallText);
       if (state.endAText !== d.end) p.set('ea', state.endAText);
       if (state.endBText !== d.end) p.set('eb', state.endBText);
+      if (state.wall2Text) p.set('w2', state.wall2Text);
+      if (state.wall3Text) p.set('w3', state.wall3Text);
+      if (state.cornerText !== d.corner) p.set('ct', state.cornerText);
       var q = p.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
       recents.note();
@@ -722,6 +873,11 @@
     var ea = grab('ea'), eb = grab('eb');
     if (ea) state.endAText = ea;
     if (eb) state.endBText = eb;
+    var w2 = grab('w2'), w3 = grab('w3'), ct = grab('ct');
+    if (w2) state.wall2Text = w2;
+    if (w3) state.wall3Text = w3;
+    if (ct) state.cornerText = ct;
+    if (p.get('u') === 'metric' && !ct) state.cornerText = DEFAULTS.metric.corner;
     return w;
   }
 
@@ -734,7 +890,8 @@
   } });
 
   [['tileInput', 'tileText'], ['jminInput', 'jminText'], ['jmaxInput', 'jmaxText'],
-   ['endAInput', 'endAText'], ['endBInput', 'endBText'], ['dimInput', 'wallText']].forEach(function (pair) {
+   ['endAInput', 'endAText'], ['endBInput', 'endBText'], ['dimInput', 'wallText'],
+   ['wall2Input', 'wall2Text'], ['wall3Input', 'wall3Text'], ['cornerInput', 'cornerText']].forEach(function (pair) {
     var el = els[pair[0]];
     el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });
     el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
@@ -766,6 +923,9 @@
   els.jmaxInput.value = state.jmaxText;
   els.endAInput.value = state.endAText;
   els.endBInput.value = state.endBText;
+  els.wall2Input.value = state.wall2Text;
+  els.wall3Input.value = state.wall3Text;
+  els.cornerInput.value = state.cornerText;
   els.dimInput.value = state.wallText;
   render();
 })();
