@@ -47,6 +47,10 @@
   .plan .zone     { fill: url(#clearhatch); stroke: var(--nl-axis); stroke-width: 0.75;
                     stroke-dasharray: 4 3; opacity: 0.85; }
   .plan .zone.is-warn { stroke: var(--accent); stroke-width: 1.25; opacity: 1; }
+  /* during a drag: the moving piece's zones lead, the rest step back */
+  .plan.is-dragging .zone { opacity: 0.25; }
+  .plan.is-dragging .zone.is-active { opacity: 1; stroke: var(--accent); stroke-width: 1.1; }
+  .plan.is-dragging .zone.is-warn { opacity: 1; }
   .plan .solid    { fill: var(--card-2); stroke: var(--ink); stroke-width: 1.4; }
   .plan .solid.is-chair { fill: var(--card); stroke-width: 1; }
   .plan .solid.is-aux   { fill: var(--card); }
@@ -312,11 +316,16 @@
       if (c.kind === 'pinch') warnZone[c.a + '/' + c.purpose] = true;
     });
 
-    // clearance zones first (under everything)
+    // clearance zones first (under everything). During a drag the moving
+    // piece's zones carry the emphasis — the live reconfiguration (a walkway
+    // dropping at a wall, chairs stepping aside) is the thing to watch.
+    var dragId = drag && drag.id != null ? drag.id : null;
+    els.plan.classList.toggle('is-dragging', dragId != null);
     if (state.showClears) geoms.forEach(function (g) {
+      var active = g.item.id === dragId;
       g.clears.forEach(function (cb) {
         var warn = warnZone[g.item.id + '/' + cb.purpose];
-        out += rectSvg(cb, 'zone' + (warn ? ' is-warn' : ''));
+        out += rectSvg(cb, 'zone' + (warn ? ' is-warn' : '') + (active ? ' is-active' : ''));
       });
     });
 
@@ -751,20 +760,23 @@
     item.x = quant(item.x); item.y = quant(item.y);
   }
 
-  // orient-back-to-wall: applied on drop, reported in the panel notes
+  // orient-back-to-wall: applied LIVE during the drag (and on drop), so a
+  // couch turns to face away from the wall as it arrives, not after.
+  // Returns true when it rotated — the drag re-anchors its grab offset.
   function orientRule(item) {
     var g = geomOf(item);
-    if (!g.made.orientBackToWall) return;
+    if (!g.made.orientBackToWall) return false;
     var nw = F.nearestWall(g.body, roomRect());
-    if (nw.dist > g.made.wallThreshold) return;
+    if (nw.dist > g.made.wallThreshold) return false;
     var want = ((nw.turnsForBack % 4) + 4) % 4;
-    if (item.turns === want) return;
+    if (item.turns === want) return false;
     var before = g.body;
     var cx = before.x + before.w / 2, cy = before.y + before.d / 2;
     item.turns = want;
     var after = geomOf(item).body;
     item.x = quant(item.x + Math.round(cx - (after.x + after.w / 2)));
     item.y = quant(item.y + Math.round(cy - (after.y + after.d / 2)));
+    return true;
   }
 
   /* ================= pointer interaction ================= */
@@ -860,6 +872,10 @@
     var snap = F.snap(g.body, targets, radius);
     item.x += snap.dx; item.y += snap.dy;
     guides = (snap.x || snap.y) ? snap : null;
+    // the wall rules run DURING the drag: a sofa arriving at a wall turns
+    // its back to it mid-drag; the grab offset re-anchors so the piece
+    // stays under the pointer instead of jumping
+    if (orientRule(item)) { drag.dx = w.x - item.x; drag.dy = w.y - item.y; }
     render(false);
   });
 
@@ -893,11 +909,26 @@
   // keeps the hit-test slop meaningful and the drawing legible
   function clampScale(s) { return Math.max(0.00001, Math.min(0.01, s)); }
 
+  // Wheel input, three gestures told apart the way canvas apps do it:
+  //   trackpad pinch      → ctrlKey wheel   → zoom, damped to the gesture
+  //   trackpad two-finger → small px deltas → PAN (zoom was far too twitchy)
+  //   mouse wheel notches → line mode / big deltas → zoom, one step a notch
+  // Zoom factors are exponential in the delta, so speed follows the finger
+  // instead of every event costing a fixed 12%.
   els.plan.addEventListener('wheel', function (ev) {
     ev.preventDefault();
+    var unit = ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? 100 : 1;
+    var dy = ev.deltaY * unit, dx = ev.deltaX * unit;
+    var pinch = ev.ctrlKey || ev.metaKey;
+    if (!pinch && ev.deltaMode === 0 && (Math.abs(dy) < 50 || dx !== 0)) {
+      view.ox -= dx; view.oy -= dy;
+      render(false);
+      return;
+    }
     var r = els.plan.getBoundingClientRect();
     var px = ev.clientX - r.left, py = ev.clientY - r.top;
-    var ns = clampScale(view.scale * (ev.deltaY < 0 ? 1.12 : 1 / 1.12));
+    var k = pinch ? 0.012 : 0.0015;                // pinch deltas are small and rapid
+    var ns = clampScale(view.scale * Math.exp(-dy * k));
     var f = ns / view.scale;
     view.ox = px - (px - view.ox) * f;
     view.oy = py - (py - view.oy) * f;
