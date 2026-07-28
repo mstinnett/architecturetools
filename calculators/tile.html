@@ -69,7 +69,10 @@
        joints flex between their minimum and maximum. Size The Wall returns the
        exact dimensions where the tile runs uncut, with the slack shown. Lay Out
        The Wall takes the wall as drawn and shows where the cuts land, flush or
-       centered — each cut a range, because the joints flex.</p>
+       centered — each cut a range, because the joints flex. Pattern The Surface
+       lays the pattern over the whole wall — courses at any offset, herringbone
+       either hand, basketweave, rotated 45° — and counts whole tiles and cuts,
+       with the drawing draggable to slide the pattern.</p>
   </div>
 
   <!-- ================= 1 · UNITS ================= -->
@@ -86,14 +89,18 @@
     <div class="opt-cluster">
       <button type="button" class="mini-pill" aria-pressed="false" data-task="size">Size The Wall</button>
       <button type="button" class="mini-pill" aria-pressed="false" data-task="layout">Lay Out The Wall</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-task="pattern">Pattern The Surface</button>
     </div>
   </div>
 
   <!-- ================= 3 · TILE ================= -->
-  <div class="section-label">Tile — the dimension along the run</div>
+  <div class="section-label" id="tileLabel">Tile — the dimension along the run</div>
   <div class="joint-row" style="margin-bottom:var(--space-sm);">
     <input type="text" id="tileInput" class="small-input" spellcheck="false" maxlength="24"
            autocomplete="off" autocapitalize="off" value="6&quot;">
+    <span class="lbl" id="tile2Wrap" style="display:none;">×
+      <input type="text" id="tile2Input" class="small-input" spellcheck="false" maxlength="24"
+             autocomplete="off" autocapitalize="off" value="3&quot;"></span>
   </div>
   <div class="grid-presets" id="tileChips" style="margin-bottom:var(--space-lg);"></div>
 
@@ -112,6 +119,7 @@
      that tight leaves nothing to adjust.</p>
 
   <!-- ================= 5 · RUN ENDS ================= -->
+  <div id="endsBlock">
   <div class="section-label">Run Ends — a fixed amount added at each end</div>
   <div class="end-row">
     <span class="end-label">Beginning Of Run</span>
@@ -127,6 +135,42 @@
   </div>
   <p class="section-note">A preset fills the amount — edit it to match your trim,
      and include the trim's joint in the number if it gets one.</p>
+  </div>
+
+  <!-- ================= 5b · PATTERN (Pattern The Surface only) ============
+       the variation grammar: a generator + typed parameters (offset as any
+       fraction, handedness, the 45° tag) — the form never grows per pattern -->
+  <div id="patternBlock" style="display:none;">
+    <div class="section-label">Pattern</div>
+    <div class="opt-line" style="margin-bottom:var(--space-sm);">
+      <div class="opt-cluster">
+        <button type="button" class="mini-pill" aria-pressed="false" data-gen="courses">Courses</button>
+        <button type="button" class="mini-pill" aria-pressed="false" data-gen="herring">Herringbone</button>
+        <button type="button" class="mini-pill" aria-pressed="false" data-gen="basket">Basketweave</button>
+      </div>
+      <div class="opt-cluster" id="offsetCluster">
+        <span class="section-label">Offset</span>
+        <button type="button" class="mini-pill" aria-pressed="false" data-off="0">stack</button>
+        <button type="button" class="mini-pill" aria-pressed="false" data-off="1/2">1/2</button>
+        <button type="button" class="mini-pill" aria-pressed="false" data-off="1/3">1/3</button>
+        <input type="text" id="offsetInput" class="small-input" style="width:3.5em;" spellcheck="false"
+               maxlength="8" autocomplete="off" value="1/2">
+      </div>
+      <div class="opt-cluster" id="handCluster" style="display:none;">
+        <span class="section-label">Hand</span>
+        <button type="button" class="mini-pill" aria-pressed="false" data-hand="r">right</button>
+        <button type="button" class="mini-pill" aria-pressed="false" data-hand="l">left</button>
+      </div>
+      <div class="opt-cluster">
+        <button type="button" class="mini-pill" aria-pressed="false" id="pat45">45°</button>
+        <span class="lbl">height</span>
+        <input type="text" id="wallHInput" class="small-input" spellcheck="false" maxlength="24"
+               autocomplete="off" autocapitalize="off" value="8'">
+      </div>
+    </div>
+    <p class="section-note" id="patternNote">Any fraction offsets the courses — 1/3, 2/5,
+       sevenths. Drag the drawing to slide the pattern under the surface.</p>
+  </div>
 
   <!-- ================= 6 · THE WALL ================= -->
   <div class="tool-section" style="margin-top:var(--space-xl);">
@@ -190,11 +234,13 @@
      to the other's when the units flip; typed values are never touched. */
   var DEFAULTS = {
     imperial: { tile: '6"', jmin: '1/16"', jmax: '3/16"', wall: '5\'-1"', end: '0"',
+                tile2: '3"', tile2U: 3 * IN, wallH: "8'", wallHU: 96 * IN,
                 corner: '3/8"', cornerU: 3 * IN / 8,
                 tileU: 6 * IN, jminU: IN / 16, jmaxU: 3 * IN / 16,
                 chips: ['3"', '4 1/4"', '6"', '12"', '24"'],
                 ends: [['None', '0"'], ['Bullnose', '3"'], ['Metal Edge', '1/8"'], ['Lapped', '3/8"']] },
     metric:   { tile: '150 mm', jmin: '2 mm', jmax: '5 mm', wall: '2.45 m', end: '0 mm',
+                tile2: '75 mm', tile2U: 75 * MM, wallH: '2.4 m', wallHU: 2400 * MM,
                 corner: '10 mm', cornerU: 10 * MM,
                 tileU: 150 * MM, jminU: 2 * MM, jmaxU: 5 * MM,
                 chips: ['100 mm', '150 mm', '300 mm', '600 mm'],
@@ -211,6 +257,13 @@
     wall2Text: '',
     wall3Text: '',
     cornerText: '3/8"',
+    tile2Text: '3"',
+    wallHText: "8'",
+    gen: 'courses',
+    offText: '1/2',
+    hand: 'r',
+    p45: false,
+    pox: 0, poy: 0,                  // pattern origin (units), dragged
     endAText: '0"',
     endBText: '0"',
     task: 'size',                    // 'size' = pick the dimension | 'layout' = the wall as drawn
@@ -221,7 +274,8 @@
   var els = {};
   ['tileInput','tileChips','jminInput','jmaxInput','endAInput','endBInput','endAPresets','endBPresets',
    'dimInput','fieldNote','echo','echoLine','echoAssume','figure','winTable','engineNote',
-   'wallLabel','tableNote','moreWalls','wall2Input','wall3Input','cornerInput'].forEach(function (id) {
+   'wallLabel','tableNote','moreWalls','wall2Input','wall3Input','cornerInput',
+   'tile2Wrap','tile2Input','patternBlock','offsetInput','handCluster','wallHInput','pat45','endsBlock','tileLabel'].forEach(function (id) {
     els[id] = document.getElementById(id);
   });
   var escapeHtml = UI.esc;
@@ -265,7 +319,16 @@
     var wall2 = state.wall2Text.trim() ? parseField(state.wall2Text, null) : { u: null, stated: false };
     var wall3 = state.wall3Text.trim() ? parseField(state.wall3Text, null) : { u: null, stated: false };
     var corner = parseField(state.cornerText, d.cornerU, true);
+    var tile2 = parseField(state.tile2Text, d.tile2U);
+    var wallH = parseField(state.wallHText, d.wallHU);
+    // the offset is a pure fraction p/q of the module (or a decimal 0..1)
+    var off = { p: 1, q: 2, stated: false };
+    var om = /^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(state.offText);
+    if (om && +om[2] > 0 && +om[1] >= 0) off = { p: +om[1] % +om[2], q: +om[2], stated: true };
+    else if (/^\s*0\s*$/.test(state.offText)) off = { p: 0, q: 1, stated: true };
+    else { var od = parseFloat(state.offText); if (isFinite(od) && od >= 0 && od < 1) off = { p: Math.round(od * 1000), q: 1000, stated: true }; }
     return {
+      tile2: tile2, wallH: wallH, off: off,
       T: tile.u, jLo: jmin.u, jHi: jmax.u, F: F,
       tile: tile, jmin: jmin, jmax: jmax, wall: wall, endA: endA, endB: endB,
       wall2: wall2, wall3: wall3, corner: corner,
@@ -408,12 +471,41 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-task]'), function (el) {
       UI.press(el, el.dataset.task === state.task);
     });
-    els.wallLabel.textContent = state.task === 'size' ? 'Wall — about how long?' : 'Wall — as dimensioned (turns corners: add walls)';
+    els.wallLabel.textContent = state.task === 'size' ? 'Wall — about how long?'
+      : state.task === 'pattern' ? 'Surface — how wide? (height beside the pattern)'
+      : 'Wall — as dimensioned (turns corners: add walls)';
     els.moreWalls.style.display = state.task === 'layout' ? '' : 'none';
+    els.patternBlock.style.display = state.task === 'pattern' ? '' : 'none';
+    els.tile2Wrap.style.display = state.task === 'pattern' ? '' : 'none';
+    els.endsBlock.style.display = state.task === 'pattern' ? 'none' : '';
+    els.tileLabel.textContent = state.task === 'pattern'
+      ? 'Tile — the face, length × height'
+      : 'Tile — the dimension along the run';
+    Array.prototype.forEach.call(document.querySelectorAll('[data-gen]'), function (el) {
+      UI.press(el, el.dataset.gen === state.gen);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-off]'), function (el) {
+      UI.press(el, el.dataset.off === state.offText.trim());
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-hand]'), function (el) {
+      UI.press(el, el.dataset.hand === state.hand);
+    });
+    UI.press(els.pat45, state.p45);
+    els.handCluster.style.display = state.gen === 'herring' ? '' : 'none';
+    document.getElementById('offsetCluster').style.display = state.gen === 'courses' ? '' : 'none';
+    document.getElementById('patternNote').textContent = (state.gen === 'courses'
+      ? 'Any fraction offsets the courses — 1/3, 2/5, sevenths. '
+      : state.gen === 'herring'
+      ? 'Hand flips which way the chevrons point. '
+      : 'Blocks alternate — tiles per block come from the tile’s own proportions. ')
+      + 'Drag the drawing to slide the pattern under the surface.';
     els.tableNote.textContent = state.task === 'size'
       ? 'Select a row to draw that count on the wall.'
+      : state.task === 'pattern'
+      ? 'Whole tiles draw plain, cuts hatch. The buy bounds are both honest: every offcut reused, and none.'
       : 'Cut widths are ranges — where the joints land inside their minimum and maximum decides each cut.';
     if (state.task === 'layout') renderLayout(m);
+    else if (state.task === 'pattern') renderPattern(m);
     else renderSize(m);
   }
 
@@ -712,6 +804,166 @@
     return svg;
   }
 
+  /* ---- Pattern The Surface: the field generated, clipped, counted ----------
+     Integer units throughout; joints at the middle of the range (rounded to a
+     unit). Orthogonal classification is exact integer comparison; the 45°
+     transform runs floating point in this version — stated in the engine note
+     (the exact Z[sqrt2] path is specified in the pattern toolset doc). */
+  var GEN_NAMES = { courses: 'courses', herring: 'herringbone', basket: 'basketweave' };
+  function patternTiles(m, boxW, boxH) {
+    var T = m.T, T2 = m.tile2.u;
+    var J = Math.round((m.jLo + m.jHi) / 2);
+    var out = [], note = null;
+    function rect(x, y, w, h) { out.push({ x: x, y: y, w: w, h: h }); }
+    if (state.gen === 'courses') {
+      var mx = T + J, my = T2 + J;
+      var offU = Math.round(mx * m.off.p / m.off.q);
+      for (var r = -2; r * my < boxH + my; r++) {
+        var rowOff = ((r * offU) % mx + mx) % mx;
+        for (var c = -2; c * mx < boxW + 2 * mx; c++) rect(c * mx - rowOff, r * my, T, T2);
+      }
+    } else if (state.gen === 'herring') {
+      // the (i−j) mod 4 domino rule on the short-side lattice u = T2 + J;
+      // hand = mirror (i+j). Assumes long ≈ 2·short: drift reported.
+      var u = T2 + J;
+      var drift = T + J - 2 * u;
+      if (drift !== 0) note = 'herringbone wants length = 2 × short + joint = ' + fmtShort(2 * T2 + J) + ' — your ' + fmtShort(T) + ' is off by ' + fmtShort(Math.abs(drift)) + ', absorbed in the joints';
+      var ni = Math.ceil(boxW / u) + 6, nj = Math.ceil(boxH / u) + 6;
+      for (var i = -6; i < ni; i++) for (var j = -6; j < nj; j++) {
+        var idx = state.hand === 'r' ? i - j : i + j;
+        var t = ((idx % 4) + 4) % 4;
+        if (t === 0) rect(i * u, j * u, 2 * u - J, u - J);
+        if (t === 3) rect(i * u, j * u, u - J, 2 * u - J);
+      }
+    } else {
+      // basketweave: pair blocks alternating, block = long side
+      var U = T + J, v = T2 + J;
+      var per = Math.max(1, Math.round(T / T2 ? T / (T2 + J) : 2));
+      per = Math.max(1, Math.round((T + J) / v));
+      if (Math.abs(per * v - U) > 1) note = 'basketweave wants length ≈ ' + per + ' × (short + joint) = ' + fmtShort(per * v - J) + ' — your ' + fmtShort(T) + ' is off by ' + fmtShort(Math.abs(per * v - U)) + ', absorbed in the joints';
+      for (var bx = -1; bx * U < boxW + 2 * U; bx++) for (var by = -1; by * U < boxH + 2 * U; by++) {
+        var vert = (bx + by) % 2 !== 0;
+        for (var q2 = 0; q2 < per; q2++) {
+          if (vert) rect(bx * U + q2 * v, by * U, T2, T);
+          else rect(bx * U, by * U + q2 * v, T, T2);
+        }
+      }
+    }
+    return { tiles: out, J: J, note: note };
+  }
+
+  function renderPattern(m) {
+    var SW = m.wall.u != null ? m.wall.u : DEFAULTS[state.target].tileU * 16;
+    var SH = m.wallH.u;
+    var T = m.T, T2 = m.tile2.u;
+    var gen = patternTiles(m, state.p45 ? SW + SH : SW, state.p45 ? SW + SH : SH);
+    var c45 = Math.SQRT1_2;
+    function corners(t) {
+      var pts = [[t.x, t.y], [t.x + t.w, t.y], [t.x + t.w, t.y + t.h], [t.x, t.y + t.h]];
+      return pts.map(function (p) {
+        var x = p[0] + state.pox, y = p[1] + state.poy;
+        if (!state.p45) return [x, y];
+        return [(x - y) * c45 + SW / 2, (x + y) * c45 - (SW + SH) / 4];
+      });
+    }
+    var whole = 0, cut = 0, shapes = [];
+    gen.tiles.forEach(function (t) {
+      var pts = corners(t);
+      var ins = 0, outs = 0;
+      pts.forEach(function (p) {
+        if (p[0] >= 0 && p[0] <= SW && p[1] >= 0 && p[1] <= SH) ins++; else outs++;
+      });
+      // edge midpoints catch straddles with no corner inside
+      for (var k = 0; k < 4; k++) {
+        var q2 = pts[(k + 1) % 4];
+        var mxp = (pts[k][0] + q2[0]) / 2, myp = (pts[k][1] + q2[1]) / 2;
+        if (mxp >= 0 && mxp <= SW && myp >= 0 && myp <= SH) ins++; else outs++;
+      }
+      if (ins === 0) return;
+      var isCut = outs > 0;
+      if (isCut) cut++; else whole++;
+      shapes.push({ pts: pts, cut: isCut });
+    });
+
+    // echo
+    var html = tok(m.tile, fmtShort(T)) + '<span class="op">×</span>' + tok(m.tile2, fmtShort(T2))
+             + '<span class="op"> tile · joint </span>' + tok(m.jmin, fmtShort(m.jLo)) + '<span class="op">–</span>' + tok(m.jmax, fmtShort(m.jHi))
+             + '<span class="op"> · surface </span>' + tok(m.wall, fmtShort(SW)) + '<span class="op">×</span>' + tok(m.wallH, fmtShort(SH))
+             + '<span class="eq">=</span><span class="result">' + whole + ' whole · ' + cut + ' cut'
+             + '</span>';
+    els.echoLine.innerHTML = html;
+    var tileA = T * T2, surfA = SW * SH;
+    var lo = Math.min(Math.ceil(surfA / tileA), whole + cut), hi = whole + cut;
+    var asm = ['pattern: ' + (state.gen === 'courses' ? 'courses offset ' + m.off.p + '/' + m.off.q : GEN_NAMES[state.gen]) + (state.p45 ? ' · 45°' : '')];
+    if (gen.note) asm.push(gen.note);
+    if (lo < hi) asm.push('buy between ' + lo + ' (every offcut reused) and ' + hi + ' (no reuse) — pattern and kerf decide where between');
+    else asm.push('buy ' + hi + ' — reusing offcuts saves none here');
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+
+    // figure
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    var pad = 8, maxH = 420;
+    var sc = Math.min((width - 2 * pad) / SW, (maxH - 2 * pad) / SH);
+    var drawW = SW * sc + 2 * pad, H = SH * sc + 2 * pad + 18;
+    var padX = pad + (width - drawW) / 2;
+    function X(u2) { return padX + u2 * sc; } function Y(u2) { return pad + u2 * sc; }
+    var svg = '<svg viewBox="0 0 ' + width + ' ' + H.toFixed(0) + '" width="' + width + '" height="' + H.toFixed(0) + '" class="nl" role="img" '
+            + 'aria-label="The pattern over the surface: whole tiles plain, cuts hatched." style="touch-action:none;cursor:grab" id="patFig">';
+    svg += '<defs><pattern id="pwhatch5" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+         + '<line x1="0" y1="0" x2="0" y2="5" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/></pattern>'
+         + '<clipPath id="surfClip"><rect x="' + X(0) + '" y="' + Y(0) + '" width="' + (SW * sc) + '" height="' + (SH * sc) + '"/></clipPath></defs>';
+    shapes.forEach(function (sh) {
+      var d = 'M' + sh.pts.map(function (p) { return X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1); }).join(' L') + ' Z';
+      svg += '<path d="' + d + '" fill="' + (sh.cut ? 'url(#pwhatch5)' : 'var(--card,#fff)') + '" stroke="var(--nl-ink,#0a0a0a)" stroke-width="0.7" clip-path="url(#surfClip)"/>';
+    });
+    svg += '<rect x="' + X(0) + '" y="' + Y(0) + '" width="' + (SW * sc) + '" height="' + (SH * sc) + '" fill="none" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.6"/>';
+    svg += '<text x="' + padX + '" y="' + (H - 4) + '" font-size="10" fill="var(--nl-axis,#999)" stroke-width="3" style="paint-order:stroke">drag to slide the pattern · hatched = cut</text>';
+    svg += '</svg>';
+    els.figure.innerHTML = svg;
+    wirePatternDrag(sc);
+
+    // table
+    var rows = '<tr><th>Pattern</th><th>Whole</th><th>Cut</th><th>Buy Between</th></tr>';
+    rows += '<tr><td>' + escapeHtml(state.gen === 'courses' ? 'courses ' + m.off.p + '/' + m.off.q : GEN_NAMES[state.gen]) + (state.p45 ? ' · 45°' : '') + '</td>'
+          + '<td>' + whole + '</td><td>' + cut + '</td><td>' + (lo < hi ? lo + ' – ' + hi : String(hi)) + '</td></tr>';
+    els.winTable.innerHTML = rows;
+
+    var lines = ['tile = ' + T + ' × ' + T2 + ' units · joint drawn at ' + gen.J + ' units · surface = ' + SW + ' × ' + SH + ' units'];
+    if (state.gen === 'courses') {
+      var mx2 = T + gen.J, offU2 = Math.round(mx2 * m.off.p / m.off.q);
+      var rem = mx2 * m.off.p - offU2 * m.off.q;
+      lines.push('offset = module × ' + m.off.p + '/' + m.off.q + ' = ' + offU2 + ' units' + (rem !== 0 ? ' (quantized to the lattice — reported, not hidden)' : ''));
+    }
+    lines.push(state.p45 ? 'the 45° transform is floating point in this version; classification for 0° patterns is exact integer comparison'
+                         : 'classification is exact integer comparison — no epsilon');
+    els.engineNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* the drag: slide the pattern origin under the surface */
+  var patDrag = null;
+  function wirePatternDrag(sc) {
+    var svg = document.getElementById('patFig');
+    if (!svg) return;
+    svg.addEventListener('pointerdown', function (ev) {
+      patDrag = { x: ev.clientX, y: ev.clientY, ox: state.pox, oy: state.poy };
+      svg.setPointerCapture(ev.pointerId);
+    });
+    svg.addEventListener('pointermove', function (ev) {
+      if (!patDrag) return;
+      var r = svg.getBoundingClientRect();
+      var k = sc * (r.width / svg.viewBox.baseVal.width);
+      var dx = (ev.clientX - patDrag.x) / k, dy = (ev.clientY - patDrag.y) / k;
+      if (state.p45) { var s2 = Math.SQRT1_2, rx = (dx + dy) * s2, ry = (dy - dx) * s2; dx = rx; dy = ry; }
+      state.pox = Math.round(patDrag.ox + dx);
+      state.poy = Math.round(patDrag.oy + dy);
+      renderPattern(model());
+    });
+    svg.addEventListener('pointerup', function () { patDrag = null; syncURL(); });
+  }
+
   /* ---- the layout elevation: flush and centered, cuts hatched -------------- */
   function layoutFig(o) {
     var W = o.width, padL = 8, padR = 8, rowH = 38, gap = 34, yA = 20;
@@ -774,7 +1026,8 @@
     [['tileText', 'tile', els.tileInput], ['jminText', 'jmin', els.jminInput],
      ['jmaxText', 'jmax', els.jmaxInput], ['wallText', 'wall', els.dimInput],
      ['endAText', 'end', els.endAInput], ['endBText', 'end', els.endBInput],
-     ['cornerText', 'corner', els.cornerInput]].forEach(function (sw) {
+     ['cornerText', 'corner', els.cornerInput], ['tile2Text', 'tile2', els.tile2Input],
+     ['wallHText', 'wallH', els.wallHInput]].forEach(function (sw) {
       if (state[sw[0]] === from[sw[1]]) { state[sw[0]] = to[sw[1]]; sw[2].value = to[sw[1]]; }
     });
   }
@@ -850,6 +1103,16 @@
       if (state.wall2Text) p.set('w2', state.wall2Text);
       if (state.wall3Text) p.set('w3', state.wall3Text);
       if (state.cornerText !== d.corner) p.set('ct', state.cornerText);
+      if (state.task === 'pattern') {
+        if (state.gen !== 'courses') p.set('g', state.gen);
+        if (state.offText !== '1/2') p.set('o', state.offText);
+        if (state.hand !== 'r') p.set('hd', state.hand);
+        if (state.p45) p.set('r', '45');
+        if (state.tile2Text !== d.tile2) p.set('t2', state.tile2Text);
+        if (state.wallHText !== d.wallH) p.set('wh', state.wallHText);
+        if (state.pox) p.set('px', String(state.pox));
+        if (state.poy) p.set('py', String(state.poy));
+      }
       var q = p.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
       recents.note();
@@ -864,6 +1127,7 @@
       var d = DEFAULTS.metric;
       state.tileText = d.tile; state.jminText = d.jmin; state.jmaxText = d.jmax;
       state.endAText = d.end; state.endBText = d.end;
+      state.tile2Text = d.tile2; state.wallHText = d.wallH;
     }
     if (p.get('q') === 'layout') state.task = 'layout';
     var t = grab('t'), jl = grab('jl'), jh = grab('jh'), w = grab('w', 120);
@@ -873,6 +1137,15 @@
     var ea = grab('ea'), eb = grab('eb');
     if (ea) state.endAText = ea;
     if (eb) state.endBText = eb;
+    if (p.get('q') === 'pattern') state.task = 'pattern';
+    var g2 = p.get('g'); if (g2 === 'herring' || g2 === 'basket') state.gen = g2;
+    var ov = grab('o'); if (ov) state.offText = ov;
+    if (p.get('hd') === 'l') state.hand = 'l';
+    if (p.get('r') === '45') state.p45 = true;
+    var t2v = grab('t2'); if (t2v) state.tile2Text = t2v;
+    var whv = grab('wh'); if (whv) state.wallHText = whv;
+    var pxv = parseInt(p.get('px'), 10); if (isFinite(pxv)) state.pox = pxv;
+    var pyv = parseInt(p.get('py'), 10); if (isFinite(pyv)) state.poy = pyv;
     var w2 = grab('w2'), w3 = grab('w3'), ct = grab('ct');
     if (w2) state.wall2Text = w2;
     if (w3) state.wall3Text = w3;
@@ -891,7 +1164,8 @@
 
   [['tileInput', 'tileText'], ['jminInput', 'jminText'], ['jmaxInput', 'jmaxText'],
    ['endAInput', 'endAText'], ['endBInput', 'endBText'], ['dimInput', 'wallText'],
-   ['wall2Input', 'wall2Text'], ['wall3Input', 'wall3Text'], ['cornerInput', 'cornerText']].forEach(function (pair) {
+   ['wall2Input', 'wall2Text'], ['wall3Input', 'wall3Text'], ['cornerInput', 'cornerText'],
+   ['tile2Input', 'tile2Text'], ['wallHInput', 'wallHText'], ['offsetInput', 'offText']].forEach(function (pair) {
     var el = els[pair[0]];
     el.addEventListener('input', function () { state[pair[1]] = el.value; render(); });
     el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
@@ -914,6 +1188,20 @@
       render();
     });
   });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-gen]'), function (el) {
+    el.addEventListener('click', function () { state.gen = el.dataset.gen; render(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-off]'), function (el) {
+    el.addEventListener('click', function () {
+      state.offText = el.dataset.off;
+      document.getElementById('offsetInput').value = state.offText;
+      render();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hand]'), function (el) {
+    el.addEventListener('click', function () { state.hand = el.dataset.hand; render(); });
+  });
+  els.pat45.addEventListener('click', function () { state.p45 = !state.p45; render(); });
 
   // initial state — URL params override the worked example (6" tile, 5'-1" wall)
   var urlW = initFromURL();
@@ -926,6 +1214,9 @@
   els.wall2Input.value = state.wall2Text;
   els.wall3Input.value = state.wall3Text;
   els.cornerInput.value = state.cornerText;
+  els.tile2Input.value = state.tile2Text;
+  els.wallHInput.value = state.wallHText;
+  document.getElementById('offsetInput').value = state.offText;
   els.dimInput.value = state.wallText;
   render();
 })();
