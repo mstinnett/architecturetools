@@ -58,9 +58,9 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Run Solver</span>
     </nav>
     <h1>Run Solver</h1>
-    <p>Fit a repeating module into a run — tiles with joints, on-center spacing,
-       balusters, equal sections. Type the run in any format. What won't divide
-       evenly is drawn to scale, never hidden.</p>
+    <p>How many modules fit this run, and what's left over? Tiles with joints,
+       on-center spacing, balusters, equal sections — type the run in any
+       format, and what won't divide evenly is drawn to scale, never hidden.</p>
   </div>
 
   <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3):
@@ -84,6 +84,7 @@
     <button type="button" class="option-pill" aria-pressed="false" data-mode="sections">equal sections<span class="pill-detail">n parts + gaps</span></button>
   </div>
   <div class="param-row" id="paramRow"></div>
+  <p class="section-note" id="modeNote" style="font-size:var(--text-sm);color:var(--ink-2);margin:0.4rem 0 0;"></p>
 
   <div id="results">
     <!-- slot 3 · ECHO: the parsed reading (stated vs inferred) -->
@@ -175,7 +176,7 @@
   };
 
   var els = {};
-  ['runInput','fieldNote','bareAsk','modeRow','paramRow','echo','echoLine','echoAssume',
+  ['runInput','fieldNote','bareAsk','modeRow','paramRow','modeNote','echo','echoLine','echoAssume',
    'solveOut','gridWrap','gridLabel','gridPresets','cardA','cardALabel','figureA','rowsA',
    'cardB','cardBLabel','figureB','rowsB','altNote','mathNote'].forEach(function (id) {
     els[id] = document.getElementById(id);
@@ -641,6 +642,11 @@
     renderBareAsk(runRes);
     renderEcho(runRes, parsed);
     updateParamActive(parsed);
+    // the tiles mode treats the joint as one number; the Tile page treats it
+    // as the range it really is — point there for the deeper questions
+    els.modeNote.innerHTML = state.mode === 'tiles'
+      ? 'Here the joint is one number. <a href="tile.html">Tile</a> treats it as a range — what wall runs uncut, and each cut as the range it really is.'
+      : '';
 
     var runOk = runRes && runRes.dimension === 1 && runRes.units != null
              && !outOfRange(runRes.units) && runRes.units > 0;
@@ -681,6 +687,13 @@
   }
 
   /* ---- shareable URL ------------------------------------------------------ */
+  // recent readings — the URL carries the whole state, so a recent
+  // restores the full reading (shared component: ui.js UI.recents)
+  var recents = UI.recents({ key: 'run', anchor: document.getElementById('runInput'), entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: (state.runText || '') + ' · ' + state.mode, result: r ? r.textContent : '' };
+  } });
+
   var urlTimer = null;
   function syncURL() {
     if (!window.history || !history.replaceState) return;
@@ -700,6 +713,7 @@
       }
       var q = params.toString();
       try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
     }, 250);
   }
   function initFromURL() {

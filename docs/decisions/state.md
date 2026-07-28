@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-07-19 (two new product threads landed as first drafts, operator-directed: the Furniture Fit tool opens the L-series (`l/`), and the exact CAD kernel opens `cad/`; research pass behind both is in docs/In Progress. The calculator promotions still await the operator taste pass.)_
+_Last updated: 2026-07-19 (two parallel threads merged onto `dev`. Thread one, 07-08/09: `tile.html` is the tile node — verb-named tasks, Size The Wall / Lay Out The Wall; Recents on every engine tool; the design-vs-construction frame in the suite map; Scale's crossing-model rebuild; `area.html` → Material Coverage; the exemplar-pass queue is in the backlog. Thread two, 07-19, operator-directed: the Furniture Fit tool (+ market-fit gauge, 149-SKU seed) opens the L-series (`l/`), and the exact CAD kernel opens `cad/`; research pass behind both in docs/In Progress. Calculator promotions still await the operator taste pass.)_
 
 ## Live architectural picture
 
@@ -39,8 +39,15 @@ _Last updated: 2026-07-19 (two new product threads landed as first drafts, opera
 - **Twelve engine tool pages, three families.** `convert.html` (shipped on
   `main`, frozen) plus eleven on `dev` (2026-06-10, noindexed, awaiting the
   operator's taste pass then one-at-a-time promotion). Drafting family:
-  `run.html` (the partition tool), `scale.html`, `slope.html` (incl. projected
-  lengths), `area.html`, `stairs.html` (introduces the edition pill + citation
+  `run.html` (the partition tool), `scale.html` (**"Scale Resolution"** — rebuilt
+  2026-07-08 on the crossing model: a dimension crosses between sheet and world
+  through an instrument, scale `n` converts sheet error to real error; see Recent
+  decisions), `slope.html` (any-two-of-three; coherence-passed 2026-07-08,
+  answer surface matched to the converter), `area.html` (**"Material
+  Coverage"** — rate divisor, waste unbundled into breakage/attic-stock/
+  cut-waste-is-the-layout's), `tile.html` (**"Tile"** — Size The Wall:
+  the uncut-run solver, dimensions-to-set answers, windows + elevation figures;
+  Lay Out The Wall: flush/centered, cuts as ranges), `stairs.html` (introduces the edition pill + citation
   pattern), `sheet-sizes.html` (the fit reference, restyled onto the theme,
   ANSI added). Egress family: `occupant-load.html` (typed takeoff ÷ IBC Table
   1004.5, gross/net surfaced), `egress-width.html` (load×factor both
@@ -149,6 +156,35 @@ _Last updated: 2026-07-19 (two new product threads landed as first drafts, opera
   review; a 7-agent research pass (field scan, dimension verification,
   touch UI, exact-geometry practice) backs both — products in
   docs/In Progress/ (furniture-field-scan, touch-cad-ui, cad-basis).
+- 2026-07-08 — **`scale.html` rebuilt on the crossing model; `slope.html`
+  coherence pass; both answer surfaces matched to `convert.html`** (operator-
+  directed, branch `claude/calculator-converter-promotion-qcbhgv`; not a
+  promotion). The 2026-07-07 two-mode Scale Resolution ("Scaled Drawing Of
+  Object" / "Physical Object") **stopped reading** and was rebuilt around one
+  unifying idea: **a dimension crosses between sheet and world through an
+  instrument; scale `n` converts sheet error to real error.** Five quantities —
+  drawing scale `n`, sheet resolution `R` (source sheet-precision × `n`), read
+  resolution `r`, tape resolution `t`, run accumulation. Two rules: reading →
+  `value ± max(r, R)`; measuring to draw → known to ±(accumulated tape error),
+  drawn off by `max(that, R)`. Page order is fixed: **scale → verb-named task
+  toggle (Read A Drawing / Measure To Draw) → precisions → dimension → run.**
+  The **sheet resolution is a knob** — a source-fidelity spectrum (Revit/CAD `snap`
+  · PDF/Revu ≈0.3 mm · Print/Scale-rule ≈0.5 mm · Hand-drawn ≈0.8 mm) — so the
+  resolution is set without a second length field. The run section now takes a
+  **physical tape length** (12/25/50 ft, metric 5/10/30 m, custom); each lay
+  covers one tape length, the table carries a Run column and highlights the lay
+  where the worst-case chain first exceeds what the sheet holds (`N ≈ R/t`), with a marker
+  on the stack-up figure. Imperial real-measurement displays read as native
+  ft-in fractions, not survey decimals. **Slope**: any-two-of-three inputs; the
+  three redundant sides collapsed to the solved ones; a rounding table
+  (shallower-for-a-max / steeper-for-a-min) whose cells are selectable and drive
+  the figure's hatch and comparison rays; regime-aware curation (pitch only when
+  12s≥1, ratio only when s≤1); conflict validation on non-triangular inputs; a
+  larger, more diagrammatic true-angle triangle with steep-tip label stacking.
+  **Both** tools now use the converter's echo grammar — stated/inferred tokens,
+  `tokens = result`, three registers (echo / figure / rows). **Show-don't-judge**
+  held throughout. Standing takeaway (unchanged): a genuine promotion here is a
+  **redesign**, not a noindex-drop.
 - 2026-06-10 — **The calculator build-out** (operator-directed, three passes in
   one day; per-tool records live in backlog "Done"). Eleven tool pages + five
   engine/figure modules + the C-0 cover, all on the shell conventions; the

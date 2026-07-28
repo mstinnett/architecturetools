@@ -229,7 +229,8 @@
     document.getElementById('sheetInfo').innerHTML = info;
 
     var bestScale = null;
-    var t = '<div class="section-label">What fits at each scale</div>';
+    var t = '<div class="section-label">What fits at each scale</div>'
+          + '<p class="section-note" style="font-size:var(--text-sm);color:var(--ink-2);margin:0.2rem 0 0.6rem;">Extent is half of choosing a scale. <a href="scale.html">Scale Resolution</a> shows the other half — the precision each scale carries.</p>';
     t += '<table class="scale-table"><thead><tr><th>Scale</th><th>Max width</th><th>Max depth</th>';
     if (userW && userD) t += '<th>Your ' + esc(userW + "' × " + userD + "'") + '</th>';
     t += '</tr></thead><tbody>';

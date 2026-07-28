@@ -3,6 +3,14 @@
 
 ---
 
+## The frame (adopted 2026-07-09)
+
+**Design tools, not construction tools.** Construction calculators (Construction
+Master Pro and kin) fit a module to a given dimension and cut the leftover. This
+suite picks the dimension so the module lands clean — the field calc's design
+inverse is our tool. Full statement + the field→inverse table in
+`coverage-layout-tolerance-firstpass.md`.
+
 ## Two rules that govern the whole graph
 
 **1. A node is a page with a shared input model.**
@@ -48,11 +56,12 @@ Status key: ✅ done · ▶ first pass · ◷ later depth · ⊘ deferred · ✕
 | Node | One-line scope | Consumes | Introduces | Status |
 |------|----------------|----------|------------|--------|
 | Converter | Exact unit conversion w/ min/max + snap | — | P1–P4 | ✅ |
-| **Run / module solver** | Fit a repeating module into a span → full count, remainder, edge cut, sliver flag. Presets: **tile (flagship)**, studs, balusters, ceiling grid, pavers | P1–P4 | P5 | ▶ |
-| Scale & drawing | Drawing scale ↔ real dim, measure-at-scale | P1,P2 | P7 | next |
-| Slope / pitch / grade | Rise·run·%·°·ratio, roof pitch | P1,P2 | P8 | next |
+| **Run / module solver** | Fit a repeating module into a span → full count, remainder, edge cut, sliver flag. Presets: studs, balusters, ceiling grid, pavers (tile graduated to its own node) | P1–P4 | P5 | ▶ exemplar pass queued |
+| Scale & drawing | **Scale Resolution** — the range a scaled dimension knows (crossing model, Across The Scales, tape-run stack-up) | P1,P2 | P7 | ✅ redesigned 2026-07 |
+| Slope / pitch / grade | Rise·run·%·°·ratio; rounding table (shallower-for-max / steeper-for-min); selectable references | P1,P2 | P8 | ✅ redesigned 2026-07 |
 | **Stairs** | Equal risers within code limits, 2R+T, IBC/IRC. *The bridge node.* | P1,P2,P6 | P6,P10 | ▶ |
-| **Area takeoff** | Chained / L / U rooms, subtract openings → area + perimeter. *Keystone.* | P1,P2 | P9 | early |
+| **Area takeoff** | **Material Coverage** — takeoff ÷ unit/rate; waste unbundled (breakage · attic stock · cut-waste-is-the-layout's). *Keystone.* | P1,P2 | P9 | ✅ 2026-07 |
+| **Tile** | One chassis (tile · joint range · run ends); tasks: **Size The Wall** (uncut-run windows → dimensions to set) · **Lay Out The Wall** (flush/centered, cuts as ranges) · patterns later | P1,P2,P5 | — | ✅ built 2026-07 |
 | Triangle / squaring | 3-4-5, diagonal check, area-from-sides | P1,P2 | — | open |
 
 ### 2 · Egress & life safety (~4–5 pages)
@@ -92,7 +101,7 @@ Status key: ✅ done · ▶ first pass · ◷ later depth · ⊘ deferred · ✕
 | **Material data layer** | Identity-keyed dimensional + property schema. *brickdims, generalized. Labor out, pricing deferred to CAD.* | introduces P11 | foundational |
 | Quantity calcs (concrete, paint, drywall, flooring, framing) | Area/volume → quantity + waste + boxes | P9,P11 | open / mostly ✕ |
 
-> **Tile is not a node here.** It lives in Family 1 as the run-solver flagship. Its material depth — pieces-per-box, coverage area, eventual layout/cutting view — is **depth on that node**, not a new page. (See depth ladder below.)
+> **Tile's material depth lives split** (2026-07-09): counting/boxes/waste are Material Coverage's; the layout and windows are `tile.html`'s. The 2-D pattern/cutting view folds into Tile later if it earns it. (Supersedes the earlier "tile is the run-solver flagship" plan.)
 
 ### 7 · Zoning (~0–4 pages) — danger zone
 FAR · coverage · setback · height · density · parking. Jurisdiction-by-jurisdiction, no single national code, brutal verification, primitives don't transfer. **Default ✕ — out of the "complete" definition.** Any zoning calc is a bonus, never a gap.
@@ -101,10 +110,13 @@ FAR · coverage · setback · height · density · parking. Jurisdiction-by-juri
 
 ## Depth ladders (the ◷ later-layers, logged not built)
 
-**Tile node**
+**Tile node** — BUILT 2026-07-09 as `tile.html` ("Tile"): one chassis (tile · joint range · run ends · units), verb-named tasks — **Size The Wall** (the uncut-run solver) and **Lay Out The Wall** (flush/centered, cuts as ranges). Pattern surface (L3) still split. Fuller spec in `coverage-layout-tolerance-firstpass.md`
+(merges tile with area/coverage into one deepening node; the grout joint read as
+a tolerance range; the inverse precision-window solver; 2-D patterns + accent
+banding; termination/corner edge cases). Ladder:
 1. ▶ Run + sliver alert + **grout-relaxation-to-whole-tile** (with the 3× lot-variance / ANSI A108.02 spec check — the part the layout tools don't do)
 2. ◷ Boxes / coverage / waste (cheap material-layer add)
-3. ◷ Layout + cutting view (heavy rendering, much later)
+3. ◷ Layout + cutting view (heavy rendering, much later) + precision-window solver (inverse: find a good wall size)
 
 **Area takeoff node**
 1. ▶ Single rectangle

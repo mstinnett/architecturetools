@@ -49,8 +49,9 @@
 
     var s = rise / run;                       // the true ratio (display only —
                                               // exactness lives in the page's ints)
-    // drawing box: origin bottom-left, run along x, rise up y
-    var mL = 14, mR = 96, mT = 30, mB = 44;   // right margin holds the rise label
+    // drawing box: origin bottom-left, run along x, rise up y. Generous margins
+    // so the larger, more diagrammatic labels clear the box.
+    var mL = 18, mR = 112, mT = 40, mB = 56;   // right margin holds the rise label
     var boxW = W - mL - mR, boxH = H - mT - mB;
     var x0 = mL, y0 = H - mB;                 // the origin (toe of the slope)
 
@@ -75,13 +76,19 @@
       return { x: ex, y: ey };
     }
 
-    // the hatched wedge between the true hypotenuse and the NEARER reference
-    // ray — the angular residual. Drawn first so lines sit on top.
+    // the hatched wedge between the true hypotenuse and a reference ray — the
+    // angular residual. By default the NEARER ref; a caller can pin it to a
+    // chosen ref via hatchTo (a ratio), e.g. when a UI selects one bracket.
+    // Drawn first so lines sit on top.
     var nearer = null;
     if (refLo != null || refHi != null) {
-      var dLo = refLo != null ? Math.abs(s - refLo) : Infinity;
-      var dHi = refHi != null ? Math.abs(refHi - s) : Infinity;
-      nearer = dLo <= dHi ? refLo : refHi;
+      if (opts.hatchTo != null) {
+        nearer = ratioOf(opts.hatchTo);
+      } else {
+        var dLo = refLo != null ? Math.abs(s - refLo) : Infinity;
+        var dHi = refHi != null ? Math.abs(refHi - s) : Infinity;
+        nearer = dLo <= dHi ? refLo : refHi;
+      }
       if (nearer != null && nearer !== s) {
         // wedge out to the true triangle's horizontal extent
         var wx = xT, wyTrue = yT, wyRef = y0 - px * nearer;
@@ -90,18 +97,44 @@
       }
     }
 
-    // reference rays — dashed, labelled at their ends
-    [{ r: refLo, label: opts.refLoLabel }, { r: refHi, label: opts.refHiLabel }].forEach(function (ref) {
-      if (ref.r == null) return;
-      var e = rayEnd(ref.r);
-      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:var(--nl-axis,#999)" stroke-width="1" stroke-dasharray="4 3"/>';
-      if (ref.label) svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', ref.label);
+    // reference rays (dashed brackets) + comparison rays (accent, dotted).
+    // Draw the lines, then place all labels together: a steep slope clips every
+    // ray to the top edge, bunching their ends onto the apex, so top-clipped
+    // labels are collected into a left-aligned stack just right of and below the
+    // tip — the tip itself stays clean. Right-edge (shallow) labels sit at their
+    // ends as before.
+    var rays = [];
+    if (refLo != null) rays.push({ r: refLo, label: opts.refLoLabel, cmp: false });
+    if (refHi != null) rays.push({ r: refHi, label: opts.refHiLabel, cmp: false });
+    (opts.compare || []).forEach(function (c) {
+      var r = ratioOf(c.ratio);
+      if (r != null && r > 0) rays.push({ r: r, label: c.label, cmp: true });
     });
+    var stack = [];   // top-clipped labels, to be stacked below the tip
+    rays.forEach(function (ray) {
+      var e = rayEnd(ray.r);
+      var stroke = ray.cmp ? 'var(--accent,#004C80)' : 'var(--nl-axis,#999)';
+      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:' + stroke + '" stroke-width="' + (ray.cmp ? 1.3 : 1) + '" stroke-dasharray="' + (ray.cmp ? '1 3' : '4 3') + '"/>';
+      if (!ray.label) return;
+      if (Math.abs(e.y - mT) < 1.5) stack.push({ ex: e.x, label: ray.label });   // clipped to top edge
+      else svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', ray.label);
+    });
+    if (stack.length) {
+      var cx = xT;
+      stack.forEach(function (l) { cx = Math.max(cx, l.ex); });
+      cx = Math.min(cx + 8, W - 4);
+      stack.forEach(function (l, i) { svg += txt(cx, mT + 14 + i * 14, 'nl-src-val', 'start', l.label); });
+    }
 
     // ground + rise legs (light), the slope itself (heavy)
-    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
-    svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
-    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="2"/>';
+    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+    svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+    // right-angle marker at the toe corner — reads as a diagram
+    if (px > 22 && py > 22) {
+      var sq = 10;
+      svg += '<path d="M ' + (xT - sq) + ' ' + y0 + ' L ' + (xT - sq) + ' ' + (y0 - sq) + ' L ' + xT + ' ' + (y0 - sq) + '" fill="none" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+    }
+    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="2.5"/>';
 
     // the slope length (the projected/true length, e.g. a rafter) — labelled
     // at the hypotenuse midpoint, offset perpendicular to sit above the line
@@ -156,6 +189,14 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   // exact refs accepted as {p,q}; no wedge when the slope IS the reference
   var on = SF.slopefig({ rise: FT, run: 12 * FT, refLo: { p: 1, q: 12 }, refHi: { p: 1, q: 12 } });
   ok('no wedge on a standard slope', on.indexOf('url(#sfhatch)') === -1);
+
+  // hatchTo pins the wedge to a chosen bracket (not just the nearer one)
+  var pinned = SF.slopefig({ rise: 38 * FT, run: 100 * FT, refLo: 3 / 12, refHi: 4 / 12, hatchTo: 3 / 12 });
+  ok('hatchTo keeps a wedge', pinned.indexOf('url(#sfhatch)') > 0);
+
+  // compare rays draw an accent line + label, no extra hatch
+  var cmp = SF.slopefig({ rise: 7 * FT, run: 22 * FT, compare: [{ ratio: 1 / 12, label: '1:12' }] });
+  ok('compare ray labelled', cmp.indexOf('>1:12</text>') > 0);
 
   // steep slope stays in the box (legs clipped by scale, not distorted)
   var steep = SF.slopefig({ rise: 100 * FT, run: 2 * FT });

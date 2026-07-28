@@ -121,9 +121,10 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── index.html                  # C-0 — the calculators set cover (dev, noindexed)
 │   ├── convert.html                # Precise Unit Converter — engine-powered, LIVE
 │   ├── run.html                    # Run Solver — partition tool page (dev, noindexed)
-│   ├── scale.html                  # Scale Converter (dev, noindexed)
+│   ├── scale.html                  # Scale Resolution — the range a scaled dimension knows (dev, noindexed)
 │   ├── slope.html                  # Slope — rise/run/slope (dev, noindexed)
-│   ├── area.html                   # Area & Coverage takeoff (dev, noindexed)
+│   ├── tile.html                   # Tile — Size The Wall / Lay Out The Wall (dev, noindexed)
+│   ├── area.html                   # Material Coverage — takeoff ÷ unit/rate, waste unbundled (dev, noindexed)
 │   ├── stairs.html                 # Stairs — risers + IRC/IBC citations (dev, noindexed)
 │   ├── occupant-load.html          # Occupant Load — takeoff ÷ Table 1004.5 (dev, noindexed)
 │   ├── egress-width.html           # Egress Width — load×factor ↔ capacity (dev, noindexed)
@@ -343,12 +344,18 @@ relative asset paths only.
 ### Engine-powered pages
 - `calculators/convert.html` — **Precise Unit Converter. Shipped and frozen.**
   Live on `main`.
-- On `dev`, built 2026-06-10, noindexed, awaiting browser review then
-  one-at-a-time promotion. Drafting family: `run.html` (Run Solver — the
-  partition tool), `scale.html`, `slope.html`, `area.html`, `stairs.html`.
-  Egress family: `occupant-load.html`, `egress-width.html` (chained:
-  area → occupant load → egress width). Accessibility family: `ramp.html`.
-  Plus the **C-0 cover** `calculators/index.html`.
+- On `dev`, noindexed, awaiting the operator's taste pass then one-at-a-time
+  promotion. Drafting family: `run.html` (Run Solver — the partition tool),
+  `scale.html` (**Scale Resolution**, rebuilt 2026-07 on the crossing model),
+  `slope.html` (coherence-passed 2026-07), `area.html` (**Material Coverage**,
+  2026-07), `tile.html` (**Tile** — Size The Wall / Lay Out The Wall, 2026-07),
+  `stairs.html`. Egress family: `occupant-load.html`, `egress-width.html`,
+  `exits.html`, `fixture-calc.html` (chained: area → occupant load → width /
+  exits / fixtures). Accessibility family: `ramp.html`. Plus the **C-0 cover**
+  `calculators/index.html`. Every engine tool carries the shared recents
+  component (`assets/js/ui.js`). Governing frame (2026-07-09, suite map):
+  **design tools, not construction tools** — pick the dimension so the module
+  lands clean; a field calculator's design inverse is our tool.
 
 ### Next on the engine
 Promotions (after the operator's taste pass), then data completion: replace

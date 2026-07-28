@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Pattern Editor (prototype) -- architecture.tools</title>
+<meta name="description" content="Prototype: define a repeating tile pattern as a repeat cell — joint-aware snaps, guides, array, mirror — with the tiling previewed live and the definition shown as data.">
+<script>
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../../assets/css/global.css">
+<style>
+  html, body { overflow-x: hidden; }
+  .proto-flag { display: inline-block; font-size: var(--text-xs); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent);
+    border-radius: var(--radius); padding: 0.15rem 0.5rem; margin-bottom: 0.6rem; }
+  .ed-wrap { display: flex; gap: var(--space-lg); flex-wrap: wrap; align-items: flex-start; }
+  .ed-canvas { flex: 1 1 420px; min-width: 320px; }
+  .ed-side { flex: 0 1 260px; min-width: 240px; }
+  svg.ed { display: block; width: 100%; height: auto; background: var(--card);
+    border: 1px solid var(--rule-2); border-radius: var(--radius); touch-action: none;
+    cursor: crosshair; }
+  .tool-row2 { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.5rem 0; }
+  .readout { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.7;
+    font-variant-numeric: tabular-nums; }
+  .readout b { color: var(--ink); font-weight: 600; }
+  .json { width: 100%; min-height: 9em; font-family: 'SF Mono', ui-monospace, monospace;
+    font-size: 11px; color: var(--ink-2); background: var(--card); border: 1px solid var(--rule-2);
+    border-radius: var(--radius); padding: 0.5rem; box-sizing: border-box; }
+  .small-input { font-family: 'SF Mono', ui-monospace, monospace; font-size: 0.95rem;
+    width: 4.5em; color: var(--ink); background: var(--card); padding: 0.3rem 0.45rem;
+    border: 1px solid var(--rule-2); border-radius: var(--radius); box-shadow: var(--shadow-well);
+    outline: none; }
+  .lbl { font-size: var(--text-xs); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.07em; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Prototypes</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Pattern Editor</span>
+    </nav>
+    <div class="proto-flag">Prototype — exploring, not shipping</div>
+    <h1>Pattern Editor</h1>
+    <p>A tile pattern is a repeat cell: tiles placed once, tiled forever. Place
+       tiles from the palette — snaps are joint-aware, so touching another tile
+       means landing one joint away. The neighbors shown ghosted are the same
+       cell wrapping; the definition below is the data the layout tool reads.</p>
+  </div>
+
+  <div class="opt-line" style="margin-bottom:var(--space-sm);">
+    <div class="opt-cluster"><span class="section-label">Cell</span>
+      <input class="small-input" id="cellW" value="12.25"> <span class="lbl">×</span>
+      <input class="small-input" id="cellH" value="12.25"> <span class="lbl">in</span>
+    </div>
+    <div class="opt-cluster"><span class="section-label">Joint</span>
+      <input class="small-input" id="jointIn" value="0.125"> <span class="lbl">in</span>
+    </div>
+    <div class="opt-cluster"><span class="section-label">Grid snap</span>
+      <input class="small-input" id="gridIn" value="0.5"> <span class="lbl">in</span>
+    </div>
+  </div>
+
+  <div class="opt-line" style="margin-bottom:var(--space-sm);">
+    <div class="opt-cluster"><span class="section-label">Place</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pal="6,3">6×3</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pal="3,6">3×6</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pal="6,6">6×6</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pal="12,12">12×12</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-pal="2,8">2×8</button>
+    </div>
+    <div class="opt-cluster"><span class="section-label">Seed</span>
+      <button type="button" class="mini-pill" data-seed="stack">stack</button>
+      <button type="button" class="mini-pill" data-seed="running">running 1/2</button>
+      <button type="button" class="mini-pill" data-seed="basket">basketweave</button>
+      <button type="button" class="mini-pill" data-seed="clear">clear</button>
+    </div>
+  </div>
+
+  <div class="ed-wrap">
+    <div class="ed-canvas">
+      <div id="svgHost"></div>
+      <div class="tool-row2">
+        <button type="button" class="mini-pill" id="opDupR">copy →</button>
+        <button type="button" class="mini-pill" id="opDupD">copy ↓</button>
+        <button type="button" class="mini-pill" id="opRow">fill row</button>
+        <button type="button" class="mini-pill" id="opCol">fill column</button>
+        <button type="button" class="mini-pill" id="opRot">rotate 90</button>
+        <button type="button" class="mini-pill" id="opMirror">mirror ↔</button>
+        <button type="button" class="mini-pill" id="opDel">delete</button>
+        <button type="button" class="mini-pill" id="opGuideV">guide |</button>
+        <button type="button" class="mini-pill" id="opGuideH">guide —</button>
+        <button type="button" class="mini-pill" id="opUndo">undo</button>
+      </div>
+      <div class="readout" id="hint">Pick a tile size, then click to place. Click a placed tile to select it.</div>
+    </div>
+    <div class="ed-side">
+      <div class="section-label">Cell readout</div>
+      <div class="readout" id="readout"></div>
+      <div class="section-label" style="margin-top:var(--space-md);">Definition</div>
+      <textarea class="json" id="jsonOut" spellcheck="false"></textarea>
+      <div class="tool-row2"><button type="button" class="mini-pill" id="jsonLoad">load definition</button></div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← calculators</a>
+  </div>
+</div>
+
+<script src="../../assets/js/ui.js"></script>
+<script>
+(function () {
+  'use strict';
+  /* All dimensions in FLOAT INCHES — a prototype shortcut. The real build
+     stores the suite's exact 1/960 mm integer units (decision in
+     docs/In Progress/pattern-surface-toolset.md). The cell is a torus. */
+  var state = {
+    cellW: 12.25, cellH: 12.25, joint: 0.125, grid: 0.5,
+    tiles: [],                 // {w,h,x,y,rot} — x,y = top-left, inches; rot 0|90
+    guides: [],                // {axis:'v'|'h', pos}
+    pal: null,                 // [w,h] being placed
+    sel: -1,
+    undo: []
+  };
+  var host = document.getElementById('svgHost');
+  var hint = document.getElementById('hint');
+  var esc = UI.esc;
+
+  function tw(t) { return t.rot === 90 ? t.h : t.w; }
+  function th(t) { return t.rot === 90 ? t.w : t.h; }
+  function pushUndo() {
+    state.undo.push(JSON.stringify(state.tiles));
+    if (state.undo.length > 60) state.undo.shift();
+  }
+
+  /* ---- seeds -------------------------------------------------------------- */
+  var SEEDS = {
+    stack:   function (g) { return { cellW: 6 + g, cellH: 3 + g, tiles: [{ w: 6, h: 3, x: 0, y: 0, rot: 0 }] }; },
+    running: function (g) { return { cellW: 6 + g, cellH: 2 * (3 + g), tiles: [
+      { w: 6, h: 3, x: 0, y: 0, rot: 0 }, { w: 6, h: 3, x: (6 + g) / 2, y: 3 + g, rot: 0 }] }; },
+    basket:  function (g) { var U = 6 + g; return { cellW: 2 * U, cellH: 2 * U, tiles: [
+      { w: 6, h: 3, x: 0, y: 0, rot: 0 }, { w: 6, h: 3, x: 0, y: 3 + g, rot: 0 },
+      { w: 6, h: 3, x: U, y: 0, rot: 90 }, { w: 6, h: 3, x: U + 3 + g, y: 0, rot: 90 },
+      { w: 6, h: 3, x: U, y: U, rot: 0 }, { w: 6, h: 3, x: U, y: U + 3 + g, rot: 0 },
+      { w: 6, h: 3, x: 0, y: U, rot: 90 }, { w: 6, h: 3, x: 3 + g, y: U, rot: 90 }] }; }
+  };
+
+  /* ---- snapping ------------------------------------------------------------
+     CAD's object snaps, joint-aware: a new tile's x candidates come from other
+     tiles' vertical edges (adjacent = one joint away, aligned = same edge) and
+     the guides; y likewise. Axes resolve independently — that's snap tracking. */
+  function snapAxis(v, size, others, axis) {
+    var g = state.joint, cand = [];
+    var cell = axis === 'x' ? state.cellW : state.cellH;
+    for (var m = 0; m <= cell / state.grid; m++) cand.push({ p: m * state.grid, why: 'grid' });
+    others.forEach(function (o) {
+      var lo = axis === 'x' ? o.x : o.y;
+      var len = axis === 'x' ? tw(o) : th(o);
+      [[lo + len + g, 'joint off'], [lo - g - size, 'joint off'],
+       [lo, 'align'], [lo + len - size, 'align'],
+       [lo + len / 2 - size / 2, 'midpoint']].forEach(function (c) { cand.push({ p: c[0], why: c[1] }); });
+    });
+    state.guides.forEach(function (gd) {
+      if ((axis === 'x') === (gd.axis === 'v')) cand.push({ p: gd.pos, why: 'guide' }, { p: gd.pos - size, why: 'guide' });
+    });
+    var best = null;
+    cand.forEach(function (c) {
+      var d = Math.abs(c.p - v);
+      if (d < 0.35 && (!best || d < best.d)) best = { p: c.p, d: d, why: c.why };
+    });
+    return best || { p: Math.round(v / state.grid) * state.grid, why: 'grid', d: 0 };
+  }
+
+  /* ---- geometry ------------------------------------------------------------ */
+  function wrapCopies(t) {
+    var out = [], W = state.cellW, H = state.cellH;
+    for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++)
+      out.push({ x: t.x + dx * W, y: t.y + dy * H, w: tw(t), h: th(t) });
+    return out;
+  }
+  function overlaps() {
+    var bad = {};
+    for (var i = 0; i < state.tiles.length; i++) {
+      var A = { x: state.tiles[i].x, y: state.tiles[i].y, w: tw(state.tiles[i]), h: th(state.tiles[i]) };
+      for (var j = 0; j < state.tiles.length; j++) {
+        if (i === j) continue;
+        wrapCopies(state.tiles[j]).forEach(function (B) {
+          if (A.x < B.x + B.w - 0.01 && B.x < A.x + A.w - 0.01 &&
+              A.y < B.y + B.h - 0.01 && B.y < A.y + A.h - 0.01) { bad[i] = true; }
+        });
+      }
+    }
+    return bad;
+  }
+
+  /* ---- render --------------------------------------------------------------- */
+  var VIEW = 680;
+  function scale() { return VIEW / (state.cellW * 2); }
+  function render() {
+    var s = scale(), W = state.cellW, H = state.cellH;
+    var vh = H * 2 * s;
+    var ox = W / 2, oy = H / 2;                       // canvas origin offset (half-cell ghost margin)
+    function X(v) { return (v + ox) * s; } function Y(v) { return (v + oy) * s; }
+    var bad = overlaps();
+    var svg = '<svg class="ed" viewBox="0 0 ' + VIEW + ' ' + vh.toFixed(1) + '" width="' + VIEW + '" height="' + vh.toFixed(1) + '">';
+    // ghost copies (the torus) first
+    state.tiles.forEach(function (t, i) {
+      for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) {
+        if (dx === 0 && dy === 0) continue;
+        svg += '<rect x="' + X(t.x + dx * W) + '" y="' + Y(t.y + dy * H) + '" width="' + (tw(t) * s) + '" height="' + (th(t) * s) + '" fill="var(--accent-soft)" stroke="var(--rule-2)" stroke-width="0.6" opacity="0.55"/>';
+      }
+    });
+    // the working cell frame
+    svg += '<rect x="' + X(0) + '" y="' + Y(0) + '" width="' + (W * s) + '" height="' + (H * s) + '" fill="none" stroke="var(--nl-ink,#0a0a0a)" stroke-width="1.2" stroke-dasharray="5 3"/>';
+    // guides
+    state.guides.forEach(function (gd) {
+      if (gd.axis === 'v') svg += '<line x1="' + X(gd.pos) + '" y1="0" x2="' + X(gd.pos) + '" y2="' + vh + '" stroke="var(--accent,#004C80)" stroke-width="0.8" stroke-dasharray="2 4"/>';
+      else svg += '<line x1="0" y1="' + Y(gd.pos) + '" x2="' + VIEW + '" y2="' + Y(gd.pos) + '" stroke="var(--accent,#004C80)" stroke-width="0.8" stroke-dasharray="2 4"/>';
+    });
+    // the cell's tiles
+    state.tiles.forEach(function (t, i) {
+      var seld = i === state.sel;
+      svg += '<rect data-i="' + i + '" x="' + X(t.x) + '" y="' + Y(t.y) + '" width="' + (tw(t) * s) + '" height="' + (th(t) * s)
+           + '" fill="var(--card,#fff)" stroke="' + (bad[i] ? 'var(--correction,#AF3D34)' : seld ? 'var(--accent,#004C80)' : 'var(--nl-ink,#0a0a0a)')
+           + '" stroke-width="' + (seld ? 2.2 : 1) + '" style="cursor:pointer"/>';
+    });
+    // ghost of the tile being placed
+    if (ghost) {
+      svg += '<rect x="' + X(ghost.x) + '" y="' + Y(ghost.y) + '" width="' + (ghost.w * s) + '" height="' + (ghost.h * s) + '" fill="var(--accent-soft)" stroke="var(--accent,#004C80)" stroke-width="1.4" stroke-dasharray="4 3" pointer-events="none"/>';
+      svg += '<text x="' + (X(ghost.x) + 4) + '" y="' + (Y(ghost.y) - 5) + '" font-size="11" fill="var(--accent,#004C80)">' + esc(ghost.x.toFixed(3).replace(/\.?0+$/, '') + ', ' + ghost.y.toFixed(3).replace(/\.?0+$/, '') + (ghost.why ? ' · ' + ghost.why : '')) + '</text>';
+    }
+    svg += '</svg>';
+    host.innerHTML = svg;
+    wireCanvas();
+
+    // readout + JSON
+    var areaT = 0;
+    state.tiles.forEach(function (t) { areaT += t.w * t.h; });
+    var cellA = W * H;
+    document.getElementById('readout').innerHTML =
+      '<b>' + state.tiles.length + '</b> tiles per cell · cell ' + W + '″ × ' + H + '″<br>'
+      + 'tile area <b>' + areaT.toFixed(2) + '</b> in² of ' + cellA.toFixed(2) + ' in² — '
+      + (cellA ? Math.round(areaT / cellA * 100) : 0) + '% tile, ' + (cellA ? Math.round((1 - areaT / cellA) * 100) : 0) + '% joints'
+      + (Object.keys(overlaps()).length ? '<br><span style="color:var(--correction,#AF3D34)">' + Object.keys(overlaps()).length + ' tiles overlap — outlined</span>' : '')
+      + '<br>tiles per ft² ≈ <b>' + (cellA ? (144 / cellA * state.tiles.length).toFixed(2) : '—') + '</b>';
+    document.getElementById('jsonOut').value = JSON.stringify({
+      name: 'custom', cell: { w: W, h: H }, joint: { nom: state.joint }, tiles: state.tiles
+    }, null, 1);
+  }
+
+  /* ---- canvas interaction ----------------------------------------------------- */
+  var ghost = null, dragging = null;
+  function canvasPoint(ev, svg) {
+    var r = svg.getBoundingClientRect();
+    var s = scale() * (r.width / VIEW);
+    return { x: (ev.clientX - r.left) / s - state.cellW / 2, y: (ev.clientY - r.top) / s - state.cellH / 2 };
+  }
+  function wireCanvas() {
+    var svg = host.querySelector('svg');
+    svg.addEventListener('pointermove', function (ev) {
+      var p = canvasPoint(ev, svg);
+      if (dragging != null) {
+        var t = state.tiles[dragging];
+        var others = state.tiles.filter(function (_, i) { return i !== dragging; });
+        var sx = snapAxis(p.x - dragOff.x, tw(t), others, 'x');
+        var sy = snapAxis(p.y - dragOff.y, th(t), others, 'y');
+        t.x = sx.p; t.y = sy.p;
+        hint.textContent = 'move · x ' + sx.why + ' · y ' + sy.why;
+        render();
+        return;
+      }
+      if (state.pal) {
+        var w = state.pal[0], h = state.pal[1];
+        var sx2 = snapAxis(p.x - w / 2, w, state.tiles, 'x');
+        var sy2 = snapAxis(p.y - h / 2, h, state.tiles, 'y');
+        ghost = { x: sx2.p, y: sy2.p, w: w, h: h, why: sx2.why + '/' + sy2.why };
+        render();
+      }
+    });
+    svg.addEventListener('pointerdown', function (ev) {
+      var hit = ev.target.getAttribute && ev.target.getAttribute('data-i');
+      var p = canvasPoint(ev, svg);
+      if (guideMode) {
+        pushUndo();
+        state.guides.push(guideMode === 'v' ? { axis: 'v', pos: Math.round(p.x / state.grid) * state.grid }
+                                            : { axis: 'h', pos: Math.round(p.y / state.grid) * state.grid });
+        guideMode = null; hint.textContent = 'guide placed'; render(); return;
+      }
+      if (state.pal && ghost) {
+        pushUndo();
+        state.tiles.push({ w: ghost.w, h: ghost.h, x: ghost.x, y: ghost.y, rot: 0 });
+        state.sel = state.tiles.length - 1;
+        render(); return;
+      }
+      if (hit != null) {
+        state.sel = +hit;
+        var t = state.tiles[state.sel];
+        dragging = state.sel;
+        dragOff = { x: p.x - t.x, y: p.y - t.y };
+        pushUndo();
+        render(); return;
+      }
+      state.sel = -1; render();
+    });
+    svg.addEventListener('pointerup', function () { dragging = null; });
+    svg.addEventListener('pointerleave', function () { ghost = null; dragging = null; render2(); });
+  }
+  var dragOff = { x: 0, y: 0 }, guideMode = null;
+  var render2 = function () { render(); };
+
+  /* ---- palette + seeds + ops ---------------------------------------------------- */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-pal]'), function (b) {
+    b.addEventListener('click', function () {
+      var v = b.dataset.pal.split(',').map(Number);
+      state.pal = state.pal && state.pal[0] === v[0] && state.pal[1] === v[1] ? null : v;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-pal]'), function (x) {
+        UI.press(x, state.pal && x === b);
+      });
+      ghost = null;
+      hint.textContent = state.pal ? 'click the canvas to place a ' + v[0] + '×' + v[1] : 'placement off';
+      render();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-seed]'), function (b) {
+    b.addEventListener('click', function () {
+      pushUndo();
+      if (b.dataset.seed === 'clear') { state.tiles = []; state.guides = []; }
+      else {
+        var def = SEEDS[b.dataset.seed](state.joint);
+        state.cellW = def.cellW; state.cellH = def.cellH; state.tiles = def.tiles;
+        document.getElementById('cellW').value = def.cellW;
+        document.getElementById('cellH').value = def.cellH;
+      }
+      state.sel = -1; render();
+    });
+  });
+  function sel() { return state.sel >= 0 ? state.tiles[state.sel] : null; }
+  function op(id, fn) { document.getElementById(id).addEventListener('click', function () { fn(); render(); }); }
+  op('opDupR', function () { var t = sel(); if (!t) return; pushUndo(); state.tiles.push({ w: t.w, h: t.h, rot: t.rot, x: t.x + tw(t) + state.joint, y: t.y }); state.sel = state.tiles.length - 1; });
+  op('opDupD', function () { var t = sel(); if (!t) return; pushUndo(); state.tiles.push({ w: t.w, h: t.h, rot: t.rot, x: t.x, y: t.y + th(t) + state.joint }); state.sel = state.tiles.length - 1; });
+  op('opRow', function () { var t = sel(); if (!t) return; pushUndo();
+    for (var x = t.x + tw(t) + state.joint; x + tw(t) <= state.cellW + 0.01; x += tw(t) + state.joint)
+      state.tiles.push({ w: t.w, h: t.h, rot: t.rot, x: x, y: t.y }); });
+  op('opCol', function () { var t = sel(); if (!t) return; pushUndo();
+    for (var y = t.y + th(t) + state.joint; y + th(t) <= state.cellH + 0.01; y += th(t) + state.joint)
+      state.tiles.push({ w: t.w, h: t.h, rot: t.rot, x: t.x, y: y }); });
+  op('opRot', function () { var t = sel(); if (!t) return; pushUndo(); t.rot = t.rot === 90 ? 0 : 90; });
+  op('opMirror', function () { var t = sel(); if (!t) return; pushUndo(); t.x = state.cellW - t.x - tw(t); });
+  op('opDel', function () { if (state.sel < 0) return; pushUndo(); state.tiles.splice(state.sel, 1); state.sel = -1; });
+  op('opUndo', function () { var u = state.undo.pop(); if (u != null) { state.tiles = JSON.parse(u); state.sel = -1; } });
+  document.getElementById('opGuideV').addEventListener('click', function () { guideMode = 'v'; hint.textContent = 'click to drop a vertical guide'; });
+  document.getElementById('opGuideH').addEventListener('click', function () { guideMode = 'h'; hint.textContent = 'click to drop a horizontal guide'; });
+
+  [['cellW', 'cellW'], ['cellH', 'cellH'], ['jointIn', 'joint'], ['gridIn', 'grid']].forEach(function (pair) {
+    var el = document.getElementById(pair[0]);
+    el.addEventListener('input', function () {
+      var v = parseFloat(el.value);
+      if (isFinite(v) && v > 0) { state[pair[1]] = v; render(); }
+    });
+  });
+  document.getElementById('jsonLoad').addEventListener('click', function () {
+    try {
+      var d = JSON.parse(document.getElementById('jsonOut').value);
+      pushUndo();
+      state.cellW = d.cell.w; state.cellH = d.cell.h;
+      if (d.joint && d.joint.nom) state.joint = d.joint.nom;
+      state.tiles = d.tiles || [];
+      document.getElementById('cellW').value = state.cellW;
+      document.getElementById('cellH').value = state.cellH;
+      document.getElementById('jointIn').value = state.joint;
+      render();
+    } catch (e) { hint.textContent = 'could not read that definition: ' + e.message; }
+  });
+
+  // start on basketweave — it shows wrap, rotation, and the joint at once
+  var d0 = SEEDS.basket(state.joint);
+  state.cellW = d0.cellW; state.cellH = d0.cellH; state.tiles = d0.tiles;
+  document.getElementById('cellW').value = d0.cellW;
+  document.getElementById('cellH').value = d0.cellH;
+  render();
+})();
+</script>
+</body>
+</html>

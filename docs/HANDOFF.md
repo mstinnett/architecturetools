@@ -8,6 +8,21 @@ tool page yet**. This doc is for the next context picking up the calculator
 work. It is self-contained; read it before touching `calculators/`._
 
 **Progress since the original handoff (all on `dev`, see `state.md` for detail):**
+- **2026-07-07/09 — the redesign arc.** The taste pass turned into story-first
+  redesigns: `scale.html` → **Scale Resolution** (the crossing model — the
+  range a scaled dimension actually knows; "sheet resolution" vocabulary),
+  `slope.html` coherence-passed, `area.html` → **Material Coverage** (rate
+  divisor; waste unbundled into breakage / attic stock / cut-waste-is-the-
+  layout's), and a new node **`tile.html` ("Tile")** — Size The Wall (the
+  uncut-run solver: joints flex, so each whole-tile count fits a *window* of
+  wall lengths; answers with dimensions to set) and Lay Out The Wall
+  (flush/centered, cuts as ranges). Shared **recents** component in `ui.js`
+  on every engine tool (a recent = the page URL). Governing frame adopted
+  (suite map): **design tools, not construction tools** — pick the dimension
+  so the module lands clean. Design thinking in
+  `docs/In Progress/coverage-layout-tolerance-firstpass.md`; the per-tool
+  exemplar queue is in the backlog. Lesson, restated: **a genuine promotion
+  is a redesign, not a noindex-drop.**
 - **2026-06-10 — §5's whole first arc is built.** Five tool pages on the engine
   (`run.html` — the partition tool, `scale.html`, `slope.html`, `area.html`,
   `stairs.html`), three new figure modules on the numberline conventions
@@ -32,13 +47,12 @@ work. It is self-contained; read it before touching `calculators/`._
 ## 1. Where things stand (one paragraph)
 
 `architecture.tools` is a public, no-build static site (vanilla HTML/CSS/JS).
-The **live site is the picker only**. A shared calculation **engine**
-(`calculators/lib/`) now exists; it powers one shipped tool — the converter —
-and holds a second primitive, `partition.js`, that is built and tested but has
-**no tool page yet**. Everything else in `calculators/` is older, standalone,
-and does **not** use the engine. The next concrete step is the **partition tool
-page** (a `convert.html`-style UI over `partition.js`); after that, slope /
-area+coverage / scale. The converter itself needs no further work right now.
+The **live site is the picker + the Precise Unit Converter**. The shared
+engine (`calculators/lib/`) powers twelve tool pages on `dev` (noindexed),
+of which four have had the full story-first redesign treatment — Scale
+Resolution, Slope, Material Coverage, Tile — and set the exemplar standard
+for the rest (backlog: the per-tool queue). The next concrete steps are the
+remaining exemplar passes and the operator's promotions.
 
 ---
 
