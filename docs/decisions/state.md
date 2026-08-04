@@ -103,7 +103,9 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   coming", no independence claim; the operator struck all three as
   editorializing, and SITE_FRAMEWORK's "one-line thesis" bullet went with them.
   Adding a tool is one `.cover-card`; a category is a `.cover-group` plus its
-  nav item. The picker's footer tool list became a
+  nav item. The cover carries no crumb or sheet stamp — it is the top of the
+  set — and the picker's category is the question it answers rather than a
+  filing term. The picker's footer tool list became a
   back-link, since indexing is the cover's job now. Also graduated the sun/moon
   **light/dark key** out of the picker: `.scheme-toggle` into `global.css`,
   its wiring into `assets/js/ui.js`, and the button onto the converter and the
@@ -210,3 +212,9 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
 - **A plate needs a drawing.** Each card carries the tool's own figure. There
   is no house placeholder, so promoting a tool onto the cover means deciding
   what it draws — budget for that, or the band grows a blank plate.
+- **Category names are copy, and they can be long.** The picker's category is
+  the question it answers ("What computer should I buy for architecture"), set
+  by the operator over the earlier "Live recommendations". A long name widens
+  its group across, wraps above the cards down, and runs the length of the
+  edge rail — all three are covered by browser checks, so a future category
+  should be added with those in view rather than assumed short.

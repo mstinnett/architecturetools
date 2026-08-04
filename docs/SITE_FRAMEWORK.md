@@ -112,9 +112,10 @@ The master cover for architecture.tools. This is the page that explains the site
 
 AT-0 should make the site feel whole even if the numbered sets are still thin.
 
-> **Built 2026-08-04.** `index.html` is the cover: a centred title block over a
-> **card band**. Each live tool is a plate — its own drawing over a name and
-> one line — plates are grouped by set, and the band is the picker's software
+> **Built 2026-08-04.** `index.html` is the cover: a centred title block — the
+> site title alone, no crumb and no sheet stamp — over a **card band**. Each
+> live tool is a plate — its own drawing over a name and one line — plates are
+> grouped by set, and the band is the picker's software
 > selector at cover scale: a sideways-scrolling strip, chevrons at the edges,
 > and a category nav below that doubles as the scrollbar. Below 820px the field
 > turns vertical and that nav becomes the rail down the left edge, so the
@@ -347,7 +348,9 @@ covers below it are still structure. Until they exist:
   Calculators → Precise Unit Converter`. The trail shows the structure even
   while the set covers are unbuilt; segments become links as covers land.
   Static, never sticky — it is part of the title block, the way a sheet
-  locates itself in the set.
+  locates itself in the set. **The cover is the exception**: it is the top of
+  the set, so it carries no crumb and no sheet stamp — just the site title.
+  A crumb there would only point at itself.
 - **the cover (AT-0) is the index.** It carries every live tool as a plate in
   a scrolling band, grouped by set, with a category nav that doubles as the
   scrollbar; every other page keeps one footer back-link to it. Top answers

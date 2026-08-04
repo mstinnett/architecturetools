@@ -391,8 +391,9 @@ promote them as each is ready, not to land them all at once.
 
 ### Live now (`main`)
 - `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Centred
-  title block over a **card band**: each live tool is a plate (its own drawing
-  over name and one line), plates grouped by set, the strip scrolling sideways
+  title block (no crumb, no sheet stamp — it is the top of the set) over a
+  **card band**: each live tool is a plate (its own drawing over name and one
+  line), plates grouped by set, the strip scrolling sideways
   with chevrons at the edges and a category nav below that doubles as the
   scrollbar. This is the picker's software selector at cover scale — same
   parts, same behaviour, `cover-*` in place of `sw-*`. Below 820px the field

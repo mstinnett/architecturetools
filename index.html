@@ -116,6 +116,9 @@
     .cover-chev { display: none; }
     .cover-scroll { overflow-x: hidden; overflow-y: auto; max-height: 68vh; padding-bottom: 0; }
     .cover-strip { flex-direction: column; gap: var(--space-lg); min-width: 0; }
+    /* one column, so a long category can wrap instead of running off the edge
+       (across, it stays on one line and simply widens its group) */
+    .cover-group-label { white-space: normal; }
     .cover-cards { flex-direction: column; }
     .cover-card { width: auto; }
     .cover-nav { flex-direction: column; margin-top: 0; padding: 0 0.5rem;
@@ -129,9 +132,9 @@
 <body>
 <div class="page-wide cover">
 
+  <!-- no crumb here: the cover IS the top of the set, so there is nowhere to
+       point back to. Every other page opens with one (SITE_FRAMEWORK "Hierarchy"). -->
   <div class="cover-header">
-    <!-- the cover's own stamp; it's the top of the set, so there's no trail -->
-    <div class="page-crumb">AT-0 &middot; Cover sheet</div>
     <h1>architecture.tools</h1>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
@@ -148,7 +151,7 @@
         <div class="cover-strip">
 
           <div class="cover-group" id="grp-live">
-            <div class="cover-group-label">Live recommendations</div>
+            <div class="cover-group-label">What computer should I buy for architecture</div>
             <div class="cover-cards">
               <a class="cover-card" href="picker.html">
                 <!-- the picker's own desk drawing; deskArt() below swaps the
@@ -187,7 +190,7 @@
                 </div>
                 <div class="card-body">
                   <div class="card-name">Precise Unit Converter</div>
-                  <div class="card-desc">Exact conversions, with the cost of rounding shown.</div>
+                  <div class="card-desc">Exact conversions and mixed unit calculations that visually show the precision of rounding.</div>
                 </div>
               </a>
             </div>
@@ -205,7 +208,7 @@
 
     <div class="cover-nav" id="coverNav">
       <span class="cover-nav-indicator" id="coverNavThumb" hidden></span>
-      <button type="button" class="cover-nav-item" data-target="grp-live">Live recommendations</button>
+      <button type="button" class="cover-nav-item" data-target="grp-live">What computer should I buy for architecture</button>
       <button type="button" class="cover-nav-item" data-target="grp-calc">Calculators</button>
     </div>
   </div>
