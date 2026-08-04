@@ -97,7 +97,7 @@ This creates room for the site to grow without abandoning the drawing-set metaph
 The master cover for architecture.tools. This is the page that explains the site at a glance and routes visitors to the major sets and flagship live pages.
 
 **Should include:**
-- the site title and one-line thesis
+- the site title
 - a compact visual index of the sets
 - direct access to flagship pages already worth visiting
 - update date
@@ -112,11 +112,18 @@ The master cover for architecture.tools. This is the page that explains the site
 
 AT-0 should make the site feel whole even if the numbered sets are still thin.
 
-> **Built 2026-08-04.** `index.html` is the cover: title block, thesis, and a
-> ruled index grouped by set. It lists **only what is live** — the picker
-> (Computer Chooser) and the Precise Unit Converter — rather than stubbing the
-> unbuilt set covers, so nothing on the cover 404s. Destinations above join the
-> index as they ship; each is one `.index-row` block.
+> **Built 2026-08-04.** `index.html` is the cover, worked **in landscape** the
+> way a sheet is: title block on the left edge, heavy division, index down the
+> field. It lists **only what is live** — the picker (Computer Chooser) and the
+> Precise Unit Converter — rather than stubbing the unbuilt set covers, so
+> nothing on the cover 404s. Destinations above join the index as they ship;
+> each is one `.index-row` block.
+>
+> The cover carries **no thesis line** (the "one-line thesis" bullet above was
+> struck for this reason). A cover sheet states the project name and lists the
+> set; a line asserting what the tools are worth is editorializing, and the
+> index says it better. Copy on the cover is descriptive only — what each tool
+> takes in and gives back, in the register of `docs/voice.md`.
 
 ---
 

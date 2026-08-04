@@ -87,13 +87,16 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
 ## Recent decisions
 
 - 2026-08-04 — **AT-0 cover landed on `main`** (operator-directed, worked
-  directly on the live branch). `index.html` is now the master cover sheet —
-  title block, one-line thesis, and a ruled index of the live tools grouped by
-  set — and the picker moved back to `picker.html` (where its redirect stub had
-  been, so old links still land on it; canonical + og:url retargeted). The
-  cover lists only what is live: Computer Chooser and Precise Unit Converter,
-  with a note that more calculators are coming. Adding a tool is one
-  `.index-row` block and nothing else. The picker's footer tool list became a
+  directly on the live branch). `index.html` is now the master cover sheet,
+  worked **in landscape** on the operator's call — title block on the left
+  edge, heavy division, ruled index down the field, stacking to portrait below
+  820px — and the picker moved back to `picker.html` (where its redirect stub
+  had been, so old links still land on it; canonical + og:url retargeted). The
+  cover lists only what is live: Computer Chooser and Precise Unit Converter.
+  Its copy is **descriptive only** — no thesis line, no "more coming", no
+  independence claim; the operator struck all three as editorializing, and
+  SITE_FRAMEWORK's "one-line thesis" bullet went with them. Adding a tool is
+  one `.index-row` block and nothing else. The picker's footer tool list became a
   back-link, since indexing is the cover's job now. Also graduated the sun/moon
   **light/dark key** out of the picker: `.scheme-toggle` into `global.css`,
   its wiring into `assets/js/ui.js`, and the button onto the converter and the

@@ -390,9 +390,11 @@ grown a cover over it. The pages below all exist on `dev`; the MVP is to
 promote them as each is ready, not to land them all at once.
 
 ### Live now (`main`)
-- `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Title
-  block, one-line thesis, and a ruled index of every live tool, grouped by set.
-  Adding a tool is one `.index-row` block; nothing else to wire.
+- `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Worked
+  in landscape: the title block holds the left edge, a heavy division separates
+  it, and the index of live tools runs down the field, grouped by set. It
+  stacks to the usual portrait order below 820px. Adding a tool is one
+  `.index-row` block; nothing else to wire.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
