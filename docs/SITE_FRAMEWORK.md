@@ -122,8 +122,13 @@ AT-0 should make the site feel whole even if the numbered sets are still thin.
 > reader keeps the same category map in either orientation.
 >
 > Each plate's drawing is the tool's own: the picker's desk line art (both
-> scheme exports), the converter's number line reduced to a value between two
-> grid marks. A tool that can't show its own drawing doesn't belong on a plate.
+> scheme exports), and for the converter its actual figure — the page's worked
+> example, 1 m at an eighth, drawn to the anatomy `numberline.js` draws (two
+> scales, the one grid cell the value falls inside magnified and hatched
+> between them) with the shared `.nl-*` classes and number-line tokens, so it
+> matches the real thing and inverts with the scheme. A plate is a reduction of
+> what the tool actually produces, not an illustration of it; a tool that can't
+> show its own drawing doesn't belong on one.
 >
 > The cover lists **only what is live** — the picker (Computer Chooser) and the
 > Precise Unit Converter — rather than stubbing the unbuilt set covers, so

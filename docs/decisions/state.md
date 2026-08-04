@@ -209,9 +209,16 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   scrubber's thumb stays hidden (as the picker's does when its strip fits),
   and with two categories the nav's `space-between` spread reads as a legend
   rather than a map. Both resolve themselves as calculators land.
-- **A plate needs a drawing.** Each card carries the tool's own figure. There
-  is no house placeholder, so promoting a tool onto the cover means deciding
-  what it draws — budget for that, or the band grows a blank plate.
+- **A plate needs a drawing, and it must be the tool's own.** The picker's is
+  its desk line art; the converter's is its actual figure — the 1 m worked
+  example drawn to `numberline.js`'s anatomy, in the shared `.nl-*` classes and
+  tokens. It is hand-drawn SVG rather than the module's output: the engine is
+  built for a 680px figure and reserves margins for its labels, so at plate
+  width it would be nearly all margin. That means the plate can drift from the
+  engine if the figure's anatomy changes — browser checks assert the two
+  scales, the hatched cell and the labels, so drift shows up as a failure
+  rather than silently. There is no house placeholder, so promoting a tool
+  onto the cover means deciding what it draws.
 - **Category names are copy, and they can be long.** The picker's category is
   the question it answers ("What computer should I buy for architecture"), set
   by the operator over the earlier "Live recommendations". A long name widens

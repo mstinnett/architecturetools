@@ -169,23 +169,53 @@
             <div class="cover-group-label">Calculators</div>
             <div class="cover-cards">
               <a class="cover-card" href="calculators/convert.html">
-                <!-- the tool's own figure, reduced: grid ticks, the true value
-                     between two of them, the nearest one taken. Strokes read
-                     the number-line tokens, so it inverts with the scheme. -->
+                <!-- The tool's own figure, reduced: the page's worked example
+                     (1 m → imperial at 1/8") drawn to the anatomy the engine
+                     draws — metric scale above, imperial below, and the one
+                     grid cell the value falls inside magnified and hatched
+                     between them. Text carries the shared .nl-* classes and
+                     the strokes read the number-line tokens, so it matches the
+                     real figure and inverts with the scheme.
+                     Simplified twice over: the end and bound labels are
+                     dropped, and the value is drawn further off the mark than
+                     1 m truly falls (+0.005") — at this size the real gap is
+                     under a pixel, and falling between marks is the point. -->
                 <div class="card-art">
-                  <svg viewBox="0 0 260 208" role="img" aria-label="A dimension falling between two grid marks, with the nearer mark taken and the difference hatched">
-                    <g fill="none" stroke-linecap="square">
-                      <!-- the grid you snap to -->
-                      <path d="M16 130 H244" stroke="var(--nl-axis)" stroke-width="1"/>
-                      <path d="M16 130 V108 M244 130 V108" stroke="var(--nl-tick)" stroke-width="1"/>
-                      <path d="M62 130 V116 M108 130 V116 M154 130 V116 M200 130 V116" stroke="var(--nl-tick)" stroke-width="1"/>
-                      <!-- the value as typed: dashed, and falling between marks -->
-                      <path d="M132 92 V141" stroke="var(--nl-ink)" stroke-width="1.2" stroke-dasharray="3 3"/>
-                      <!-- the mark it lands on — solid, and the accent is the answer -->
-                      <path d="M154 130 V62" stroke="var(--accent)" stroke-width="2.5"/>
+                  <svg class="nl" viewBox="0 0 260 208" role="img"
+                       aria-label="One metre on a metric scale, reading three feet three and three-eighths inches on an imperial scale, with the eighth-inch it falls inside magnified and hatched">
+                    <defs>
+                      <pattern id="coverhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                        <line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/>
+                      </pattern>
+                    </defs>
+
+                    <!-- the magnified cell: the single 1/8" the value sits in -->
+                    <rect x="102" y="78" width="78" height="50" fill="url(#coverhatch)" stroke="none"/>
+
+                    <g fill="none" stroke="var(--nl-tick)" stroke-width="1">
+                      <!-- metric ticks: fine outside the cell, opened up inside it -->
+                      <path d="M18 78 V70 M26 78 V72 M34 78 V72 M42 78 V72 M50 78 V72 M58 78 V72 M66 78 V72 M74 78 V72 M82 78 V72 M90 78 V72 M98 78 V72"/>
+                      <path d="M124 78 V72 M146 78 V72 M168 78 V72"/>
+                      <path d="M188 78 V72 M196 78 V72 M204 78 V72 M212 78 V72 M220 78 V72 M228 78 V72 M236 78 V72 M242 78 V70"/>
+                      <!-- imperial ticks: one eighth apart, the cell one eighth wide -->
+                      <path d="M18 128 V138 M46 128 V137 M74 128 V137 M208 128 V137 M236 128 V138"/>
                     </g>
-                    <!-- what the rounding cost -->
-                    <rect x="132" y="131" width="22" height="10" fill="var(--nl-hatch)" opacity="0.38"/>
+
+                    <!-- the two scales -->
+                    <path d="M18 78 H242 M18 128 H242" fill="none" stroke="var(--nl-axis)" stroke-width="1"/>
+
+                    <!-- the marks it falls between: round down, then the one it
+                         takes (the accent is the answer, per global.css) -->
+                    <path d="M102 78 V128" fill="none" stroke="var(--nl-ink)" stroke-width="1.4"/>
+                    <path d="M180 78 V140" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+
+                    <!-- the value itself, crossing both scales -->
+                    <path d="M150 66 V78" fill="none" stroke="var(--nl-ink)" stroke-width="1"/>
+                    <path d="M150 78 V134" fill="none" stroke="var(--nl-ink)" stroke-width="2"/>
+
+                    <text x="150" y="60" class="nl-src-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">1 m</text>
+                    <!-- inline fill, not the attribute: .nl-snap-val sets one -->
+                    <text x="180" y="158" class="nl-snap-val nl-nearest" text-anchor="middle" stroke-width="3" style="paint-order:stroke;fill:var(--accent)">3'-3 3/8"</text>
                   </svg>
                 </div>
                 <div class="card-body">
