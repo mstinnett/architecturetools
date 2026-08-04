@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-06-09 (UI review pass landed; converter promoted to main — the live site is now picker + converter)_
+_Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to picker.html; the light/dark key is now shared on every page)_
 
 ## Live architectural picture
 
@@ -12,14 +12,15 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
   Vanilla HTML/CSS/JS. No framework, no build step, no backend
   (`docs/PROJECT.md`).
 - **Two branches (read `docs/HANDOFF.md` first):**
-  - **`main` — the live site: the picker (home) + the Precise Unit Converter**
-    (`calculators/convert.html` + the three lib modules it loads — promoted
-    2026-06-09). `picker.html` redirects to `/`. Plus `assets/`, `data/`,
-    `tools/`, `docs/`, the `build-data` workflow, `CNAME`, `.nojekyll`.
-    Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb (site title
-    home link + set-trail label) on every page; picker footer links each live
-    tool; each tool back-links home. Nothing links a deferred page, so
-    nothing 404s.
+  - **`main` — the live site: the AT-0 cover (`index.html`, home) + the picker
+    (`picker.html`) + the Precise Unit Converter** (`calculators/convert.html`
+    + the three lib modules it loads — promoted 2026-06-09). Plus `assets/`,
+    `data/`, `tools/`, `docs/`, the `build-data` workflow, `CNAME`,
+    `.nojekyll`. Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb
+    (site title home link + set-trail label) on every page; the **cover** is
+    the index of live tools, one ruled row each, grouped by set; each tool
+    back-links to the cover. Nothing links a deferred page, so nothing 404s.
+    Publishing a tool = adding its `.index-row` to the cover.
   - **`dev` — the workbench (this branch).** The full prior site
     (`components.html`, `site-screen.html`, `calculators/`) **plus** the new
     calculator engine and converter. All work-in-progress lives here.
@@ -45,9 +46,13 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
   `<html>` and the one shared dark scheme). The picker and converter use it
   fully; `components.html` and `dimension-converter.html` link it and inherit
   the theme (the old cool-neutral sheet of the same name was replaced —
-  same class/token vocabulary, re-valued). `assets/data/hardware-data.json`
-  (the picker's runtime data, generated from the `data/` CSV tables — see the
-  pipeline contract below).
+  same class/token vocabulary, re-valued). `assets/js/ui.js` — the shared page
+  glue: `esc()`, `press()`, and the light/dark key (it wires every
+  `.scheme-toggle`, persists the choice, and fires `schemechange` for anything
+  a page drew in JS). Each page still needs the tiny pre-paint head script that
+  resolves the scheme before first paint — that can't be deferred to a
+  `<script src>`. `assets/data/hardware-data.json` (the picker's runtime data,
+  generated from the `data/` CSV tables — see the pipeline contract below).
 - **Verification gate:** `.claude/gate/run.sh` — htmlhint + stylelint +
   internal-link check. A dependency carve-out under `.claude/gate/`; not
   shipped with the site.
@@ -81,6 +86,19 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
 
 ## Recent decisions
 
+- 2026-08-04 — **AT-0 cover landed on `main`** (operator-directed, worked
+  directly on the live branch). `index.html` is now the master cover sheet —
+  title block, one-line thesis, and a ruled index of the live tools grouped by
+  set — and the picker moved back to `picker.html` (where its redirect stub had
+  been, so old links still land on it; canonical + og:url retargeted). The
+  cover lists only what is live: Computer Chooser and Precise Unit Converter,
+  with a note that more calculators are coming. Adding a tool is one
+  `.index-row` block and nothing else. The picker's footer tool list became a
+  back-link, since indexing is the cover's job now. Also graduated the sun/moon
+  **light/dark key** out of the picker: `.scheme-toggle` into `global.css`,
+  its wiring into `assets/js/ui.js`, and the button onto the converter and the
+  cover — so the scheme choice is now available and consistent on every page.
+  Verified: gate green, 37-check browser pass (both schemes, 1280 + 390).
 - 2026-06-09 — Interim nav revised after operator review: every title block
   opens with a breadcrumb (site title linking home + the set trail as a
   label — "Calculators → Precise Unit Converter"), in place of routing the
@@ -172,5 +190,6 @@ _Last updated: 2026-06-09 (UI review pass landed; converter promoted to main —
   `convert.html` and should be retired, not ported. The code-compliance
   calculators (`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`)
   are a different lineage (table lookups) — out of scope for the engine thread.
-- The richer AT-0 master cover (a multi-set index) is deferred behind the
-  picker-only launch — tracked in the backlog.
+- AT-0 is built, but thin by design: it indexes the two live tools. It fills
+  out as pages promote — a new tool is one `.index-row`. The set covers
+  (A-0 / C-0 / L-0) are still deferred, so the cover links tools directly.

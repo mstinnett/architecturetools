@@ -16,9 +16,11 @@ The site uses a minimal, high-contrast design language. No framework, no build t
 
 This file records actual repo and shipping state, and that now differs by branch:
 
-- **`main` — the live site, picker-only.** `index.html` (the picker) plus its
-  support files; `picker.html` redirects to `/`. `components.html`,
-  `site-screen.html`, and `calculators/` were trimmed off `main` in `f01b200`.
+- **`main` — the live site: the AT-0 cover, the picker, and the converter.**
+  `index.html` is the cover sheet; the picker is back at `picker.html` and the
+  Precise Unit Converter at `calculators/convert.html`, plus their support
+  files. `components.html`, `site-screen.html`, and the rest of `calculators/`
+  were trimmed off `main` in `f01b200`.
 - **`dev` — the workbench (this branch).** The full site below **plus** the
   calculator engine (`calculators/lib/`) and the shipped Precise Unit Converter
   (`calculators/convert.html`). Finished tools promote to `main` one at a time.
@@ -70,8 +72,8 @@ They are part of the site structure, but they do not need premature renaming or 
 
 ```text
 /
-├── index.html                      # The picker — site home page and launch entry point
-├── picker.html                     # Redirect to / (kept so old links resolve)
+├── index.html                      # AT-0 — the master cover sheet; indexes every live tool
+├── picker.html                     # The picker (Computer Chooser) — flagship live page
 ├── components.html                 # Flagship live component recommendation page
 ├── site-screen.html                # Flagship live site feasibility page
 ├── a/
@@ -130,8 +132,8 @@ Notes:
 - `/a/`, `/c/`, and `/l/` are the long-term structural homes (not created yet).
 - `calculators/index.html` (a C-0 cover) is not built yet; add it once the
   engine-based tools settle.
-- On `main` the picker is the only page; the rest of this tree is `dev`-only
-  until promoted.
+- On `main` the live pages are the cover, the picker, and the converter; the
+  rest of this tree is `dev`-only until promoted.
 
 ---
 
@@ -234,7 +236,7 @@ format, since a 72-row matrix is far nicer to edit there than as JSON.
 the full model string. Its `cpuNote`/`gpuNote` cell is **blank** to inherit the
 catalog note, **plain text** to replace it, or **`+ text`** to add a line on top
 of it. So the RTX 5090's `$2,900+` caveat lives once in `gpus.csv` and each
-build adds its own flavor. `hydrateSpecs()` in `index.html` resolves these
+build adds its own flavor. `hydrateSpecs()` in `picker.html` resolves these
 references at load into the flat `{ cpu, cpuNote, gpu, gpuNote, ... }` shape the
 render code expects.
 
@@ -248,13 +250,15 @@ or a duplicate, so typos never ship.
 
 ## Flagship pages
 
-The picker is the center of gravity, and **the only one live on `main`**.
+The picker is the center of gravity, and **the only flagship live on `main`**.
 `components.html` and `site-screen.html` are full pages on `dev` but are not yet
 promoted — they're documented here as the intended companions.
 
-### picker.html — live (as `index.html`)
-The main hardware recommendation page, and the site home page. `picker.html`
-remains only as a redirect to `/`.
+### picker.html — live
+The main hardware recommendation page, listed on the cover as the **Computer
+Chooser** (its short name in nav and index copy; the page keeps the question as
+its title). It was the site home page during the picker-only launch and moved
+back to `picker.html` when the AT-0 cover landed, so old links to it resolve.
 
 User flow:
 1. Select software used
@@ -381,19 +385,24 @@ The goal is to leave room for these without re-architecting later.
 
 ## Shipping MVP
 
-What actually shipped is a **picker-only launch** on `main`. The pages below
-all exist on `dev`; the MVP is to promote them as each is ready, not to land
-them all at once.
+What shipped was a **picker-only launch** on `main`, and the site has since
+grown a cover over it. The pages below all exist on `dev`; the MVP is to
+promote them as each is ready, not to land them all at once.
 
 ### Live now (`main`)
-- `index.html` — the picker, doubling as the home page (a fuller **AT-0** cover
-  is deferred behind the picker-only launch).
+- `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Title
+  block, one-line thesis, and a ruled index of every live tool, grouped by set.
+  Adding a tool is one `.index-row` block; nothing else to wire.
+- `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
-  label ("Calculators → Precise Unit Converter"); the picker footer links
-  each live tool; each tool's back-link returns home. C-0 is deferred until
+  label ("Calculators → Precise Unit Converter"); the cover indexes each live
+  tool; each tool's back-link returns to the cover. C-0 is deferred until
   the set has a second shipped tool.
+- Every title block carries the light/dark key (`.scheme-toggle` in
+  `global.css`, wired once in `assets/js/ui.js`); the choice persists in
+  `localStorage` and follows the reader across pages.
 
 ### Promote from `dev` as ready
 - `components.html`, `site-screen.html`
@@ -414,8 +423,8 @@ The backlog leads with the calculator-engine thread (HANDOFF §5).
 1. Extend the calculator engine — `partition()`, then slope, area+coverage,
    scale — and retire the superseded `dimension-converter.html`
 2. Close the provenance loose ends (noindex on dev WIP, a neutral preview host)
-3. Grow `index.html` toward a fuller **AT-0** cover; add a **C-0** calculator
-   index once the engine tools settle
+3. Grow the **AT-0** cover as sets fill in (it ships with the two live tools);
+   add a **C-0** calculator index once the engine tools settle
 4. Bring the remaining pages onto `global.css` as they're touched (the picker
    and converter are on it; the legacy calculators and `site-screen.html`
    still carry their own inline styles)

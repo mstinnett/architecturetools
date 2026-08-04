@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Accuracy audit for the picker: replicates the selection logic in index.html
+// Accuracy audit for the picker: replicates the selection logic in picker.html
 // over every reachable input combination and reports anomalies.
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

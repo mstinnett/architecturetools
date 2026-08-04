@@ -112,6 +112,12 @@ The master cover for architecture.tools. This is the page that explains the site
 
 AT-0 should make the site feel whole even if the numbered sets are still thin.
 
+> **Built 2026-08-04.** `index.html` is the cover: title block, thesis, and a
+> ruled index grouped by set. It lists **only what is live** — the picker
+> (Computer Chooser) and the Precise Unit Converter — rather than stubbing the
+> unbuilt set covers, so nothing on the cover 404s. Destinations above join the
+> index as they ship; each is one `.index-row` block.
+
 ---
 
 ## A-series
@@ -283,13 +289,15 @@ The L-series matters now because the site should be organized so these can be ad
 
 These remain important and should stay prominent even though they are not yet numbered.
 
-> **Status (2026-06-07):** only the picker is live on `main` (as `index.html`).
-> `components.html` and `site-screen.html` are full pages on `dev`, awaiting
-> promotion. See `docs/PROJECT.md`.
+> **Status (2026-08-04):** live on `main` are the AT-0 cover (`index.html`),
+> the picker (`picker.html`), and the converter. `components.html` and
+> `site-screen.html` are full pages on `dev`, awaiting promotion. See
+> `docs/PROJECT.md`.
 
 ### picker.html
-The main live hardware recommendation page. Ships as `index.html` (the home
-page), with `picker.html` redirecting to `/`.
+The main live hardware recommendation page, listed on the cover as the
+**Computer Chooser**. It served as `index.html` through the picker-only launch
+and moved back to `picker.html` when AT-0 landed.
 
 ### components.html
 The live current-picks companion page.
@@ -314,8 +322,8 @@ Instead, the hierarchy is:
 
 This is still simple. It is just no longer artificially flat.
 
-**Interim navigation — revised (2026-06-09).** The covers above are
-structure, not yet pages. Until they exist:
+**Interim navigation — revised (2026-08-04).** AT-0 is now a page; the set
+covers below it are still structure. Until they exist:
 
 - every page's title block opens with a **crumb line**: the site title (a
   link home), then the set trail as a *label* — e.g. `architecture.tools ·
@@ -323,13 +331,15 @@ structure, not yet pages. Until they exist:
   while the set covers are unbuilt; segments become links as covers land.
   Static, never sticky — it is part of the title block, the way a sheet
   locates itself in the set.
-- the picker (the home page) lists each live tool in its footer; every tool
-  page keeps one footer back-link home. Top answers "where am I"; bottom
-  answers "I'm done, what next."
+- **the cover (AT-0) is the index.** It lists every live tool, one ruled row
+  each, grouped by set; every other page keeps one footer back-link to it.
+  Top answers "where am I"; bottom answers "I'm done, what next." A new tool
+  is published by adding its row to the cover — that is the whole wiring.
 - **C-0 is deliberately deferred** until the calculator set has more than
   one shipped tool — a one-item index is less deliberate than a labeled
   trail. When it lands, the trail's "Calculators" segment becomes its link
-  and the tool back-links retarget to it.
+  and the tool back-links retarget to it, with AT-0 listing the set cover
+  in place of the individual tools.
 
 No menus; a menu is a destination list duplicated onto every page, and the
 cover structure is supposed to do that job.
@@ -341,7 +351,8 @@ cover structure is supposed to do that job.
 Do not attempt to fill every future slot before shipping.
 
 ### Immediate priorities
-1. Make `index.html` function as **AT-0**
+1. ~~Make `index.html` function as **AT-0**~~ — done 2026-08-04; grow the
+   index as sets fill in
 2. Make `calculators/index.html` function as **C-0**
 3. Keep `picker.html`, `components.html`, and `site-screen.html` prominent
 4. Add a thin **A-0** layer and then grow the A-series gradually
