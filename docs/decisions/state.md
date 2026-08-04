@@ -18,9 +18,10 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
     `data/`, `tools/`, `docs/`, the `build-data` workflow, `CNAME`,
     `.nojekyll`. Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb
     (site title home link + set-trail label) on every page; the **cover** is
-    the index of live tools, one ruled row each, grouped by set; each tool
-    back-links to the cover. Nothing links a deferred page, so nothing 404s.
-    Publishing a tool = adding its `.index-row` to the cover.
+    the index of live tools — a band of plates grouped by set, with a category
+    nav that doubles as the scrollbar; each tool back-links to the cover.
+    Nothing links a deferred page, so nothing 404s. Publishing a tool = adding
+    its `.cover-card` to the band.
   - **`dev` — the workbench (this branch).** The full prior site
     (`components.html`, `site-screen.html`, `calculators/`) **plus** the new
     calculator engine and converter. All work-in-progress lives here.
@@ -87,16 +88,22 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
 ## Recent decisions
 
 - 2026-08-04 — **AT-0 cover landed on `main`** (operator-directed, worked
-  directly on the live branch). `index.html` is now the master cover sheet,
-  worked **in landscape** on the operator's call — title block on the left
-  edge, heavy division, ruled index down the field, stacking to portrait below
-  820px — and the picker moved back to `picker.html` (where its redirect stub
-  had been, so old links still land on it; canonical + og:url retargeted). The
-  cover lists only what is live: Computer Chooser and Precise Unit Converter.
-  Its copy is **descriptive only** — no thesis line, no "more coming", no
-  independence claim; the operator struck all three as editorializing, and
-  SITE_FRAMEWORK's "one-line thesis" bullet went with them. Adding a tool is
-  one `.index-row` block and nothing else. The picker's footer tool list became a
+  directly on the live branch). `index.html` is now the master cover sheet:
+  centred title block over a **card band** (operator's call, after two
+  iterations — a portrait index, then a landscape title/index split). Each
+  live tool is a plate — its own drawing over a name and one line — grouped by
+  set. The band is **the picker's software selector at cover scale**: same
+  strip, chevrons, and category nav-as-scrollbar, `cover-*` in place of `sw-*`.
+  Below 820px the field turns vertical and the nav becomes the rail down the
+  left edge; one scrubber reads its axis from the layout, so there is no second
+  implementation. The picker moved back to `picker.html` (where its redirect
+  stub had been, so old links still land on it; canonical + og:url retargeted).
+  The cover lists only what is live: Computer Chooser and Precise Unit
+  Converter. Its copy is **descriptive only** — no thesis line, no "more
+  coming", no independence claim; the operator struck all three as
+  editorializing, and SITE_FRAMEWORK's "one-line thesis" bullet went with them.
+  Adding a tool is one `.cover-card`; a category is a `.cover-group` plus its
+  nav item. The picker's footer tool list became a
   back-link, since indexing is the cover's job now. Also graduated the sun/moon
   **light/dark key** out of the picker: `.scheme-toggle` into `global.css`,
   its wiring into `assets/js/ui.js`, and the button onto the converter and the
@@ -193,6 +200,13 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   `convert.html` and should be retired, not ported. The code-compliance
   calculators (`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`)
   are a different lineage (table lookups) — out of scope for the engine thread.
-- AT-0 is built, but thin by design: it indexes the two live tools. It fills
-  out as pages promote — a new tool is one `.index-row`. The set covers
+- AT-0 is built, but thin by design: two plates in the band. It fills out as
+  pages promote — a new tool is one `.cover-card`. The set covers
   (A-0 / C-0 / L-0) are still deferred, so the cover links tools directly.
+  Two consequences of being thin: the band doesn't overflow yet, so the
+  scrubber's thumb stays hidden (as the picker's does when its strip fits),
+  and with two categories the nav's `space-between` spread reads as a legend
+  rather than a map. Both resolve themselves as calculators land.
+- **A plate needs a drawing.** Each card carries the tool's own figure. There
+  is no house placeholder, so promoting a tool onto the cover means deciding
+  what it draws — budget for that, or the band grows a blank plate.

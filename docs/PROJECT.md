@@ -390,11 +390,15 @@ grown a cover over it. The pages below all exist on `dev`; the MVP is to
 promote them as each is ready, not to land them all at once.
 
 ### Live now (`main`)
-- `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Worked
-  in landscape: the title block holds the left edge, a heavy division separates
-  it, and the index of live tools runs down the field, grouped by set. It
-  stacks to the usual portrait order below 820px. Adding a tool is one
-  `.index-row` block; nothing else to wire.
+- `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Centred
+  title block over a **card band**: each live tool is a plate (its own drawing
+  over name and one line), plates grouped by set, the strip scrolling sideways
+  with chevrons at the edges and a category nav below that doubles as the
+  scrollbar. This is the picker's software selector at cover scale — same
+  parts, same behaviour, `cover-*` in place of `sw-*`. Below 820px the field
+  turns vertical and that nav becomes a rail down the left edge; it is one
+  scrubber reading its axis from the layout, not two. Adding a tool is one
+  `.cover-card`; a new category is a `.cover-group` plus its nav item.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block

@@ -28,64 +28,111 @@
 <style>
   /* ---- page-specific only ----
      The sheet, the crumb, the scheme toggle and the palette are shared
-     (assets/css/global.css + tokens.css). What's local is the cover's
-     landscape layout and its index. */
+     (assets/css/global.css + tokens.css). What's local is the title block and
+     the card band.
 
-  /* The sheet is worked in landscape, the way a drawing sheet is: the title
-     block holds the left edge, a heavy division separates it, and the index
-     runs down the field. The index sets the height — min-height is only a
-     floor, so the field grows as tools are added and never clips. */
-  /* the shared sheet reserves 5rem at the foot for scrolling content; a cover
-     is framed evenly instead, top and bottom */
-  .cover { padding-bottom: var(--space-2xl); }
-  /* position + the right gutter host the scheme toggle, as .page-header does */
-  .cover-stamp { position: relative; min-height: 2.25rem; padding-right: 3rem; margin-bottom: var(--space-lg); }
-  .cover-stamp .page-crumb { margin-bottom: 0; }
-  .cover-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); min-height: 24rem; }
-  .cover-title { display: flex; flex-direction: column; padding-right: var(--space-2xl); }
-  .cover-title h1 { font-size: var(--text-2xl); font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; }
-  .cover-date { margin-top: auto; font-size: var(--text-xs); font-weight: 300; color: var(--ink-3); }
-  .cover-index { padding-left: var(--space-2xl); border-left: var(--border-heavy); }
+     The band is the picker's software selector at cover scale: a scrolling
+     strip of category groups, chevrons at the edges, and a nav below that
+     doubles as the scrollbar — same parts, same names (sw-* there, cover-*
+     here), larger cards in place of chips. Below 820px the field turns
+     vertical and that nav becomes a rail down the left edge; it is the same
+     scrubber either way, reading its axis from the layout. */
 
-  /* SHEET INDEX — one ruled row per live tool, grouped by set. A row is a
-     whole link, so the target is the row and not just the title. */
-  .index-group { margin-bottom: var(--space-xl); }
-  .index-group:last-child { margin-bottom: 0; }
-  .index-row {
-    display: block; position: relative;
-    padding: 0.8rem 2rem 0.8rem 0;
-    border-top: 1px solid var(--rule);
-    color: inherit; text-decoration: none;
-  }
-  .index-row:last-of-type { border-bottom: 1px solid var(--rule); }
-  .index-row::after {
-    content: '\2192'; position: absolute; right: 0.15rem; top: 0.85rem;
-    color: var(--ink-3); transition: transform 0.15s, color 0.15s;
-  }
-  .index-row:hover::after { transform: translateX(3px); color: var(--accent); }
-  .index-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-  .index-name { display: block; font-size: var(--text-md); font-weight: 400; transition: color 0.15s; }
-  .index-row:hover .index-name { color: var(--accent); }
-  .index-desc { display: block; margin-top: 0.15rem;
-                font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); line-height: 1.55; }
+  /* TITLE BLOCK — centred, the way a cover is stamped */
+  .cover-header { position: relative; text-align: center; padding: 0 3rem var(--space-xl); margin-bottom: var(--space-xl); border-bottom: var(--border-heavy); }
+  .cover-header .page-crumb { margin-bottom: var(--space-xs); }
+  .cover-header h1 { font-size: var(--text-2xl); font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; }
 
-  /* Portrait below the wide breakpoint: the division turns horizontal and the
-     title block sits above the field, as it does on every other page. */
+  /* FIELD — band + nav. Wide: nav under the band. Narrow: nav down the left
+     edge, band beside it (grid areas swap; nothing is duplicated). */
+  .cover-field { display: grid; grid-template-areas: "band" "nav"; }
+  .cover-band { grid-area: band; display: flex; align-items: stretch; gap: 0.5rem; min-width: 0; }
+  .cover-nav { grid-area: nav; }
+
+  .cover-chev { flex-shrink: 0; width: 2.25rem; border: 1px solid var(--rule-2); background: var(--card);
+                box-shadow: var(--shadow-key); border-radius: var(--radius); cursor: pointer;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1.1rem; line-height: 1; color: var(--ink-2); padding: 0;
+                transition: border-color 0.15s, color 0.15s, box-shadow 0.15s; }
+  .cover-chev:hover { border-color: var(--ink-3); color: var(--ink); box-shadow: var(--shadow-key-hover); }
+  .cover-chev[hidden] { display: none; }
+
+  /* the scroller — its scrollbar is hidden because the nav below IS the bar */
+  .cover-scroll { flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+                  padding-bottom: 0.5rem; scrollbar-width: none; }
+  .cover-scroll::-webkit-scrollbar { display: none; }
+  .cover-strip { display: flex; gap: 2.5rem; min-width: max-content; padding: 0.25rem 0; }
+  .cover-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .cover-group-label { font-size: 0.55rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase;
+                       color: var(--gray-400); white-space: nowrap; }
+  /* flex:1 so every group fills the strip's height and all card bottoms line
+     up, however long a description runs */
+  .cover-cards { display: flex; gap: 0.75rem; flex: 1; }
+
+  /* CARD — the raised key material the pills use, at plate size: drawing in a
+     recessed window on top, name and one line under it. */
+  .cover-card { display: flex; flex-direction: column; width: 16rem; flex-shrink: 0;
+                border: 1px solid var(--rule-2); border-radius: var(--radius);
+                background: var(--card); box-shadow: var(--shadow-key);
+                color: inherit; text-decoration: none; overflow: hidden;
+                transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s; }
+  .cover-card:hover { border-color: var(--ink-3); box-shadow: var(--shadow-key-hover); transform: translateY(-1px); }
+  .cover-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .cover-card .card-art { aspect-ratio: 5 / 4; display: flex; align-items: center; justify-content: center;
+                          padding: 0.6rem; overflow: hidden; background: var(--answer-surface);
+                          border-bottom: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); }
+  .cover-card .card-art img,
+  .cover-card .card-art svg { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .cover-card .card-body { padding: 0.7rem 0.85rem 0.85rem; }
+  .cover-card .card-name { font-size: var(--text-md); font-weight: 400; transition: color 0.15s; }
+  .cover-card:hover .card-name { color: var(--accent); }
+  .cover-card .card-desc { margin-top: 0.15rem; font-size: var(--text-sm); font-weight: 300;
+                           color: var(--ink-2); line-height: 1.5; }
+
+  /* NAV — the category index, and the scrollbar. Thin track line above, heavy
+     rule below; the indicator overhangs both, as it does on the picker. */
+  .cover-nav { position: relative; display: flex; justify-content: space-between; gap: 1rem;
+               margin-top: 0.5rem; padding: 0.5rem 0;
+               border-top: 1px solid var(--gray-700); border-bottom: 2px solid var(--black);
+               cursor: pointer; touch-action: none; user-select: none; }
+  .cover-nav-item { background: none; border: 0; padding: 0; position: relative; z-index: 1;
+                    font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase;
+                    color: var(--gray-400); white-space: nowrap; cursor: pointer; transition: color 0.15s; }
+  .cover-nav-item:hover, .cover-nav-item.is-active { color: var(--black); }
+  .cover-nav-indicator { position: absolute; top: -1px; bottom: -2px;
+                         border: 1px solid var(--accent); background: var(--accent-soft);
+                         pointer-events: none; cursor: grab; }
+  .cover-nav.is-scrubbing, .cover-nav.is-scrubbing .cover-nav-indicator { cursor: grabbing; }
+
+  .cover-foot { margin-top: var(--space-xl); text-align: center;
+                font-size: var(--text-xs); font-weight: 300; color: var(--ink-3); }
+
+  /* NARROW — the field turns vertical: cards stack, and the nav becomes the
+     rail down the left edge that says where you are in the field. */
   @media (max-width: 820px) {
-    .cover-body { grid-template-columns: 1fr; min-height: 0; }
-    .cover-title { padding-right: 0; padding-bottom: var(--space-xl); }
-    .cover-title h1 { font-size: var(--text-xl); }
-    .cover-date { margin-top: var(--space-md); }
-    .cover-index { padding-left: 0; padding-top: var(--space-xl); border-left: none; border-top: var(--border-heavy); }
+    .cover-header { padding-bottom: var(--space-lg); margin-bottom: var(--space-lg); }
+    .cover-header h1 { font-size: var(--text-xl); }
+    .cover-field { grid-template-areas: "nav band"; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-md); }
+    .cover-chev { display: none; }
+    .cover-scroll { overflow-x: hidden; overflow-y: auto; max-height: 68vh; padding-bottom: 0; }
+    .cover-strip { flex-direction: column; gap: var(--space-lg); min-width: 0; }
+    .cover-cards { flex-direction: column; }
+    .cover-card { width: auto; }
+    .cover-nav { flex-direction: column; margin-top: 0; padding: 0 0.5rem;
+                 border-top: none; border-bottom: none;
+                 border-left: 1px solid var(--gray-700); border-right: 2px solid var(--black); }
+    .cover-nav-item { writing-mode: vertical-rl; text-orientation: mixed; }
+    .cover-nav-indicator { top: auto; bottom: auto; left: -1px; right: -2px; }
   }
 </style>
 </head>
 <body>
 <div class="page-wide cover">
 
-  <div class="cover-stamp">
+  <div class="cover-header">
     <!-- the cover's own stamp; it's the top of the set, so there's no trail -->
     <div class="page-crumb">AT-0 &middot; Cover sheet</div>
+    <h1>architecture.tools</h1>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
@@ -93,34 +140,227 @@
     </button>
   </div>
 
-  <div class="cover-body">
-    <div class="cover-title">
-      <h1>architecture.tools</h1>
-      <div class="cover-date">Updated August 2026</div>
+  <div class="cover-field">
+    <div class="cover-band">
+      <button type="button" class="cover-chev" id="coverPrev" hidden aria-label="Scroll back">&#8249;</button>
+
+      <div class="cover-scroll" id="coverScroll">
+        <div class="cover-strip">
+
+          <div class="cover-group" id="grp-live">
+            <div class="cover-group-label">Live recommendations</div>
+            <div class="cover-cards">
+              <a class="cover-card" href="picker.html">
+                <!-- the picker's own desk drawing; deskArt() below swaps the
+                     light/dark export, the way the picker does -->
+                <div class="card-art" id="artPicker"></div>
+                <div class="card-body">
+                  <div class="card-name">Computer Chooser</div>
+                  <div class="card-desc">CPU, GPU, RAM, monitor and laptop picks from your software, project scale and budget.</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="cover-group" id="grp-calc">
+            <div class="cover-group-label">Calculators</div>
+            <div class="cover-cards">
+              <a class="cover-card" href="calculators/convert.html">
+                <!-- the tool's own figure, reduced: grid ticks, the true value
+                     between two of them, the nearest one taken. Strokes read
+                     the number-line tokens, so it inverts with the scheme. -->
+                <div class="card-art">
+                  <svg viewBox="0 0 260 208" role="img" aria-label="A dimension falling between two grid marks, with the nearer mark taken and the difference hatched">
+                    <g fill="none" stroke-linecap="square">
+                      <!-- the grid you snap to -->
+                      <path d="M16 130 H244" stroke="var(--nl-axis)" stroke-width="1"/>
+                      <path d="M16 130 V108 M244 130 V108" stroke="var(--nl-tick)" stroke-width="1"/>
+                      <path d="M62 130 V116 M108 130 V116 M154 130 V116 M200 130 V116" stroke="var(--nl-tick)" stroke-width="1"/>
+                      <!-- the value as typed: dashed, and falling between marks -->
+                      <path d="M132 92 V141" stroke="var(--nl-ink)" stroke-width="1.2" stroke-dasharray="3 3"/>
+                      <!-- the mark it lands on — solid, and the accent is the answer -->
+                      <path d="M154 130 V62" stroke="var(--accent)" stroke-width="2.5"/>
+                    </g>
+                    <!-- what the rounding cost -->
+                    <rect x="132" y="131" width="22" height="10" fill="var(--nl-hatch)" opacity="0.38"/>
+                  </svg>
+                </div>
+                <div class="card-body">
+                  <div class="card-name">Precise Unit Converter</div>
+                  <div class="card-desc">Exact conversions, with the cost of rounding shown.</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Next calculator goes here: copy one .cover-card into the group's
+               .cover-cards. A new category is a .cover-group with an id, plus
+               one .cover-nav-item below pointing at that id. -->
+
+        </div>
+      </div>
+
+      <button type="button" class="cover-chev" id="coverNext" hidden aria-label="Scroll on">&#8250;</button>
     </div>
 
-    <div class="cover-index">
-      <div class="index-group">
-        <div class="section-label">Live recommendations</div>
-        <a class="index-row" href="picker.html">
-          <span class="index-name">Computer Chooser</span>
-          <span class="index-desc">CPU, GPU, RAM, monitor and laptop picks from your software, project scale and budget.</span>
-        </a>
-      </div>
-
-      <div class="index-group">
-        <div class="section-label">Calculators</div>
-        <a class="index-row" href="calculators/convert.html">
-          <span class="index-name">Precise Unit Converter</span>
-          <span class="index-desc">Exact conversions, with the cost of rounding shown.</span>
-        </a>
-        <!-- Next calculator goes here: copy one .index-row block, point it at
-             the new page, and give it a one-line description. Nothing else. -->
-      </div>
+    <div class="cover-nav" id="coverNav">
+      <span class="cover-nav-indicator" id="coverNavThumb" hidden></span>
+      <button type="button" class="cover-nav-item" data-target="grp-live">Live recommendations</button>
+      <button type="button" class="cover-nav-item" data-target="grp-calc">Calculators</button>
     </div>
   </div>
+
+  <div class="cover-foot">Updated August 2026</div>
 </div>
 
 <script src="assets/js/ui.js"></script>
+<script>
+// ---- the picker's desk drawing, as the Computer Chooser's plate ----
+// The line art ships as two flat exports, light and dark; <picture media>
+// can't choose between them because the scheme is a manual choice, so the
+// file is picked here and repainted on schemechange (same as the picker).
+(function () {
+  'use strict';
+  var slot = document.getElementById('artPicker');
+  var FILE = 'NorthXL_2x27.png';                 // the picker's stock desk
+  function paint() {
+    var dir = document.documentElement.dataset.scheme === 'dark' ? 'assets/desk-images-dark/' : 'assets/desk-images/';
+    slot.innerHTML = '<img src="' + dir + FILE + '" alt="Two monitors and a tower on a desk" loading="eager">';
+  }
+  document.addEventListener('schemechange', paint);
+  paint();
+})();
+
+// ---- the field scrubber ----
+// One scrubber, two orientations. Wide: the strip scrolls sideways and the
+// nav under it is the bar. Narrow: the strip scrolls down and that same nav
+// is the rail along the left edge. Everything below is written against one
+// axis and reads which axis it is from the layout, so there is no second
+// implementation to keep in step.
+(function () {
+  'use strict';
+  var scroll = document.getElementById('coverScroll');
+  var nav    = document.getElementById('coverNav');
+  var thumb  = document.getElementById('coverNavThumb');
+  var prev   = document.getElementById('coverPrev');
+  var next   = document.getElementById('coverNext');
+  var items  = Array.prototype.slice.call(nav.querySelectorAll('.cover-nav-item'));
+  var STEP   = 280;                              // one card + gap, for a chevron press
+
+  var DOWN = {                                   // the field runs top to bottom
+    pos: 'scrollTop', total: 'scrollHeight', view: 'clientHeight',
+    navSize: 'offsetHeight', thumbSize: 'offsetHeight',
+    near: 'top', far: 'bottom', client: 'clientY',
+    edge: 'top', span: 'height', clear: ['left', 'width']
+  };
+  var ACROSS = {                                 // the field runs left to right
+    pos: 'scrollLeft', total: 'scrollWidth', view: 'clientWidth',
+    navSize: 'offsetWidth', thumbSize: 'offsetWidth',
+    near: 'left', far: 'right', client: 'clientX',
+    edge: 'left', span: 'width', clear: ['top', 'height']
+  };
+  function axis() { return matchMedia('(max-width: 820px)').matches ? DOWN : ACROSS; }
+
+  function update() {
+    var a = axis();
+    var total = scroll[a.total], view = scroll[a.view], at = scroll[a.pos];
+
+    prev.hidden = at <= 0;
+    next.hidden = at >= total - view - 1;
+
+    // a category is current while any part of it is in the window
+    var sr = scroll.getBoundingClientRect();
+    items.forEach(function (item) {
+      var group = document.getElementById(item.dataset.target);
+      if (!group) return;
+      var gr = group.getBoundingClientRect();
+      item.classList.toggle('is-active', gr[a.far] > sr[a.near] + 1 && gr[a.near] < sr[a.far] - 1);
+    });
+
+    // the thumb is the window, drawn to scale across the whole nav
+    if (total <= view) { thumb.hidden = true; return; }
+    var navSize = nav[a.navSize];
+    thumb.hidden = false;
+    a.clear.forEach(function (p) { thumb.style[p] = ''; });
+    thumb.style[a.edge] = Math.round((at / total) * navSize) + 'px';
+    thumb.style[a.span] = Math.round((view / total) * navSize) + 'px';
+  }
+
+  function step(sign) {
+    var a = axis(), to = {};
+    to[a.edge] = scroll[a.pos] + sign * STEP;
+    to.behavior = 'smooth';
+    scroll.scrollTo(to);
+  }
+  prev.addEventListener('click', function () { step(-1); });
+  next.addEventListener('click', function () { step(1); });
+  scroll.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+
+  // a label jumps to its category — align the group's leading edge to the window
+  items.forEach(function (item) {
+    item.addEventListener('click', function () {
+      var group = document.getElementById(item.dataset.target);
+      if (!group) return;
+      var a = axis(), to = {};
+      to[a.edge] = scroll[a.pos] + (group.getBoundingClientRect()[a.near] - scroll.getBoundingClientRect()[a.near]);
+      to.behavior = 'smooth';
+      scroll.scrollTo(to);
+    });
+  });
+
+  // The nav doubles as the scrollbar: grab it and the field follows your
+  // pointer proportionally. Pressing down moves nothing — motion drives the
+  // scroll, in the direction you drag. A press inside the thumb always
+  // scrubs, even over a label (the thumb is pointer-events:none, so the label
+  // beneath is the target); an exposed label keeps its jump.
+  var scrubbing = false, startAt = 0, startScroll = 0, perPixel = 1, suppressClick = false;
+
+  nav.addEventListener('pointerdown', function (e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    var a = axis();
+    var overThumb = false;
+    if (!thumb.hidden) {
+      var t = thumb.getBoundingClientRect();
+      overThumb = e.clientX >= t.left && e.clientX <= t.right && e.clientY >= t.top && e.clientY <= t.bottom;
+    }
+    if (!overThumb && e.target.closest('.cover-nav-item')) return;
+    var maxScroll = scroll[a.total] - scroll[a.view];
+    if (maxScroll <= 0) return;
+    var track = Math.max(nav[a.navSize] - (thumb[a.thumbSize] || 0), 1);
+    scrubbing = true;
+    startAt = e[a.client];
+    startScroll = scroll[a.pos];
+    perPixel = maxScroll / track;
+    nav.classList.add('is-scrubbing');
+    try { nav.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  });
+
+  nav.addEventListener('pointermove', function (e) {
+    if (!scrubbing) return;
+    var a = axis();
+    var maxScroll = scroll[a.total] - scroll[a.view];
+    scroll[a.pos] = Math.max(0, Math.min(maxScroll, startScroll + (e[a.client] - startAt) * perPixel));
+  });
+
+  function endScrub(e) {
+    if (!scrubbing) return;
+    scrubbing = false;
+    suppressClick = true;            // a scrub that releases over a label isn't a click
+    nav.classList.remove('is-scrubbing');
+    try { nav.releasePointerCapture(e.pointerId); } catch (err) {}
+  }
+  nav.addEventListener('pointerup', endScrub);
+  nav.addEventListener('pointercancel', endScrub);
+  nav.addEventListener('click', function (e) {
+    if (suppressClick) { suppressClick = false; e.stopPropagation(); e.preventDefault(); }
+  }, true);
+
+  // the desk plate loads after first paint and changes the field's extent
+  window.addEventListener('load', update);
+  update();
+})();
+</script>
 </body>
 </html>

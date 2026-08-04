@@ -112,17 +112,27 @@ The master cover for architecture.tools. This is the page that explains the site
 
 AT-0 should make the site feel whole even if the numbered sets are still thin.
 
-> **Built 2026-08-04.** `index.html` is the cover, worked **in landscape** the
-> way a sheet is: title block on the left edge, heavy division, index down the
-> field. It lists **only what is live** — the picker (Computer Chooser) and the
+> **Built 2026-08-04.** `index.html` is the cover: a centred title block over a
+> **card band**. Each live tool is a plate — its own drawing over a name and
+> one line — plates are grouped by set, and the band is the picker's software
+> selector at cover scale: a sideways-scrolling strip, chevrons at the edges,
+> and a category nav below that doubles as the scrollbar. Below 820px the field
+> turns vertical and that nav becomes the rail down the left edge, so the
+> reader keeps the same category map in either orientation.
+>
+> Each plate's drawing is the tool's own: the picker's desk line art (both
+> scheme exports), the converter's number line reduced to a value between two
+> grid marks. A tool that can't show its own drawing doesn't belong on a plate.
+>
+> The cover lists **only what is live** — the picker (Computer Chooser) and the
 > Precise Unit Converter — rather than stubbing the unbuilt set covers, so
-> nothing on the cover 404s. Destinations above join the index as they ship;
-> each is one `.index-row` block.
+> nothing on it 404s. Destinations above join the band as they ship: one
+> `.cover-card` for a tool, a `.cover-group` plus a nav item for a category.
 >
 > The cover carries **no thesis line** (the "one-line thesis" bullet above was
 > struck for this reason). A cover sheet states the project name and lists the
 > set; a line asserting what the tools are worth is editorializing, and the
-> index says it better. Copy on the cover is descriptive only — what each tool
+> band says it better. Copy on a plate is descriptive only — what the tool
 > takes in and gives back, in the register of `docs/voice.md`.
 
 ---
@@ -338,10 +348,11 @@ covers below it are still structure. Until they exist:
   while the set covers are unbuilt; segments become links as covers land.
   Static, never sticky — it is part of the title block, the way a sheet
   locates itself in the set.
-- **the cover (AT-0) is the index.** It lists every live tool, one ruled row
-  each, grouped by set; every other page keeps one footer back-link to it.
-  Top answers "where am I"; bottom answers "I'm done, what next." A new tool
-  is published by adding its row to the cover — that is the whole wiring.
+- **the cover (AT-0) is the index.** It carries every live tool as a plate in
+  a scrolling band, grouped by set, with a category nav that doubles as the
+  scrollbar; every other page keeps one footer back-link to it. Top answers
+  "where am I"; bottom answers "I'm done, what next." A new tool is published
+  by adding its plate to the cover — that is the whole wiring.
 - **C-0 is deliberately deferred** until the calculator set has more than
   one shipped tool — a one-item index is less deliberate than a labeled
   trail. When it lands, the trail's "Calculators" segment becomes its link
