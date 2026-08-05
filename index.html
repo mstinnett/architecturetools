@@ -41,7 +41,13 @@
   /* TITLE BLOCK — centred, the way a cover is stamped */
   .cover-header { position: relative; text-align: center; padding: 0 3rem var(--space-xl); margin-bottom: var(--space-xl); border-bottom: var(--border-heavy); }
   .cover-header .page-crumb { margin-bottom: var(--space-xs); }
-  .cover-header h1 { font-size: var(--text-2xl); font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; }
+  /* The wordmark. Title case is doing real work here, not styling: it is the
+     only setting of the name with no lowercase 'a' in it, and Jost's
+     double-storey 'a' is the one glyph that reads un-geometric against a face
+     otherwise built from circles and triangles. The cap A is the triangle.
+     Tracking opens slightly (the body scale runs tight) so it reads as a mark
+     rather than as a word. */
+  .cover-header h1 { font-size: var(--text-2xl); font-weight: 400; letter-spacing: 0.02em; line-height: 1.1; }
 
   /* FIELD — band + nav. Wide: nav under the band. Narrow: nav down the left
      edge, band beside it (grid areas swap; nothing is duplicated). */
@@ -110,7 +116,10 @@
   /* NARROW — the field turns vertical: cards stack, and the nav becomes the
      rail down the left edge that says where you are in the field. */
   @media (max-width: 820px) {
-    .cover-header { padding-bottom: var(--space-lg); margin-bottom: var(--space-lg); }
+    /* the key moves above the wordmark rather than beside it: at phone widths
+       the mark and a 3rem gutter don't both fit, and shrinking the mark to
+       make room costs more than moving the key does */
+    .cover-header { padding: 2.75rem 0 var(--space-lg); margin-bottom: var(--space-lg); }
     .cover-header h1 { font-size: var(--text-xl); }
     .cover-field { grid-template-areas: "nav band"; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-md); }
     .cover-chev { display: none; }
@@ -135,7 +144,7 @@
   <!-- no crumb here: the cover IS the top of the set, so there is nowhere to
        point back to. Every other page opens with one (SITE_FRAMEWORK "Hierarchy"). -->
   <div class="cover-header">
-    <h1>architecture.tools</h1>
+    <h1>Architecture.tools</h1>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>

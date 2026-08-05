@@ -219,6 +219,18 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   scales, the hatched cell and the labels, so drift shows up as a failure
   rather than silently. There is no house placeholder, so promoting a tool
   onto the cover means deciding what it draws.
+- **The wordmark is title case on purpose.** The cover sets the name as
+  "Architecture.tools" — the only setting of it with no lowercase `a`. Jost's
+  double-storey `a` is the one glyph that reads un-geometric in a face
+  otherwise built from circles and triangles, and the cap A is the triangle;
+  Jost carries no single-storey alternate (its only GSUB feature is `tnum`),
+  so the case change is the whole fix. Tracking opens to +0.02em. It stays
+  lowercase everywhere it is the *domain* rather than the mark — `<title>`,
+  the og tags, `CNAME` — and the crumb never shows the problem because
+  `.page-crumb` uppercases. Below 820px the light/dark key moves above the
+  mark instead of beside it: at phone widths the mark and a 3rem gutter don't
+  both fit, and moving the key costs less than shrinking the mark. A browser
+  sweep from 320 to 1280 holds it to one line, clear of the key.
 - **Category names are copy, and they can be long.** The picker's category is
   the question it answers ("What computer should I buy for architecture"), set
   by the operator over the earlier "Live recommendations". A long name widens
