@@ -394,8 +394,11 @@ promote them as each is ready, not to land them all at once.
 
 ### Live now (`main`)
 - `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Centred
-  title block (no crumb, no sheet stamp, no rule under it — it is the top of
-  the set) carrying the wordmark in `--font-mark`, over a **card band**: each live tool is a plate (its own drawing over name and one
+  title bar (no crumb, no sheet stamp — it is the top of the set) carrying the
+  wordmark in `--font-mark` as a box that fits it and nothing else, lifted on
+  its own shadow and **overlaid** above the sheet rather than banded inside it;
+  it settles from a large title into a mini title once the field scrolls under
+  it. Below that, a **card band**: each live tool is a plate (its own drawing over name and one
   line), plates grouped by set, the strip scrolling sideways
   with chevrons at the edges and a category nav below that doubles as the
   scrollbar. This is the picker's software selector at cover scale — same

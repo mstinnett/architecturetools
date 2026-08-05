@@ -221,6 +221,28 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   scales, the hatched cell and the labels, so drift shows up as a failure
   rather than silently. There is no house placeholder, so promoting a tool
   onto the cover means deciding what it draws.
+- **The cover's title is an overlaid bar, not a header in the sheet.** A box
+  that fits the wordmark and nothing else, lifted off the paper on its own
+  shadow, riding above the sheet rather than inside it — so there is no white
+  band behind it. It behaves like a native large title: full size at the top,
+  settling into a mini title pinned to the top edge once the field moves under
+  it, the box shrink-wrapping at both sizes.
+  Two things about it are load-bearing, not styling:
+  - It is `position: fixed` with a spacer holding its place. An in-flow bar
+    that shrinks **shortens the document**, which on a short page hands back
+    the very scroll that collapsed it — so it uncollapses, grows, and
+    flickers. Overlaid, the document height never moves and the field never
+    lurches when the title lands. A check asserts `scrollHeight` is identical
+    either side of the collapse.
+  - The trigger has a dead zone (enter at 56px, leave at 20px) rather than one
+    threshold, so the state cannot chatter on a stray pixel.
+  **It only engages where the page actually scrolls.** The cover is short: on a
+  1280×900 window it does not scroll at all, so the title stays large — which
+  is the right answer, there being nothing to have scrolled past. It shows on
+  shorter windows, on small phones, and will show everywhere once the band
+  carries more calculators. If it is wanted somewhere it always reads, the
+  picker is the page that scrolls, and the parts would move to global.css +
+  ui.js unchanged.
 - **Two faces now: one to read, one to mark.** `--font-body` (Jost) for
   everything, `--font-mark` (League Spartan, self-hosted, 13KB, SIL OFL) for
   the cover wordmark and nothing else. The split came out of a real finding,

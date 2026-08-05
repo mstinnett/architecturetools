@@ -38,18 +38,51 @@
      vertical and that nav becomes a rail down the left edge; it is the same
      scrubber either way, reading its axis from the layout. */
 
-  /* TITLE BLOCK — centred, the way a cover is stamped. No rule under it: the
-     band's own category labels and card edges start the field cleanly enough,
-     and the mark reads better standing on white than boxed in. */
-  .cover-header { position: relative; text-align: center; padding: 0 3rem var(--space-xl); margin-bottom: var(--space-lg); }
-  .cover-header .page-crumb { margin-bottom: var(--space-xs); }
+  /* THE MARK — not a band across the sheet but a box that fits the wordmark
+     and nothing else, lifted off the paper on its own shadow. It rides above
+     the sheet rather than inside it, so the white rectangle behind it is gone.
+
+     It behaves the way a native large title does: full size while you are at
+     the top, settling into a mini title pinned to the top edge once the field
+     starts moving under it. The box shrink-wraps at both sizes, so the morph
+     is the box doing its one job at two scales — type and padding animate,
+     and the shadow drops from the sheet's lift to a key's as it lands.
+
+     The bar OVERLAYS rather than sits in the flow, and a spacer holds its
+     place. That is not a detail: an in-flow bar that shrinks shortens the
+     document, which on a short page hands back the very scroll that collapsed
+     it — so it uncollapses, grows, and flickers. Overlaid, the document height
+     never moves, the field never lurches when the title lands, and the state
+     can only settle. */
+  :root { --mark-h: 8rem; --mark-h-mini: 3.25rem; }
+  .cover-mark-space { height: var(--mark-h); }
+  .cover-mark { position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+                height: var(--mark-h); display: flex; align-items: center;
+                background: var(--gray-100); border-bottom: 1px solid transparent;
+                transition: height 0.28s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.28s; }
+  .cover-mark.is-mini { height: var(--mark-h-mini); border-bottom-color: var(--rule); }
+  .cover-mark-inner { position: relative; display: flex; justify-content: center; align-items: center;
+                      width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 var(--space-xl); }
   /* THE WORDMARK — set in --font-mark (League Spartan), the site's only
      display face. Its 'a' is a circle and a stem, so the name can stay
      lowercase, as a domain should: the glyph that read un-geometric in Jost
      is simply not in this face. Tracking opens slightly — the body scale runs
      tight, and a mark wants air. */
-  .cover-header h1 { font-family: var(--font-mark); font-size: var(--text-2xl);
-                     font-weight: 400; letter-spacing: 0.02em; line-height: 1.1; }
+  .cover-mark-box { font-family: var(--font-mark); font-size: var(--text-2xl);
+                    font-weight: 400; letter-spacing: 0.02em; line-height: 1.15;
+                    padding: 0.5rem 1.5rem; background: var(--card);
+                    border: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
+                    border-radius: var(--radius); box-shadow: var(--shadow-card);
+                    transition: font-size 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                                padding 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s; }
+  .cover-mark.is-mini .cover-mark-box { font-size: var(--text-md); padding: 0.25rem 0.85rem;
+                                        box-shadow: var(--shadow-key); }
+  /* the key rides with the bar, centred on whichever height it currently is */
+  .cover-mark .scheme-toggle { top: 50%; right: var(--space-xl); transform: translateY(-50%); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cover-mark, .cover-mark-box { transition: none; }
+  }
 
   /* FIELD — band + nav. Wide: nav under the band. Narrow: nav down the left
      edge, band beside it (grid areas swap; nothing is duplicated). */
@@ -118,11 +151,19 @@
   /* NARROW — the field turns vertical: cards stack, and the nav becomes the
      rail down the left edge that says where you are in the field. */
   @media (max-width: 820px) {
-    /* the key moves above the wordmark rather than beside it: at phone widths
-       the mark and a 3rem gutter don't both fit, and shrinking the mark to
-       make room costs more than moving the key does */
-    .cover-header { padding: 2.75rem 0 var(--space-lg); margin-bottom: var(--space-lg); }
-    .cover-header h1 { font-size: var(--text-xl); }
+    /* the key moves above the mark rather than beside it: at phone widths the
+       box, its padding and a key don't share a line, and shrinking the mark to
+       make room costs more than stacking does */
+    /* the key takes the top of the bar and the mark sits under it, rather than
+       beside it: at phone widths a centred box this wide reaches the key, and
+       stacking beats shrinking the mark to make room */
+    :root { --mark-h: 7.5rem; --mark-h-mini: 2.9rem; }
+    .cover-mark-inner { height: 100%; align-items: flex-end; padding: 0 var(--space-lg) 1rem; }
+    .cover-mark .scheme-toggle { top: 0.5rem; right: var(--space-lg); transform: none; }
+    .cover-mark-box { font-size: var(--text-xl); padding: 0.4rem 1.1rem; }
+    .cover-mark.is-mini .cover-mark-inner { align-items: center; padding-bottom: 0; }
+    .cover-mark.is-mini .scheme-toggle { top: 50%; transform: translateY(-50%); }
+    .cover-mark.is-mini .cover-mark-box { font-size: var(--text-base); }
     .cover-field { grid-template-areas: "nav band"; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-md); }
     .cover-chev { display: none; }
     .cover-scroll { overflow-x: hidden; overflow-y: auto; max-height: 68vh; padding-bottom: 0; }
@@ -141,18 +182,24 @@
 </style>
 </head>
 <body>
-<div class="page-wide cover">
 
-  <!-- no crumb here: the cover IS the top of the set, so there is nowhere to
-       point back to. Every other page opens with one (SITE_FRAMEWORK "Hierarchy"). -->
-  <div class="cover-header">
-    <h1>architecture.tools</h1>
+<!-- holds the bar's place in the flow; the bar itself is overlaid -->
+<div class="cover-mark-space"></div>
+
+<!-- no crumb here: the cover IS the top of the set, so there is nowhere to
+     point back to. Every other page opens with one (SITE_FRAMEWORK "Hierarchy"). -->
+<div class="cover-mark" id="coverMark">
+  <div class="cover-mark-inner">
+    <h1 class="cover-mark-box">architecture.tools</h1>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
       <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
     </button>
   </div>
+</div>
+
+<div class="page-wide cover">
 
   <div class="cover-field">
     <div class="cover-band">
@@ -273,6 +320,32 @@
   }
   document.addEventListener('schemechange', paint);
   paint();
+})();
+
+// ---- large title → mini title ----
+// The mark settles into the bar once the field has genuinely moved. Two
+// thresholds, not one: a single threshold sitting where the page can only just
+// reach it lets the state chatter on every stray pixel of scroll, so entering
+// and leaving are held apart. On a page too short to scroll past ENTER the
+// title simply stays large, which is the right answer there — there is nothing
+// to have scrolled past.
+// Everything visual is a CSS transition; this only decides which state is on.
+(function () {
+  'use strict';
+  var mark = document.getElementById('coverMark');
+  if (!mark) return;
+  var ENTER = 56, LEAVE = 20, mini = false, queued = false;
+  function read() {
+    queued = false;
+    var y = window.scrollY || window.pageYOffset || 0;
+    if (!mini && y > ENTER) { mini = true; mark.classList.add('is-mini'); }
+    else if (mini && y < LEAVE) { mini = false; mark.classList.remove('is-mini'); }
+  }
+  // coalesced to one read a frame, and it only reads scrollY — no layout
+  window.addEventListener('scroll', function () {
+    if (!queued) { queued = true; requestAnimationFrame(read); }
+  }, { passive: true });
+  read();
 })();
 
 // ---- the field scrubber ----
