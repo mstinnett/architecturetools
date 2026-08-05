@@ -44,7 +44,9 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
   warm sheet theme; imports `assets/css/tokens.css`, the canonical color
   palette; owns the per-family accent system selected via `data-family` on
-  `<html>` and the one shared dark scheme). The picker and converter use it
+  `<html>`, the one shared dark scheme, and the two type tokens —
+  `--font-body` for reading, `--font-mark` for the wordmark, whose face is
+  self-hosted from `assets/fonts/`). The picker and converter use it
   fully; `components.html` and `dimension-converter.html` link it and inherit
   the theme (the old cool-neutral sheet of the same name was replaced —
   same class/token vocabulary, re-valued). `assets/js/ui.js` — the shared page
@@ -219,18 +221,22 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   scales, the hatched cell and the labels, so drift shows up as a failure
   rather than silently. There is no house placeholder, so promoting a tool
   onto the cover means deciding what it draws.
-- **The wordmark is title case on purpose.** The cover sets the name as
-  "Architecture.tools" — the only setting of it with no lowercase `a`. Jost's
-  double-storey `a` is the one glyph that reads un-geometric in a face
-  otherwise built from circles and triangles, and the cap A is the triangle;
-  Jost carries no single-storey alternate (its only GSUB feature is `tnum`),
-  so the case change is the whole fix. Tracking opens to +0.02em. It stays
-  lowercase everywhere it is the *domain* rather than the mark — `<title>`,
-  the og tags, `CNAME` — and the crumb never shows the problem because
-  `.page-crumb` uppercases. Below 820px the light/dark key moves above the
-  mark instead of beside it: at phone widths the mark and a 3rem gutter don't
-  both fit, and moving the key costs less than shrinking the mark. A browser
-  sweep from 320 to 1280 holds it to one line, clear of the key.
+- **Two faces now: one to read, one to mark.** `--font-body` (Jost) for
+  everything, `--font-mark` (League Spartan, self-hosted, 13KB, SIL OFL) for
+  the cover wordmark and nothing else. The split came out of a real finding,
+  not taste: Jost's double-storey `a` reads un-geometric in a face otherwise
+  built from circles and triangles, and Jost carries no single-storey
+  alternate (its only GSUB feature is `tnum`). League Spartan's `a` is a
+  circle and a stem, which fixes the mark **and** is why it can't have the
+  body — measured on the picker at the same px it renders smaller (shorter
+  x-height) and wider per character, so copy reads greyer and runs longer, and
+  matching Jost's reading size would mean raising the one 18px base the whole
+  rem scale rides on. Display face, display use.
+  Tracking on the mark opens to +0.02em. Below 820px the light/dark key sits
+  above the mark rather than beside it — at 320 they don't both fit — and a
+  browser sweep from 320 to 1280 holds the mark to one line, clear of the key.
+  A check asserts the woff2 actually loaded, since a 404 would fall back to
+  Jost and look merely slightly wrong rather than broken.
 - **Category names are copy, and they can be long.** The picker's category is
   the question it answers ("What computer should I buy for architecture"), set
   by the operator over the earlier "Live recommendations". A long name widens

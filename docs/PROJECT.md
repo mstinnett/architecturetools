@@ -86,6 +86,9 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── css/
 │   │   ├── global.css              # Shared theme + components (imports tokens.css)
 │   │   └── tokens.css              # Canonical color palette (family accents + grounds)
+│   ├── fonts/
+│   │   ├── league-spartan-400.woff2  # --font-mark, the wordmark face (display only)
+│   │   └── LICENSE-league-spartan.txt # SIL OFL
 │   └── data/
 │       └── hardware-data.json      # GENERATED from data/*.csv — do not hand-edit
 ├── data/                           # Hardware data source (edit in Numbers; see data/README.md)
@@ -391,8 +394,8 @@ promote them as each is ready, not to land them all at once.
 
 ### Live now (`main`)
 - `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Centred
-  title block (no crumb, no sheet stamp — it is the top of the set) over a
-  **card band**: each live tool is a plate (its own drawing over name and one
+  title block (no crumb, no sheet stamp, no rule under it — it is the top of
+  the set) carrying the wordmark in `--font-mark`, over a **card band**: each live tool is a plate (its own drawing over name and one
   line), plates grouped by set, the strip scrolling sideways
   with chevrons at the edges and a category nav below that doubles as the
   scrollbar. This is the picker's software selector at cover scale — same

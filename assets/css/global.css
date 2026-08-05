@@ -21,6 +21,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap');
 @import url('tokens.css');   /* canonical palette — resolves relative to this file */
 
+/* The WORDMARK face — League Spartan, a Futura descendant, self-hosted as one
+   13KB file (SIL OFL; see assets/fonts/LICENSE-league-spartan.txt).
+   DISPLAY ONLY. Its single-storey 'a' is a circle and a stem, which is what
+   makes it a mark and not a paragraph: at body sizes it renders smaller than
+   Jost at the same px (shorter x-height) and wider per character, so text set
+   in it reads greyer and runs longer. Body type stays --font-body. */
+@font-face {
+  font-family: 'League Spartan';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/league-spartan-400.woff2') format('woff2');
+}
+
 /* A static preview loader here can drop the first rule after @import; this
    harmless guard absorbs it. Safe to keep in production. */
 .theme-guard { color: inherit; }
@@ -85,8 +99,9 @@
      calculator pages. */
   --nl-ink: #0a0a0a; --nl-hatch: #0a0a0a; --nl-tick: #bbb; --nl-axis: #999;
 
-  /* Type */
+  /* Type — one face for reading, one for the mark (see the @font-face above) */
   --font-body: 'Verlag', 'Jost', 'Futura PT', sans-serif;
+  --font-mark: 'League Spartan', 'Jost', 'Futura PT', sans-serif;
 
   /* Scale */
   --text-xs: 0.6875rem; --text-sm: 0.8125rem; --text-base: 0.9375rem;
