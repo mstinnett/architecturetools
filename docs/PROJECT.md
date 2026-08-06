@@ -396,9 +396,12 @@ promote them as each is ready, not to land them all at once.
 - `index.html` — **AT-0**, the master cover sheet (landed 2026-08-04). Centred
   title bar (no crumb, no sheet stamp — it is the top of the set) carrying the
   wordmark in `--font-mark` as a box that fits it and nothing else, lifted on
-  its own shadow and **overlaid** above the sheet rather than banded inside it;
+  its own shadow and **overlaid** above the page rather than banded inside it;
   it settles from a large title into a mini title once the field scrolls under
-  it. Below that, a **card band**: each live tool is a plate (its own drawing over name and one
+  it, and stays. The cover runs on **one content surface** — the sheet's
+  background, border and shadow are switched off here, and cards are drawn on
+  that surface with hairlines rather than lifted off it. Below the bar, a
+  **card band**: each live tool is a plate (its own drawing over name and one
   line), plates grouped by set, the strip scrolling sideways
   with chevrons at the edges and a category nav below that doubles as the
   scrollbar. This is the picker's software selector at cover scale — same

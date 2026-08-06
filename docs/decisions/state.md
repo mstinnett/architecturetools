@@ -221,12 +221,25 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   scales, the hatched cell and the labels, so drift shows up as a failure
   rather than silently. There is no house placeholder, so promoting a tool
   onto the cover means deciding what it draws.
+- **The cover is ONE surface with one thing floating on it** (operator, after
+  seeing paper → sheet → card stacked: "too many layers"). A single content
+  ground runs edge to edge; the mark is the only object lifted off it. Cards
+  are drawn **on** the surface — hairline outline, no fill, no resting shadow —
+  and keep the lift only for hover, where it means "this is a link" rather than
+  being a permanent layer. One consequence worth carrying forward: **a shadow
+  cannot lift anything on a dark ground** — black on near-black is invisible,
+  and the mark read as a flat hairline rectangle until its fill stepped up to
+  the palette's raised surface (`--card-2`) under `data-scheme="dark"`. Dark
+  expresses height as light, not as shadow. The sheet's own background/border/shadow are
+  switched off on the cover, not in `global.css`, which the picker and the
+  converter still use as it stands.
 - **The cover's title is an overlaid bar, not a header in the sheet.** A box
-  that fits the wordmark and nothing else, lifted off the paper on its own
-  shadow, riding above the sheet rather than inside it — so there is no white
-  band behind it. It behaves like a native large title: full size at the top,
-  settling into a mini title pinned to the top edge once the field moves under
-  it, the box shrink-wrapping at both sizes.
+  that fits the wordmark and nothing else, on its own drop shadow. The bar
+  behind it is the same surface as the page and carries no rule, so only the
+  box reads and content slides under it on the shadow — which is what the
+  shadow is for. It behaves like a native large title: full size at the top,
+  shrinking as the field moves under it and then **staying**, never absent, at
+  either size.
   Two things about it are load-bearing, not styling:
   - It is `position: fixed` with a spacer holding its place. An in-flow bar
     that shrinks **shortens the document**, which on a short page hands back
@@ -236,13 +249,21 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
     either side of the collapse.
   - The trigger has a dead zone (enter at 56px, leave at 20px) rather than one
     threshold, so the state cannot chatter on a stray pixel.
-  **It only engages where the page actually scrolls.** The cover is short: on a
-  1280×900 window it does not scroll at all, so the title stays large — which
-  is the right answer, there being nothing to have scrolled past. It shows on
-  shorter windows, on small phones, and will show everywhere once the band
-  carries more calculators. If it is wanted somewhere it always reads, the
-  picker is the page that scrolls, and the parts would move to global.css +
-  ui.js unchanged.
+  **On a phone THE PAGE is the scroller**, not a box inside the page. That one
+  change does three things: it is what makes the title shrink as you scroll
+  (the whole point of the behaviour), it removes the nested scroll region, and
+  it fixes the rail being cut off — there is no longer a box for the field to
+  end inside of. The rail is `sticky` and deliberately **shorter than the
+  viewport** (70vh): a sticky element can only travel inside its containing
+  block, and a rail as tall as the field has nowhere to go — it gets pushed off
+  the top and loses its first label, which is exactly what happened first time.
+  Checked whole, in view and clear of the title at six phone sizes × three
+  scroll positions.
+  **Across, it still only engages where the page scrolls.** On a 1280×900
+  window the cover does not scroll at all, so the title stays large — the right
+  answer, there being nothing to have scrolled past. If it is wanted somewhere
+  it always reads, the picker is the page that scrolls, and the parts would
+  move to global.css + ui.js unchanged.
 - **Two faces now: one to read, one to mark.** `--font-body` (Jost) for
   everything, `--font-mark` (League Spartan, self-hosted, 13KB, SIL OFL) for
   the cover wordmark and nothing else. The split came out of a real finding,
