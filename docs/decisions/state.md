@@ -235,9 +235,10 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   converter still use as it stands.
 - **The cover's title is an overlaid bar, not a header in the sheet.** A box
   that fits the wordmark and nothing else, on its own drop shadow. The bar
-  behind it is the same surface as the page and carries no rule, so only the
-  box reads and content slides under it on the shadow — which is what the
-  shadow is for. It behaves like a native large title: full size at the top,
+  behind it has **no fill and no rule at all** — it is only a positioner, and
+  it passes pointer events through to whatever is beneath. So the field slides
+  *behind the box* on its shadow, rather than being masked by a band the width
+  of the window. It behaves like a native large title: full size at the top,
   shrinking as the field moves under it and then **staying**, never absent, at
   either size.
   Two things about it are load-bearing, not styling:
@@ -253,12 +254,16 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   change does three things: it is what makes the title shrink as you scroll
   (the whole point of the behaviour), it removes the nested scroll region, and
   it fixes the rail being cut off — there is no longer a box for the field to
-  end inside of. The rail is `sticky` and deliberately **shorter than the
-  viewport** (70vh): a sticky element can only travel inside its containing
-  block, and a rail as tall as the field has nowhere to go — it gets pushed off
-  the top and loses its first label, which is exactly what happened first time.
-  Checked whole, in view and clear of the title at six phone sizes × three
-  scroll positions.
+  end inside of. The rail is **placed, not laid out**: a `fixed` top-layer
+  element positioned by hand below the floating title and running to the
+  matching inset at the foot, symmetric once the title has settled. Nothing in
+  the box model decides where it ends, which is what kept clipping it — first
+  as a flow item that ended wherever the field ended, then as a sticky one that
+  could only travel inside its containing block and got pushed off the top. It
+  is drawn as a **closed rectangle**: the earlier version had only its two long
+  edges, so the ends read as unfinished open lines. Padding keeps the labels
+  off those ends. Checked whole, closed, labels inset, clear of the title and
+  of the cards, at six phone sizes × three scroll positions.
   **Across, it still only engages where the page scrolls.** On a 1280×900
   window the cover does not scroll at all, so the title stays large — the right
   answer, there being nothing to have scrolled past. If it is wanted somewhere
