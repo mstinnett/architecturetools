@@ -403,6 +403,7 @@
 </div>
 
 <script src="assets/js/ui.js"></script>
+<script src="assets/js/analytics.js"></script>
 <script>
 // Hardware data lives in assets/data/hardware-data.json — the single source of
 // truth, editable in Pages CMS (see .pages.yml). We fetch it, expose it as the
@@ -636,6 +637,7 @@ function runPicker(){
         var c = Data.MonitorConfigs[State.monitorConfig];
         if (c) State.desk = c.monitors.slice();
         updatePreservingScroll();
+        schedulePickerAnalytics();
       });
     });
   }
@@ -984,11 +986,24 @@ function runPicker(){
   syncStaticOptionSelections();
 
   // ---- EVENTS ----
+  // Capture the settled setup after engagement, including defaults the user
+  // keeps. Otherwise Windows/Desktop would be undercounted versus alternatives.
+  var pickerAnalyticsTimer;
+  function schedulePickerAnalytics() {
+    clearTimeout(pickerAnalyticsTimer);
+    pickerAnalyticsTimer = setTimeout(function () {
+      if (!window.SiteAnalytics) return;
+      SiteAnalytics.pickerUsed();
+      SiteAnalytics.setup(State.machineType);
+      SiteAnalytics.platform(State.platform);
+    }, 1000);
+  }
   document.querySelectorAll('.app-toggle:not(.baseline)').forEach(function(appToggle) {
     appToggle.addEventListener('click', function() {
       var isOn = !appToggle.classList.contains('active');
       UI.press(appToggle, isOn);
       State.apps[appToggle.dataset.app] = isOn;
+      if (isOn && window.SiteAnalytics) SiteAnalytics.software(appToggle.dataset.app);
       if (availablePlatforms() === 'win') {
         State.platform = 'win';
         document.querySelectorAll('#platArea .option-pill').forEach(function(platformOption) {
@@ -996,6 +1011,7 @@ function runPicker(){
         });
       }
       update();
+      schedulePickerAnalytics();
     });
   });
   document.querySelectorAll('.sw-nav-item').forEach(function(navItem) {
@@ -1009,6 +1025,7 @@ function runPicker(){
       document.querySelectorAll('#platArea .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === platformOption); });
       State.platform = platformOption.dataset.platform;
       update();
+      schedulePickerAnalytics();
     });
   });
   document.querySelectorAll('#budgetOptions .option-pill').forEach(function(budgetOption) {
@@ -1016,6 +1033,7 @@ function runPicker(){
       document.querySelectorAll('#budgetOptions .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === budgetOption); });
       State.budget = budgetOption.dataset.budget;
       update();
+      schedulePickerAnalytics();
     });
   });
   document.querySelectorAll('#scaleOptions .option-pill').forEach(function(scaleOption) {
@@ -1023,6 +1041,7 @@ function runPicker(){
       document.querySelectorAll('#scaleOptions .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === scaleOption); });
       State.scale = scaleOption.dataset.scale;
       update();
+      schedulePickerAnalytics();
     });
   });
   document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(machineTypeOption) {
@@ -1030,6 +1049,7 @@ function runPicker(){
       document.querySelectorAll('#machineTypeOptions .option-pill').forEach(function(optionElement) { UI.press(optionElement, optionElement === machineTypeOption); });
       State.machineType = machineTypeOption.dataset.machinetype;
       update();
+      schedulePickerAnalytics();
     });
   });
 

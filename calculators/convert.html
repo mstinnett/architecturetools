@@ -109,6 +109,7 @@
 
 <!-- pure modules (UMD: attach to window); page below is wiring only -->
 <script src="../assets/js/ui.js"></script>
+<script src="../assets/js/analytics.js"></script>
 <script src="lib/parse-length.js"></script>
 <script src="lib/snap.js"></script>
 <script src="lib/numberline.js"></script>
@@ -199,7 +200,7 @@
     }
     els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
     Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
-      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); scheduleConversionEvent(); });
     });
   }
 
@@ -517,7 +518,16 @@
     });
   }
 
-  els.input.addEventListener('input', function () { state.text = els.input.value; render(); });
+  // Wait for a settled reading; initial examples, URL loads and redraws do not
+  // count as tool use. Only complete, in-range parses produce analytics events.
+  var analyticsTimer;
+  function scheduleConversionEvent() {
+    clearTimeout(analyticsTimer);
+    analyticsTimer = setTimeout(function () {
+      if (window.SiteAnalytics) SiteAnalytics.conversion(parseLength(state.text, { defaultUnit: state.defaultUnit }), state.target);
+    }, 1200);
+  }
+  els.input.addEventListener('input', function () { state.text = els.input.value; render(); scheduleConversionEvent(); });
   // selecting the field selects its text, so a new entry overwrites the old one
   // (deferred to the next tick so iOS doesn't collapse the selection on tap)
   els.input.addEventListener('focus', function () { setTimeout(function () { els.input.select(); }, 0); });
@@ -526,6 +536,7 @@
     el.addEventListener('click', function () {
       state.target = el.dataset.target; state.targetPinned = true;
       setActive('[data-target]', 'target', state.target); render();
+      scheduleConversionEvent();
     });
   });
 
