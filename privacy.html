@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!-- Privacy & analytics — the site's compliance statement. Plain text in the
+     register of docs/voice.md: what is collected, why, on what basis, and how
+     to refuse it. Kept factual; see docs/ANALYTICS.md "Compliance" for the
+     research behind each claim and what to re-check when the tracker or
+     host changes. -->
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy &amp; analytics -- architecture.tools</title>
+<meta name="description" content="What architecture.tools collects when you use it, why, and how to refuse it. No cookies, no accounts, no personal data retained.">
+<link rel="canonical" href="https://architecture.tools/privacy.html">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The sheet, crumb, title block, scheme toggle, section labels and footer
+     are shared (global.css). Local: a reading column for running text. */
+  .notice { max-width: 46em; }
+  .notice section { margin-bottom: var(--space-2xl); }
+  .notice p, .notice li { font-size: var(--text-base); font-weight: 300; line-height: 1.65; color: var(--ink); }
+  .notice p { margin-bottom: var(--space-md); }
+  .notice ul { list-style: none; padding: 0; margin: 0 0 var(--space-md); }
+  .notice li { position: relative; padding-left: 1.25em; margin-bottom: var(--space-xs); }
+  .notice li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 0.5em; height: 1px; background: var(--ink-2); }
+  .notice a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color 0.15s, border-color 0.15s; }
+  .notice a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .notice code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+  .notice .updated { font-size: var(--text-xs); color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--space-xl); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span aria-current="page">Privacy &amp; analytics</span>
+    </nav>
+    <h1>Privacy &amp; analytics</h1>
+    <p>What this site collects when you use it, why, and how to refuse it.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <div class="notice">
+    <p class="updated">Last updated 21 September 2026</p>
+
+    <section id="summary">
+      <div class="section-label">In short</div>
+      <p>This site has no accounts, no forms, and no comments. Nothing you type
+         into a tool leaves your browser. It sets no cookies. It counts visits
+         with Plausible Analytics, which stores no personal data, and it keeps
+         nothing that could identify you.</p>
+    </section>
+
+    <section id="tools">
+      <div class="section-label">The tools run in your browser</div>
+      <p>The Computer Chooser and the Precise Unit Converter are ordinary web
+         pages. The dimensions you enter, the software you select, and the
+         budget you set are held in your browser only. They are not sent to
+         this site or to anyone else.</p>
+    </section>
+
+    <section id="analytics">
+      <div class="section-label">Analytics</div>
+      <p>Visits are measured with <a href="https://plausible.io/data-policy" rel="noopener">Plausible Analytics</a>,
+         a service operated by Plausible Insights O&Uuml; (Estonia). Plausible
+         processes and stores this site&rsquo;s data on servers in Germany,
+         inside the European Union, and acts as a processor for this site
+         under its data processing agreement.</p>
+      <p>For each page you view, Plausible receives:</p>
+      <ul>
+        <li>the page address and the address of the page that linked to it, if any;</li>
+        <li>your browser and operating system family, and a device type read from your screen width;</li>
+        <li>a country, region, and city derived from your IP address;</li>
+        <li>named events: which tool categories you used on that page, such as
+            &ldquo;Conversion: Metric to Imperial&rdquo; or &ldquo;Software: Revit&rdquo;.
+            Never the values you typed or your full configuration. The full list of
+            event names is published in the site&rsquo;s
+            <a href="https://github.com/mstinnett/architecturetools/blob/main/docs/ANALYTICS.md" rel="noopener">analytics documentation</a>.</li>
+      </ul>
+      <p>To count you once per day rather than once per page, Plausible combines
+         your IP address and browser identifier with a random value that changes
+         every 24 hours, and keeps only the resulting hash. The IP address and
+         browser identifier are not written to any log, database, or disk, and
+         the daily value is discarded, so visits cannot be linked from one day to
+         the next. Plausible sets no cookies and stores nothing on your device.</p>
+      <p>The site only ever sees totals: how many people used a tool, and which
+         categories they used. It cannot see, and does not try to see, any one
+         person.</p>
+    </section>
+
+    <section id="basis">
+      <div class="section-label">Why, and on what basis</div>
+      <p>Analytics are used for one purpose: to learn which tools and which
+         parts of them are used, so that effort goes to the ones that are. This
+         site does not advertise, does not profile, and earns no commission from
+         any link.</p>
+      <p>Under the EU and UK General Data Protection Regulation, the moment of
+         processing described above rests on the site operator&rsquo;s legitimate
+         interest (Article 6(1)(f)) in understanding how a free, public tool is
+         used, weighed against the minimal and momentary nature of that
+         processing. No personal data is retained by this site or by its
+         analytics provider.</p>
+    </section>
+
+    <section id="storage">
+      <div class="section-label">Cookies and storage on your device</div>
+      <p>No cookies are set by this site or by its analytics.</p>
+      <p>One value may be written to your browser&rsquo;s local storage, named
+         <code>scheme</code>, holding &ldquo;light&rdquo; or &ldquo;dark&rdquo;.
+         It is written only when you press the light/dark key, so that the
+         choice you made follows you across the site&rsquo;s pages. Until you
+         press it, nothing is written and the page follows your system setting.
+         It is never sent anywhere. Clearing this site&rsquo;s data in your
+         browser removes it.</p>
+    </section>
+
+    <section id="hosting">
+      <div class="section-label">Hosting</div>
+      <p>The site is served by GitHub Pages. Fonts, scripts, and data are
+         served from this domain, not from a third-party network. As with any
+         web host, GitHub may record the IP addresses of visitors in its server
+         logs for security and to meet its legal obligations, as described in
+         the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub Privacy Statement</a>.
+         This site does not have access to those logs.</p>
+    </section>
+
+    <section id="links">
+      <div class="section-label">Links to other sites</div>
+      <p>Recommendations link to manufacturers and retailers. Once you follow a
+         link, that site&rsquo;s privacy terms apply, not these. None of the links
+         are affiliate links, and no click is reported to the site you land on.</p>
+    </section>
+
+    <section id="rights">
+      <div class="section-label">Your rights and how to refuse</div>
+      <p>Because no identifier is kept, this site cannot find the records of any
+         one visitor, and so cannot single yours out to show, correct, or delete
+         them. There is nothing to delete.</p>
+      <p>To refuse analytics altogether, block requests to
+         <code>plausible.io</code> with a content blocker or your browser&rsquo;s
+         tracking protection. The tools work exactly the same without it.</p>
+      <p>If you are in the EU or the UK you also have the right to object to
+         processing based on legitimate interest, and to complain to your
+         national data protection authority.</p>
+    </section>
+
+    <section id="us">
+      <div class="section-label">California and other US states</div>
+      <p>This site does not sell or share personal information, does not use it
+         for targeted advertising, and does not retain any. It has no data to
+         disclose, correct, or delete on request. Because nothing is sold or
+         shared, there is no &ldquo;Do Not Sell or Share&rdquo; choice to make.
+         Requests may still be sent to the contact below.</p>
+    </section>
+
+    <section id="contact">
+      <div class="section-label">Who runs this site, and how to reach them</div>
+      <p>architecture.tools is an independent site published from the
+         <a href="https://github.com/mstinnett/architecturetools" rel="noopener">mstinnett/architecturetools</a>
+         repository on GitHub, whose owner is the controller for the processing
+         described here. Questions about this statement can be raised through
+         that repository&rsquo;s issue tracker.</p>
+      <p>This statement changes when the site&rsquo;s tools, analytics, or host
+         change. The date at the top is the date of the current version.</p>
+    </section>
+  </div>
+
+  <!-- interim nav (SITE_FRAMEWORK "Hierarchy"): crumb in the title block above, one back-link home here -->
+  <div class="page-footer">
+    <a class="back-link" href="index.html">&larr; architecture.tools</a>
+  </div>
+</div>
+
+<script src="assets/js/ui.js"></script>
+</body>
+</html>

@@ -69,3 +69,46 @@ Verify production by performing a conversion and selecting software, then
 checking the corresponding Goals in Plausible. Browser blockers and Plausible
 bot filtering can prevent a test visit from appearing. Historical pageviews
 cannot recover these interactions before the tracking code was deployed.
+
+## Compliance statement
+
+`privacy.html` is the site's privacy and analytics statement. Every page links
+to it from its footer. It exists because a cookie-free tracker removes the
+consent banner, not the duty to tell visitors what is processed. What it
+rests on, and what to re-check when the tracker, the host, or the tools change:
+
+- **GDPR / UK GDPR (Articles 6, 13).** Plausible reads the visitor's IP
+  address and user agent for the moment it takes to hash them with a daily
+  rotating salt; the raw values are never stored and the salt is discarded
+  every 24 hours. That momentary processing still needs a lawful basis and a
+  transparency notice. The statement names legitimate interest (Article
+  6(1)(f)), the purpose (which tools are used), what is received, where it is
+  processed (Plausible's EU-owned servers in Germany, Plausible Insights OÜ as
+  processor under its DPA), the rights that apply, and a contact route (the
+  repository's issue tracker). No data-subject record can be located because
+  no identifier is retained; the statement says so rather than promising a
+  lookup it cannot perform.
+- **ePrivacy Directive / UK PECR.** Plausible sets no cookies and writes
+  nothing to the device, so the storage-and-access consent rule does not
+  apply to it. The one item this site does write, the `scheme` value in
+  localStorage, is written only on the visitor's own press of the light/dark
+  key and only to keep that choice; it is user-requested functionality, which
+  is the exemption, and it is disclosed. If any future feature stores
+  anything else on the device, add it to the statement and confirm it is
+  strictly necessary or gated behind consent.
+- **CCPA / CPRA and other US state laws.** The site is far below the
+  revenue and volume thresholds, but California's CalOPPA has no threshold,
+  so the statement is published anyway and states plainly: no sale or
+  sharing, no targeted advertising, nothing retained.
+- **Hosting.** GitHub Pages may log visitor IPs for security and legal
+  compliance under the GitHub Privacy Statement; the site has no access to
+  those logs. Fonts, scripts, and data are self-hosted, so no other third
+  party is contacted by a page load. Recommendation links are outbound and
+  non-affiliate; only `Outbound Link: Click` counts them, without any visitor
+  identifier.
+- **Named events.** The statement promises that only fixed category names
+  are sent, never entered values or full configurations. `assets/js/analytics.js`
+  is the code that keeps that promise; `node tools/test-analytics.mjs` checks it.
+
+Update the date at the top of `privacy.html` whenever any of the above
+changes.
