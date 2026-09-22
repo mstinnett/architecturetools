@@ -100,12 +100,17 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
   revenue and volume thresholds, but California's CalOPPA has no threshold,
   so the statement is published anyway and states plainly: no sale or
   sharing, no targeted advertising, nothing retained.
-- **Hosting.** GitHub Pages may log visitor IPs for security and legal
-  compliance under the GitHub Privacy Statement; the site has no access to
-  those logs. Fonts, scripts, and data are self-hosted, so no other third
-  party is contacted by a page load. Recommendation links are outbound and
-  non-affiliate; only `Outbound Link: Click` counts them, without any visitor
-  identifier.
+- **Hosting.** The site is served by Cloudflare, which handles visitor IPs
+  and request headers to deliver pages, defend against abuse, and keep
+  short-lived logs under the Cloudflare Privacy Policy; the site has no
+  access to those logs. Cloudflare's network is global, so the statement
+  says a request may be answered outside the visitor's region. The statement
+  also says the site does not use Cloudflare Web Analytics; if that is ever
+  switched on in the Cloudflare dashboard, it becomes a second analytics
+  processor and the statement must name it. Fonts, scripts, and data are
+  self-hosted, so no other third party is contacted by a page load.
+  Recommendation links are outbound and non-affiliate; only
+  `Outbound Link: Click` counts them, without any visitor identifier.
 - **Named events.** The statement promises that only fixed category names
   are sent, never entered values or full configurations. `assets/js/analytics.js`
   is the code that keeps that promise; `node tools/test-analytics.mjs` checks it.
