@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!-- PDF markup & review — a software landscape page. A named live page
+     (docs/PROJECT.md "Working rule"): the picks change faster than a numbered
+     sheet should, so it carries an update date and stays named.
+     data-family: material, the site's red-brown, the nearest family to a
+     redline. Copy follows docs/voice.md. -->
+<html lang="en" data-family="material">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Markup &amp; Review Software -- architecture.tools</title>
+<meta name="description" content="PDF markup and review software for architects: Bluebeam Revu, Adobe Acrobat, Drawboard, PDF Expert, Documents, PDF-XChange, PDF Studio and more, compared by platform, scaled measurement and team review.">
+<link rel="canonical" href="https://architecture.tools/pdf-markup.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://architecture.tools/pdf-markup.html">
+<meta property="og:title" content="PDF Markup &amp; Review Software -- architecture.tools">
+<meta property="og:description" content="Bluebeam is the standard. What to use instead, by platform, measurement and team review.">
+<meta name="twitter:card" content="summary">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The sheet, crumb, title block, scheme toggle, section labels, .pick,
+     .ref-table and footer are shared (global.css). Local: the reading column,
+     the situation list, the table's scroll well and its yes/no marks. */
+  .landscape section { margin-bottom: var(--space-2xl); }
+  .landscape p { font-size: var(--text-base); font-weight: 300; line-height: 1.65; margin-bottom: var(--space-md); max-width: 46em; }
+  .landscape a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color 0.15s, border-color 0.15s; }
+  .landscape a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .updated { font-size: var(--text-xs); color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--space-xl); }
+
+  /* situation → answer: one row per reader, the answer in the accent */
+  .situations { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+  .situations li { display: grid; grid-template-columns: 15rem 1fr; gap: 0.25rem 1.25rem;
+                   padding: 0.7rem 0; border-bottom: var(--border-light); }
+  .sit-who { font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); line-height: 1.5; }
+  .sit-pick { font-size: var(--text-base); font-weight: 300; line-height: 1.5; }
+  .sit-pick strong { font-weight: 400; color: var(--accent); }
+
+  /* the table scrolls inside its own well on a phone; the page never does */
+  .table-well { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 var(--space-sm); }
+  .ref-table table { min-width: 34rem; }
+  .ref-table td:first-child { font-weight: 400; }
+  .ref-table th, .ref-table td { padding-left: 0.5rem; padding-right: 0.5rem; }
+  .ref-table th:first-child, .ref-table td:first-child { padding-left: 0; }
+  .ref-table td { vertical-align: top; line-height: 1.45; }
+  .mark-yes { color: var(--accent); }
+  .mark-no  { color: var(--ink-3); }
+  .table-note { font-size: var(--text-xs); color: var(--ink-3); line-height: 1.6; }
+
+  /* the tool entries: shared .pick, plus a platform line */
+  .tool-group { margin-bottom: var(--space-xl); }
+  .pick-name a { border-bottom-color: var(--rule-2); }
+  .pick-meta { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.3rem; }
+  .pick-note + .pick-note { margin-top: 0.4rem; }
+
+  .checks { list-style: none; padding: 0; margin: 0 0 var(--space-md); max-width: 46em; }
+  .checks li { position: relative; padding-left: 1.25em; margin-bottom: var(--space-sm);
+               font-size: var(--text-base); font-weight: 300; line-height: 1.6; }
+  .checks li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 0.5em; height: 1px; background: var(--ink-2); }
+
+  @media (max-width: 600px) {
+    .situations li { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Software</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">PDF Markup &amp; Review</span>
+    </nav>
+    <h1>PDF Markup &amp; Review</h1>
+    <p>Software for redlining drawing sets, measuring from PDFs, and running
+       reviews with your team and consultants.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <div class="landscape">
+    <p class="updated">Updated October 2026</p>
+
+    <section id="short">
+      <div class="section-label">The short answer</div>
+      <p>Bluebeam Revu is the industry standard. If your firm and your
+         consultants already use it, stay on it. If you are leaving it, or never
+         started, pick by platform and by whether you need to measure from the
+         drawings.</p>
+      <ul class="situations">
+        <li>
+          <span class="sit-who">Windows, firm already on Bluebeam</span>
+          <span class="sit-pick">Stay on <strong>Bluebeam Revu</strong>. Your consultants expect its markups and Studio Sessions.</span>
+        </li>
+        <li>
+          <span class="sit-who">Replacing Bluebeam for a team</span>
+          <span class="sit-pick">Get <strong>Drawboard Projects</strong>. It is built for drawing review across a firm, and guests join without a paid seat.</span>
+        </li>
+        <li>
+          <span class="sit-who">Replacing Bluebeam on your own, on Windows</span>
+          <span class="sit-pick">Get <strong>PDF-XChange Editor</strong>. Calibrated measurement and full markup for a one-time price.</span>
+        </li>
+        <li>
+          <span class="sit-who">On a Mac</span>
+          <span class="sit-pick">Use <strong>PDF Expert</strong> for markup. Bluebeam has no Mac desktop app. If you measure from drawings, get <strong>PDF Studio Pro</strong> or <strong>Acrobat Pro</strong> instead.</span>
+        </li>
+        <li>
+          <span class="sit-who">On an iPad with a pencil</span>
+          <span class="sit-pick">Use <strong>PDF Expert</strong> or <strong>Drawboard PDF</strong>. Use <strong>Documents</strong> to carry sets to site.</span>
+        </li>
+        <li>
+          <span class="sit-who">Already paying for Adobe</span>
+          <span class="sit-pick">Use <strong>Acrobat Pro</strong> before buying anything else. It measures and comments, it just isn't organized around drawing sets.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section id="compare">
+      <div class="section-label">Compared</div>
+      <div class="table-well ref-table">
+        <table>
+          <thead>
+            <tr><th>Software</th><th>Platforms</th><th>Scaled measurement</th><th>Team review</th><th>Pricing</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Bluebeam Revu</td><td>Windows. Web and iPhone/iPad through Bluebeam Cloud</td><td class="mark-yes">Yes, the strongest</td><td class="mark-yes">Studio Sessions</td><td>Subscription, about $260&ndash;440 per user per year</td></tr>
+            <tr><td>Drawboard Projects</td><td>Windows, web, iPad</td><td class="mark-yes">Yes</td><td class="mark-yes">Issues, versions, free guests</td><td>Subscription, per user</td></tr>
+            <tr><td>Drawboard PDF</td><td>Windows, Mac, iPad, Android, web</td><td class="mark-yes">Paid tier</td><td class="mark-yes">Shared documents</td><td>Free, paid tier</td></tr>
+            <tr><td>Adobe Acrobat Pro</td><td>Windows, Mac, iPad, web</td><td class="mark-yes">Yes</td><td class="mark-yes">Shared review</td><td>Subscription</td></tr>
+            <tr><td>PDF-XChange Editor</td><td>Windows</td><td class="mark-yes">Yes</td><td class="mark-no">No</td><td>One-time license</td></tr>
+            <tr><td>PDF Studio Pro</td><td>Windows, Mac, Linux</td><td class="mark-yes">Yes</td><td class="mark-no">No</td><td>One-time license</td></tr>
+            <tr><td>Foxit PDF Editor</td><td>Windows, Mac, iPad, web</td><td class="mark-yes">Yes</td><td class="mark-yes">Shared review</td><td>Subscription</td></tr>
+            <tr><td>PDF Expert</td><td>Mac, iPad, iPhone</td><td class="mark-no">No</td><td class="mark-no">No</td><td>Subscription</td></tr>
+            <tr><td>Documents</td><td>iPad, iPhone</td><td class="mark-no">No</td><td class="mark-no">No</td><td>Free, paid tier</td></tr>
+            <tr><td>Preview &amp; Markup</td><td>Mac, iPad, iPhone</td><td class="mark-no">No</td><td class="mark-no">No</td><td>Free, built in</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">Scaled measurement means you can calibrate a sheet
+         to its drawing scale and take lengths and areas off it. Prices and
+         plans change. Check the vendor before you buy.</p>
+    </section>
+
+    <section id="tools">
+      <div class="section-label">The software</div>
+
+      <div class="tool-group">
+        <div class="panel-label">Built for drawing sets</div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://www.bluebeam.com/product/markups-and-data/" rel="noopener">Bluebeam Revu</a></div>
+          <div class="pick-meta">Windows &middot; Bluebeam Cloud on web and iOS</div>
+          <div class="pick-note">The standard in architecture and construction. Tool chests of saved markups, a markups list you can sort and export, calibrated measurement and takeoff, sheet comparison, and Studio Sessions for live review with consultants.</div>
+          <div class="pick-note">There is no Mac desktop app, and Revu for iPad was retired at the end of 2025. Mac and iPad users get Bluebeam Cloud in the browser or the iOS app, which does less than Revu on Windows.</div>
+        </div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://www.drawboard.com" rel="noopener">Drawboard Projects</a></div>
+          <div class="pick-meta">Windows &middot; web &middot; iPad</div>
+          <div class="pick-note">The closest replacement for Bluebeam as a team review tool. Drawings live in one project with versions, markups sync live, and issues are pinned to a spot on a sheet with an owner and a status. Clients and consultants join as guests without a paid license.</div>
+        </div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://www.drawboard.com" rel="noopener">Drawboard PDF</a></div>
+          <div class="pick-meta">Windows &middot; Mac &middot; iPad &middot; Android &middot; web</div>
+          <div class="pick-note">Drawboard's single-user app, and the best pen experience on a Windows tablet. The free tier covers ink, shapes, text and signatures. Measurement is in the paid tier.</div>
+        </div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://www.pdf-xchange.com/product/pdf-xchange-editor" rel="noopener">PDF-XChange Editor</a></div>
+          <div class="pick-meta">Windows</div>
+          <div class="pick-note">The inexpensive Windows replacement for working alone. Clouds, callouts, stamps, and calibrated length, perimeter and area measurement, for a one-time license. It has no shared review.</div>
+        </div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://www.qoppa.com/pdfstudio/" rel="noopener">PDF Studio Pro</a></div>
+          <div class="pick-meta">Windows &middot; Mac &middot; Linux</div>
+          <div class="pick-note">The Mac option if you measure from drawings and don't want a subscription. Markup, calibrated measurement and document comparison for a one-time license.</div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="panel-label">General PDF editors</div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://www.adobe.com/acrobat/acrobat-pro.html" rel="noopener">Adobe Acrobat Pro</a></div>
+          <div class="pick-meta">Windows &middot; Mac &middot; iPad &middot; web</div>
+          <div class="pick-note">Capable, and often already paid for. Comments, drawing markups, calibrated measurement and shared review all work. It has no tool chest or sortable markups list, so a fifty-sheet review takes more clicks than in Bluebeam.</div>
+        </div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://pdfexpert.com" rel="noopener">PDF Expert</a></div>
+          <div class="pick-meta">Readdle &middot; Mac &middot; iPad &middot; iPhone</div>
+          <div class="pick-note">The best markup app on a Mac and on an iPad with an Apple Pencil. Fast on large sets, with highlights, shapes, ink, stamps and notes that sync across your devices. It does not measure to scale.</div>
+        </div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://www.foxit.com/pdf-editor/" rel="noopener">Foxit PDF Editor</a></div>
+          <div class="pick-meta">Windows &middot; Mac &middot; iPad &middot; web</div>
+          <div class="pick-note">An Acrobat alternative with measurement and shared review. Consider it if your firm buys Foxit for office documents already.</div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="panel-label">Reading sets and quick notes</div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://documents.io/app" rel="noopener">Documents</a></div>
+          <div class="pick-meta">Readdle &middot; iPad &middot; iPhone</div>
+          <div class="pick-note">A file manager that opens PDFs with annotation built in. Use it to carry a set to site, pull files from cloud storage, and note what you see on the sheet.</div>
+        </div>
+
+        <div class="pick">
+          <div class="pick-name">Preview &amp; Markup</div>
+          <div class="pick-meta">Apple &middot; built into Mac, iPad and iPhone</div>
+          <div class="pick-note">Enough to circle something on one sheet and send it back. Nothing to install.</div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="panel-label">Sketching over drawings</div>
+
+        <div class="pick">
+          <div class="pick-name"><a href="https://morpholio.com/trace" rel="noopener">Morpholio Trace</a></div>
+          <div class="pick-meta">iPad &middot; iPhone &middot; Mac</div>
+          <div class="pick-note">Digital trace paper. Use it to sketch design responses over a plan or photo at scale, not to track comments.</div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="panel-label">Markup inside a project platform</div>
+
+        <div class="pick">
+          <div class="pick-note">If the project lives in <a href="https://construction.autodesk.com/products/autodesk-docs/" rel="noopener">Autodesk Docs</a> or <a href="https://www.procore.com" rel="noopener">Procore</a>, mark up there. The comments stay attached to the sheet version the contractor builds from.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="switching">
+      <div class="section-label">Before you switch</div>
+      <p>Clouds, callouts, text and ink are standard PDF annotations, so they
+         open in any of these apps. What does not carry over is the Bluebeam
+         layer around them. Test these on one of your own sets first:</p>
+      <ul class="checks">
+        <li>Calibrate a sheet and measure a dimension you know.</li>
+        <li>Mark up a set in the new app and open it in Bluebeam, then the reverse. Check that clouds, callouts and colors survive.</li>
+        <li>Rebuild the markups you use most. Bluebeam tool chests and custom markups-list columns do not import.</li>
+        <li>Run a review with one consultant. If they stay on Bluebeam, decide who exports and who imports.</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="index.html">&larr; architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="privacy.html">Privacy &amp; analytics</a>
+  </div>
+</div>
+
+<script src="assets/js/ui.js"></script>
+</body>
+</html>
