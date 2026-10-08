@@ -411,16 +411,20 @@ promote them as each is ready, not to land them all at once.
   `.cover-card`; a new category is a `.cover-group` plus its nav item.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
-- `pdf-markup.html` — **PDF Markup & Review**, a software chooser in the
-  picker's register (landed 2026-10-08): Runs on / You need / Price / Sort by
-  controls over a grid of tool cards, then short answers, project platforms,
-  and what to test before leaving Bluebeam. Every tool is a static
-  `<article class="tool">` (readable without JS, indexable); the inline script
-  only hides and reorders cards from their `data-*` attributes (contract in the
-  page's head comment). Browser-only matches sort after native apps. "Most
-  used" is an editorial rank. Adequate Design Review is listed with a
-  disclosure. Re-check vendor facts (platforms, tiers, prices) when updating.
-  Its cover card sits in a **Software** group.
+- **Software choosers** (landed 2026-10-08), three named live pages in the
+  picker's register, indexed on the cover under a **Software** group:
+  `pdf-markup.html` (PDF Markup & Review), `bim-platforms.html` (BIM & Design
+  Platforms: Revit, Archicad, Vectorworks, Rhino, SketchUp, AutoCAD, Chief
+  Architect, the renderers) and `bim-emerging.html` (Emerging BIM: Motif,
+  Snaptrude, Qonic, Arcol, Forma, Rayon...). Each is filter controls over
+  static `<article class="tool">` cards (readable without JS, indexable),
+  then short answers and context. One behaviour, `assets/js/chooser.js` (its
+  header is the data-* contract); one style block, global.css "CHOOSER".
+  Platforms are native apps plus "web" as its own platform; web never
+  stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
+  editorial and labelled so. Adequate Design Review is listed on the PDF
+  page with a disclosure. Prices are rounded from third-party sources —
+  re-check vendor facts when updating.
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
   label ("Calculators → Precise Unit Converter"); the cover indexes each live

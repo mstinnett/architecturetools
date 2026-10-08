@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<!-- Emerging BIM — the browser-based "BIM 2.0" tools challenging Revit, as AEC Magazine covers them.
+     data-family: envelope, the site's green.
+
+     A software chooser: the picker's controls over static tool cards, then
+     the editorial notes. Every tool is a static <article class="tool">, so
+     the page reads in full without JavaScript and is indexable; the shared
+     assets/js/chooser.js only hides and reorders the cards (its header holds
+     the data-* contract). Styles are global.css "CHOOSER". Adding a tool is
+     one <article>; nothing else lists them. "Most used" (data-rank) is an
+     editorial estimate and the page says so. Copy follows docs/voice.md. -->
+<html lang="en" data-family="envelope">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emerging BIM Software -- architecture.tools</title>
+<meta name="description" content="The new browser-based BIM tools challenging Revit, compared for architects: Motif, Snaptrude, Qonic, Arcol, Forma, Hypar, Rayon, Speckle and more, by design stage, Revit exchange and price.">
+<link rel="canonical" href="https://architecture.tools/bim-emerging.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://architecture.tools/bim-emerging.html">
+<meta property="og:title" content="Emerging BIM Software -- architecture.tools">
+<meta property="og:description" content="Motif, Snaptrude, Qonic, Arcol, Forma, Rayon and the rest, filtered by design stage and how they work with Revit.">
+<meta name="twitter:card" content="summary">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
+</head>
+<body>
+<div class="page-wide">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Software</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Emerging BIM</span>
+    </nav>
+    <h1>Which new BIM tools are worth trying?</h1>
+    <p>Pick the stage of design and what has to work with what. Every tool that fits stays on the list.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <p class="chooser-updated">Updated October 2026</p>
+  <p class="chooser-lede">These run in the browser and let several people work in one model at once. None replaces Revit for a full construction set today. Most are worth a pilot beside it.</p>
+
+  <div class="chooser-controls" id="controls">
+    <div class="control-group">
+      <div class="section-label">Design stage</div>
+      <div class="option-row">
+        <button type="button" class="option-pill active" aria-pressed="true" data-single="stage" data-value="any">Any</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="stage" data-value="concept">Concept and feasibility</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="stage" data-value="sd">Schematic design</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="stage" data-value="docs">Drawings and documents</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="stage" data-value="space">Interiors and space planning</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="stage" data-value="coord">Coordination and data</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="section-label">You need</div>
+      <p class="control-hint">Every one you select.</p>
+      <div class="option-row">
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="revit">Works with Revit</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="ifc">IFC</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="multi">Several people live in one model</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="section-label">Price</div>
+      <div class="option-row">
+        <button type="button" class="option-pill active" aria-pressed="true" data-single="price" data-value="any">Any</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="price" data-value="free">Has a free tier</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="section-label">Sort by</div>
+      <div class="option-row">
+        <button type="button" class="option-pill active" aria-pressed="true" data-single="sort" data-value="rank">Most established<span class="pill-detail">Our estimate of readiness</span></button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="sort" data-value="price">Lowest price<span class="pill-detail">Unpublished prices last</span></button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="sort" data-value="name">Name</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-bar">
+    <span id="resultCount" aria-live="polite">10 tools</span>
+    <button type="button" id="resetFilters" hidden>Clear filters</button>
+  </div>
+
+  <div class="tool-grid" id="toolGrid">
+    <article class="tool" id="forma" data-platforms="web" data-needs="revit" data-stage="concept sd" data-price="sub" data-price-order="0" data-rank="1" data-name="forma">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.autodesk.com/products/forma/overview" rel="noopener">Forma</a></h3>
+        <div class="tool-kind">Autodesk &middot; Site and early design</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Building Design released April 2026</dd></div>
+        <div><dt>With Revit</dt><dd>Native connection, Revit becomes a Forma client</dd></div>
+        <div><dt>Price</dt><dd>Included with Revit and the AEC Collection</dd></div>
+      </dl>
+      <p class="tool-note">Autodesk's cloud platform for site analysis and schematic design, and the company's stated successor to Revit "over time". If you pay for Revit, you already have it.</p>
+      <p class="tool-note">Early-stage only for now, with no construction documents. Expect the same lock-in as Revit, and charges for moving large amounts of data out.</p>
+    </article>
+
+    <article class="tool" id="snaptrude" data-platforms="web" data-needs="revit ifc multi" data-stage="concept sd" data-price="freemium" data-price-order="720" data-rank="2" data-name="snaptrude">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.snaptrude.com" rel="noopener">Snaptrude</a></h3>
+        <div class="tool-kind">Snaptrude &middot; Browser BIM, concept to schematic</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Released, AI features since October 2025</dd></div>
+        <div><dt>With Revit</dt><dd>Two-way RVT exchange, by its own account</dd></div>
+        <div><dt>Price</dt><dd>Free for 3 projects. $60 a month individual, $100 a user a month for firms</dd></div>
+      </dl>
+      <p class="tool-note">Models from a brief or a sketch in the browser, with live drawings and several people in a model at once. The most direct fit for feasibility and schematic design in a Revit office.</p>
+      <p class="tool-note">Detailed documentation still usually moves to Revit. Test its Revit round trip on one of your own projects before relying on it.</p>
+    </article>
+
+    <article class="tool" id="speckle" data-platforms="web" data-needs="revit ifc" data-stage="coord" data-price="freemium" data-price-order="1188" data-rank="3" data-name="speckle">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://speckle.systems" rel="noopener">Speckle</a></h3>
+        <div class="tool-kind">Speckle &middot; Data layer</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Released, open source</dd></div>
+        <div><dt>With Revit</dt><dd>Connectors for Revit, Rhino, Grasshopper and more</dd></div>
+        <div><dt>Price</dt><dd>Free tier and self-hosting. Team $99 a month</dd></div>
+      </dl>
+      <p class="tool-note">Moves model data between Revit, Rhino and the newer tools, with version history, a web viewer and dashboards. It is how most firms will run new tools beside Revit.</p>
+      <p class="tool-note">Not a design tool. It needs someone in the office who is comfortable setting up data workflows.</p>
+    </article>
+
+    <article class="tool" id="qonic" data-platforms="web ipad" data-needs="revit ifc multi" data-stage="sd docs coord" data-price="freemium" data-price-order="2340" data-rank="4" data-name="qonic">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://qonic.com" rel="noopener">Qonic</a></h3>
+        <div class="tool-kind">Qonic &middot; Browser BIM and coordination</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="ipad">iPad</li><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Released, drawings added April 2026</dd></div>
+        <div><dt>With Revit</dt><dd>Opens RVT and IFC, Revit plugin</dd></div>
+        <div><dt>Price</dt><dd>Free up to 5,000 m&sup2;. Paid plans by floor area, unlimited users</dd></div>
+      </dl>
+      <p class="tool-note">Opens large RVT and IFC models fast in the browser for coordination, quantities and editing, and now produces annotated plans, sections and elevations. AEC Magazine calls it the most mature of these for production work.</p>
+      <p class="tool-note">No construction details yet. Pricing by building area, not by seat, suits teams with many occasional users.</p>
+    </article>
+
+    <article class="tool" id="arcol" data-platforms="web" data-needs="revit ifc multi" data-stage="concept" data-price="freemium" data-price-order="1200" data-rank="5" data-name="arcol">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://arcol.io" rel="noopener">Arcol</a></h3>
+        <div class="tool-kind">Arcol &middot; Early-stage design</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Released</dd></div>
+        <div><dt>With Revit</dt><dd>Massing export only, on paid plans</dd></div>
+        <div><dt>Price</dt><dd>Free solo tier. Team $100 an editor a month, viewers free</dd></div>
+      </dl>
+      <p class="tool-note">Massing, plans, area metrics and presentation boards in one shared browser file, like Figma for feasibility studies. Good for small teams working closely with clients.</p>
+      <p class="tool-note">Stops at early design. It does not produce construction documents.</p>
+    </article>
+
+    <article class="tool" id="hypar" data-platforms="web" data-needs="revit" data-stage="space" data-price="freemium" data-price-order="99999" data-rank="6" data-name="hypar">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://hypar.io" rel="noopener">Hypar</a></h3>
+        <div class="tool-kind">Hypar &middot; Space planning</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Released</dd></div>
+        <div><dt>With Revit</dt><dd>Revit add-in, both directions</dd></div>
+        <div><dt>Price</dt><dd>Free projects. Paid plans, price not published</dd></div>
+      </dl>
+      <p class="tool-note">Generates test fits and space plans from rules and plain-language prompts, then hands them to Revit. For workplace and interiors planning.</p>
+      <p class="tool-note">Narrow by design: it plans space, it does not model buildings.</p>
+    </article>
+
+    <article class="tool" id="motif" data-platforms="web" data-needs="revit ifc multi" data-stage="sd docs" data-price="sub" data-price-order="1800" data-rank="7" data-name="motif">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://motif.io" rel="noopener">Motif</a></h3>
+        <div class="tool-kind">Motif &middot; Browser BIM</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Design released September 2026, Review in 2025</dd></div>
+        <div><dt>With Revit</dt><dd>Streams in from Revit and Rhino, no export back</dd></div>
+        <div><dt>Price</dt><dd>$150 per active user a month. Viewing free, AI credits extra</dd></div>
+      </dl>
+      <p class="tool-note">The best-funded Revit challenger, built by former Autodesk and Revit leaders. Several people model in the browser at once, AI agents can model and check requirements, and sheets are live views of the model.</p>
+      <p class="tool-note">Its library of building objects is still thin, and nothing goes back to Revit. Pilot it on a small project before committing a team.</p>
+    </article>
+
+    <article class="tool" id="rayon" data-platforms="web" data-needs="multi" data-stage="space" data-price="freemium" data-price-order="228" data-rank="8" data-name="rayon">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://rayon.design" rel="noopener">Rayon</a></h3>
+        <div class="tool-kind">Rayon &middot; 2D layout and drawing</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Released. 3D and AI agents due December 2026</dd></div>
+        <div><dt>With Revit</dt><dd>No. Imports DWG, DXF and PDF</dd></div>
+        <div><dt>Price</dt><dd>Free for 3 models. Pro about &euro;19 an editor a month, billed yearly</dd></div>
+      </dl>
+      <p class="tool-note">Fast, shared 2D plans in the browser with an AI drawing assistant. Built for interiors, fit-out and space plans.</p>
+      <p class="tool-note">Not BIM, and DWG export is not confirmed. Use it for plans you would otherwise draw in AutoCAD.</p>
+    </article>
+
+    <article class="tool" id="higharc" data-platforms="web" data-needs="" data-stage="docs" data-price="sub" data-price-order="99999" data-rank="9" data-name="higharc">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://higharc.com" rel="noopener">Higharc</a></h3>
+        <div class="tool-kind">Higharc &middot; Homebuilder platform</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Released, sold to builders</dd></div>
+        <div><dt>With Revit</dt><dd>No</dd></div>
+        <div><dt>Price</dt><dd>Not published</dd></div>
+      </dl>
+      <p class="tool-note">Design, plan sets, estimating and sales configurators for US production homebuilders, with AI that turns a floor-plan image into a model.</p>
+      <p class="tool-note">Only relevant if you design for volume homebuilders.</p>
+    </article>
+
+    <article class="tool" id="pascal" data-platforms="web" data-needs="ifc" data-stage="concept" data-price="free" data-price-order="0" data-rank="10" data-name="pascal editor">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://github.com/pascalorg/editor" rel="noopener">Pascal Editor</a></h3>
+        <div class="tool-kind">Open source &middot; Browser 3D editor &middot; beta</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Status</dt><dd>Beta</dd></div>
+        <div><dt>With Revit</dt><dd>No. IFC converter</dd></div>
+        <div><dt>Price</dt><dd>Free, open source</dd></div>
+      </dl>
+      <p class="tool-note">An open-source building editor in the browser, built so AI agents can drive it. Interesting for firms writing their own tools.</p>
+      <p class="tool-note">Not production BIM.</p>
+    </article>
+  </div>
+  <p class="no-match" id="noMatch" hidden>Nothing here does all of that. Clear a filter to see the closest tools.</p>
+
+  <div class="chooser-notes">
+    <section id="short">
+      <div class="section-label">Short answers</div>
+      <ul class="situations">
+        <li>
+          <span class="sit-who">Revit office, earlier design</span>
+          <span class="sit-pick">Use <strong>Forma</strong> first, since you already pay for it. Pilot <strong>Snaptrude</strong> for schematic design with a team.</span>
+        </li>
+        <li>
+          <span class="sit-who">Piloting a Revit replacement</span>
+          <span class="sit-pick">Try <strong>Motif</strong> on a small project. Use <strong>Qonic</strong> if your work is coordination of big RVT and IFC models.</span>
+        </li>
+        <li>
+          <span class="sit-who">Feasibility with clients</span>
+          <span class="sit-pick">Use <strong>Arcol</strong>.</span>
+        </li>
+        <li>
+          <span class="sit-who">Interiors and space planning</span>
+          <span class="sit-pick">Use <strong>Rayon</strong> for drawing, <strong>Hypar</strong> for test fits.</span>
+        </li>
+        <li>
+          <span class="sit-who">Using several of these beside Revit</span>
+          <span class="sit-pick">Connect them with <strong>Speckle</strong>.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section id="context">
+      <div class="section-label">What is happening</div>
+      <p>AEC Magazine groups these tools as BIM 2.0: browser-based, several
+         people in one model at once, and built on data rather than files,
+         so AI can work with the model. They exist because Revit is a
+         file-based desktop app that is hard to share live, and because firms
+         are unhappy with Autodesk's prices and control of their data.</p>
+      <p>None of them produces a full construction set the way Revit does
+         today, and most now pitch themselves as working beside Revit rather
+         than replacing it. Autodesk said in September 2026 that Forma will
+         replace Revit over time, with no date. Graphisoft has announced its
+         own cloud collaboration layer and an Archicad connection to Forma.
+         The question AEC Magazine now raises is whether AI agents doing the
+         modeling will matter more than any of these interfaces.</p>
+      <p>Prices are early-stage and change often. Check the vendor before you
+         buy. For the established tools, see <a href="bim-platforms.html">BIM
+         &amp; Design Platforms</a>.</p>
+    </section>
+
+    <section id="watch">
+      <div class="section-label">Watch list</div>
+      <p>Not yet ready to compare: <strong>NeoBIM</strong>, AI-first BIM from a
+         co-founder of Enscape, shown at NXT BLD 2026. <strong>Skema</strong>,
+         an AI design assistant that syncs Rhino and Revit.
+         <strong>Swapp</strong>, AI that drafts design development and
+         construction sets inside Revit. Graphisoft's <strong>browser design
+         tool</strong> for massing and layout, announced in 2026.</p>
+    </section>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="index.html">&larr; architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="privacy.html">Privacy &amp; analytics</a>
+  </div>
+</div>
+
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/chooser.js"></script>
+</body>
+</html>

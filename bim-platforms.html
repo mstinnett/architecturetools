@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!-- BIM & Design Platforms — the standard modeling, drafting and visualization software architects choose between.
+     data-family: building, the site's amber.
+
+     A software chooser: the picker's controls over static tool cards, then
+     the editorial notes. Every tool is a static <article class="tool">, so
+     the page reads in full without JavaScript and is indexable; the shared
+     assets/js/chooser.js only hides and reorders the cards (its header holds
+     the data-* contract). Styles are global.css "CHOOSER". Adding a tool is
+     one <article>; nothing else lists them. "Most used" (data-rank) is an
+     editorial estimate and the page says so. Copy follows docs/voice.md. -->
+<html lang="en" data-family="building">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIM &amp; Design Software for Architects -- architecture.tools</title>
+<meta name="description" content="Revit, Archicad, Vectorworks, Rhino, SketchUp, AutoCAD, Chief Architect, Enscape, Lumion, Twinmotion, D5 and V-Ray compared for architects, filtered by Windows, Mac, Linux, iPad or web, by what you use it for, and by price.">
+<link rel="canonical" href="https://architecture.tools/bim-platforms.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://architecture.tools/bim-platforms.html">
+<meta property="og:title" content="BIM &amp; Design Software for Architects -- architecture.tools">
+<meta property="og:description" content="The standard design software, filtered by platform, what you use it for, and price.">
+<meta name="twitter:card" content="summary">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
+</head>
+<body>
+<div class="page-wide">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Software</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">BIM &amp; Design Platforms</span>
+    </nav>
+    <h1>Which design software should an architect use?</h1>
+    <p>Pick your platforms and the work you do. Every tool that fits stays on the list.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <p class="chooser-updated">Updated October 2026</p>
+  <p class="chooser-lede">Choose by who you exchange models with before anything else. In the US that usually means Revit. On a Mac it usually means Archicad or Vectorworks.</p>
+
+  <div class="chooser-controls" id="controls">
+    <div class="control-group">
+      <div class="section-label">Runs on</div>
+      <p class="control-hint">Every device you will use. Features are the main app's; web versions often do less.</p>
+      <div class="option-row">
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="win">Windows</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="mac">Mac</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="linux">Linux</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="ipad">iPad</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="web">Cloud / web<span class="pill-detail">In the browser, any computer</span></button>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="section-label">Used for</div>
+      <div class="option-row">
+        <button type="button" class="option-pill active" aria-pressed="true" data-single="kind" data-value="any">Anything</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="kind" data-value="bim">BIM and documents</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="kind" data-value="cad">2D drafting</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="kind" data-value="model">3D and concept modeling</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="kind" data-value="residential">Residential design</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="kind" data-value="viz">Visualization</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="section-label">You need</div>
+      <p class="control-hint">Every one you select.</p>
+      <div class="option-row">
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="docs">Construction documents</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="ifc">IFC exchange</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="rvt">Opens Revit files</button>
+        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="team">Several people in one model</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="section-label">Sort by</div>
+      <div class="option-row">
+        <button type="button" class="option-pill active" aria-pressed="true" data-single="sort" data-value="rank">Most used<span class="pill-detail">Among architects, our estimate</span></button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="sort" data-value="price">Lowest price</button>
+        <button type="button" class="option-pill" aria-pressed="false" data-single="sort" data-value="name">Name</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-bar">
+    <span id="resultCount" aria-live="polite">14 tools</span>
+    <button type="button" id="resetFilters" hidden>Clear filters</button>
+  </div>
+
+  <div class="tool-grid" id="toolGrid">
+    <article class="tool" id="revit" data-platforms="win" data-needs="docs ifc team rvt" data-kind="bim" data-price="sub" data-price-order="3005" data-rank="1" data-name="revit">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.autodesk.com/products/revit/overview" rel="noopener">Revit</a></h3>
+        <div class="tool-kind">Autodesk &middot; BIM authoring</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Yes</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-yes">Cloud worksharing, sold separately</dd></div>
+        <div><dt>Price</dt><dd>About $3,000 a year. AEC Collection about $3,700</dd></div>
+      </dl>
+      <p class="tool-note">The default in US firms that exchange models with consultants. RVT is the format structural and MEP engineers expect, and the add-in ecosystem (Dynamo, Enscape, Forma) is the deepest.</p>
+      <p class="tool-note">Windows only, the most expensive here, and weak at freeform modeling. Revit LT is about $540 a year but drops worksharing, rendering and the API.</p>
+    </article>
+
+    <article class="tool" id="autocad" data-platforms="win mac web" data-needs="docs" data-kind="cad" data-price="sub" data-price-order="2030" data-rank="2" data-name="autocad">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.autodesk.com/products/autocad/overview" rel="noopener">AutoCAD</a></h3>
+        <div class="tool-kind">Autodesk &middot; 2D CAD</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Yes, in 2D</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-no">No</dd></div>
+        <div><dt>Price</dt><dd>About $2,000 a year. AutoCAD LT about $540</dd></div>
+      </dl>
+      <p class="tool-note">DWG is the format every consultant can open, so most firms keep a seat even after moving to BIM. AutoCAD LT is enough for drafting and reading backgrounds.</p>
+      <p class="tool-note">It is not BIM: plans, sections and schedules are coordinated by hand. The Mac version trails Windows.</p>
+    </article>
+
+    <article class="tool" id="sketchup" data-platforms="win mac ipad web" data-needs="ifc rvt" data-kind="model" data-price="sub" data-price-order="399" data-rank="3" data-name="sketchup">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.sketchup.com" rel="noopener">SketchUp</a></h3>
+        <div class="tool-kind">Trimble &middot; 3D modeling</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="web">Web</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Limited, through LayOut</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-yes">Trimble Connect</dd></div>
+        <div><dt>Price</dt><dd>Pro $399 a year. Studio about $820, with V-Ray and a Revit importer</dd></div>
+      </dl>
+      <p class="tool-note">The fastest way to model a building idea, with the largest library of models and extensions. Runs on every platform here, including iPad and the browser.</p>
+      <p class="tool-note">A surface modeler, not BIM. It slows down on large models, and LayOut drawings take more work than drawings from a BIM tool.</p>
+    </article>
+
+    <article class="tool" id="enscape" data-platforms="win mac" data-needs="" data-kind="viz" data-price="sub" data-price-order="575" data-rank="4" data-name="enscape">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.chaos.com/enscape" rel="noopener">Enscape</a></h3>
+        <div class="tool-kind">Chaos &middot; Real-time visualization</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Works inside</dt><dd>Revit, SketchUp, Rhino, Archicad, Vectorworks</dd></div>
+        <div><dt>Runs on</dt><dd>The GPU</dd></div>
+        <div><dt>Price</dt><dd>About $575 a year</dd></div>
+      </dl>
+      <p class="tool-note">Real-time rendering inside the modeling app, so the view updates as you change the model. The common choice in Revit offices.</p>
+      <p class="tool-note">On a Mac it works with SketchUp, Rhino, Archicad and Vectorworks, without hardware ray tracing. Final images do not reach V-Ray quality.</p>
+    </article>
+
+    <article class="tool" id="rhino" data-platforms="win mac" data-needs="" data-kind="model" data-price="onetime" data-price-order="995" data-rank="5" data-name="rhino + grasshopper">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.rhino3d.com" rel="noopener">Rhino + Grasshopper</a></h3>
+        <div class="tool-kind">McNeel &middot; 3D modeling</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Limited without add-ons</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-no">No</dd></div>
+        <div><dt>Price</dt><dd>$995 one-time, Grasshopper included</dd></div>
+      </dl>
+      <p class="tool-note">Precise freeform and NURBS geometry, with Grasshopper for parametric design. The standard in facade, computational and design-led practices, and the cheapest to own.</p>
+      <p class="tool-note">Not BIM. VisualARQ adds BIM objects and IFC, and Rhino.Inside.Revit runs it inside Revit.</p>
+    </article>
+
+    <article class="tool" id="lumion" data-platforms="win" data-needs="" data-kind="viz" data-price="sub" data-price-order="1149" data-rank="6" data-name="lumion">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://lumion.com" rel="noopener">Lumion</a></h3>
+        <div class="tool-kind">Lumion &middot; Real-time visualization</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Works inside</dt><dd>Its own app, with LiveSync from Revit, SketchUp, Rhino, Archicad, Vectorworks</dd></div>
+        <div><dt>Runs on</dt><dd>The GPU, a demanding one</dd></div>
+        <div><dt>Price</dt><dd>Pro about $1,150 a year</dd></div>
+      </dl>
+      <p class="tool-note">A separate app for fast, well-dressed renderings and animation, with a large library of trees, people and materials.</p>
+      <p class="tool-note">Windows only for Pro, with no monthly plan. Every design change makes a round trip from the model.</p>
+    </article>
+
+    <article class="tool" id="archicad" data-platforms="win mac" data-needs="docs ifc team rvt" data-kind="bim" data-price="sub" data-price-order="2414" data-rank="7" data-name="archicad">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://graphisoft.com/solutions/archicad" rel="noopener">Archicad</a></h3>
+        <div class="tool-kind">Graphisoft &middot; BIM authoring</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Yes</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-yes">Teamwork, BIMcloud</dd></div>
+        <div><dt>Price</dt><dd>Studio about $2,400 a year</dd></div>
+      </dl>
+      <p class="tool-note">The best BIM on a Mac, quicker to learn than Revit, with strong drawing output and mature Teamwork collaboration. Strong in Europe and in smaller firms.</p>
+      <p class="tool-note">US consultants mostly expect RVT, so exchange runs through IFC or plugins. Perpetual licenses are being retired.</p>
+    </article>
+
+    <article class="tool" id="vray" data-platforms="win mac" data-needs="" data-kind="viz" data-price="sub" data-price-order="540" data-rank="8" data-name="v-ray">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.chaos.com/vray" rel="noopener">V-Ray</a></h3>
+        <div class="tool-kind">Chaos &middot; Rendering</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Works inside</dt><dd>SketchUp, Rhino, Revit, 3ds Max, Archicad</dd></div>
+        <div><dt>Runs on</dt><dd>CPU or GPU</dd></div>
+        <div><dt>Price</dt><dd>Solo about $540 a year</dd></div>
+      </dl>
+      <p class="tool-note">The standard for final, photographic images, and included in SketchUp Studio on Windows.</p>
+      <p class="tool-note">Slower to set up and iterate than real-time tools. On a Mac it runs in SketchUp and Rhino only.</p>
+    </article>
+
+    <article class="tool" id="twinmotion" data-platforms="win mac" data-needs="" data-kind="viz" data-price="freemium" data-price-order="0" data-rank="9" data-name="twinmotion">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.twinmotion.com" rel="noopener">Twinmotion</a></h3>
+        <div class="tool-kind">Epic Games &middot; Real-time visualization</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Works inside</dt><dd>Its own app, with Direct Link from Revit, SketchUp, Rhino, Archicad, Vectorworks</dd></div>
+        <div><dt>Runs on</dt><dd>The GPU</dd></div>
+        <div><dt>Price</dt><dd>Free under $1M annual revenue, then $445 a seat a year</dd></div>
+      </dl>
+      <p class="tool-note">Unreal Engine rendering, free for most small firms. Runs on Windows and Mac.</p>
+      <p class="tool-note">A separate app, like Lumion. Mac performance trails Windows.</p>
+    </article>
+
+    <article class="tool" id="vectorworks" data-platforms="win mac" data-needs="docs ifc team rvt" data-kind="bim cad model" data-price="sub" data-price-order="1530" data-rank="10" data-name="vectorworks architect">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.vectorworks.net/architect" rel="noopener">Vectorworks Architect</a></h3>
+        <div class="tool-kind">Vectorworks &middot; BIM, 2D and 3D</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Yes</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-yes">Project Sharing</dd></div>
+        <div><dt>Price</dt><dd>About $1,530 a year</dd></div>
+      </dl>
+      <p class="tool-note">One app for 2D drafting, 3D modeling and BIM, with the best graphic presentation output of the BIM tools. The lowest-priced full BIM here, and strong for landscape work.</p>
+      <p class="tool-note">A thinner US consultant ecosystem than Revit or Archicad.</p>
+    </article>
+
+    <article class="tool" id="chief" data-platforms="win mac" data-needs="docs" data-kind="bim residential" data-price="sub" data-price-order="1995" data-rank="11" data-name="chief architect premier">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.chiefarchitect.com" rel="noopener">Chief Architect Premier</a></h3>
+        <div class="tool-kind">Chief Architect &middot; Residential design</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Yes, residential</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-no">No</dd></div>
+        <div><dt>Price</dt><dd>About $2,000 a year</dd></div>
+      </dl>
+      <p class="tool-note">The fastest route from a house plan to framing, roofs, cabinets, 3D views and a permit set. The tool of US residential designers, builders and remodelers.</p>
+      <p class="tool-note">Weak for commercial work, with little model exchange with consultants. Home Designer is the consumer version.</p>
+    </article>
+
+    <article class="tool" id="d5" data-platforms="win" data-needs="" data-kind="viz" data-price="sub" data-price-order="360" data-rank="12" data-name="d5 render">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.d5render.com" rel="noopener">D5 Render</a></h3>
+        <div class="tool-kind">D5 &middot; Real-time visualization</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Works inside</dt><dd>Its own app, with LiveSync from SketchUp, Revit, Rhino, Archicad</dd></div>
+        <div><dt>Runs on</dt><dd>The GPU, NVIDIA recommended</dd></div>
+        <div><dt>Price</dt><dd>Pro about $360 a year. Free for non-commercial use</dd></div>
+      </dl>
+      <p class="tool-note">Ray-traced real-time rendering at a lower price than Lumion, and growing quickly.</p>
+      <p class="tool-note">Windows only.</p>
+    </article>
+
+    <article class="tool" id="bricscad" data-platforms="win mac linux" data-needs="docs ifc" data-kind="bim cad" data-price="both" data-price-order="1890" data-rank="13" data-name="bricscad bim">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.bricsys.com" rel="noopener">BricsCAD BIM</a></h3>
+        <div class="tool-kind">Bricsys &middot; BIM on a DWG engine</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Yes</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-no">No</dd></div>
+        <div><dt>Price</dt><dd>One-time license or subscription</dd></div>
+      </dl>
+      <p class="tool-note">BIM built on native DWG, with AutoCAD-style commands, a perpetual license, and the only native Linux version of any tool here.</p>
+      <p class="tool-note">Few US firms use it, and its BIM tools are less developed than Revit or Archicad.</p>
+    </article>
+
+    <article class="tool" id="allplan" data-platforms="win" data-needs="docs ifc team" data-kind="bim" data-price="sub" data-price-order="3160" data-rank="14" data-name="allplan">
+      <div class="tool-head">
+        <h3 class="tool-name"><a href="https://www.allplan.com" rel="noopener">Allplan</a></h3>
+        <div class="tool-kind">Nemetschek &middot; BIM authoring</div>
+      </div>
+      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li></ul>
+      <dl class="tool-specs">
+        <div><dt>Construction documents</dt><dd class="mark-yes">Yes</dd></div>
+        <div><dt>Shares a model</dt><dd class="mark-yes">Allplan Share, Bimplus</dd></div>
+        <div><dt>Price</dt><dd>From about &euro;263 a month</dd></div>
+      </dl>
+      <p class="tool-note">Architecture and structure in one model, with strong reinforcement and precast detailing. Common in Germany and engineering-led firms.</p>
+      <p class="tool-note">Windows only, and rare in the US.</p>
+    </article>
+  </div>
+  <p class="no-match" id="noMatch" hidden>Nothing here does all of that. Clear a filter to see the closest tools.</p>
+
+  <div class="chooser-notes">
+    <section id="short">
+      <div class="section-label">Short answers</div>
+      <ul class="situations">
+        <li>
+          <span class="sit-who">US firm, mid-size or larger buildings</span>
+          <span class="sit-pick">Use <strong>Revit</strong>. Your structural and MEP consultants will expect RVT.</span>
+        </li>
+        <li>
+          <span class="sit-who">BIM on a Mac</span>
+          <span class="sit-pick">Use <strong>Archicad</strong>. Use <strong>Vectorworks Architect</strong> if you draw a lot of 2D or landscape, or want the lower price.</span>
+        </li>
+        <li>
+          <span class="sit-who">Houses, design-build and remodels</span>
+          <span class="sit-pick">Use <strong>Chief Architect Premier</strong>. Use <strong>Archicad</strong> or <strong>Revit</strong> if you also do commercial work.</span>
+        </li>
+        <li>
+          <span class="sit-who">Concept design and small projects</span>
+          <span class="sit-pick">Use <strong>SketchUp</strong>. Add <strong>Rhino</strong> for freeform or computational design.</span>
+        </li>
+        <li>
+          <span class="sit-who">Drafting and consultant backgrounds</span>
+          <span class="sit-pick">Use <strong>AutoCAD LT</strong>. Full AutoCAD is only worth it for 3D or its toolsets.</span>
+        </li>
+        <li>
+          <span class="sit-who">Renderings</span>
+          <span class="sit-pick">Use <strong>Enscape</strong> inside the model. <strong>Twinmotion</strong> is free for firms under $1M revenue. Use <strong>V-Ray</strong> for final marketing images.</span>
+        </li>
+        <li>
+          <span class="sit-who">On Linux</span>
+          <span class="sit-pick">Use <strong>BricsCAD BIM</strong>. It is the only tool here with a native Linux version.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section id="context">
+      <div class="section-label">What changed this year</div>
+      <p>Nearly everything is now a subscription. Rhino is the only major
+         tool still sold as a one-time purchase, and BricsCAD still offers
+         both. Graphisoft and Vectorworks are retiring their remaining
+         perpetual licenses.</p>
+      <p>Autodesk now bundles Forma's early-stage design tools with Revit,
+         and every major vendor has added an AI assistant or AI rendering.
+         A new generation of browser-based tools is aiming at Revit directly.
+         They are compared on <a href="bim-emerging.html">Emerging BIM</a>.</p>
+      <p>Once you know your software, the <a href="picker.html">Computer
+         Chooser</a> picks the machine to run it on. Prices are rounded and
+         change often. Check the vendor before you buy.</p>
+    </section>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="index.html">&larr; architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="privacy.html">Privacy &amp; analytics</a>
+  </div>
+</div>
+
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/chooser.js"></script>
+</body>
+</html>

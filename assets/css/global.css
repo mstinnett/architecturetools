@@ -473,6 +473,69 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
 /* ---- FOOTER ---- */
 .page-footer { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--rule-2); font-size: var(--text-xs); color: var(--ink-3); font-weight: 300; line-height: 1.7; }
 
+/* ---- CHOOSER — the software choosers (pdf-markup, bim-platforms,
+   bim-emerging): the picker's control columns over a grid of tool cards.
+   Behaviour is assets/js/chooser.js; the markup contract is in its header. ---- */
+.chooser-lede { font-size: var(--text-base); font-weight: 300; line-height: 1.65; max-width: 46em; margin-bottom: var(--space-xl); }
+.chooser-updated { font-size: var(--text-xs); color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--space-md); }
+.chooser-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; align-items: start;
+                    padding-bottom: var(--space-lg); border-bottom: 2px solid var(--black); }
+.chooser-controls .control-group { display: flex; flex-direction: column; min-width: 0; }
+.chooser-controls .option-row { flex-direction: column; align-items: stretch; }
+.chooser-controls .option-pill, .chooser-controls .app-toggle { width: 100%; text-align: left; white-space: normal; }
+.chooser-controls .app-toggle .pill-detail { display: block; font-size: var(--text-xs); font-weight: 300; opacity: 0.7; margin-top: 0.1rem; }
+.control-hint { font-size: var(--text-xs); color: var(--ink-3); font-weight: 300; margin: -0.5rem 0 var(--space-sm); line-height: 1.5; }
+
+.result-bar { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem;
+              margin: var(--space-md) 0 var(--space-lg); font-size: var(--text-sm); color: var(--ink-2); }
+.result-bar button { background: none; border: 0; padding: 0; font: inherit; color: var(--ink-2); cursor: pointer; border-bottom: 1px solid var(--rule-2); }
+.result-bar button:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.result-bar button[hidden] { display: none; }
+
+.tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.tool { border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem 1.1rem 1.1rem; min-width: 0; }
+.tool[hidden] { display: none; }
+.tool-head { margin-bottom: 0.5rem; }
+.tool-name { font-size: var(--text-md); font-weight: 400; }
+.tool-name a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color 0.15s, border-color 0.15s; }
+.tool-name a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.tool-kind { margin-top: 0.15rem; font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.tool-plats { list-style: none; padding: 0; margin: 0 0 0.6rem; display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.tool-plats li { font-size: var(--text-xs); padding: 0.1rem 0.45rem; border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink-2); }
+.tool-plats li.is-match { border-color: var(--accent); color: var(--accent); }
+.tool-specs { margin: 0 0 0.6rem; border-top: var(--border-light); }
+.tool-specs > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0.75rem; padding: 0.3rem 0; border-bottom: var(--border-light); }
+.tool-specs dt { font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); padding-top: 0.15em; }
+.tool-specs dd { margin: 0; font-size: var(--text-sm); font-weight: 300; }
+.tool .mark-yes { color: var(--accent); }
+.tool .mark-no  { color: var(--ink-3); }
+.tool-note { font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); line-height: 1.55; }
+.tool-note + .tool-note { margin-top: 0.4rem; }
+.tool-disclosure { margin-top: 0.5rem; font-size: var(--text-xs); color: var(--ink-3); line-height: 1.5; }
+.no-match { padding: 1.5rem 0; color: var(--ink-2); font-size: var(--text-base); font-weight: 300; }
+.no-match[hidden] { display: none; }
+
+/* the editorial notes under the cards */
+.chooser-notes { margin-top: var(--space-2xl); max-width: 720px; }
+.chooser-notes section { margin-bottom: var(--space-2xl); }
+.chooser-notes p { font-size: var(--text-base); font-weight: 300; line-height: 1.65; margin-bottom: var(--space-md); }
+.chooser-notes a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color 0.15s, border-color 0.15s; }
+.chooser-notes a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.situations { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+.situations li { display: grid; grid-template-columns: 13rem 1fr; gap: 0.25rem 1.25rem; padding: 0.7rem 0; border-bottom: var(--border-light); }
+.sit-who { font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); line-height: 1.5; }
+.sit-pick { font-size: var(--text-base); font-weight: 300; line-height: 1.5; }
+.sit-pick strong { font-weight: 400; color: var(--accent); }
+.chooser-notes .pick-name a { border-bottom-color: var(--rule-2); }
+.chooser-notes .pick-meta { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.3rem; }
+.checks { list-style: none; padding: 0; margin: 0 0 var(--space-md); }
+.checks li { position: relative; padding-left: 1.25em; margin-bottom: var(--space-sm); font-size: var(--text-base); font-weight: 300; line-height: 1.6; }
+.checks li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 0.5em; height: 1px; background: var(--ink-2); }
+
+@media (max-width: 900px) { .chooser-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2rem; } }
+@media (max-width: 760px) { .tool-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .situations li { grid-template-columns: 1fr; } .tool-specs > div { grid-template-columns: 8rem 1fr; } }
+
 /* ---- UTILITY ---- */
 .hidden { display: none !important; }
 
