@@ -411,12 +411,16 @@ promote them as each is ready, not to land them all at once.
   `.cover-card`; a new category is a `.cover-group` plus its nav item.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
-- `pdf-markup.html` — **PDF Markup & Review**, a software landscape page (landed
-  2026-10-08): situation → pick list, a comparison table (platform, scaled
-  measurement, team review, pricing model), one entry per tool, and what to
-  test before leaving Bluebeam. A named live page with an update date; its
-  cover card sits in a new **Software** group. Re-check the vendor facts
-  (platforms, pricing, Bluebeam's Mac/iPad status) when you update it.
+- `pdf-markup.html` — **PDF Markup & Review**, a software chooser in the
+  picker's register (landed 2026-10-08): Runs on / You need / Price / Sort by
+  controls over a grid of tool cards, then short answers, project platforms,
+  and what to test before leaving Bluebeam. Every tool is a static
+  `<article class="tool">` (readable without JS, indexable); the inline script
+  only hides and reorders cards from their `data-*` attributes (contract in the
+  page's head comment). Browser-only matches sort after native apps. "Most
+  used" is an editorial rank. Adequate Design Review is listed with a
+  disclosure. Re-check vendor facts (platforms, tiers, prices) when updating.
+  Its cover card sits in a **Software** group.
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
   label ("Calculators → Precise Unit Converter"); the cover indexes each live
