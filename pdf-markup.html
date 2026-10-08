@@ -6,8 +6,9 @@
      Every tool is a static <article class="tool"> in the HTML, so the page
      reads in full without JavaScript and is indexable. The script at the
      bottom only hides and reorders those cards from their data-* attributes:
-       data-platforms  native platforms; "web" also satisfies Windows, Mac
-                       and Linux, and the card says so when that is the match
+       data-platforms  native apps only. "web" is its own platform: it shows
+                       as a chip but is never a filter, since a browser app
+                       would match every device and blur Windows/Mac/Linux
        data-needs      measure / team / compare / checklist
        data-price      free / freemium / onetime / both / sub
        data-paid-needs needs a freemium tool meets only on a subscription tier,
@@ -81,7 +82,6 @@
   .tool-plats { list-style: none; padding: 0; margin: 0 0 0.6rem; display: flex; flex-wrap: wrap; gap: 0.3rem; }
   .tool-plats li { font-size: var(--text-xs); padding: 0.1rem 0.45rem; border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink-2); }
   .tool-plats li.is-match { border-color: var(--accent); color: var(--accent); }
-  .tool-via { font-size: var(--text-xs); color: var(--ink-3); margin: -0.3rem 0 0.6rem; }
   .tool-specs { margin: 0 0 0.6rem; border-top: var(--border-light); }
   .tool-specs > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0.75rem; padding: 0.3rem 0; border-bottom: var(--border-light); }
   .tool-specs dt { font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); padding-top: 0.15em; }
@@ -146,7 +146,7 @@
   <div class="controls-row" id="controls">
     <div class="control-group">
       <div class="section-label">Runs on</div>
-      <p class="control-hint">Select every device you will use.</p>
+      <p class="control-hint">Native apps, on every device you select. Web versions are marked on each card.</p>
       <div class="option-row">
         <button type="button" class="app-toggle" aria-pressed="false" data-platform="win">Windows</button>
         <button type="button" class="app-toggle" aria-pressed="false" data-platform="mac">Mac</button>
@@ -194,7 +194,6 @@
         <div class="tool-kind">Bluebeam &middot; Drawing sets</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li><li data-p="web">Web (Bluebeam Cloud)</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes, the strongest</dd></div>
         <div><dt>Team review</dt><dd class="mark-yes">Studio Sessions</dd></div>
@@ -210,7 +209,6 @@
         <div class="tool-kind">Adobe &middot; General PDF editor</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li><li data-p="android">Android</li><li data-p="web">Web</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
         <div><dt>Team review</dt><dd class="mark-yes">Shared review</dd></div>
@@ -225,7 +223,6 @@
         <div class="tool-kind">Apple &middot; Quick notes</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -240,7 +237,6 @@
         <div class="tool-kind">Drawboard &middot; Drawing sets</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="android">Android</li><li data-p="web">Web</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Pro Plus and Pro Unlimited</dd></div>
         <div><dt>Team review</dt><dd class="mark-yes">Shared documents</dd></div>
@@ -255,7 +251,6 @@
         <div class="tool-kind">Readdle &middot; General PDF editor</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -270,7 +265,6 @@
         <div class="tool-kind">Foxit &middot; General PDF editor</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li><li data-p="android">Android</li><li data-p="web">Web</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
         <div><dt>Team review</dt><dd class="mark-yes">Shared review</dd></div>
@@ -285,7 +279,6 @@
         <div class="tool-kind">PDF-XChange &middot; Drawing sets</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -300,7 +293,6 @@
         <div class="tool-kind">Drawboard &middot; Team review</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="ipad">iPad</li><li data-p="web">Web</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
         <div><dt>Team review</dt><dd class="mark-yes">Issues, versions, free guests</dd></div>
@@ -315,7 +307,6 @@
         <div class="tool-kind">Morpholio &middot; Sketching</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Scale-aware drawing</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -330,7 +321,6 @@
         <div class="tool-kind">Readdle &middot; Reading sets</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -345,7 +335,6 @@
         <div class="tool-kind">Qoppa &middot; Drawing sets</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -360,7 +349,6 @@
         <div class="tool-kind">KDE &middot; Quick notes</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="linux">Linux</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -375,7 +363,6 @@
         <div class="tool-kind">Code Industry &middot; General PDF editor</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Distance, perimeter, area</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -390,7 +377,6 @@
         <div class="tool-kind">Open source &middot; Sketching</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -405,7 +391,6 @@
         <div class="tool-kind">Noir architects &middot; Drawing sets</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-no">Not listed</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
@@ -420,7 +405,6 @@
         <div class="tool-kind">Adequate Design &middot; Checklist review &middot; in beta</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">No, runs locally</dd></div>
@@ -437,7 +421,6 @@
         <div class="tool-kind">PolyPDF &middot; Drawing sets</div>
       </div>
       <ul class="tool-plats" aria-label="Platforms"><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <p class="tool-via" hidden></p>
       <dl class="tool-specs">
         <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
         <div><dt>Team review</dt><dd class="mark-no">Not yet</dd></div>
@@ -542,8 +525,6 @@
   var count = document.getElementById('resultCount');
   var noMatch = document.getElementById('noMatch');
   var reset = document.getElementById('resetFilters');
-  var NAMES = { win: 'Windows', mac: 'Mac', linux: 'Linux', ipad: 'iPad' };
-  var DESKTOP = { win: true, mac: true, linux: true };   // where "web" counts
   var state = { platforms: {}, needs: {}, price: 'any', sort: 'rank' };
 
   function list(el, attr) { return (el.getAttribute(attr) || '').split(' ').filter(Boolean); }
@@ -553,12 +534,8 @@
     var plats = on(state.platforms), needs = on(state.needs), shown = 0;
     tools.forEach(function (t) {
       var have = list(t, 'data-platforms'), has = list(t, 'data-needs');
-      var price = t.getAttribute('data-price'), paid = list(t, 'data-paid-needs'), viaWeb = [];
-      var ok = plats.every(function (p) {
-        if (have.indexOf(p) >= 0) return true;
-        if (DESKTOP[p] && have.indexOf('web') >= 0) { viaWeb.push(NAMES[p]); return true; }
-        return false;
-      }) && needs.every(function (n) {
+      var price = t.getAttribute('data-price'), paid = list(t, 'data-paid-needs');
+      var ok = plats.every(function (p) { return have.indexOf(p) >= 0; }) && needs.every(function (n) {
         // a freemium tool's paid-only features don't count under a no-subscription price
         if (state.price !== 'any' && paid.indexOf(n) >= 0) return false;
         return has.indexOf(n) >= 0;
@@ -571,19 +548,12 @@
       // mark the chips that answer the platforms asked for
       Array.prototype.forEach.call(t.querySelectorAll('.tool-plats li'), function (li) {
         var p = li.getAttribute('data-p');
-        li.classList.toggle('is-match', plats.indexOf(p) >= 0 || (p === 'web' && viaWeb.length > 0));
+        li.classList.toggle('is-match', plats.indexOf(p) >= 0);
       });
-      t.setAttribute('data-web-only', viaWeb.length ? '1' : '0');
-      var via = t.querySelector('.tool-via');
-      via.hidden = viaWeb.length === 0;
-      via.textContent = viaWeb.length ? 'On ' + viaWeb.join(' and ') + ', in the browser only.' : '';
     });
 
     var key = state.sort;
-    // native apps before browser-only matches, then the chosen order
     tools.slice().sort(function (a, b) {
-      var w = (+a.getAttribute('data-web-only')) - (+b.getAttribute('data-web-only'));
-      if (w) return w;
       if (key === 'name') return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
       var d = key === 'price' ? (+a.getAttribute('data-price-order')) - (+b.getAttribute('data-price-order')) : 0;
       return d || (+a.getAttribute('data-rank')) - (+b.getAttribute('data-rank'));
