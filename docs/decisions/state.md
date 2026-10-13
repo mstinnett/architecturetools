@@ -105,6 +105,19 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
 
 ## Recent decisions
 
+- 2026-10-13 — **Scale Resolution's range labels no longer collide**
+  (operator: "improve the scale resolution label"). `rangeFig` in
+  `calculators/scale.html` centred all three labels under the band on one
+  baseline, so below ~360px screens (and for long values wider) the end values
+  ran into the ±. Now the ± stays centred and each end value hangs outward
+  from its edge; where an end would reach the ± or the figure's edge (by
+  numberline.js's 0.62 em/char estimate), both ends drop to a second row,
+  clamped inside, and the figure grows 14px. End values take `--ink-2` (the
+  shared axis-label ink) instead of the faint `--nl-axis`. A sweep of 14
+  readings (both tasks, imperial and metric, long values) × 9 widths from 300
+  to 1280 finds no overlap or clipping (the old figure failed 32 of the 126).
+  The cover's Scale plate was recaptured and has its end values back.
+
 - 2026-10-13 — **Four calculators promoted; the software choosers join the
   cover** (operator: "show a few calculators on it and show the PDF and BIM
   pages on the computer chooser row — calculators and what tool to buy/use").
@@ -118,8 +131,8 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   calculators list keeps the converter feature and gains a shelf beneath it
   with its own untitled rule and keys (keys belong to the head directly above
   a shelf); each calculator plate is its page's own figure captured at phone
-  width and cropped to 5:4 (Scale's range end values and Tile's key line
-  dropped, as the converter plate drops its bound labels). The second list is
+  width and cropped to 5:4 (Tile's key line dropped, as the converter plate
+  drops its bound labels). The second list is
   **What tool to buy or use**: Chooser, PDF, BIM, Emerging BIM. The privacy
   page's tools line now covers every tool. Verified: gate green; promoted and
   chooser pages pass in both schemes at 1280 and 390 (no errors, no missing

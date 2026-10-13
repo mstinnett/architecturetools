@@ -503,6 +503,26 @@
     var half = o.RU * 2.6 || 1;
     function x(m) { return padL + ((m + half) / (2 * half)) * innerW; }
     var xL = x(-o.RU), xR = x(o.RU), xC = x(0), top = midY - 26, bot = midY + 26;
+
+    // Labels under the band. The ± is centred; each end value hangs OUTWARD
+    // from its edge (the low one ends at the left edge, the high one starts at
+    // the right), so the middle stays the ±'s. Centred on the edges, as they
+    // were, they ran into the ± once the figure narrowed (about 360px screens
+    // and below). Widths use numberline.js's conservative glyph estimate
+    // (numeric readouts ≈ 0.62 em/char). Where an end value would reach the ±
+    // or the figure's edge, both ends drop to a second row, still hung from
+    // their edges but clamped inside the figure: a narrow figure grows a row
+    // rather than overlapping.
+    function estW(s, fs) { return s.length * fs * 0.62; }
+    var GAP = 6, pm = '± ' + o.bandLabel, wPm = estW(pm, 12);
+    var wLo = estW(o.loLabel, 10), wHi = estW(o.hiLabel, 10);
+    var oneRow = xL - wLo >= padL && xR + wHi <= W - padR
+              && xL + GAP <= xC - wPm / 2 && xR - GAP >= xC + wPm / 2;
+    var endY = oneRow ? bot + 21 : bot + 35;
+    var xLo = oneRow ? xL : Math.max(xL, padL + wLo);
+    var xHi = oneRow ? xR : Math.min(xR, W - padR - wHi);
+    if (!oneRow) H += 14;
+
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" '
             + 'aria-label="The value with its range — the precision actually known.">';
     svg += '<defs><pattern id="rdhatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
@@ -515,8 +535,10 @@
     svg += '<line x1="' + xC + '" y1="' + (top - 8) + '" x2="' + xC + '" y2="' + (bot + 8) + '" stroke="var(--accent,#004C80)" stroke-width="2"/>';
     svg += '<text x="' + xC + '" y="' + (top - 15) + '" text-anchor="middle" font-size="14" font-weight="700" fill="var(--nl-ink,#0a0a0a)">' + escapeHtml(o.valueLabel) + '</text>';
     svg += '<text x="' + xC + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="12" font-weight="600" fill="var(--accent,#004C80)">± ' + escapeHtml(o.bandLabel) + '</text>';
-    svg += '<text x="' + xL + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(o.loLabel) + '</text>';
-    svg += '<text x="' + xR + '" y="' + (bot + 21) + '" text-anchor="middle" font-size="10" fill="var(--nl-axis,#999)">' + escapeHtml(o.hiLabel) + '</text>';
+    // --ink-2, the shared figure's axis-label ink: --nl-axis is a stroke tone
+    // and read too faint as text
+    svg += '<text x="' + xLo + '" y="' + endY + '" text-anchor="end" font-size="10" fill="var(--ink-2,#5b5346)">' + escapeHtml(o.loLabel) + '</text>';
+    svg += '<text x="' + xHi + '" y="' + endY + '" text-anchor="start" font-size="10" fill="var(--ink-2,#5b5346)">' + escapeHtml(o.hiLabel) + '</text>';
     svg += '</svg>';
     return svg;
   }
