@@ -1,15 +1,16 @@
-// POST /api/feedback, where feedback.html sends a note. Each note becomes one
-// row in the D1 database bound as FEEDBACK_DB, read at /inbox. Kept: what the
-// reader typed, the page they came from, and the time. Not kept: their IP
-// address, browser details, or any cookie (privacy.html#feedback).
-import { schema, sameOrigin } from '../_lib/feedback-store.js';
+// POST /api/feedback (routed by index.js), where feedback.html sends a note.
+// Each note becomes one row in the D1 database bound as FEEDBACK_DB, read at
+// /inbox. Kept: what the reader typed, the page they came from, and the time.
+// Not kept: their IP address, browser details, or any cookie
+// (privacy.html#feedback).
+import { schema, sameOrigin } from './feedback-store.js';
 
 // Character limits, matched by the maxlength attributes in feedback.html.
 const MAX = { message: 4000, contact: 200, page: 200 };
 // Bytes. A full-length note survives URL encoding in any script.
 const MAX_BODY = 64 * 1024;
 
-export async function onRequestPost({ request, env }) {
+export async function handleFeedback(request, env) {
   // The page's script asks for JSON. A plain form post (no script) is sent
   // back to the page, where :target shows the outcome.
   const json = (request.headers.get('Accept') || '').includes('application/json');

@@ -1,0 +1,33 @@
+// architecture.tools on Cloudflare: one Worker that serves the site's static
+// files and runs the feedback collector. Workers Builds deploys it on every
+// push to main. Setup and the move from GitHub Pages: docs/HOSTING.md.
+{
+  // Must match the Worker's name in the Cloudflare dashboard.
+  "name": "architecturetools",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-01",
+
+  "assets": {
+    // The repo root is the site. .assetsignore keeps everything that isn't
+    // part of it (git, docs, tools, the Worker's own source) unpublished.
+    "directory": ".",
+    "binding": "ASSETS",
+    // Only these paths run code. Every page view is answered from the static
+    // files without calling the Worker.
+    "run_worker_first": ["/api/*", "/inbox"]
+  },
+
+  "d1_databases": [
+    // No database_id needed: the first deploy connects to the database with
+    // this name, creating it if it doesn't exist, and later deploys reuse it.
+    { "binding": "FEEDBACK_DB", "database_name": "architecturetools-feedback" }
+  ],
+
+  // Off, so Cloudflare keeps no per-request log of the Worker that this site
+  // could read (privacy.html#hosting, #feedback). Turning it on changes what
+  // the privacy statement promises.
+  "observability": { "enabled": false },
+
+  // The *.workers.dev address, for testing before the domain moves over.
+  "workers_dev": true
+}

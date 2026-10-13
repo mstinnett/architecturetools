@@ -4,14 +4,18 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-10-13 (feedback form: the site's first server code, two Cloudflare Pages Functions over D1; Jost self-hosted, Google Fonts import removed)_
+_Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worker with static assets; feedback form over D1; Jost self-hosted)_
 
 ## Live architectural picture
 
 - **What this is:** `architecture.tools` — a static site for architects.
   Vanilla HTML/CSS/JS. No framework, no build step, and no backend except
-  the feedback form's two Cloudflare Pages Functions (`functions/`,
-  `docs/FEEDBACK.md`) (`docs/PROJECT.md`).
+  the feedback form's two routes (`worker/`, `docs/FEEDBACK.md`)
+  (`docs/PROJECT.md`). Served by a Cloudflare Worker with static assets,
+  deployed from `main` by Workers Builds (`wrangler.jsonc`,
+  `docs/HOSTING.md`); `.assetsignore` keeps everything but the site
+  unpublished. Previously GitHub Pages, until the operator completes the
+  move-over steps in `docs/HOSTING.md`.
 - **Two branches (read `docs/HANDOFF.md` first):**
   - **`main` — the live site: the AT-0 cover (`index.html`, home) + the picker
     (`picker.html`) + the Precise Unit Converter** (`calculators/convert.html`
@@ -70,8 +74,9 @@ _Last updated: 2026-10-13 (feedback form: the site's first server code, two Clou
 - `docs/HANDOFF.md` — the calculator-engine charter: the engine model, the
   build plan, and the provenance rule.
 - The "no build tools / no framework / no backend" rule for the site itself.
-  One operator-approved exception: `functions/` (the feedback collector and
-  its inbox). Static pages never call into it except `feedback.html`'s post,
+  One operator-approved exception: `worker/` (the feedback collector and
+  its inbox, plus the router that hands every other path to the static
+  files). Static pages never call into it except `feedback.html`'s post,
   and a new server feature is a new exception, not a precedent.
 - The shared-CSS vocabulary: `assets/css/tokens.css` (canonical palette;
   the only definer of `--paper` and the other ground anchors) +
@@ -94,6 +99,20 @@ _Last updated: 2026-10-13 (feedback form: the site's first server code, two Clou
 
 ## Recent decisions
 
+- 2026-10-13 — **Hosting moves from GitHub Pages to a Cloudflare Worker**
+  (operator-directed; Cloudflare Pages is being wound down in favour of
+  Workers). `wrangler.jsonc` makes the repo root the Worker's static assets,
+  with `run_worker_first` limited to `/api/*` and `/inbox`, so page views
+  never run code. The Pages Functions in `functions/` became plain handlers
+  in `worker/` behind `worker/index.js`. `.assetsignore` publishes only the
+  site; its root-only names are anchored with `/` (an unanchored `data` hid
+  `assets/data/` and broke the picker in a local run; `tools/test-hosting.mjs`
+  now guards that). The D1 database is bound by name, so the first deploy
+  creates or connects it. Worker logging is off to keep
+  `privacy.html#hosting` true. `.html` addresses now redirect to clean ones
+  (`/picker.html` -> `/picker`), Cloudflare's default; both keep working.
+  The move itself is operator steps in the dashboard (`docs/HOSTING.md`).
+
 - 2026-10-13 — **Jost self-hosted; Google Fonts import removed.** `global.css`
   loaded Jost from fonts.googleapis.com on every page, contradicting
   `privacy.html#hosting` ("no other third party is contacted when a page
@@ -111,7 +130,8 @@ _Last updated: 2026-10-13 (feedback form: the site's first server code, two Clou
   signup). The operator rejected email (it depends on the reader's mail app)
   and GitHub Issues, and chose this over a Google Form, which would add a
   third party to the privacy page and cannot confirm delivery. This relaxes the
-  "no backend" contract for `functions/` only. `privacy.html` gained a
+  "no backend" contract for that code only (now `worker/`, see the hosting
+  move above). `privacy.html` gained a
   `#feedback` section. Needs one-time dashboard setup before it works
   (`docs/FEEDBACK.md`).
 

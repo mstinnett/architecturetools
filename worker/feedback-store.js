@@ -1,6 +1,5 @@
-// Shared by the feedback collector (api/feedback.js) and the owner's inbox
-// (inbox.js). Not a route: it exports no onRequest handler. docs/FEEDBACK.md
-// has the Cloudflare setup.
+// Shared by the feedback collector (feedback.js) and the owner's inbox
+// (inbox.js). docs/FEEDBACK.md has the Cloudflare setup.
 
 // One table in the D1 database bound as FEEDBACK_DB. It is created on first
 // use, so setup needs no trip to the SQL console. Run this statement first in

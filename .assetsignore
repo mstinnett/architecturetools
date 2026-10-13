@@ -1,0 +1,23 @@
+# Files the Worker must NOT publish (gitignore syntax). The assets directory
+# is the repo root (wrangler.jsonc), so everything that isn't the site itself
+# is listed here: repo machinery, the Worker's own source and config, notes,
+# tooling, and the data tables the picker's JSON is built from.
+# A leading / anchors a name to the repo root. Without it, "data" would also
+# hide assets/data/, which the picker loads.
+/.git
+/.github
+/.claude
+/.wrangler
+/.gitignore
+/.gitattributes
+/.assetsignore
+/.nojekyll
+/CNAME
+/wrangler.jsonc
+/worker
+/docs
+/tools
+/data
+/scratch
+.DS_Store
+node_modules

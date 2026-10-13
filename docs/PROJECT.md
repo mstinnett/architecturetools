@@ -8,7 +8,7 @@ A static site for architects that combines three modes of content:
 2. **Sheet sets** — diagram-led editorial pages organized like drawing sets
 3. **Utility/reference sets** — calculators now, libraries later
 
-The site uses a minimal, high-contrast design language. No framework, no build tools, and no backend beyond the feedback form's two Cloudflare Pages Functions (`docs/FEEDBACK.md`). Vanilla HTML/CSS/JS served as static files. The aesthetic is architectural: precise, monochrome, monospaced labels, restrained diagrams, and generous whitespace.
+The site uses a minimal, high-contrast design language. No framework, no build tools, and no backend beyond the feedback form's two routes in the site's Cloudflare Worker (`docs/FEEDBACK.md`). Vanilla HTML/CSS/JS served as static files by Cloudflare (`docs/HOSTING.md`). The aesthetic is architectural: precise, monochrome, monospaced labels, restrained diagrams, and generous whitespace.
 
 ---
 
@@ -106,7 +106,8 @@ They are part of the site structure, but they do not need premature renaming or 
 │   └── README.md                   # The authoritative data-pipeline contract
 ├── tools/
 │   ├── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
-│   ├── test-feedback.mjs           # node tools/test-feedback.mjs — the feedback functions
+│   ├── test-feedback.mjs           # node tools/test-feedback.mjs — the feedback collector + inbox
+│   ├── test-hosting.mjs            # node tools/test-hosting.mjs — the router + what gets published
 │   └── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
 ├── calculators/                    # convert.html + the 3 lib modules it uses are LIVE on main; the rest is dev-only
 │   ├── convert.html                # Precise Unit Converter — engine-powered, LIVE
@@ -124,18 +125,23 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── parking-ratio.html          # LEGACY — code-lookup lineage, out of engine scope
 │   ├── egress-width.html           # LEGACY — code-lookup lineage, out of engine scope
 │   └── fixture-calc.html           # LEGACY — code-lookup lineage, out of engine scope
-├── functions/                      # Cloudflare Pages Functions — the site's only server code
-│   ├── api/feedback.js             # POST /api/feedback — saves a note to D1 (FEEDBACK_DB)
+├── worker/                         # The Cloudflare Worker — the site's only server code (docs/HOSTING.md)
+│   ├── index.js                    # Router: /api/feedback and /inbox; everything else is static files
+│   ├── feedback.js                 # POST /api/feedback — saves a note to D1 (FEEDBACK_DB)
 │   ├── inbox.js                    # /inbox — the owner's password-protected reading view
-│   └── _lib/feedback-store.js      # Shared table definition + same-site check (not a route)
+│   └── feedback-store.js           # Shared table definition + same-site check
+├── wrangler.jsonc                  # Worker config: assets = repo root, D1 binding, logging off
+├── .assetsignore                   # What the Worker never publishes (docs/, tools/, data/, …)
 ├── .github/workflows/
 │   └── build-data.yml              # Rebuilds hardware-data.json on push, commits it back
-├── CNAME                           # Custom domain: architecture.tools
-├── .nojekyll                       # Serve files as-is on GitHub Pages
+├── CNAME                           # GitHub Pages leftover — delete after the move (docs/HOSTING.md)
+├── .nojekyll                       # GitHub Pages leftover — delete after the move
 └── docs/
     ├── PROJECT.md                  # This file — actual repo & shipping state
     ├── SITE_FRAMEWORK.md           # The structural/editorial roadmap
     ├── HANDOFF.md                  # Calculator-engine charter, build plan, provenance
+    ├── HOSTING.md                  # Cloudflare Worker hosting, deploys, the move from GitHub Pages
+    ├── FEEDBACK.md                 # The feedback form and its private inbox
     ├── voice.md                    # Recommendation-copy voice & glossary
     └── decisions/                  # Autonomous work system (state, backlog, queue, guide)
 ```

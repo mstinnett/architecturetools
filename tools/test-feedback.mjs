@@ -1,12 +1,16 @@
 #!/usr/bin/env node
-// Checks the feedback collector (functions/api/feedback.js) and the owner's
-// inbox (functions/inbox.js) against a real SQLite database standing in for
+// Checks the feedback collector (worker/feedback.js) and the owner's inbox
+// (worker/inbox.js) against a real SQLite database standing in for
 // Cloudflare D1. Run: node tools/test-feedback.mjs
+// The router and what gets published: tools/test-hosting.mjs.
 // End-to-end on Cloudflare's own runtime: docs/FEEDBACK.md "Test locally".
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
-import { onRequestPost as send } from '../functions/api/feedback.js';
-import { onRequest as inbox } from '../functions/inbox.js';
+import { handleFeedback } from '../worker/feedback.js';
+import { handleInbox } from '../worker/inbox.js';
+
+const send = ({ request, env }) => handleFeedback(request, env);
+const inbox = ({ request, env }) => handleInbox(request, env);
 
 const SITE = 'https://architecture.tools';
 const PASSWORD = 'correct horse battery staple';

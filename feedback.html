@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- Feedback — the site's one form. It posts to the Pages Function in
-     functions/api/feedback.js, which keeps each note in Cloudflare D1 for the
+<!-- Feedback — the site's one form. It posts to the site's Worker
+     (worker/feedback.js), which keeps each note in Cloudflare D1 for the
      owner to read at /inbox (docs/FEEDBACK.md). With script it sends in
      place. Without script it is a plain form post that returns here to
      #sent or #not-sent. Nothing needs the reader's email app. -->

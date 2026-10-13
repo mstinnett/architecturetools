@@ -1,13 +1,13 @@
-// /inbox, the owner's private view of the notes sent from feedback.html
-// (docs/FEEDBACK.md). The browser asks for a password, checked against the
-// INBOX_PASSWORD secret; any user name is accepted. Until the secret and the
-// FEEDBACK_DB database are both set up, the route answers 404, so a
-// half-finished setup never shows the notes to anyone.
-import { schema, sameOrigin } from './_lib/feedback-store.js';
+// /inbox (routed by index.js), the owner's private view of the notes sent
+// from feedback.html (docs/FEEDBACK.md). The browser asks for a password,
+// checked against the INBOX_PASSWORD secret; any user name is accepted. Until
+// the secret and the FEEDBACK_DB database are both set up, the route answers
+// 404, so a half-finished setup never shows the notes to anyone.
+import { schema, sameOrigin } from './feedback-store.js';
 
 const SHOW = 500;   // newest notes listed; older ones stay in the table
 
-export async function onRequest({ request, env }) {
+export async function handleInbox(request, env) {
   if (!env.INBOX_PASSWORD || !env.FEEDBACK_DB) return new Response('Not found', { status: 404 });
   if (!(await authorized(request, env.INBOX_PASSWORD))) {
     return new Response('Enter the inbox password to read the feedback.', {

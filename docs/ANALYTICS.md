@@ -108,7 +108,10 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
   says a request may be answered outside the visitor's region. The statement
   also says the site does not use Cloudflare Web Analytics; if that is ever
   switched on in the Cloudflare dashboard, it becomes a second analytics
-  processor and the statement must name it. Fonts, scripts, and data are
+  processor and the statement must name it. The site runs as a Cloudflare
+  Worker (`docs/HOSTING.md`) with Workers Logs off (`"observability":
+  { "enabled": false }` in `wrangler.jsonc`), which is what keeps "the site
+  has no access to those logs" true; switching it on means rewording that. Fonts, scripts, and data are
   self-hosted except Plausible's own script, so no third party beyond
   Plausible is contacted by a page load. Both
   typefaces (Jost, League Spartan) are served from `assets/fonts/` via
@@ -118,7 +121,7 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
   Recommendation links are outbound and non-affiliate; only
   `Outbound Link: Click` counts them, without any visitor identifier.
 - **Feedback.** `feedback.html` is the one place where a visitor's typing
-  leaves the browser. `functions/api/feedback.js` keeps the note, an optional
+  leaves the browser. `worker/feedback.js` keeps the note, an optional
   reply address, the page on this site it was sent from, and the time, in
   Cloudflare D1 under the site's own account (Cloudflare as processor). It
   never keeps the IP address, the user agent, or a cookie. The statement's
