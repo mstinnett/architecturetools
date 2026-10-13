@@ -46,8 +46,9 @@ _Last updated: 2026-10-13 (feedback form: the site's first server code, two Clou
   warm sheet theme; imports `assets/css/tokens.css`, the canonical color
   palette; owns the per-family accent system selected via `data-family` on
   `<html>`, the one shared dark scheme, and the two type tokens —
-  `--font-body` for reading, `--font-mark` for the wordmark, whose face is
-  self-hosted from `assets/fonts/`). The picker and converter use it
+  `--font-body` for reading, `--font-mark` for the wordmark; both faces are
+  self-hosted from `assets/fonts/`, so no page load contacts a font
+  service). The picker and converter use it
   fully; `components.html` and `dimension-converter.html` link it and inherit
   the theme (the old cool-neutral sheet of the same name was replaced —
   same class/token vocabulary, re-valued). `assets/js/ui.js` — the shared page
@@ -92,6 +93,15 @@ _Last updated: 2026-10-13 (feedback form: the site's first server code, two Clou
   of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
 
 ## Recent decisions
+
+- 2026-10-13 — **Jost self-hosted; Google Fonts import removed.** `global.css`
+  loaded Jost from fonts.googleapis.com on every page, contradicting
+  `privacy.html#hosting` ("no other third party is contacted when a page
+  loads"). It now serves Google's own Jost 3.710 variable files (latin,
+  latin-ext, cyrillic; ~54KB total, usually only latin's 26KB is fetched)
+  from `assets/fonts/` with Google's unicode-ranges, declared for weights
+  300–500 as before. Every live page rendered pixel-identical before and
+  after, light and dark.
 
 - 2026-10-13 — **Feedback form, collected on Cloudflare** (operator-directed).
   Readers send notes from `feedback.html` (linked in every live footer); a

@@ -90,7 +90,9 @@ They are part of the site structure, but they do not need premature renaming or 
 │   │   └── tokens.css              # Canonical color palette (family accents + grounds)
 │   ├── fonts/
 │   │   ├── league-spartan-400.woff2  # --font-mark, the wordmark face (display only)
-│   │   └── LICENSE-league-spartan.txt # SIL OFL
+│   │   ├── LICENSE-league-spartan.txt # SIL OFL
+│   │   ├── jost-latin.woff2          # --font-body, Jost variable (also -latin-ext, -cyrillic)
+│   │   └── LICENSE-jost.txt          # SIL OFL
 │   └── data/
 │       └── hardware-data.json      # GENERATED from data/*.csv — do not hand-edit
 ├── data/                           # Hardware data source (edit in Numbers; see data/README.md)

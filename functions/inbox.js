@@ -79,8 +79,8 @@ async function list(db) {
       'Content-Security-Policy': [
         "default-src 'none'",
         `script-src 'nonce-${nonce}'`,
-        `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
-        "font-src 'self' https://fonts.gstatic.com",
+        `style-src 'self' 'nonce-${nonce}'`,
+        "font-src 'self'",
         'img-src data:',
         "form-action 'self'",
         "frame-ancestors 'none'",

@@ -109,7 +109,11 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
   also says the site does not use Cloudflare Web Analytics; if that is ever
   switched on in the Cloudflare dashboard, it becomes a second analytics
   processor and the statement must name it. Fonts, scripts, and data are
-  self-hosted, so no other third party is contacted by a page load.
+  self-hosted, so no other third party is contacted by a page load. Both
+  typefaces (Jost, League Spartan) are served from `assets/fonts/` via
+  `@font-face` in `global.css`. Until 2026-10-13 Jost came from a Google
+  Fonts `@import`, which broke this claim; never reintroduce a font service
+  or CDN without naming it in the statement.
   Recommendation links are outbound and non-affiliate; only
   `Outbound Link: Click` counts them, without any visitor identifier.
 - **Feedback.** `feedback.html` is the one place where a visitor's typing
