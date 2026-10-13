@@ -125,7 +125,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PB64",
       "price": "$600--$900",
-      "note": "Up to 64 GB, drives two displays up to 6K. Mounts behind a monitor, and silent.",
+      "note": "Up to 64 GB, drives four 4K displays. Mounts behind a monitor, and quiet.",
       "workloadProfiles": [
         "review",
         "drafting"
@@ -140,7 +140,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PN55",
       "price": "$600--$800",
-      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Drives two displays up to 6K.",
+      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Up to 96 GB, and drives four 4K displays.",
       "workloadProfiles": [
         "review",
         "drafting"
@@ -367,7 +367,7 @@
   },
   "PrebuiltTypeNotes": {
     "builder": "Bespoke builders who spec, test, and support the machine, and walk you through the order. The best route for a small firm with no IT.",
-    "mini": "Silent and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.",
+    "mini": "Quiet and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.",
     "office": "A standard office tower. A few fit a modest GPU, enough for drafting and modeling, but rarely a fast one.",
     "workstation": "Certified and supported for professional software, but limited to pro GPUs, not gaming ones. Fine for modeling, short on power for serious visualization. Most architects don't need the certification, so don't pay the premium for it unless your firm requires it.",
     "gaming": "The best value when you need a powerful GPU. The cooling and power supply it needs come standard, so it beats a pricier workstation at Enscape, Lumion, and V-Ray."
