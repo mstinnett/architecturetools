@@ -41,6 +41,11 @@ Nothing breaks.
 
 ## Reading and clearing notes
 
+**The privacy statement promises every note is deleted after it is read, or
+after the reply if the reader asked for an answer** (`privacy.html#feedback`).
+Nothing deletes notes automatically, so that promise is kept by pressing
+Delete: read a note, answer it if it has a reply address, then delete it.
+
 - `/inbox` works on a phone. The browser can save the password.
 - Delete is per note: open "Delete", then press "Delete this note".
 - To clear many at once, use the D1 console (Storage & Databases > D1 > the

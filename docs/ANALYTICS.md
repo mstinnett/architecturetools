@@ -125,8 +125,11 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
   reply address, the page on this site it was sent from, and the time, in
   Cloudflare D1 under the site's own account (Cloudflare as processor). It
   never keeps the IP address, the user agent, or a cookie. The statement's
-  `#feedback` section lists exactly those four items, names legitimate
-  interest as the basis, and promises deletion on request (`#rights`, `#us`).
+  `#feedback` section lists exactly those four items and promises each note
+  is deleted after it is read, or after the reply when an answer was
+  requested. Nothing deletes automatically, so the owner keeps that promise
+  by deleting from `/inbox` (`docs/FEEDBACK.md`). `#basis` names legitimate
+  interest; `#rights` and `#us` cover deletion on request.
   If the form gains a field or the function starts keeping anything else,
   update the statement. Operations: `docs/FEEDBACK.md`.
 - **Named events.** The statement promises that only fixed category names
