@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-10-13 (feedback form: the site's first server code, two Cloudflare Pages Functions over D1)_
+_Last updated: 2026-10-13 (feedback form: the site's first server code, two Cloudflare Pages Functions over D1; Jost self-hosted, Google Fonts import removed)_
 
 ## Live architectural picture
 
