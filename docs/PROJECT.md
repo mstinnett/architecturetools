@@ -426,6 +426,20 @@ promote them as each is ready, not to land them all at once.
   on its list's shelf; a new set is a `.cover-list`.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
+- **Software choosers** (landed 2026-10-08), three named live pages in the
+  picker's register, indexed on the cover under a **Software** group:
+  `pdf-markup.html` (PDF Markup & Review), `bim-platforms.html` (BIM & Design
+  Platforms: Revit, Archicad, Vectorworks, Rhino, SketchUp, AutoCAD, Chief
+  Architect, the renderers) and `bim-emerging.html` (Emerging BIM: Motif,
+  Snaptrude, Qonic, Arcol, Forma, Rayon...). Each is filter controls over
+  static `<article class="tool">` cards (readable without JS, indexable),
+  then short answers and context. One behaviour, `assets/js/chooser.js` (its
+  header is the data-* contract); one style block, global.css "CHOOSER".
+  Platforms are native apps plus "web" as its own platform; web never
+  stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
+  editorial and labelled so. Adequate Design Review is listed on the PDF
+  page with a disclosure. Prices are rounded from third-party sources —
+  re-check vendor facts when updating.
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
   label ("Calculators → Precise Unit Converter"); the cover indexes each live
