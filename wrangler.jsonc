@@ -29,5 +29,9 @@
   "observability": { "enabled": false },
 
   // The *.workers.dev address, for testing before the domain moves over.
-  "workers_dev": true
+  // Set to false once architecture.tools points here (docs/HOSTING.md step 7).
+  "workers_dev": true,
+  // No per-version preview addresses: each would be another public copy of
+  // the site, writing to the same feedback database.
+  "preview_urls": false
 }

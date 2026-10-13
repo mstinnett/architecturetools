@@ -76,8 +76,9 @@ If spam still gets through, Cloudflare has two free fixes:
 ```sh
 node tools/test-feedback.mjs          # handlers + SQL, no Cloudflare tooling needed
 
-# The real Worker with a local database (state goes in .wrangler/):
-npx wrangler dev --var INBOX_PASSWORD:test
+# The real Worker with a local database, kept outside the repo
+# (docs/HOSTING.md "Run it locally" says why):
+npx wrangler dev --persist-to ../.wrangler-state --var INBOX_PASSWORD:test
 # then open http://localhost:8787/feedback.html and http://localhost:8787/inbox
 ```
 

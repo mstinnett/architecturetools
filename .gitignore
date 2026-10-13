@@ -10,5 +10,5 @@ __pycache__/
 scratch/*
 !scratch/.gitkeep
 
-# Local Cloudflare runtime state (`wrangler pages dev`, docs/FEEDBACK.md)
+# Local Cloudflare build output (`wrangler dev`, docs/HOSTING.md)
 .wrangler/

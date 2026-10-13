@@ -29,13 +29,16 @@ existing link and bookmark keeps working. `/` serves `index.html`.
 Do these in order. Until step 5 the live site stays on GitHub Pages and
 works as before; only the feedback form says "not sent".
 
-1. **Merge this work into `main`.** GitHub Pages ignores the Worker files, so
-   nothing changes for visitors yet.
+1. **Merge this work into `main`.** GitHub Pages serves the new files as
+   plain files (harmless: the repo is public) and nothing changes for
+   visitors yet.
 2. **Create the Worker from the repo.** Cloudflare dashboard > Workers & Pages >
    Create > Import a repository > GitHub > `mstinnett/architecturetools`.
    - Project name: **`architecturetools`** (must match `name` in `wrangler.jsonc`).
    - Production branch: `main`. Build command: leave empty.
      Deploy command: `npx wrangler deploy` (the default).
+   - Check the first build log: with no `package.json`, the build picks its
+     own wrangler version, and one too old for `wrangler.jsonc` fails loudly.
    - The first deploy creates the D1 database `architecturetools-feedback`.
      If you already made a database with exactly that name, it connects to it
      instead. A database you made under another name is unused: delete it, or
@@ -57,20 +60,34 @@ works as before; only the feedback form says "not sent".
      AAAA `2606:50c0:8000::153` to `2606:50c0:8003::153`, or a CNAME to
      `mstinnett.github.io`) under the zone's DNS > Records, then add the custom
      domain again. HTTPS is set up automatically.
-   - If `www.architecture.tools` is in use, keep it working with a redirect:
-     the zone > Rules > Redirect Rules > template "Redirect from WWW to root".
+   - If `www.architecture.tools` is in use, keep it working with a redirect.
+     A redirect rule only runs on a proxied (orange-cloud) record, so first
+     replace any `www` record pointing at GitHub (usually a CNAME to
+     `mstinnett.github.io`) with a proxied placeholder: type AAAA, name `www`,
+     address `100::`. Then the zone > Rules > Redirect Rules > template
+     "Redirect from WWW to root".
 6. **Turn off GitHub Pages.** GitHub > the repo > Settings > Pages >
-   Branch: None > Save, and clear the custom domain there. Then delete
-   `CNAME` and `.nojekyll` from the repo; they only served GitHub Pages.
+   Branch: None > Save, and clear the custom domain there. Then check the
+   zone's DNS has **no record left pointing at GitHub** (any `185.199.*`
+   address, `2606:50c0:*` address, or `github.io` CNAME, most often on `www`).
+   Once Pages is off, a leftover record lets another GitHub user claim the
+   name and serve their own site on it.
+7. **Tidy the repo.** Delete `CNAME` and `.nojekyll` (they only served GitHub
+   Pages) and set `"workers_dev": false` in `wrangler.jsonc`, so the site is no
+   longer also public at the workers.dev address, with its own working form
+   and inbox.
 
 If something is wrong after step 5, the Worker's Deployments tab can roll
-back to an earlier version, or re-adding the GitHub DNS records and turning
-GitHub Pages back on restores the old host.
+back to an earlier version. To go back to GitHub Pages instead: remove the
+Worker's custom domain first (its managed DNS record blocks the old ones),
+then re-add the GitHub records and turn GitHub Pages back on.
 
 ## Day to day
 
 - A push to `main` deploys. The `build-data` workflow's own commit (the
-  rebuilt `assets/data/hardware-data.json`) deploys the same way.
+  rebuilt `assets/data/hardware-data.json`) deploys the same way. That
+  commit must not carry `[skip ci]`: Cloudflare's Git builds skip commits
+  tagged that way, and the picker would never get the new data.
 - Build logs: the Worker > Deployments, or Settings > Builds.
 - **Logging is off** (`"observability": { "enabled": false }`), so Cloudflare
   keeps no per-request log of the Worker this site could read. That is what
@@ -85,7 +102,12 @@ GitHub Pages back on restores the old host.
 ```sh
 node tools/test-hosting.mjs && node tools/test-feedback.mjs
 
-# The real Worker, static files and a local database (state goes in .wrangler/):
-npx wrangler dev --var INBOX_PASSWORD:test
+# The real Worker, static files and a local database:
+npx wrangler dev --persist-to ../.wrangler-state --var INBOX_PASSWORD:test
 # then open http://localhost:8787/
 ```
+
+Keep `--persist-to` pointing outside the repo. The repo root is the assets
+folder, and wrangler restarts whenever a file in it changes, so a local
+database kept inside it (the default, `.wrangler/state`) makes it restart on
+every write and never answer.
