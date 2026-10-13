@@ -100,6 +100,23 @@ await check('empty and over-length notes are refused; 4000 characters fit', asyn
   assert.equal(await status({ message: '建'.repeat(4000) }), 200);
   assert.equal(rows(db).length, 1);
 });
+await check('a no-referrer browser is let in by Sec-Fetch-Site, never another site', async () => {
+  const db = d1();
+  const status = async (origin, site) =>
+    (await send({ request: post('/api/feedback', { message: 'x' }, { origin, headers: site ? { 'Sec-Fetch-Site': site } : {} }), env: env(db) })).status;
+  assert.equal(await status('null', 'same-origin'), 200);
+  assert.equal(await status('null', 'cross-site'), 403);
+  assert.equal(await status('null', null), 403);
+  assert.equal(await status('https://evil.example', 'same-origin'), 403);
+  assert.equal(rows(db).length, 1);
+});
+await check('line breaks count and store as one character on either path', async () => {
+  const db = d1();
+  const crlf = 'abc\r\n'.repeat(900);   // 4500 sent, 3600 once normalized
+  const res = await send({ request: post('/api/feedback', { message: crlf }, { json: false }), env: env(db) });
+  assert.equal(res.headers.get('Location'), SITE + '/feedback.html#sent');
+  assert.equal(rows(db)[0].message, 'abc\n'.repeat(900).trim());
+});
 await check('with no database bound the form reports unavailable', async () => {
   const res = await send({ request: post('/api/feedback', { message: 'x' }), env: {} });
   assert.equal(res.status, 503);

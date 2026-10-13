@@ -18,8 +18,12 @@ export function schema(db) {
 }
 
 // Browsers send Origin on every POST, so a post from another site's page
-// carries that site's origin, and one with none came from a script rather
-// than a reader's browser.
+// carries that site's origin. A browser set to send no referrer reports
+// "Origin: null" instead; then Sec-Fetch-Site decides, which the browser sets
+// itself and no page can change. A post with neither came from a script
+// rather than a reader's browser.
 export function sameOrigin(request) {
-  return request.headers.get('Origin') === new URL(request.url).origin;
+  const origin = request.headers.get('Origin');
+  if (origin && origin !== 'null') return origin === new URL(request.url).origin;
+  return request.headers.get('Sec-Fetch-Site') === 'same-origin';
 }

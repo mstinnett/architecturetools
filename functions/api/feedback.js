@@ -23,7 +23,9 @@ export async function onRequestPost({ request, env }) {
 
   let form;
   try { form = await request.formData(); } catch { return done(400, 'format'); }
-  const field = (name) => String(form.get(name) ?? '').trim();
+  // A plain form post sends each line break as \r\n, two characters toward
+  // the limit. Count and store them as one, the same as the script path.
+  const field = (name) => String(form.get(name) ?? '').replace(/\r\n?/g, '\n').trim();
 
   // The "website" field is hidden from people, so only bots fill it in. They
   // get the same answer a person does and learn nothing from it.

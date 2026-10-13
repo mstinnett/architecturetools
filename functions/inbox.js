@@ -72,7 +72,7 @@ async function list(db) {
       'Cache-Control': 'no-store',
       'X-Robots-Tag': 'noindex, nofollow',
       // Not no-referrer: under that policy the browser sends "Origin: null"
-      // with the delete form, and remove() would refuse the owner.
+      // with the delete form, leaving remove() only Sec-Fetch-Site to go on.
       'Referrer-Policy': 'same-origin',
       // Nothing a reader typed can run here: every value is escaped, and only
       // this response's own script and style may execute.
