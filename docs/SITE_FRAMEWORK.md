@@ -134,9 +134,14 @@ AT-0 should make the site feel whole even if the numbered sets are still thin.
 > tool actually produces, not an illustration of it; a tool that can't show
 > its own drawing doesn't belong on one.
 >
-> The cover lists **only what is live** — the picker (Computer Chooser) and the
-> Precise Unit Converter — rather than stubbing the unbuilt set covers, so
-> nothing on it 404s. Destinations above join as they ship: one `.cover-card`
+> The calculator shelf under the feature carries Stairs, Slope, Tile and Scale
+> Resolution, each plate its page's own figure for its worked example. The
+> second list, **What tool to buy or use**, holds the Computer Chooser and the
+> three software choosers (PDF Markup & Review, BIM & Design Platforms,
+> Emerging BIM).
+>
+> The cover lists **only what is live** rather than stubbing the unbuilt set
+> covers, so nothing on it 404s. Destinations above join as they ship: one `.cover-card`
 > on its list's shelf for a tool, a `.cover-list` for a set.
 >
 > The cover carries **no thesis line** (the "one-line thesis" bullet above was
@@ -316,8 +321,9 @@ The L-series matters now because the site should be organized so these can be ad
 
 These remain important and should stay prominent even though they are not yet numbered.
 
-> **Status (2026-08-04):** live on `main` are the AT-0 cover (`index.html`),
-> the picker (`picker.html`), and the converter. `components.html` and
+> **Status (2026-10-13):** live on `main` are the AT-0 cover (`index.html`),
+> the picker (`picker.html`), five calculators (the converter, Stairs, Slope,
+> Tile, Scale Resolution) and the three software choosers. `components.html` and
 > `site-screen.html` are full pages on `dev`, awaiting promotion. See
 > `docs/PROJECT.md`.
 

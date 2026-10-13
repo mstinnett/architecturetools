@@ -16,10 +16,12 @@ The site uses a minimal, high-contrast design language. No framework, no build t
 
 This file records actual repo and shipping state, and that now differs by branch:
 
-- **`main` — the live site: the AT-0 cover, the picker, and the converter.**
-  `index.html` is the cover sheet; the picker is back at `picker.html` and the
-  Precise Unit Converter at `calculators/convert.html`, plus their support
-  files. `components.html`, `site-screen.html`, and the rest of `calculators/`
+- **`main` — the live site: the AT-0 cover, the picker, five calculators and
+  three software choosers.** `index.html` is the cover sheet; the picker is
+  back at `picker.html`; the calculators are the Precise Unit Converter
+  (`calculators/convert.html`) and, promoted from `dev` 2026-10-13, Stairs,
+  Slope, Tile and Scale Resolution; the choosers are `pdf-markup.html`,
+  `bim-platforms.html` and `bim-emerging.html`; plus their support files. `components.html`, `site-screen.html`, and the rest of `calculators/`
   were trimmed off `main` in `f01b200`.
 - **`dev` — the workbench (this branch).** The full site below **plus** the
   calculator engine (`calculators/lib/`) and the shipped Precise Unit Converter
@@ -150,8 +152,9 @@ Notes:
 - `/a/`, `/c/`, and `/l/` are the long-term structural homes (not created yet).
 - `calculators/index.html` (a C-0 cover) is not built yet; add it once the
   engine-based tools settle.
-- On `main` the live pages are the cover, the picker, and the converter; the
-  rest of this tree is `dev`-only until promoted.
+- On `main` the live pages are the cover, the picker, the converter, Stairs,
+  Slope, Tile, Scale Resolution and the three software choosers; the rest of
+  this tree is `dev`-only until promoted.
 
 ---
 
@@ -421,13 +424,27 @@ promote them as each is ready, not to land them all at once.
   its name and one line), with keys at the end of the rule while the shelf
   overflows. The calculators lead, opening on a **featured plate** for the
   Precise Unit Converter at full width — its real figure beside the name, the
-  line and three worked inputs that open the converter on them — and the
-  Computer Chooser follows as its own list. Adding a tool is one `.cover-card`
+  line and three worked inputs that open the converter on them — over a shelf
+  of Stairs, Slope, Tile and Scale Resolution, each plate carrying its page's
+  own figure. The second list, **What tool to buy or use**, holds the Computer
+  Chooser and the three software choosers. Adding a tool is one `.cover-card`
   on its list's shelf; a new set is a `.cover-list`.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
-- **Software choosers** (landed 2026-10-08), three named live pages in the
-  picker's register, indexed on the cover under a **Software** group:
+- `calculators/stairs.html`, `slope.html`, `tile.html`, `scale.html` — Stairs,
+  Slope, Tile and Scale Resolution, promoted from `dev` 2026-10-13 at the
+  operator's ask to show calculators on the cover, with the figure modules
+  they load (`stairfig.js`, `slopefig.js`, `partition.js`). Promoted the way
+  the converter was: noindex off; Plausible, the light/dark key, and Privacy
+  and Feedback in the footer on; **recent readings left out** (`UI.recents`
+  stays on `dev`), since `privacy.html#storage` promises the scheme key is the
+  only thing a page writes to the browser — bringing recents means rewording
+  that section first. Links to pages not yet live are cut: Stairs' crumb
+  "Calculators" is a label, and Scale's cross-link to Sheet Sizes waits in a
+  comment.
+- **Software choosers** (landed 2026-10-08, merged to the lists cover
+  2026-10-13), three named live pages in the picker's register, indexed on
+  the cover in the **What tool to buy or use** list:
   `pdf-markup.html` (PDF Markup & Review), `bim-platforms.html` (BIM & Design
   Platforms: Revit, Archicad, Vectorworks, Rhino, SketchUp, AutoCAD, Chief
   Architect, the renderers) and `bim-emerging.html` (Emerging BIM: Motif,
@@ -443,8 +460,8 @@ promote them as each is ready, not to land them all at once.
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
   label ("Calculators → Precise Unit Converter"); the cover indexes each live
-  tool; each tool's back-link returns to the cover. C-0 is deferred until
-  the set has a second shipped tool.
+  tool; each tool's back-link returns to the cover. C-0 was deferred until
+  the set had a second shipped tool; it now has five, so C-0 is due (backlog).
 - Every title block carries the light/dark key (`.scheme-toggle` in
   `global.css`, wired once in `assets/js/ui.js`); the choice persists in
   `localStorage` and follows the reader across pages.

@@ -19,13 +19,17 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
 - **Two branches (read `docs/HANDOFF.md` first):**
   - **`main` — the live site: the AT-0 cover (`index.html`, home) + the picker
     (`picker.html`) + the Precise Unit Converter** (`calculators/convert.html`
-    + the three lib modules it loads — promoted 2026-06-09). Plus `assets/`,
+    + the three lib modules it loads — promoted 2026-06-09) **+ Stairs, Slope,
+    Tile and Scale Resolution** (promoted 2026-10-13) **+ the three software
+    choosers** (`pdf-markup.html`, `bim-platforms.html`, `bim-emerging.html`).
+    Plus `assets/`,
     `data/`, `tools/`, `docs/`, the `build-data` workflow, `CNAME`,
     `.nojekyll`. Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb
     (site title home link + set-trail label) on every page; the **cover** is
     the index of live tools — a stack of lists, one per set, each a titled
     shelf of plates; the calculators lead, opening on the converter as a
-    full-width featured plate. Each tool back-links to the cover. Nothing
+    full-width featured plate over a shelf of the other four, then **What tool
+    to buy or use**. Each tool back-links to the cover. Nothing
     links a deferred page, so nothing 404s. Publishing a tool = adding its
     `.cover-card` to its list's shelf.
   - **`dev` — the workbench (this branch).** The full prior site
@@ -40,11 +44,12 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   `snap.js` (fails loud, floor/nearest/ceil to a grid), `numberline.js` (pure
   SVG string), and `partition.js` (fails loud; divides a run into a whole number
   of equal parts — sections, tiles, on-center, balusters — and exposes the
-  residual; reuses snap's integer division). `convert.html`, the Precise Unit
-  Converter, is the only **tool page** yet built on the engine — **shipped and
-  frozen**; it uses parse/snap/numberline. `partition.js` is landed and tested
-  but has no tool page yet. Every other `calculators/*.html` is older,
-  standalone, and does **not** use the engine.
+  residual; reuses snap's integer division). On `main` five tool pages run on
+  the engine: `convert.html` (the Precise Unit Converter, **shipped and
+  frozen**) and, promoted from `dev` 2026-10-13, `stairs.html`, `slope.html`,
+  `tile.html` and `scale.html`, with the figure modules `stairfig.js` and
+  `slopefig.js`; `partition.js` is loaded by Stairs. The rest of `dev`'s
+  engine tools await promotion.
 - **Structure:** a "set of sets" — AT-0 master cover, A-series (editorial),
   C-series (calculators), L-series (library). Roadmap in `docs/SITE_FRAMEWORK.md`.
 - **Shared assets:** `assets/css/global.css` — THE shared stylesheet (the
@@ -99,6 +104,28 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
 
 ## Recent decisions
+
+- 2026-10-13 — **Four calculators promoted; the software choosers join the
+  cover** (operator: "show a few calculators on it and show the PDF and BIM
+  pages on the computer chooser row — calculators and what tool to buy/use").
+  Stairs, Slope, Tile and Scale Resolution came from `dev` (the suite map's
+  exemplars plus Stairs), promoted the way the converter was, and **without
+  recent readings**: `privacy.html#storage` says the scheme key is the only
+  thing written to the browser, so `UI.recents` stays on `dev` until that
+  section is reworded. Links to unpromoted pages were cut (Stairs' crumb,
+  Scale → Sheet Sizes). `claude/gracious-tesla-akyt3w` was merged for the PDF
+  and BIM choosers; their footers gained the Feedback link. On the cover the
+  calculators list keeps the converter feature and gains a shelf beneath it
+  with its own untitled rule and keys (keys belong to the head directly above
+  a shelf); each calculator plate is its page's own figure captured at phone
+  width and cropped to 5:4 (Scale's range end values and Tile's key line
+  dropped, as the converter plate drops its bound labels). The second list is
+  **What tool to buy or use**: Chooser, PDF, BIM, Emerging BIM. The privacy
+  page's tools line now covers every tool. Verified: gate green; promoted and
+  chooser pages pass in both schemes at 1280 and 390 (no errors, no missing
+  files, key flips the scheme, no overflow); a cover pass checks every plate's
+  labels for overlaps, clipping and erased text at four widths, both shelves'
+  keys, every card's target, and tab order.
 
 - 2026-10-13 — **The cover becomes a stack of lists, and features the
   converter** (operator: "instead of one list with sections I want the
