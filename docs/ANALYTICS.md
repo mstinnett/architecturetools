@@ -85,7 +85,7 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
   6(1)(f)), the purpose (which tools are used), what is received, where it is
   processed (Plausible's EU-owned servers in Germany, Plausible Insights OÜ as
   processor under its DPA), the rights that apply, and a contact route (the
-  repository's issue tracker). No data-subject record can be located because
+  feedback form or the repository's issue tracker). No data-subject record can be located because
   no identifier is retained; the statement says so rather than promising a
   lookup it cannot perform.
 - **ePrivacy Directive / UK PECR.** Plausible sets no cookies and writes
@@ -99,7 +99,8 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
 - **CCPA / CPRA and other US state laws.** The site is far below the
   revenue and volume thresholds, but California's CalOPPA has no threshold,
   so the statement is published anyway and states plainly: no sale or
-  sharing, no targeted advertising, nothing retained.
+  sharing, no targeted advertising, nothing retained but feedback a visitor
+  chooses to send.
 - **Hosting.** The site is served by Cloudflare, which handles visitor IPs
   and request headers to deliver pages, defend against abuse, and keep
   short-lived logs under the Cloudflare Privacy Policy; the site has no
@@ -111,6 +112,15 @@ rests on, and what to re-check when the tracker, the host, or the tools change:
   self-hosted, so no other third party is contacted by a page load.
   Recommendation links are outbound and non-affiliate; only
   `Outbound Link: Click` counts them, without any visitor identifier.
+- **Feedback.** `feedback.html` is the one place where a visitor's typing
+  leaves the browser. `functions/api/feedback.js` keeps the note, an optional
+  reply address, the page on this site it was sent from, and the time, in
+  Cloudflare D1 under the site's own account (Cloudflare as processor). It
+  never keeps the IP address, the user agent, or a cookie. The statement's
+  `#feedback` section lists exactly those four items, names legitimate
+  interest as the basis, and promises deletion on request (`#rights`, `#us`).
+  If the form gains a field or the function starts keeping anything else,
+  update the statement. Operations: `docs/FEEDBACK.md`.
 - **Named events.** The statement promises that only fixed category names
   are sent, never entered values or full configurations. `assets/js/analytics.js`
   is the code that keeps that promise; `node tools/test-analytics.mjs` checks it.

@@ -8,7 +8,7 @@ A static site for architects that combines three modes of content:
 2. **Sheet sets** — diagram-led editorial pages organized like drawing sets
 3. **Utility/reference sets** — calculators now, libraries later
 
-The site uses a minimal, high-contrast design language. No framework, no build tools, no backend. Vanilla HTML/CSS/JS served as static files. The aesthetic is architectural: precise, monochrome, monospaced labels, restrained diagrams, and generous whitespace.
+The site uses a minimal, high-contrast design language. No framework, no build tools, and no backend beyond the feedback form's two Cloudflare Pages Functions (`docs/FEEDBACK.md`). Vanilla HTML/CSS/JS served as static files. The aesthetic is architectural: precise, monochrome, monospaced labels, restrained diagrams, and generous whitespace.
 
 ---
 
@@ -73,6 +73,8 @@ They are part of the site structure, but they do not need premature renaming or 
 ```text
 /
 ├── index.html                      # AT-0 — the master cover sheet; indexes every live tool
+├── feedback.html                   # The feedback form; notes go to D1, read at /inbox (docs/FEEDBACK.md)
+├── privacy.html                    # Privacy & analytics statement, linked from every footer
 ├── picker.html                     # The picker (Computer Chooser) — flagship live page
 ├── components.html                 # Flagship live component recommendation page
 ├── site-screen.html                # Flagship live site feasibility page
@@ -102,6 +104,7 @@ They are part of the site structure, but they do not need premature renaming or 
 │   └── README.md                   # The authoritative data-pipeline contract
 ├── tools/
 │   ├── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
+│   ├── test-feedback.mjs           # node tools/test-feedback.mjs — the feedback functions
 │   └── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
 ├── calculators/                    # convert.html + the 3 lib modules it uses are LIVE on main; the rest is dev-only
 │   ├── convert.html                # Precise Unit Converter — engine-powered, LIVE
@@ -119,6 +122,10 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── parking-ratio.html          # LEGACY — code-lookup lineage, out of engine scope
 │   ├── egress-width.html           # LEGACY — code-lookup lineage, out of engine scope
 │   └── fixture-calc.html           # LEGACY — code-lookup lineage, out of engine scope
+├── functions/                      # Cloudflare Pages Functions — the site's only server code
+│   ├── api/feedback.js             # POST /api/feedback — saves a note to D1 (FEEDBACK_DB)
+│   ├── inbox.js                    # /inbox — the owner's password-protected reading view
+│   └── _lib/feedback-store.js      # Shared table definition + same-site check (not a route)
 ├── .github/workflows/
 │   └── build-data.yml              # Rebuilds hardware-data.json on push, commits it back
 ├── CNAME                           # Custom domain: architecture.tools

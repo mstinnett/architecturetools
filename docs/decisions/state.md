@@ -4,13 +4,14 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to picker.html; the light/dark key is now shared on every page)_
+_Last updated: 2026-10-13 (feedback form: the site's first server code, two Cloudflare Pages Functions over D1)_
 
 ## Live architectural picture
 
 - **What this is:** `architecture.tools` — a static site for architects.
-  Vanilla HTML/CSS/JS. No framework, no build step, no backend
-  (`docs/PROJECT.md`).
+  Vanilla HTML/CSS/JS. No framework, no build step, and no backend except
+  the feedback form's two Cloudflare Pages Functions (`functions/`,
+  `docs/FEEDBACK.md`) (`docs/PROJECT.md`).
 - **Two branches (read `docs/HANDOFF.md` first):**
   - **`main` — the live site: the AT-0 cover (`index.html`, home) + the picker
     (`picker.html`) + the Precise Unit Converter** (`calculators/convert.html`
@@ -68,6 +69,9 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
 - `docs/HANDOFF.md` — the calculator-engine charter: the engine model, the
   build plan, and the provenance rule.
 - The "no build tools / no framework / no backend" rule for the site itself.
+  One operator-approved exception: `functions/` (the feedback collector and
+  its inbox). Static pages never call into it except `feedback.html`'s post,
+  and a new server feature is a new exception, not a precedent.
 - The shared-CSS vocabulary: `assets/css/tokens.css` (canonical palette;
   the only definer of `--paper` and the other ground anchors) +
   `assets/css/global.css` (theme + components, family accents via
@@ -88,6 +92,18 @@ _Last updated: 2026-08-04 (AT-0 cover landed on main; the picker moved back to p
   of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
 
 ## Recent decisions
+
+- 2026-10-13 — **Feedback form, collected on Cloudflare** (operator-directed).
+  Readers send notes from `feedback.html` (linked in every live footer); a
+  Pages Function saves them to a D1 database in the site's Cloudflare account,
+  and the owner reads them at `/inbox` behind an `INBOX_PASSWORD` secret
+  (HTTP Basic auth, chosen over Cloudflare Access to avoid a Zero Trust
+  signup). The operator rejected email (it depends on the reader's mail app)
+  and GitHub Issues, and chose this over a Google Form, which would add a
+  third party to the privacy page and cannot confirm delivery. This relaxes the
+  "no backend" contract for `functions/` only. `privacy.html` gained a
+  `#feedback` section. Needs one-time dashboard setup before it works
+  (`docs/FEEDBACK.md`).
 
 - 2026-08-04 — **AT-0 cover landed on `main`** (operator-directed, worked
   directly on the live branch). `index.html` is now the master cover sheet:

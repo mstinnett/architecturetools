@@ -9,3 +9,6 @@ __pycache__/
 .claude/gate/node_modules/
 scratch/*
 !scratch/.gitkeep
+
+# Local Cloudflare runtime state (`wrangler pages dev`, docs/FEEDBACK.md)
+.wrangler/
