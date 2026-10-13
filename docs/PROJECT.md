@@ -416,14 +416,14 @@ promote them as each is ready, not to land them all at once.
   it, and stays. The cover runs on **one content surface** — the sheet's
   background, border and shadow are switched off here, and cards are drawn on
   that surface with hairlines rather than lifted off it. Below the bar, a
-  **card band**: each live tool is a plate (its own drawing over name and one
-  line), plates grouped by set, the strip scrolling sideways
-  with chevrons at the edges and a category nav below that doubles as the
-  scrollbar. This is the picker's software selector at cover scale — same
-  parts, same behaviour, `cover-*` in place of `sw-*`. Below 820px the field
-  turns vertical and that nav becomes a rail down the left edge; it is one
-  scrubber reading its axis from the layout, not two. Adding a tool is one
-  `.cover-card`; a new category is a `.cover-group` plus its nav item.
+  **stack of lists**, one per set (2026-10-13): each list is a title on a
+  hairline rule over its own sideways shelf of plates (a tool's drawing over
+  its name and one line), with keys at the end of the rule while the shelf
+  overflows. The calculators lead, opening on a **featured plate** for the
+  Precise Unit Converter at full width — its real figure beside the name, the
+  line and three worked inputs that open the converter on them — and the
+  Computer Chooser follows as its own list. Adding a tool is one `.cover-card`
+  on its list's shelf; a new set is a `.cover-list`.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block

@@ -23,10 +23,11 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
     `data/`, `tools/`, `docs/`, the `build-data` workflow, `CNAME`,
     `.nojekyll`. Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb
     (site title home link + set-trail label) on every page; the **cover** is
-    the index of live tools — a band of plates grouped by set, with a category
-    nav that doubles as the scrollbar; each tool back-links to the cover.
-    Nothing links a deferred page, so nothing 404s. Publishing a tool = adding
-    its `.cover-card` to the band.
+    the index of live tools — a stack of lists, one per set, each a titled
+    shelf of plates; the calculators lead, opening on the converter as a
+    full-width featured plate. Each tool back-links to the cover. Nothing
+    links a deferred page, so nothing 404s. Publishing a tool = adding its
+    `.cover-card` to its list's shelf.
   - **`dev` — the workbench (this branch).** The full prior site
     (`components.html`, `site-screen.html`, `calculators/`) **plus** the new
     calculator engine and converter. All work-in-progress lives here.
@@ -98,6 +99,30 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   of it; preview only on a neutral, noindexed host (`docs/HANDOFF.md` §4).
 
 ## Recent decisions
+
+- 2026-10-13 — **The cover becomes a stack of lists, and features the
+  converter** (operator: "instead of one list with sections I want the
+  calculators to be more featured — like multiple lists. I want to feature the
+  unit converter more"). The single sideways band with its category
+  nav-as-scrollbar (and, below 820px, the edge rail) is gone. Each set is now
+  its own `.cover-list`: a title on a hairline rule over a `.cover-shelf` that
+  scrolls sideways on its own, with its two keys at the end of the rule while
+  it overflows (disabled, not hidden, at an end, so neither jumps). The
+  calculators lead and open on a **featured plate** for the Precise Unit
+  Converter at the list's full width: its real figure — `numberline.js`'s own
+  output for 1 m at 1/8", drawn at 560 wide and inlined, nearest mark in the
+  accent as on the plate — beside the name, the line, and three worked inputs
+  that open the converter on that input through its `?d=` link state. Links
+  can't nest, so the feature is a box whose name link stretches over it, with
+  the inputs above the stretch. It stacks below 960px; below 600px it swaps to
+  the reduced figure the plate was first drawn with, since the full one would
+  print its labels at a few pixels. The Computer Chooser is the second list.
+  Below 820px the keys go (touch scrolls a shelf) and a plate takes 82% of the
+  column so the next one shows; one alone takes the column. The mark and its
+  mini-title behaviour are unchanged. Verified: gate green, 25-check browser
+  pass (inputs land in the converter, stretched link, tab order, focus ring,
+  shelf keys with an overflowing shelf, figure swap at 600/601 and 960/961,
+  no horizontal scroll), both schemes at 1280, 900 and 390.
 
 - 2026-10-13 — **Hosting moves from GitHub Pages to a Cloudflare Worker**
   (operator-directed; Cloudflare Pages is being wound down in favour of
@@ -250,13 +275,12 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   `convert.html` and should be retired, not ported. The code-compliance
   calculators (`occupant-load`, `egress-width`, `fixture-calc`, `parking-ratio`)
   are a different lineage (table lookups) — out of scope for the engine thread.
-- AT-0 is built, but thin by design: two plates in the band. It fills out as
-  pages promote — a new tool is one `.cover-card`. The set covers
-  (A-0 / C-0 / L-0) are still deferred, so the cover links tools directly.
-  Two consequences of being thin: the band doesn't overflow yet, so the
-  scrubber's thumb stays hidden (as the picker's does when its strip fits),
-  and with two categories the nav's `space-between` spread reads as a legend
-  rather than a map. Both resolve themselves as calculators land.
+- AT-0 is built, but thin by design: a featured plate and one plate, in two
+  lists. It fills out as pages promote — a new tool is one `.cover-card` on
+  its list's shelf (the calculators list has no shelf yet; its first
+  non-featured calculator adds one, and the head's two keys with it). The set
+  covers (A-0 / C-0 / L-0) are still deferred, so the cover links tools
+  directly. No shelf overflows yet, so no keys show.
 - **A plate needs a drawing, and it must be the tool's own.** The picker's is
   its desk line art; the converter's is its actual figure — the 1 m worked
   example drawn to `numberline.js`'s anatomy, in the shared `.nl-*` classes and
@@ -265,8 +289,11 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   width it would be nearly all margin. That means the plate can drift from the
   engine if the figure's anatomy changes — browser checks assert the two
   scales, the hatched cell and the labels, so drift shows up as a failure
-  rather than silently. There is no house placeholder, so promoting a tool
-  onto the cover means deciding what it draws.
+  rather than silently. The converter's **featured** plate has the room the
+  small plate lacked, so above 600px it shows the engine's actual output,
+  inlined (the reduced drawing stays for phones); if the figure's anatomy
+  changes, redraw it from the engine. There is no house placeholder, so
+  promoting a tool onto the cover means deciding what it draws.
 - **The cover is ONE surface with one thing floating on it** (operator, after
   seeing paper → sheet → card stacked: "too many layers"). A single content
   ground runs edge to edge; the mark is the only object lifted off it. Cards
@@ -296,21 +323,10 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
     either side of the collapse.
   - The trigger has a dead zone (enter at 56px, leave at 20px) rather than one
     threshold, so the state cannot chatter on a stray pixel.
-  **On a phone THE PAGE is the scroller**, not a box inside the page. That one
-  change does three things: it is what makes the title shrink as you scroll
-  (the whole point of the behaviour), it removes the nested scroll region, and
-  it fixes the rail being cut off — there is no longer a box for the field to
-  end inside of. The rail is **placed, not laid out**: a `fixed` top-layer
-  element positioned by hand below the floating title and running to the
-  matching inset at the foot, symmetric once the title has settled. Nothing in
-  the box model decides where it ends, which is what kept clipping it — first
-  as a flow item that ended wherever the field ended, then as a sticky one that
-  could only travel inside its containing block and got pushed off the top. It
-  is drawn as a **closed rectangle**: the earlier version had only its two long
-  edges, so the ends read as unfinished open lines. Padding keeps the labels
-  off those ends. Checked whole, closed, labels inset, clear of the title and
-  of the cards, at six phone sizes × three scroll positions.
-  **Across, it still only engages where the page scrolls.** On a 1280×900
+  **THE PAGE is the vertical scroller**, never a box inside it — that is what
+  makes the title shrink as you scroll. (The phone's edge rail that indexed the
+  single band went with the band, 2026-10-13; the lists' own titles do that
+  job now.) **It only engages where the page scrolls.** On a 1280×900
   window the cover does not scroll at all, so the title stays large — the right
   answer, there being nothing to have scrolled past. If it is wanted somewhere
   it always reads, the picker is the page that scrolls, and the parts would
@@ -333,7 +349,7 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   Jost and look merely slightly wrong rather than broken.
 - **Category names are copy, and they can be long.** The picker's category is
   the question it answers ("What computer should I buy for architecture"), set
-  by the operator over the earlier "Live recommendations". A long name widens
-  its group across, wraps above the cards down, and runs the length of the
-  edge rail — all three are covered by browser checks, so a future category
-  should be added with those in view rather than assumed short.
+  by the operator over the earlier "Live recommendations". As a list title it
+  shares a line with the rule (and the shelf's keys, when they show) and wraps
+  onto a second line on a phone, so a future list should be added with that
+  in view rather than assumed short.

@@ -112,28 +112,32 @@ The master cover for architecture.tools. This is the page that explains the site
 
 AT-0 should make the site feel whole even if the numbered sets are still thin.
 
-> **Built 2026-08-04.** `index.html` is the cover: a centred title block — the
-> site title alone, no crumb and no sheet stamp — over a **card band**. Each
-> live tool is a plate — its own drawing over a name and one line — plates are
-> grouped by set, and the band is the picker's software
-> selector at cover scale: a sideways-scrolling strip, chevrons at the edges,
-> and a category nav below that doubles as the scrollbar. Below 820px the field
-> turns vertical and that nav becomes the rail down the left edge, so the
-> reader keeps the same category map in either orientation.
+> **Built 2026-08-04; lists 2026-10-13.** `index.html` is the cover: a centred
+> title block — the site title alone, no crumb and no sheet stamp — over a
+> **stack of lists**, one per set. Each live tool is a plate — its own drawing
+> over a name and one line — and each list is a title on a hairline rule over a
+> shelf of plates that scrolls sideways on its own, its two keys at the end of
+> the rule while it overflows (touch scrolls it below 820px).
+>
+> **The calculators lead**, and their list opens on a **featured plate**: the
+> Precise Unit Converter at the list's full width, its figure beside its name,
+> its line and three worked inputs, each of which opens the converter on that
+> input. Further calculators go on a shelf under the feature.
 >
 > Each plate's drawing is the tool's own: the picker's desk line art (both
 > scheme exports), and for the converter its actual figure — the page's worked
-> example, 1 m at an eighth, drawn to the anatomy `numberline.js` draws (two
-> scales, the one grid cell the value falls inside magnified and hatched
-> between them) with the shared `.nl-*` classes and number-line tokens, so it
-> matches the real thing and inverts with the scheme. A plate is a reduction of
-> what the tool actually produces, not an illustration of it; a tool that can't
-> show its own drawing doesn't belong on one.
+> example, 1 m at an eighth. On the feature it is `numberline.js`'s own output,
+> inlined; on a phone, a reduction drawn to the same anatomy (two scales, the
+> one grid cell the value falls inside magnified and hatched between them).
+> Both use the shared `.nl-*` classes and number-line tokens, so they match the
+> real thing and invert with the scheme. A plate is a reduction of what the
+> tool actually produces, not an illustration of it; a tool that can't show
+> its own drawing doesn't belong on one.
 >
 > The cover lists **only what is live** — the picker (Computer Chooser) and the
 > Precise Unit Converter — rather than stubbing the unbuilt set covers, so
-> nothing on it 404s. Destinations above join the band as they ship: one
-> `.cover-card` for a tool, a `.cover-group` plus a nav item for a category.
+> nothing on it 404s. Destinations above join as they ship: one `.cover-card`
+> on its list's shelf for a tool, a `.cover-list` for a set.
 >
 > The cover carries **no thesis line** (the "one-line thesis" bullet above was
 > struck for this reason). A cover sheet states the project name and lists the
@@ -356,9 +360,9 @@ covers below it are still structure. Until they exist:
   locates itself in the set. **The cover is the exception**: it is the top of
   the set, so it carries no crumb and no sheet stamp — just the site title.
   A crumb there would only point at itself.
-- **the cover (AT-0) is the index.** It carries every live tool as a plate in
-  a scrolling band, grouped by set, with a category nav that doubles as the
-  scrollbar; every other page keeps one footer back-link to it. Top answers
+- **the cover (AT-0) is the index.** It carries every live tool as a plate,
+  in one list per set, the calculators first and led by the converter as a
+  featured plate; every other page keeps one footer back-link to it. Top answers
   "where am I"; bottom answers "I'm done, what next." A new tool is published
   by adding its plate to the cover — that is the whole wiring.
 - **C-0 is deliberately deferred** until the calculator set has more than
