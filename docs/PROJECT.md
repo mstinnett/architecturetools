@@ -427,7 +427,9 @@ promote them as each is ready, not to land them all at once.
   line and three worked inputs that open the converter on them — over a shelf
   of Stairs, Slope, Tile and Scale Resolution, each plate carrying its page's
   own figure. The second list, **What tool to buy or use**, holds the Computer
-  Chooser and the three software choosers. Adding a tool is one `.cover-card`
+  Chooser and the three software choosers. Below 820px (2026-10-14) the
+  shelves unroll into two-column grids read top to bottom, and a sticky
+  category bar with one tab per list does the moving between lists. Adding a tool is one `.cover-card`
   on its list's shelf; a new set is a `.cover-list`.
 - `picker.html` — the picker, listed as the **Computer Chooser**.
 - `calculators/convert.html` — the Precise Unit Converter (promoted 2026-06-09).
