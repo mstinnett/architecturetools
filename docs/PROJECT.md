@@ -456,18 +456,19 @@ promote them as each is ready, not to land them all at once.
   `assets/js/chooser.js` (its header is the data-* contract), one style
   block, global.css "CHOOSER". **`pdf-markup.html` is a software sheet**
   (2026-10-14, on `claude/determined-bardeen-etpcp6`, pending the
-  operator's call): one claim, then one "Runs on" filter over two tables.
-  The frame says you subscribe only to mark up together live with your
-  team and consultants. The picks matrix (devices down; mark up, measure,
-  check a set, mark up together live across, in order of cost; the paid
-  column behind a thick rule) shows the chosen platform's row, or all five.
-  The tools table (operator: "platform could be a filter then role and
-  capabilities could be the table items") lists every tool that runs there,
-  grouped by role, with a dot per capability and the price. The filter is
-  `assets/js/platform-filter.js`: it starts on the visitor's platform,
-  stores nothing, and only hides rows, so without script the page shows
-  every row. Styles: global.css "SOFTWARE SHEET". The BIM pages follow if
-  the pattern holds.
+  operator's call): a catalog with one claim. Operator: "I genuinely want
+  a catalog of the available scaled measure and callout tools as well as
+  the real time collaboration". The claim: callouts, clouds and scaled
+  measurement are in most paid apps on every platform, so the tools differ
+  on live markup and revision overlays. One "Runs on" filter
+  (`assets/js/platform-filter.js`: starts on the visitor's platform, stores
+  nothing, only hides rows) over 19 tools in three groups (made for drawing
+  sets, PDF editors, project platforms), each with a mark and a few words
+  for callouts and clouds, measures to scale, mark up together live,
+  overlays revisions and markups list, then price and a note that decides
+  or locates. Facts were checked against vendor documentation in October
+  2026; "?" marks what could not be. Styles: global.css "SOFTWARE SHEET".
+  The BIM pages follow if the pattern holds.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
   editorial and labelled so. Adequate Design Review is listed on the PDF

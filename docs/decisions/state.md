@@ -145,6 +145,26 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   marks read "not live" in words, an inference from the old copy calling
   only Studio Sessions and Drawboard Projects live: the operator to confirm
   for Drawboard PDF.
+  Then, operator: "PDF Expert and Documents are equivalent - there's
+  measure tools"; the copy is "very far from voice.md"; "checklist review is
+  pretty niche ... looks like an ad"; "I genuinely want a catalog of the
+  available scaled measure and callout tools as well as the real time
+  collaboration. Are there other features that are stand outs?" A research
+  pass (four agents, vendor docs via search summaries, plus direct checks)
+  found the page's facts wrong in places: PDF Expert measures; Qoppa PDF
+  Studio is discontinued (now Xodo PDF Studio); PolyPDF is a Mac and
+  Windows app with overlays and a live beta; Drawboard PDF's Store + Share
+  is live, so "only a subscription buys live markup" was false. The page is
+  now a catalog: the picks matrix and checklist column are gone, 19 tools
+  in three groups, columns callouts and clouds / measures to scale / mark
+  up together live / overlays revisions / markups list / price. The
+  standouts chosen are the two that split the field (live markup, revision
+  overlays) plus the markups list; batch sheet hyperlinking is in notes,
+  since only Bluebeam Complete and the project platforms have it. The
+  claim was rewritten to what the research shows. Every line was checked
+  against docs/voice.md (no metaphors; notes decide or locate). Documents
+  having PDF Expert's tools is the operator's statement; Readdle documents
+  them only for PDF Expert.
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

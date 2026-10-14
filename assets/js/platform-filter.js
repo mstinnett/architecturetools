@@ -1,18 +1,20 @@
 /* platform-filter.js — the one "Runs on" filter on a software sheet
    (pdf-markup.html; the BIM pages next).
 
-   The page reads in full without it: every pick row and every tool row is
+   The page reads in full without it: every tool row is
    static HTML, and the filter itself starts hidden. This script shows the
    filter and hides rows. Nothing here knows any tool by name.
 
    Controls: <button data-platform="win|mac|ipad|linux|web|all"
              data-on="on a Mac"> inside #platformFilter; "all" hides nothing.
    Rows:     any element with data-platforms (a space-separated list) inside
-             a [data-platform-rows] container. A matrix pick row lists one
-             platform; a tool row lists every platform it runs on.
+             a [data-platform-rows] container: each tool row lists every
+             platform it runs on.
    Labels:   [data-platform-on] gets the chosen button's data-on (" on a
              Mac"), or nothing for "all". #platformCount counts the visible
-             rows of the container marked data-platform-count.
+             rows of the container marked data-platform-count, leaving
+             out group headings (.s-group), which list their tools'
+             platforms so they hide with them.
 
    The starting choice is the visitor's own platform when the browser names
    one (an iPad reports itself as a Mac with touch), else "all". A link or a
@@ -26,7 +28,7 @@
   var buttons = Array.prototype.slice.call(bar.querySelectorAll('button[data-platform]'));
   var rows = Array.prototype.slice.call(document.querySelectorAll('[data-platform-rows] [data-platforms]'));
   var counted = document.querySelector('[data-platform-count]');
-  var tools = counted ? Array.prototype.slice.call(counted.querySelectorAll('[data-platforms]')) : [];
+  var tools = counted ? Array.prototype.slice.call(counted.querySelectorAll('[data-platforms]:not(.s-group)')) : [];
   var count = document.getElementById('platformCount');
   var labels = Array.prototype.slice.call(document.querySelectorAll('[data-platform-on]'));
 
@@ -62,9 +64,8 @@
     var b = e.target.closest('button[data-platform]');
     if (b) apply(b.getAttribute('data-platform'));
   });
-  // A link to a row the filter hides (a Mac pick naming a browser tool, or
-  // a shared link to another platform's tool) switches the filter to All,
-  // so the link lands on its row.
+  // A link to a row the filter hides (a shared link to another platform's
+  // tool) switches the filter to All, so the link lands on its row.
   function hiddenRow(id) {
     var t = id && document.getElementById(id);
     var r = t && t.closest('[data-platforms]');
