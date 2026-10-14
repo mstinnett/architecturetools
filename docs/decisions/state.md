@@ -168,6 +168,14 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   is now #xodo-pdf-studio, and #documents, #preview, #trace, #okular,
   #xournalpp, #ncored and the old section ids are gone. The page has not
   been on main, and nothing links to them.
+  Operator, on Adequate: "Yes we have them" (callouts and clouds), and
+  "Snapping is required for measurement." Measuring now gets a full mark
+  only with calibration and snapping to the drawing's lines. A second
+  search found snapping in Foxit, Nitro, Drawboard Projects (2025) and
+  Autodesk Docs (web, vector PDFs); none for PDF Expert, Bluebeam Cloud
+  (Bluebeam lists it unsupported on iOS), Procore, Revizto or Master PDF
+  (grid only); Fieldwire snaps angles only. Those now carry half marks
+  that say so, and the claim drops "on every platform".
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

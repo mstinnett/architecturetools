@@ -464,7 +464,8 @@ promote them as each is ready, not to land them all at once.
   (`assets/js/platform-filter.js`: starts on the visitor's platform, stores
   nothing, only hides rows) over 19 tools in three groups (made for drawing
   sets, PDF editors, project platforms), each with a mark and a few words
-  for callouts and clouds, measures to scale, mark up together live,
+  for callouts and clouds, measures to scale (with snapping, which the
+  operator requires), mark up together live,
   overlays revisions and markups list, then price and a note that decides
   or locates. Facts were checked against vendor documentation in October
   2026; a dashed ring, "not checked", marks what could not be. A full dot
