@@ -105,6 +105,30 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
 
 ## Recent decisions
 
+- 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
+  (operator: "limiting the horizontal scrolling on mobile … multicolumn
+  layouts with vertical swipes for long lists and then category changing";
+  agreed after weighing it, with tap rather than swipe for the categories).
+  Below 820px each `.cover-shelf` unrolls into a two-column grid (a lone plate
+  spans both); below 600px grid plates drop their description and become
+  drawing + name, since at ~165px a line runs five or six lines (the feature
+  keeps its line). Drawings in compact plates scale to ~58%, so their labels
+  read 6–8px — accepted as thumbnails; each tool page and the feature carry
+  the legible figure. Between lists: `#coverCats`, a sticky bar of one tab per
+  list. Tabs are plain links to the list ids (they jump with JS off; CSS gives
+  the smooth scroll and `scroll-margin-top`); a small script marks the list
+  being read with `is-active` + `aria-current="location"`. Tap, not swipe: a
+  sideways swipe on a web page competes with the browser's back gesture and is
+  invisible. The bar sticks at top 0 with its padding running up under the
+  settled mini title, filled with the page surface — so it is invisible until
+  stuck but for its tabs, and once stuck no strip of cards shows above the
+  tabs; the mark still floats above it. The first list's own title is hidden
+  on phones (the first tab names it); later lists keep theirs to mark the
+  boundary. Desktop is unchanged. Verified: 69-check browser pass at 320, 390
+  and 700 in both schemes (no sideways scroll, equal columns, tab jumps land
+  under the stuck bar, marks follow taps and scrolling, JS-off jumps) plus the
+  earlier cover suites.
+
 - 2026-10-13 — **Scale Resolution's range labels no longer collide**
   (operator: "improve the scale resolution label"). `rangeFig` in
   `calculators/scale.html` centred all three labels under the band on one

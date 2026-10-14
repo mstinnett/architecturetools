@@ -117,7 +117,10 @@ AT-0 should make the site feel whole even if the numbered sets are still thin.
 > **stack of lists**, one per set. Each live tool is a plate — its own drawing
 > over a name and one line — and each list is a title on a hairline rule over a
 > shelf of plates that scrolls sideways on its own, its two keys at the end of
-> the rule while it overflows (touch scrolls it below 820px).
+> the rule while it overflows. **Below 820px nothing scrolls sideways**: each
+> shelf becomes a two-column grid read top to bottom (plates compact to their
+> drawing and name below 600px), and a category bar stuck under the title, one
+> tab per list, jumps between the lists and marks the one being read.
 >
 > **The calculators lead**, and their list opens on a **featured plate**: the
 > Precise Unit Converter at the list's full width, its figure beside its name,
