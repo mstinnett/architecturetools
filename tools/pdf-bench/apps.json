@@ -1,0 +1,141 @@
+{
+  "_readme": [
+    "Per-app input recipes for drive.py. One entry per app and platform.",
+    "Actions: key:ctrl+0 | type:text | click:x,y (fractions of the ROI) | sclick:x,y (fractions of the screen)",
+    "  | dclick:x,y | drag:x0,y0>x1,y1@seconds[,button=middle][,hold=space] | scroll:+N@x,y[,hold=ctrl]",
+    "  | sleep:s | run:command {file} | focus",
+    "In type: and run:, {file} is the PDF, {jump_number}/{jump_label} the jump sheet, {search} the search text.",
+    "The clock for a step starts at its last action (at the start of a drag).",
+    "roi: the drawing canvas as x,y,w,h fractions of the screen, with the window maximised.",
+    "zoom must land at 400% of fit: calibrate once, then record the recipe here.",
+    "verified: set true only after watching a full run do the right thing. Unverified keys are best guesses.",
+    "iPad apps (PolyPDF, Bluebeam iPad, ...) have no driver: record the screen and use settle.py."
+  ],
+
+  "chromium-linux": {
+    "app": "Chromium PDF viewer (PDFium)",
+    "platform": "Linux",
+    "verified": true,
+    "note": "Checked under Xvfb at 1920x1200. Chrome's viewer pans by scrolling, not dragging, and its fit key toggles, so fit and zoom type into the zoom box: pass --fit-pct. Flip clicks the grey margin first to take focus back from the zoom box; search is incremental, so its clock starts at the typing.",
+    "roi": "0.16,0.12,0.83,0.88",
+    "quit": "pkill -f 'chrome.*pdf-bench-profile' || true",
+    "steps": {
+      "open": ["run:${{CHROMIUM:-chromium}} --user-data-dir=/tmp/pdf-bench-profile --start-maximized {file}"],
+      "fit": ["sclick:0.469,0.096", "key:ctrl+a", "type:{fit_pct}", "key:enter"],
+      "zoom": ["sclick:0.469,0.096", "key:ctrl+a", "type:{zoom_pct}", "key:enter"],
+      "pan": ["scroll:-12@0.5,0.5"],
+      "flip": ["click:0.02,0.5", "key:right"],
+      "jump": ["sclick:0.398,0.096", "key:ctrl+a", "type:{jump_number}", "key:enter"],
+      "search": ["key:escape", "key:ctrl+f", "sleep:0.4", "type:{search}"]
+    }
+  },
+
+  "edge-win": {
+    "app": "Microsoft Edge PDF viewer",
+    "platform": "Windows",
+    "verified": false,
+    "roi": "0.0,0.14,1.0,0.86",
+    "quit": "taskkill /IM msedge.exe /F",
+    "steps": {
+      "open": ["run:start msedge {file}"],
+      "fit": ["key:ctrl+\\"],
+      "zoom": ["key:ctrl+=", "key:ctrl+=", "key:ctrl+=", "key:ctrl+=", "key:ctrl+=", "key:ctrl+=", "key:ctrl+="],
+      "pan": ["drag:0.75,0.5>0.25,0.5@1.5"],
+      "flip": ["key:right"],
+      "jump": null,
+      "search": ["key:ctrl+f", "sleep:0.4", "type:{search}", "key:enter"]
+    }
+  },
+
+  "acrobat-win": {
+    "app": "Adobe Acrobat",
+    "platform": "Windows",
+    "verified": false,
+    "note": "Set View > Page Display > Single Page first. Go To Page takes page labels (A-501).",
+    "roi": "0.05,0.12,0.9,0.85",
+    "quit": "taskkill /IM Acrobat.exe /F",
+    "steps": {
+      "open": ["run:start \"\" \"C:\\Program Files\\Adobe\\Acrobat DC\\Acrobat\\Acrobat.exe\" {file}"],
+      "fit": ["key:ctrl+0"],
+      "zoom": ["key:ctrl+y", "sleep:0.6", "type:400", "key:enter"],
+      "pan": ["drag:0.75,0.5>0.25,0.5@1.5,hold=space"],
+      "flip": ["key:pagedown"],
+      "jump": ["key:ctrl+shift+n", "sleep:0.6", "type:{jump_label}", "key:enter"],
+      "search": ["key:ctrl+f", "sleep:0.6", "type:{search}", "key:enter"]
+    }
+  },
+
+  "acrobat-mac": {
+    "app": "Adobe Acrobat",
+    "platform": "macOS",
+    "verified": false,
+    "note": "Set View > Page Display > Single Page first.",
+    "roi": "0.05,0.12,0.9,0.85",
+    "quit": "osascript -e 'quit app \"Adobe Acrobat\"'",
+    "steps": {
+      "open": ["run:open -a 'Adobe Acrobat' {file}"],
+      "fit": ["key:command+0"],
+      "zoom": ["key:command+y", "sleep:0.6", "type:400", "key:enter"],
+      "pan": ["drag:0.75,0.5>0.25,0.5@1.5,hold=space"],
+      "flip": ["key:pagedown"],
+      "jump": ["key:command+shift+n", "sleep:0.6", "type:{jump_label}", "key:enter"],
+      "search": ["key:command+f", "sleep:0.6", "type:{search}", "key:enter"]
+    }
+  },
+
+  "preview-mac": {
+    "app": "Apple Preview (PDFKit)",
+    "platform": "macOS",
+    "verified": false,
+    "note": "View > Single Page. Zoom presses to reach 400% depend on the window size: calibrate.",
+    "roi": "0.0,0.06,1.0,0.94",
+    "quit": "osascript -e 'quit app \"Preview\"'",
+    "steps": {
+      "open": ["run:open -a Preview {file}"],
+      "fit": ["key:command+9"],
+      "zoom": ["key:command+=", "key:command+=", "key:command+=", "key:command+=", "key:command+="],
+      "pan": ["drag:0.75,0.5>0.25,0.5@1.5"],
+      "flip": ["key:pagedown"],
+      "jump": ["key:command+option+g", "sleep:0.6", "type:{jump_number}", "key:enter"],
+      "search": ["key:command+f", "sleep:0.6", "type:{search}", "key:enter"]
+    }
+  },
+
+  "bluebeam-win": {
+    "app": "Bluebeam Revu",
+    "platform": "Windows",
+    "verified": false,
+    "note": "Fill in from Revu's keyboard shortcut list (Revu > Preferences > Shortcuts) before use.",
+    "roi": "0.12,0.12,0.76,0.8",
+    "quit": "taskkill /IM Revu.exe /F",
+    "steps": {
+      "open": ["run:start \"\" {file}"],
+      "fit": null,
+      "zoom": null,
+      "pan": ["drag:0.75,0.5>0.25,0.5@1.5,button=middle"],
+      "flip": ["key:pagedown"],
+      "jump": null,
+      "search": null
+    }
+  },
+
+  "drawboard-win": {
+    "app": "Drawboard PDF",
+    "platform": "Windows",
+    "verified": false,
+    "note": "Template: fill in the step keys before use.",
+    "roi": "0.05,0.12,0.9,0.85",
+    "steps": {"open": null, "fit": null, "zoom": null, "pan": null, "flip": null, "jump": null, "search": null}
+  },
+
+  "pdfexpert-mac": {
+    "app": "PDF Expert",
+    "platform": "macOS",
+    "verified": false,
+    "note": "Template: fill in the step keys before use.",
+    "roi": "0.0,0.08,1.0,0.92",
+    "quit": "osascript -e 'quit app \"PDF Expert\"'",
+    "steps": {"open": ["run:open -a 'PDF Expert' {file}"], "fit": null, "zoom": null, "pan": null,
+              "flip": null, "jump": null, "search": null}
+  }
+}
