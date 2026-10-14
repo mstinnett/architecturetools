@@ -164,7 +164,10 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   claim was rewritten to what the research shows. Every line was checked
   against docs/voice.md (no metaphors; notes decide or locate). Documents
   having PDF Expert's tools is the operator's statement; Readdle documents
-  them only for PDF Expert.
+  them only for PDF Expert. Row anchors changed with the rows: #pdf-studio
+  is now #xodo-pdf-studio, and #documents, #preview, #trace, #okular,
+  #xournalpp, #ncored and the old section ids are gone. The page has not
+  been on main, and nothing links to them.
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

@@ -12,9 +12,9 @@
              platform it runs on.
    Labels:   [data-platform-on] gets the chosen button's data-on (" on a
              Mac"), or nothing for "all". #platformCount counts the visible
-             rows of the container marked data-platform-count, leaving
-             out group headings (.s-group), which list their tools'
-             platforms so they hide with them.
+             rows of the container marked data-platform-count.
+   Groups:   a .s-group heading row hides when no row in its <tbody> shows,
+             so adding a tool never means editing its heading.
 
    The starting choice is the visitor's own platform when the browser names
    one (an iPad reports itself as a Mac with touch), else "all". A link or a
@@ -28,9 +28,10 @@
   var buttons = Array.prototype.slice.call(bar.querySelectorAll('button[data-platform]'));
   var rows = Array.prototype.slice.call(document.querySelectorAll('[data-platform-rows] [data-platforms]'));
   var counted = document.querySelector('[data-platform-count]');
-  var tools = counted ? Array.prototype.slice.call(counted.querySelectorAll('[data-platforms]:not(.s-group)')) : [];
+  var tools = counted ? Array.prototype.slice.call(counted.querySelectorAll('[data-platforms]')) : [];
   var count = document.getElementById('platformCount');
   var labels = Array.prototype.slice.call(document.querySelectorAll('[data-platform-on]'));
+  var groups = Array.prototype.slice.call(document.querySelectorAll('[data-platform-rows] .s-group'));
 
   function guess() {
     var ua = navigator.userAgent || '';
@@ -51,6 +52,10 @@
     });
     rows.forEach(function (r) {
       r.hidden = p !== 'all' && r.getAttribute('data-platforms').split(' ').indexOf(p) < 0;
+    });
+    groups.forEach(function (g) {
+      g.hidden = !Array.prototype.some.call(g.parentNode.querySelectorAll('[data-platforms]'),
+        function (r) { return !r.hidden; });
     });
     labels.forEach(function (l) { l.textContent = on; });
     if (count) {

@@ -467,7 +467,9 @@ promote them as each is ready, not to land them all at once.
   for callouts and clouds, measures to scale, mark up together live,
   overlays revisions and markups list, then price and a note that decides
   or locates. Facts were checked against vendor documentation in October
-  2026; "?" marks what could not be. Styles: global.css "SOFTWARE SHEET".
+  2026; a dashed ring, "not checked", marks what could not be. A full dot
+  is a feature the app has (the note names its plan); a half dot is a
+  limited form (the note names what is missing). Styles: global.css "SOFTWARE SHEET".
   The BIM pages follow if the pattern holds.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
