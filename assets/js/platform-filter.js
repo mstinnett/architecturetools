@@ -15,9 +15,10 @@
              rows of the container marked data-platform-count.
 
    The starting choice is the visitor's own platform when the browser names
-   one (an iPad reports itself as a Mac with touch), else "all". The choice is
-   not stored: privacy.html#storage promises the scheme key is the only thing
-   written to the browser. */
+   one (an iPad reports itself as a Mac with touch), else "all". A link or a
+   page address pointing at a row the filter hides switches it to "all".
+   The choice is not stored: privacy.html#storage promises the scheme key is
+   the only thing written to the browser. */
 (function () {
   'use strict';
   var bar = document.getElementById('platformFilter');
@@ -61,6 +62,21 @@
     var b = e.target.closest('button[data-platform]');
     if (b) apply(b.getAttribute('data-platform'));
   });
+  // A link to a row the filter hides (a Mac pick naming a browser tool, or
+  // a shared link to another platform's tool) switches the filter to All,
+  // so the link lands on its row.
+  function hiddenRow(id) {
+    var t = id && document.getElementById(id);
+    var r = t && t.closest('[data-platforms]');
+    return !!(r && r.hidden);
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (a && hiddenRow(a.getAttribute('href').slice(1))) apply('all');
+  });
+
   bar.hidden = false;
   apply(guess());
+  var id = location.hash.slice(1);
+  if (hiddenRow(id)) { apply('all'); document.getElementById(id).scrollIntoView(); }
 })();

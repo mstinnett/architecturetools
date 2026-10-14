@@ -140,7 +140,11 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   Studio Sessions, Drawboard Projects, both subscriptions), ○ shared review
   (Acrobat, Foxit, Drawboard PDF). Dots are CSS shapes, not glyphs, since
   Jost has no ◐; under 980px they turn into words and a tool's missing
-  capabilities drop out.
+  capabilities drop out. A link or address naming a row the filter hides
+  (a Mac pick naming a browser tool) switches the filter to All. Hollow
+  marks read "not live" in words, an inference from the old copy calling
+  only Studio Sessions and Drawboard Projects live: the operator to confirm
+  for Drawboard PDF.
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

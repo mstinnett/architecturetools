@@ -660,7 +660,7 @@ h2.section-label { line-height: inherit; }
   .schedule .s-cap { text-align: left; padding: 0.15rem 0; }
   .schedule td.s-cap .cap { display: none; }
   .schedule td.s-cap::after { content: attr(data-text); }
-  .cap-key { display: block; margin: 0.25rem 0 0; }
+  .cap-key { display: none; }
   .schedule tbody tr:target { background: var(--accent-soft); }
   .schedule tbody tr:target > * { background: none; }
 }
