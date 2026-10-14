@@ -448,10 +448,18 @@ promote them as each is ready, not to land them all at once.
   `pdf-markup.html` (PDF Markup & Review), `bim-platforms.html` (BIM & Design
   Platforms: Revit, Archicad, Vectorworks, Rhino, SketchUp, AutoCAD, Chief
   Architect, the renderers) and `bim-emerging.html` (Emerging BIM: Motif,
-  Snaptrude, Qonic, Arcol, Forma, Rayon...). Each is filter controls over
-  static `<article class="tool">` cards (readable without JS, indexable),
-  then short answers and context. One behaviour, `assets/js/chooser.js` (its
-  header is the data-* contract); one style block, global.css "CHOOSER".
+  Snaptrude, Qonic, Arcol, Forma, Rayon...). The two BIM pages are filter
+  controls over static `<article class="tool">` cards (readable without JS,
+  indexable), then short answers and context: one behaviour,
+  `assets/js/chooser.js` (its header is the data-* contract), one style
+  block, global.css "CHOOSER". **`pdf-markup.html` is a software sheet**
+  (2026-10-14, on `claude/determined-bardeen-etpcp6`, pending the
+  operator's call): one claim, drawn. The frame says you need a
+  subscription only to review with other people; a static matrix (devices
+  down; mark up, measure, check, review across, in order of cost; the paid
+  column behind a heavy rule) gives one pick per cell; then the notes and a
+  schedule of every tool. No script; global.css "SOFTWARE SHEET". The BIM
+  pages follow if the pattern holds.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
   editorial and labelled so. Adequate Design Review is listed on the PDF

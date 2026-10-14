@@ -105,6 +105,27 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
 
 ## Recent decisions
 
+- 2026-10-14 — **Chooser contrast passes AA; the PDF page becomes a
+  software sheet** (operator: "the text contrast is too low ... I'm not sure
+  the quiz / result filter format makes as much sense for this information.
+  It's typically a listicle ... each of these pages should have something to
+  say"). Contrast: `--ink-3` was 3.7:1 (light) / 4.0:1 (dark), failing AA on
+  every 11px label; it is now `#736a5a` / `#8F8B83` (5.1:1 on the sheet,
+  4.6:1 on `--card-2`, still under `--ink-2`). In the CHOOSER block nothing
+  is weight 300 below `--text-base` or set in `--ink-3`, and card notes are
+  `--ink`; a computed audit of the three choosers went from ~100 failing
+  text elements per page to 0, both schemes. Format: the filters' two axes
+  (platform, need) were a matrix behind buttons, and the cards ranked
+  unlike things in one list. `pdf-markup.html` now states its claim (no
+  subscription to mark up, measure or check a set; a subscription buys
+  review with others, and then you use what your consultants use) and draws
+  it as a devices × needs matrix with the paid column behind a heavy rule,
+  then notes, then a schedule of all 17 tools (old card ids kept as row
+  anchors). Cell picks restate the old page's own claims; none is new
+  vendor fact. Built on `claude/determined-bardeen-etpcp6` off
+  `new-layout`, where the choosers live (`dev` has none). The BIM pages keep
+  the chooser until the operator rules on the pattern and their claims.
+
 - 2026-10-13 — **Scale Resolution's range labels no longer collide**
   (operator: "improve the scale resolution label"). `rangeFig` in
   `calculators/scale.html` centred all three labels under the band on one

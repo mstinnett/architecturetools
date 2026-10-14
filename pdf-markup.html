@@ -2,24 +2,30 @@
 <!-- PDF Markup & Review — software for redlining drawing sets, measuring from PDFs and running reviews.
      data-family: material, the site's red-brown, the nearest family to a redline.
 
-     A software chooser: the picker's controls over static tool cards, then
-     the editorial notes. Every tool is a static <article class="tool">, so
-     the page reads in full without JavaScript and is indexable; the shared
-     assets/js/chooser.js only hides and reorders the cards (its header holds
-     the data-* contract). Styles are global.css "CHOOSER". Adding a tool is
-     one <article>; nothing else lists them. "Most used" (data-rank) is an
-     editorial estimate and the page says so. Copy follows docs/voice.md. -->
+     A software sheet, read top down: the claim (.sheet-frame), the matrix
+     that shows it, the notes, then a schedule of every tool. global.css
+     "SOFTWARE SHEET" styles it. No script beyond the scheme key: every
+     recommendation is visible at once, so the page has nothing to filter.
+
+     The claim: marking up, measuring and checking a set never need a
+     subscription; review with other people does, and then the tool is the
+     one your consultants use. The matrix carries it: devices down, needs
+     across in order of cost, and the one paid column behind a heavy rule.
+     A cell names its pick and its reason; cells may repeat, since a reader
+     reads one row. Matrix links go to the tool's schedule row (#id), the
+     schedule links to the vendor. Adding a tool is a schedule row, plus a
+     cell only if it becomes a pick. Copy follows docs/voice.md. -->
 <html lang="en" data-family="material">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDF Markup &amp; Review Software -- architecture.tools</title>
-<meta name="description" content="PDF markup and review software for architects, filtered by Windows, Mac, Linux, iPad or web and by measurement, team review, revision comparison and price: Bluebeam Revu, Acrobat, Drawboard, PDF Expert, PDF-XChange, PDF Studio, Adequate Design Review and more.">
+<meta name="description" content="What to use to mark up, measure, check and review drawing sets on Windows, Mac, iPad, Linux or the web. You need a subscription only to review with other people. Bluebeam Revu, Drawboard, PDF-XChange, PDF Studio, PDF Expert, PolyPDF, Adequate Design Review and more.">
 <link rel="canonical" href="https://architecture.tools/pdf-markup.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://architecture.tools/pdf-markup.html">
 <meta property="og:title" content="PDF Markup &amp; Review Software -- architecture.tools">
-<meta property="og:description" content="Bluebeam is the standard. Everything else, filtered by your platform and what you need.">
+<meta property="og:description" content="You don't need a subscription to mark up drawings, measure them or check a set. You pay by the year to review with other people.">
 <meta name="twitter:card" content="summary">
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
 <script>
@@ -46,7 +52,6 @@
       <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Software</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">PDF Markup &amp; Review</span>
     </nav>
     <h1>What should I use to mark up and review drawings?</h1>
-    <p>Pick the devices you work on and what you need. Every tool that fits stays on the list.</p>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
@@ -55,338 +60,89 @@
   </div>
 
   <p class="chooser-updated">Updated October 2026</p>
-  <p class="chooser-lede">Bluebeam Revu is the industry standard. If your consultants already use it, stay on it. Everything below is for choosing anything else.</p>
+  <p class="sheet-frame">You don&rsquo;t need a subscription to mark up drawings, measure them or check a set. Clouds, callouts and text are standard PDF markup that every app here opens. You pay by the year to review with other people, and for that you use what your consultants use.</p>
 
-  <div class="chooser-controls" id="controls">
-    <div class="control-group">
-      <div class="section-label">Runs on</div>
-      <p class="control-hint">Every device you will use. Features are the main app's; web versions often do less.</p>
-      <div class="option-row">
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="win">Windows</button>
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="mac">Mac</button>
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="linux">Linux</button>
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="ipad">iPad</button>
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="platforms" data-value="web">Cloud / web<span class="pill-detail">In the browser, any computer</span></button>
-      </div>
-    </div>
-    <div class="control-group">
-      <div class="section-label">You need</div>
-      <p class="control-hint">Every one you select.</p>
-      <div class="option-row">
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="measure">Scaled measurement</button>
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="team">Review with a team</button>
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="compare">Compare revisions</button>
-        <button type="button" class="app-toggle" aria-pressed="false" data-multi="needs" data-value="checklist">Checklist review</button>
-      </div>
-    </div>
-    <div class="control-group">
-      <div class="section-label">Price</div>
-      <div class="option-row">
-        <button type="button" class="option-pill active" aria-pressed="true" data-single="price" data-value="any">Any</button>
-        <button type="button" class="option-pill" aria-pressed="false" data-single="price" data-value="nosub">No subscription<span class="pill-detail">Free or a one-time license</span></button>
-        <button type="button" class="option-pill" aria-pressed="false" data-single="price" data-value="free">Free<span class="pill-detail">Including free tiers</span></button>
-      </div>
-    </div>
-    <div class="control-group">
-      <div class="section-label">Sort by</div>
-      <div class="option-row">
-        <button type="button" class="option-pill active" aria-pressed="true" data-single="sort" data-value="rank">Most used<span class="pill-detail">Among architects, our estimate</span></button>
-        <button type="button" class="option-pill" aria-pressed="false" data-single="sort" data-value="price">Lowest price</button>
-        <button type="button" class="option-pill" aria-pressed="false" data-single="sort" data-value="name">Name</button>
-      </div>
-    </div>
-  </div>
+  <section class="sheet-section" id="what-to-use" aria-labelledby="what-to-use-label">
+    <h2 class="section-label" id="what-to-use-label">What to use</h2>
+    <p class="matrix-how">Find your device, then the most you need.</p>
 
-  <div class="result-bar">
-    <span id="resultCount" aria-live="polite">17 tools</span>
-    <button type="button" id="resetFilters" hidden>Clear filters</button>
-  </div>
-
-  <div class="tool-grid" id="toolGrid">
-    <article class="tool" id="bluebeam" data-platforms="win ipad iphone web" data-needs="measure team compare" data-price="sub" data-price-order="4" data-rank="1" data-name="bluebeam revu">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://www.bluebeam.com/product/markups-and-data/" rel="noopener">Bluebeam Revu</a></h3>
-        <div class="tool-kind">Bluebeam &middot; Drawing sets</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li><li data-p="web">Web (Bluebeam Cloud)</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes, the strongest</dd></div>
-        <div><dt>Team review</dt><dd class="mark-yes">Studio Sessions</dd></div>
-        <div><dt>Price</dt><dd>About $260&ndash;440 per user per year</dd></div>
-      </dl>
-      <p class="tool-note">The standard in architecture and construction. Tool chests of saved markups, a markups list you can sort and export, calibrated measurement and takeoff, sheet comparison, and Studio Sessions for live review with consultants.</p>
-      <p class="tool-note">The full app is Windows only. Revu for iPad was retired at the end of 2025, so Mac, iPad and Linux users get Bluebeam Cloud in the browser or the iOS app, which does less.</p>
-    </article>
-
-    <article class="tool" id="acrobat" data-platforms="win mac ipad iphone android web" data-needs="measure team compare" data-price="sub" data-price-order="4" data-rank="2" data-name="adobe acrobat pro">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://www.adobe.com/acrobat/acrobat-pro.html" rel="noopener">Adobe Acrobat Pro</a></h3>
-        <div class="tool-kind">Adobe &middot; General PDF editor</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li><li data-p="android">Android</li><li data-p="web">Web</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-        <div><dt>Team review</dt><dd class="mark-yes">Shared review</dd></div>
-        <div><dt>Price</dt><dd>Subscription</dd></div>
-      </dl>
-      <p class="tool-note">Capable, and often already paid for. Comments, drawing markups, calibrated measurement, file comparison and shared review all work. It has no tool chest or sortable markups list, so a fifty-sheet review takes more clicks than in Bluebeam.</p>
-    </article>
-
-    <article class="tool" id="preview" data-platforms="mac ipad iphone" data-needs="" data-price="free" data-price-order="0" data-rank="3" data-name="preview and markup">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://support.apple.com/guide/preview/welcome/mac" rel="noopener">Preview &amp; Markup</a></h3>
-        <div class="tool-kind">Apple &middot; Quick notes</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>Free, built in</dd></div>
-      </dl>
-      <p class="tool-note">Enough to circle something on one sheet and send it back. Nothing to install.</p>
-    </article>
-
-    <article class="tool" id="drawboard-pdf" data-platforms="win mac ipad android web" data-needs="measure team" data-paid-needs="measure" data-price="freemium" data-price-order="1" data-rank="4" data-name="drawboard pdf">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://www.drawboard.com" rel="noopener">Drawboard PDF</a></h3>
-        <div class="tool-kind">Drawboard &middot; Drawing sets</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="android">Android</li><li data-p="web">Web</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Pro Plus and Pro Unlimited</dd></div>
-        <div><dt>Team review</dt><dd class="mark-yes">Shared documents</dd></div>
-        <div><dt>Price</dt><dd>Free. Paid tiers $6.99&ndash;13.33 a month, billed annually</dd></div>
-      </dl>
-      <p class="tool-note">Drawboard's single-user app, and the best pen experience on a Windows tablet. The free tier covers ink, shapes, text and signatures. Pro syncs up to 50 documents. Measurement tools are in Pro Plus and Pro Unlimited.</p>
-    </article>
-
-    <article class="tool" id="pdf-expert" data-platforms="mac ipad iphone" data-needs="" data-price="sub" data-price-order="4" data-rank="5" data-name="pdf expert">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://pdfexpert.com" rel="noopener">PDF Expert</a></h3>
-        <div class="tool-kind">Readdle &middot; General PDF editor</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>Subscription</dd></div>
-      </dl>
-      <p class="tool-note">The best markup app on a Mac and on an iPad with an Apple Pencil. Fast on large sets, with highlights, shapes, ink, stamps and notes that sync across your devices. It does not measure to scale.</p>
-    </article>
-
-    <article class="tool" id="foxit" data-platforms="win mac ipad iphone android web" data-needs="measure team compare" data-price="sub" data-price-order="4" data-rank="6" data-name="foxit pdf editor">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://www.foxit.com/pdf-editor/" rel="noopener">Foxit PDF Editor</a></h3>
-        <div class="tool-kind">Foxit &middot; General PDF editor</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li><li data-p="android">Android</li><li data-p="web">Web</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-        <div><dt>Team review</dt><dd class="mark-yes">Shared review</dd></div>
-        <div><dt>Price</dt><dd>Subscription</dd></div>
-      </dl>
-      <p class="tool-note">An Acrobat alternative with measurement, file comparison and shared review. Consider it if your firm buys Foxit for office documents already.</p>
-    </article>
-
-    <article class="tool" id="pdf-xchange" data-platforms="win" data-needs="measure" data-price="onetime" data-price-order="2" data-rank="7" data-name="pdf-xchange editor">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://www.pdf-xchange.com/product/pdf-xchange-editor" rel="noopener">PDF-XChange Editor</a></h3>
-        <div class="tool-kind">PDF-XChange &middot; Drawing sets</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>One-time license</dd></div>
-      </dl>
-      <p class="tool-note">The inexpensive Windows replacement for working alone. Clouds, callouts, stamps, and calibrated length, perimeter and area measurement, for a one-time license. It has no shared review.</p>
-    </article>
-
-    <article class="tool" id="drawboard-projects" data-platforms="win ipad web" data-needs="measure team" data-price="sub" data-price-order="4" data-rank="8" data-name="drawboard projects">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://www.drawboard.com" rel="noopener">Drawboard Projects</a></h3>
-        <div class="tool-kind">Drawboard &middot; Team review</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="ipad">iPad</li><li data-p="web">Web</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-        <div><dt>Team review</dt><dd class="mark-yes">Issues, versions, free guests</dd></div>
-        <div><dt>Price</dt><dd>Subscription, per user</dd></div>
-      </dl>
-      <p class="tool-note">The closest replacement for Bluebeam as a team review tool. Drawings live in one project with versions, markups sync live, and issues are pinned to a spot on a sheet with an owner and a status. Clients and consultants join as guests without a paid license.</p>
-    </article>
-
-    <article class="tool" id="trace" data-platforms="mac ipad iphone" data-needs="" data-price="sub" data-price-order="4" data-rank="9" data-name="morpholio trace">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://morpholio.com/trace" rel="noopener">Morpholio Trace</a></h3>
-        <div class="tool-kind">Morpholio &middot; Sketching</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="mac">Mac</li><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Scale-aware drawing</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>Subscription</dd></div>
-      </dl>
-      <p class="tool-note">Digital trace paper. Use it to sketch design responses over a plan or photo at scale, not to track comments.</p>
-    </article>
-
-    <article class="tool" id="documents" data-platforms="ipad iphone" data-needs="" data-price="freemium" data-price-order="1" data-rank="10" data-name="documents">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://documents.io/app" rel="noopener">Documents</a></h3>
-        <div class="tool-kind">Readdle &middot; Reading sets</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>Free, paid tier</dd></div>
-      </dl>
-      <p class="tool-note">A file manager that opens PDFs with annotation built in. Use it to carry a set to site, pull files from cloud storage, and note what you see on the sheet.</p>
-    </article>
-
-    <article class="tool" id="pdf-studio" data-platforms="win mac linux" data-needs="measure compare" data-price="onetime" data-price-order="2" data-rank="11" data-name="pdf studio pro">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://www.qoppa.com/pdfstudio/" rel="noopener">PDF Studio Pro</a></h3>
-        <div class="tool-kind">Qoppa &middot; Drawing sets</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>One-time license</dd></div>
-      </dl>
-      <p class="tool-note">The choice if you measure from drawings on a Mac or on Linux and don't want a subscription. Markup, calibrated measurement and document comparison for a one-time license.</p>
-    </article>
-
-    <article class="tool" id="okular" data-platforms="linux win" data-needs="" data-price="free" data-price-order="0" data-rank="12" data-name="okular">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://okular.kde.org" rel="noopener">Okular</a></h3>
-        <div class="tool-kind">KDE &middot; Quick notes</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="linux">Linux</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>Free, open source</dd></div>
-      </dl>
-      <p class="tool-note">The standard document viewer on KDE Linux desktops. Highlights, notes, lines, shapes and stamps, saved into the PDF. Enough for marking up a sheet, not for measuring.</p>
-    </article>
-
-    <article class="tool" id="master-pdf" data-platforms="win mac linux" data-needs="measure" data-price="onetime" data-price-order="2" data-rank="13" data-name="master pdf editor">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://code-industry.net/masterpdfeditor/" rel="noopener">Master PDF Editor</a></h3>
-        <div class="tool-kind">Code Industry &middot; General PDF editor</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Distance, perimeter, area</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>One-time license</dd></div>
-      </dl>
-      <p class="tool-note">One of the few full PDF editors with a native Linux version. Annotations, page editing, OCR, and distance, perimeter and area tools. Check how it sets a drawing scale before you rely on it for takeoff.</p>
-    </article>
-
-    <article class="tool" id="xournalpp" data-platforms="linux win mac" data-needs="" data-price="free" data-price-order="0" data-rank="14" data-name="xournal++">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://xournalpp.github.io" rel="noopener">Xournal++</a></h3>
-        <div class="tool-kind">Open source &middot; Sketching</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>Free, open source</dd></div>
-      </dl>
-      <p class="tool-note">Handwriting and sketching over a PDF in layers, with pen pressure. The pick for a Linux machine with a drawing tablet.</p>
-    </article>
-
-    <article class="tool" id="ncored" data-platforms="win mac" data-needs="" data-price="both" data-price-order="3" data-rank="15" data-name="ncored">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://ncored.com" rel="noopener">Ncored</a></h3>
-        <div class="tool-kind">Noir architects &middot; Drawing sets</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-no">Not listed</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-        <div><dt>Price</dt><dd>Subscription or one-time license</dd></div>
-      </dl>
-      <p class="tool-note">A PDF editor made by a working architecture studio for large CAD and BIM exports, the 50&ndash;200&nbsp;MB sets that make general PDF apps lag on zoom and pan. Redlines, notes, shapes and large-format printing, with files kept on your machine. Try it if Bluebeam or Acrobat stalls on your sets.</p>
-    </article>
-
-    <article class="tool" id="adequate" data-platforms="win mac linux" data-needs="measure compare checklist" data-price="onetime" data-price-order="2" data-rank="16" data-name="adequate design review">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://adequate.design" rel="noopener">Adequate Design Review</a></h3>
-        <div class="tool-kind">Adequate Design &middot; Checklist review &middot; in beta</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="win">Windows</li><li data-p="mac">Mac</li><li data-p="linux">Linux</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">No, runs locally</dd></div>
-        <div><dt>Price</dt><dd>$400 one-time after the beta</dd></div>
-      </dl>
-      <p class="tool-note">For reviewing a set against a checklist rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.</p>
-      <p class="tool-note">Runs locally and offline on Windows, Mac and Linux, and nothing leaves your machine. It is for one reviewer, not live team sessions.</p>
-      <p class="tool-disclosure">Disclosure: I make it, to replace my own Bluebeam, Excel and Affinity workflow.</p>
-    </article>
-
-    <article class="tool" id="polypdf" data-platforms="ipad iphone" data-needs="measure" data-price="free" data-price-order="0" data-rank="17" data-name="polypdf">
-      <div class="tool-head">
-        <h3 class="tool-name"><a href="https://polypdf.com" rel="noopener">PolyPDF</a></h3>
-        <div class="tool-kind">PolyPDF &middot; Drawing sets</div>
-      </div>
-      <ul class="tool-plats" aria-label="Platforms"><li data-p="ipad">iPad</li><li data-p="iphone">iPhone</li></ul>
-      <dl class="tool-specs">
-        <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-        <div><dt>Team review</dt><dd class="mark-no">Not yet</dd></div>
-        <div><dt>Price</dt><dd>Free</dd></div>
-      </dl>
-      <p class="tool-note">A new iPad app for drawings. Callouts, discipline colors, and measurement of lengths, areas and angles at a set scale, with line detection to snap to the drawing. Sync and team review are not out yet. Use it to measure on an iPad now that Revu for iPad is gone.</p>
-    </article>
-  </div>
-  <p class="no-match" id="noMatch" hidden>Nothing here does all of that. Clear a filter to see the closest tools.</p>
+    <table class="matrix">
+      <colgroup><col class="m-col-plat"><col><col><col><col></colgroup>
+      <thead>
+        <tr>
+          <td></td>
+          <th scope="col"><span class="m-job">Mark up a sheet</span><span class="m-gloss">Clouds, callouts, text and ink</span><span class="m-cost">Free</span></th>
+          <th scope="col"><span class="m-job">Measure to scale</span><span class="m-gloss">Calibrate a sheet, take lengths and areas</span><span class="m-cost">Free or one-time</span></th>
+          <th scope="col"><span class="m-job">Check a set</span><span class="m-gloss">Compare revisions, work through a checklist</span><span class="m-cost">One-time</span></th>
+          <th scope="col" class="m-paid"><span class="m-job">Review with others</span><span class="m-gloss">Your team, consultants and clients on one set</span><span class="m-cost">Per user, per year</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row"><span class="m-plat">Windows</span><span class="m-plat-note">The only platform with Bluebeam Revu&rsquo;s full app.</span></th>
+          <td data-job="Mark up a sheet · Free"><a href="#drawboard-pdf">Drawboard PDF</a>. Free, and the best with a pen on a Windows tablet.</td>
+          <td data-job="Measure to scale · Free or one-time"><a href="#pdf-xchange">PDF-XChange Editor</a>. Calibrated length, perimeter and area for a one-time license.</td>
+          <td data-job="Check a set · One-time"><a href="#adequate">Adequate Design Review</a><span class="m-dagger">&dagger;</span> for checklists and revision overlays. <a href="#pdf-studio">PDF Studio Pro</a> compares two files.</td>
+          <td data-job="Review with others · Per user, per year" class="m-paid"><a href="#bluebeam">Bluebeam Revu</a> if your consultants use it. <a href="#drawboard-projects">Drawboard Projects</a> to replace it, with free guests.</td>
+        </tr>
+        <tr>
+          <th scope="row"><span class="m-plat">Mac</span><span class="m-plat-note">No Bluebeam app. Bluebeam Cloud runs in the browser.</span></th>
+          <td data-job="Mark up a sheet · Free"><a href="#preview">Preview</a>, built in. <a href="#pdf-expert">PDF Expert</a> for whole sets, by subscription.</td>
+          <td data-job="Measure to scale · Free or one-time"><a href="#pdf-studio">PDF Studio Pro</a>, for a one-time license.</td>
+          <td data-job="Check a set · One-time"><a href="#adequate">Adequate Design Review</a><span class="m-dagger">&dagger;</span> for checklists and revision overlays. <a href="#pdf-studio">PDF Studio Pro</a> compares two files.</td>
+          <td data-job="Review with others · Per user, per year" class="m-paid"><a href="#bluebeam">Bluebeam Cloud</a> in the browser if your consultants use Bluebeam. <a href="#drawboard-projects">Drawboard Projects</a> in the browser if not.</td>
+        </tr>
+        <tr>
+          <th scope="row"><span class="m-plat">iPad</span><span class="m-plat-note">Revu for iPad was retired at the end of 2025.</span></th>
+          <td data-job="Mark up a sheet · Free"><a href="#drawboard-pdf">Drawboard PDF</a>, free, with an Apple Pencil. <a href="#pdf-expert">PDF Expert</a> for large sets, by subscription.</td>
+          <td data-job="Measure to scale · Free or one-time"><a href="#polypdf">PolyPDF</a>, free. Lengths, areas and angles at a set scale.</td>
+          <td data-job="Check a set · One-time" class="m-none">Check on a computer.</td>
+          <td data-job="Review with others · Per user, per year" class="m-paid"><a href="#drawboard-projects">Drawboard Projects</a>. Bluebeam&rsquo;s iOS app if your consultants use Bluebeam, though it does less than Revu.</td>
+        </tr>
+        <tr>
+          <th scope="row"><span class="m-plat">Linux</span><span class="m-plat-note">Few native apps. Review runs in the browser.</span></th>
+          <td data-job="Mark up a sheet · Free"><a href="#okular">Okular</a>, free. <a href="#xournalpp">Xournal++</a> with a drawing tablet.</td>
+          <td data-job="Measure to scale · Free or one-time"><a href="#pdf-studio">PDF Studio Pro</a>, for a one-time license.</td>
+          <td data-job="Check a set · One-time"><a href="#adequate">Adequate Design Review</a><span class="m-dagger">&dagger;</span> for checklists and revision overlays. <a href="#pdf-studio">PDF Studio Pro</a> compares two files.</td>
+          <td data-job="Review with others · Per user, per year" class="m-paid"><a href="#bluebeam">Bluebeam Cloud</a> in the browser if your consultants use Bluebeam. <a href="#drawboard-projects">Drawboard Projects</a> in the browser if not.</td>
+        </tr>
+        <tr>
+          <th scope="row"><span class="m-plat">Browser</span><span class="m-plat-note">Any computer. Web versions often do less than the app.</span></th>
+          <td data-job="Mark up a sheet · Free"><a href="#drawboard-pdf">Drawboard PDF</a>, on its free tier.</td>
+          <td data-job="Measure to scale · Free or one-time" class="m-none">Measure in an app.</td>
+          <td data-job="Check a set · One-time" class="m-none">Check in an app.</td>
+          <td data-job="Review with others · Per user, per year" class="m-paid"><a href="#drawboard-projects">Drawboard Projects</a>, or <a href="#bluebeam">Bluebeam Cloud</a> if your consultants use Bluebeam. Mark up in <a href="#platforms">Autodesk Docs or Procore</a> when the project lives there.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="matrix-key">Nothing left of the heavy line needs a subscription. <span class="m-dagger">&dagger;</span>&nbsp;I make Adequate Design Review, to replace my own Bluebeam, Excel and Affinity workflow.</p>
+  </section>
 
   <div class="chooser-notes">
-    <section id="short">
-      <div class="section-label">Short answers</div>
-      <ul class="situations">
-        <li>
-          <span class="sit-who">Your firm and consultants use Bluebeam</span>
-          <span class="sit-pick">Stay on <strong>Bluebeam Revu</strong>. Your consultants expect its markups and Studio Sessions.</span>
-        </li>
-        <li>
-          <span class="sit-who">Replacing Bluebeam for a team</span>
-          <span class="sit-pick">Get <strong>Drawboard Projects</strong>. It is built for drawing review across a firm, and guests join without a paid seat.</span>
-        </li>
-        <li>
-          <span class="sit-who">Replacing Bluebeam on your own, on Windows</span>
-          <span class="sit-pick">Get <strong>PDF-XChange Editor</strong>. Calibrated measurement and full markup for a one-time price.</span>
-        </li>
-        <li>
-          <span class="sit-who">On a Mac</span>
-          <span class="sit-pick">Use <strong>PDF Expert</strong> for markup. If you measure from drawings, get <strong>PDF Studio Pro</strong> or <strong>Acrobat Pro</strong> instead.</span>
-        </li>
-        <li>
-          <span class="sit-who">On Linux</span>
-          <span class="sit-pick">Use <strong>Adequate Design Review</strong> for checklist review, scaled measurement and revision overlays, <strong>PDF Studio Pro</strong> or <strong>Master PDF Editor</strong> for a general PDF editor, and <strong>Okular</strong> or <strong>Xournal++</strong> for free markup.</span>
-        </li>
-        <li>
-          <span class="sit-who">On an iPad with a pencil</span>
-          <span class="sit-pick">Use <strong>PDF Expert</strong> or <strong>Drawboard PDF</strong>. Use <strong>PolyPDF</strong> to measure and <strong>Documents</strong> to carry sets to site.</span>
-        </li>
-        <li>
-          <span class="sit-who">Already paying for Adobe</span>
-          <span class="sit-pick">Use <strong>Acrobat Pro</strong> before buying anything else. It measures and comments, it just isn't organized around drawing sets.</span>
-        </li>
-        <li>
-          <span class="sit-who">Checking sets against a checklist</span>
-          <span class="sit-pick">Use <strong>Adequate Design Review</strong>. It is built for quality review against a checklist, with overlays to compare one revision against the last. I make it.</span>
-        </li>
+    <section id="adobe">
+      <h2 class="section-label">Already paying for Adobe</h2>
+      <p>Use <a href="#acrobat">Acrobat Pro</a> before buying anything else.
+         It marks up, measures to scale, compares files and runs shared
+         review on every device above. It has no tool chest or sortable
+         markups list, so a fifty-sheet review takes more clicks than in
+         Bluebeam.</p>
+    </section>
+
+    <section id="switching">
+      <h2 class="section-label">Before you leave Bluebeam</h2>
+      <p>Your clouds and callouts open anywhere. What stays behind is the
+         Bluebeam layer around them. Test these on one of your own sets
+         first:</p>
+      <ul class="checks">
+        <li>Calibrate a sheet and measure a dimension you know.</li>
+        <li>Mark up a set in the new app and open it in Bluebeam, then the reverse. Check that clouds, callouts and colors survive.</li>
+        <li>Rebuild the markups you use most. Bluebeam tool chests and custom markups-list columns do not import.</li>
+        <li>Run a review with one consultant. If they stay on Bluebeam, decide who exports and who imports.</li>
       </ul>
     </section>
 
     <section id="platforms">
-      <div class="section-label">Review inside a project platform</div>
+      <h2 class="section-label">Review inside a project platform</h2>
       <p>If the project lives in <a href="https://construction.autodesk.com/products/autodesk-docs/" rel="noopener">Autodesk Docs</a> or <a href="https://www.procore.com" rel="noopener">Procore</a>, mark up there. The comments stay attached to the sheet version the contractor builds from.</p>
 
       <div class="pick">
@@ -407,23 +163,145 @@
         <div class="pick-note">For reviewing the model, not the PDF. Issues are tracked across the 3D model and 2D sheets together, with clash detection for coordination.</div>
       </div>
     </section>
-
-    <section id="switching">
-      <div class="section-label">Before you switch</div>
-      <p>Clouds, callouts, text and ink are standard PDF annotations, so they
-         open in any of these apps. What does not carry over is the Bluebeam
-         layer around them. Test these on one of your own sets first:</p>
-      <ul class="checks">
-        <li>Calibrate a sheet and measure a dimension you know.</li>
-        <li>Mark up a set in the new app and open it in Bluebeam, then the reverse. Check that clouds, callouts and colors survive.</li>
-        <li>Rebuild the markups you use most. Bluebeam tool chests and custom markups-list columns do not import.</li>
-        <li>Run a review with one consultant. If they stay on Bluebeam, decide who exports and who imports.</li>
-      </ul>
-      <p>Scaled measurement means you can calibrate a sheet to its drawing
-         scale and take lengths and areas off it. Prices and plans change.
-         Check the vendor before you buy.</p>
-    </section>
   </div>
+
+  <section class="sheet-section" id="tools" aria-labelledby="tools-label">
+    <h2 class="section-label" id="tools-label">Every tool on this page</h2>
+    <table class="schedule">
+      <colgroup><col class="s-col-tool"><col class="s-col-runs"><col class="s-col-fact"><col class="s-col-fact"><col class="s-col-price"></colgroup>
+      <thead>
+        <tr>
+          <th scope="col">Tool</th>
+          <th scope="col">Runs on</th>
+          <th scope="col">Measures to scale</th>
+          <th scope="col">Review with others</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="acrobat">
+          <th scope="row"><a href="https://www.adobe.com/acrobat/acrobat-pro.html" rel="noopener">Adobe Acrobat Pro</a><span class="s-maker">Adobe &middot; General PDF editor</span><span class="s-note">Capable, and often already paid for. Not organized around drawing sets.</span></th>
+          <td data-label="Runs on">Windows, Mac, iPad, iPhone, Android, web</td>
+          <td data-label="Measures to scale">Yes</td>
+          <td data-label="Review with others">Shared review</td>
+          <td data-label="Price">Subscription</td>
+        </tr>
+        <tr id="adequate">
+          <th scope="row"><a href="https://adequate.design" rel="noopener">Adequate Design Review</a><span class="s-maker">Adequate Design &middot; Checklist review &middot; in beta</span><span class="s-note">Reviews a set against your own Excel or Word checklists, with overlays to see what changed between revisions. Runs offline, and nothing leaves your machine. &dagger;&nbsp;I make it.</span></th>
+          <td data-label="Runs on">Windows, Mac, Linux</td>
+          <td data-label="Measures to scale">Yes</td>
+          <td data-label="Review with others" class="s-no">No, one reviewer</td>
+          <td data-label="Price">$400 one-time after the beta</td>
+        </tr>
+        <tr id="bluebeam">
+          <th scope="row"><a href="https://www.bluebeam.com/product/markups-and-data/" rel="noopener">Bluebeam Revu</a><span class="s-maker">Bluebeam &middot; Drawing sets</span><span class="s-note">The standard in architecture and construction: tool chests, a markups list you can sort and export, takeoff, sheet comparison and Studio Sessions. The full app is Windows only. Elsewhere, Bluebeam Cloud and the iOS app do less.</span></th>
+          <td data-label="Runs on">Windows, iPad, iPhone, web (Bluebeam Cloud)</td>
+          <td data-label="Measures to scale">Yes, the strongest</td>
+          <td data-label="Review with others">Studio Sessions</td>
+          <td data-label="Price">About $260&ndash;440 per user per year</td>
+        </tr>
+        <tr id="documents">
+          <th scope="row"><a href="https://documents.io/app" rel="noopener">Documents</a><span class="s-maker">Readdle &middot; Reading sets</span><span class="s-note">A file manager with annotation built in. For carrying a set to site and noting what you see.</span></th>
+          <td data-label="Runs on">iPad, iPhone</td>
+          <td data-label="Measures to scale" class="s-no">No</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">Free, paid tier</td>
+        </tr>
+        <tr id="drawboard-pdf">
+          <th scope="row"><a href="https://www.drawboard.com" rel="noopener">Drawboard PDF</a><span class="s-maker">Drawboard &middot; Drawing sets</span><span class="s-note">The best pen experience on a Windows tablet. The free tier covers ink, shapes, text and signatures. Measurement is in Pro Plus and Pro Unlimited.</span></th>
+          <td data-label="Runs on">Windows, Mac, iPad, Android, web</td>
+          <td data-label="Measures to scale">Pro Plus and Pro Unlimited</td>
+          <td data-label="Review with others">Shared documents</td>
+          <td data-label="Price">Free. Paid tiers $6.99&ndash;13.33 a month, billed annually</td>
+        </tr>
+        <tr id="drawboard-projects">
+          <th scope="row"><a href="https://www.drawboard.com" rel="noopener">Drawboard Projects</a><span class="s-maker">Drawboard &middot; Team review</span><span class="s-note">The closest replacement for Bluebeam as a team tool. Versions in one project, live markups, issues pinned to the sheet with an owner and a status. Clients and consultants join as free guests.</span></th>
+          <td data-label="Runs on">Windows, iPad, web</td>
+          <td data-label="Measures to scale">Yes</td>
+          <td data-label="Review with others">Issues, versions, free guests</td>
+          <td data-label="Price">Subscription, per user</td>
+        </tr>
+        <tr id="foxit">
+          <th scope="row"><a href="https://www.foxit.com/pdf-editor/" rel="noopener">Foxit PDF Editor</a><span class="s-maker">Foxit &middot; General PDF editor</span><span class="s-note">An Acrobat alternative. Consider it if your firm buys Foxit for office documents already.</span></th>
+          <td data-label="Runs on">Windows, Mac, iPad, iPhone, Android, web</td>
+          <td data-label="Measures to scale">Yes</td>
+          <td data-label="Review with others">Shared review</td>
+          <td data-label="Price">Subscription</td>
+        </tr>
+        <tr id="master-pdf">
+          <th scope="row"><a href="https://code-industry.net/masterpdfeditor/" rel="noopener">Master PDF Editor</a><span class="s-maker">Code Industry &middot; General PDF editor</span><span class="s-note">One of the few full PDF editors with a native Linux version. Check how it sets a drawing scale before you rely on it for takeoff.</span></th>
+          <td data-label="Runs on">Windows, Mac, Linux</td>
+          <td data-label="Measures to scale">Distance, perimeter, area</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">One-time license</td>
+        </tr>
+        <tr id="trace">
+          <th scope="row"><a href="https://morpholio.com/trace" rel="noopener">Morpholio Trace</a><span class="s-maker">Morpholio &middot; Sketching</span><span class="s-note">Digital trace paper, for sketching a design response over a plan at scale, not for tracking comments.</span></th>
+          <td data-label="Runs on">Mac, iPad, iPhone</td>
+          <td data-label="Measures to scale">Scale-aware drawing</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">Subscription</td>
+        </tr>
+        <tr id="ncored">
+          <th scope="row"><a href="https://ncored.com" rel="noopener">Ncored</a><span class="s-maker">Noir architects &middot; Drawing sets</span><span class="s-note">Made by a working architecture studio for the 50&ndash;200&nbsp;MB CAD and BIM exports that make general PDF apps lag. Try it if Bluebeam or Acrobat stalls on your sets.</span></th>
+          <td data-label="Runs on">Windows, Mac</td>
+          <td data-label="Measures to scale" class="s-no">Not listed</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">Subscription or one-time license</td>
+        </tr>
+        <tr id="okular">
+          <th scope="row"><a href="https://okular.kde.org" rel="noopener">Okular</a><span class="s-maker">KDE &middot; Quick notes</span><span class="s-note">The standard document viewer on KDE Linux desktops. Highlights, notes, lines, shapes and stamps, saved into the PDF.</span></th>
+          <td data-label="Runs on">Windows, Linux</td>
+          <td data-label="Measures to scale" class="s-no">No</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">Free, open source</td>
+        </tr>
+        <tr id="pdf-expert">
+          <th scope="row"><a href="https://pdfexpert.com" rel="noopener">PDF Expert</a><span class="s-maker">Readdle &middot; General PDF editor</span><span class="s-note">The best markup app on a Mac, and on an iPad with an Apple Pencil. Fast on large sets. It does not measure to scale.</span></th>
+          <td data-label="Runs on">Mac, iPad, iPhone</td>
+          <td data-label="Measures to scale" class="s-no">No</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">Subscription</td>
+        </tr>
+        <tr id="pdf-studio">
+          <th scope="row"><a href="https://www.qoppa.com/pdfstudio/" rel="noopener">PDF Studio Pro</a><span class="s-maker">Qoppa &middot; Drawing sets</span><span class="s-note">Markup, calibrated measurement and document comparison on Mac and Linux, for a one-time license.</span></th>
+          <td data-label="Runs on">Windows, Mac, Linux</td>
+          <td data-label="Measures to scale">Yes</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">One-time license</td>
+        </tr>
+        <tr id="pdf-xchange">
+          <th scope="row"><a href="https://www.pdf-xchange.com/product/pdf-xchange-editor" rel="noopener">PDF-XChange Editor</a><span class="s-maker">PDF-XChange &middot; Drawing sets</span><span class="s-note">The inexpensive Windows replacement for working alone. Clouds, callouts, stamps and calibrated measurement.</span></th>
+          <td data-label="Runs on">Windows</td>
+          <td data-label="Measures to scale">Yes</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">One-time license</td>
+        </tr>
+        <tr id="polypdf">
+          <th scope="row"><a href="https://polypdf.com" rel="noopener">PolyPDF</a><span class="s-maker">PolyPDF &middot; Drawing sets</span><span class="s-note">A new iPad app for drawings, with callouts, discipline colors and line detection to snap measurements to the drawing. Sync and team review are not out yet.</span></th>
+          <td data-label="Runs on">iPad, iPhone</td>
+          <td data-label="Measures to scale">Yes</td>
+          <td data-label="Review with others" class="s-no">Not yet</td>
+          <td data-label="Price">Free</td>
+        </tr>
+        <tr id="preview">
+          <th scope="row"><a href="https://support.apple.com/guide/preview/welcome/mac" rel="noopener">Preview &amp; Markup</a><span class="s-maker">Apple &middot; Quick notes</span><span class="s-note">Enough to circle something on one sheet and send it back. Nothing to install.</span></th>
+          <td data-label="Runs on">Mac, iPad, iPhone</td>
+          <td data-label="Measures to scale" class="s-no">No</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">Free, built in</td>
+        </tr>
+        <tr id="xournalpp">
+          <th scope="row"><a href="https://xournalpp.github.io" rel="noopener">Xournal++</a><span class="s-maker">Open source &middot; Sketching</span><span class="s-note">Handwriting and sketching over a PDF in layers, with pen pressure. The pick for a Linux machine with a drawing tablet.</span></th>
+          <td data-label="Runs on">Windows, Mac, Linux</td>
+          <td data-label="Measures to scale" class="s-no">No</td>
+          <td data-label="Review with others" class="s-no">No</td>
+          <td data-label="Price">Free, open source</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="schedule-key">Measuring to scale means calibrating a sheet to its drawing scale and taking lengths and areas off it. Prices and plans change. Check the vendor before you buy.</p>
+  </section>
 
   <div class="page-footer">
     <a class="back-link" href="index.html">&larr; architecture.tools</a>
@@ -433,6 +311,5 @@
 </div>
 
 <script src="assets/js/ui.js"></script>
-<script src="assets/js/chooser.js"></script>
 </body>
 </html>
