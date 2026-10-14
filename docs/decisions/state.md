@@ -117,12 +117,15 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   text elements per page to 0, both schemes. Format: the filters' two axes
   (platform, need) were a matrix behind buttons, and the cards ranked
   unlike things in one list. `pdf-markup.html` now states its claim (no
-  subscription to mark up, measure or check a set; a subscription buys
-  review with others, and then you use what your consultants use) and draws
-  it as a devices × needs matrix with the paid column behind a heavy rule,
+  subscription to mark up, measure or check a set; you subscribe to run a
+  review with your team and consultants, and then you use what your
+  consultants use) and draws it as a devices × jobs matrix with the paid
+  column behind a thick rule,
   then notes, then a schedule of all 17 tools (old card ids kept as row
   anchors). Cell picks restate the old page's own claims; none is new
-  vendor fact. Built on `claude/determined-bardeen-etpcp6` off
+  vendor fact (the claim was narrowed from "review with others" because
+  Drawboard PDF's free tier shares documents, and billing is stated only as
+  "subscription, per user"). Built on `claude/determined-bardeen-etpcp6` off
   `new-layout`, where the choosers live (`dev` has none). The BIM pages keep
   the chooser until the operator rules on the pattern and their claims.
 

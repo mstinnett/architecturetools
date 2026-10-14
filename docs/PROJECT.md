@@ -454,11 +454,11 @@ promote them as each is ready, not to land them all at once.
   `assets/js/chooser.js` (its header is the data-* contract), one style
   block, global.css "CHOOSER". **`pdf-markup.html` is a software sheet**
   (2026-10-14, on `claude/determined-bardeen-etpcp6`, pending the
-  operator's call): one claim, drawn. The frame says you need a
-  subscription only to review with other people; a static matrix (devices
-  down; mark up, measure, check, review across, in order of cost; the paid
-  column behind a heavy rule) gives one pick per cell; then the notes and a
-  schedule of every tool. No script; global.css "SOFTWARE SHEET". The BIM
+  operator's call): one claim, drawn. The frame says you subscribe only
+  to run a review with your team and consultants; a static matrix (devices
+  down; mark up, measure, check, run a review across, in order of cost; the
+  paid column behind a thick rule) gives one or two picks per cell, each
+  with a verb and its reason; then the notes and a schedule of every tool. No script; global.css "SOFTWARE SHEET". The BIM
   pages follow if the pattern holds.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are

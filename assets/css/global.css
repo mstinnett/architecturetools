@@ -576,10 +576,10 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
 
 /* ---- SOFTWARE SHEET — a software page that makes one claim and draws it
    (pdf-markup first): the claim (.sheet-frame), a matrix that shows it
-   (devices down, needs across in order of cost, the paid column behind a
-   heavy rule), the notes (.chooser-notes above), and a schedule of every
+   (devices down, jobs across in order of cost, the paid column behind a
+   thick rule), the notes (.chooser-notes above), and a schedule of every
    tool. Static; no script. Under 980px both tables restack: the matrix one
-   device at a time, each cell labelled by its need (data-job), and the
+   device at a time, each cell labelled by its job (data-job), and the
    schedule one tool at a time (data-label).
    Contrast: nothing here is weight 300 below --text-lg, and nothing reads
    in --ink-3. ---- */
@@ -630,7 +630,7 @@ h2.section-label { line-height: inherit; }
   .matrix thead, .matrix colgroup, .schedule thead, .schedule colgroup { display: none; }
 
   .matrix tbody tr { border-top: var(--border-heavy); padding-top: 0.9rem; margin-bottom: var(--space-lg); }
-  .matrix tbody tr + tr > * { border-top: 0; }
+  .matrix tbody tr + tr > th { border-top: 0; }
   .matrix tbody th { padding: 0 0 0.6rem; }
   .matrix td { padding: 0.6rem 0; border-top: var(--border-light); }
   .matrix td::before { content: attr(data-job); display: block; margin-bottom: 0.2rem; font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
