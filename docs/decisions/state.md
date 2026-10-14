@@ -128,6 +128,19 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   "subscription, per user"). Built on `claude/determined-bardeen-etpcp6` off
   `new-layout`, where the choosers live (`dev` has none). The BIM pages keep
   the chooser until the operator rules on the pattern and their claims.
+  Same day, operator follow-up ("platform could be a filter then role and
+  capabilities could be the table items"; "not sure what run a review means
+  ... maybe a design meeting?"; then "Mark Up Together Live"): platform is
+  now one "Runs on" filter (`assets/js/platform-filter.js`, starting on the
+  visitor's platform, storing nothing, only hiding rows) over the picks
+  matrix and a tools table grouped by role, with a dot per capability
+  (measures, compares revisions, checklist review, mark up together live)
+  and price. "Run a review" became **mark up together live**, since
+  Adequate's solo QA review is also a review: ● is a live session (Bluebeam
+  Studio Sessions, Drawboard Projects, both subscriptions), ○ shared review
+  (Acrobat, Foxit, Drawboard PDF). Dots are CSS shapes, not glyphs, since
+  Jost has no ◐; under 980px they turn into words and a tool's missing
+  capabilities drop out.
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

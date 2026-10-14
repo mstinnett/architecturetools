@@ -1,6 +1,7 @@
 /* chooser.js — the filter-and-sort behaviour shared by the software choosers
    (bim-platforms.html, bim-emerging.html). pdf-markup.html left it for the
-   static SOFTWARE SHEET layout (global.css) and loads no script of its own.
+   SOFTWARE SHEET layout (global.css), whose one "Runs on" filter is
+   assets/js/platform-filter.js.
 
    Every item is a static <article class="tool"> in the page, so a chooser
    reads in full without JavaScript and is indexable. This script only hides

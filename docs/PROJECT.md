@@ -456,12 +456,18 @@ promote them as each is ready, not to land them all at once.
   `assets/js/chooser.js` (its header is the data-* contract), one style
   block, global.css "CHOOSER". **`pdf-markup.html` is a software sheet**
   (2026-10-14, on `claude/determined-bardeen-etpcp6`, pending the
-  operator's call): one claim, drawn. The frame says you subscribe only
-  to run a review with your team and consultants; a static matrix (devices
-  down; mark up, measure, check, run a review across, in order of cost; the
-  paid column behind a thick rule) gives one or two picks per cell, each
-  with a verb and its reason; then the notes and a schedule of every tool. No script; global.css "SOFTWARE SHEET". The BIM
-  pages follow if the pattern holds.
+  operator's call): one claim, then one "Runs on" filter over two tables.
+  The frame says you subscribe only to mark up together live with your
+  team and consultants. The picks matrix (devices down; mark up, measure,
+  check a set, mark up together live across, in order of cost; the paid
+  column behind a thick rule) shows the chosen platform's row, or all five.
+  The tools table (operator: "platform could be a filter then role and
+  capabilities could be the table items") lists every tool that runs there,
+  grouped by role, with a dot per capability and the price. The filter is
+  `assets/js/platform-filter.js`: it starts on the visitor's platform,
+  stores nothing, and only hides rows, so without script the page shows
+  every row. Styles: global.css "SOFTWARE SHEET". The BIM pages follow if
+  the pattern holds.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
   editorial and labelled so. Adequate Design Review is listed on the PDF
