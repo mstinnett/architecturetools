@@ -447,7 +447,7 @@ promote them as each is ready, not to land them all at once.
 - **Software choosers** (landed 2026-10-08, merged to the lists cover
   2026-10-13), three named live pages in the picker's register, indexed on
   the cover in the **What tool to buy or use** list:
-  `pdf-markup.html` (PDF Markup & Review), `bim-platforms.html` (BIM & Design
+  `pdf-markup.html` (PDF Tools for Drawing Sets, formerly PDF Markup & Review), `bim-platforms.html` (BIM & Design
   Platforms: Revit, Archicad, Vectorworks, Rhino, SketchUp, AutoCAD, Chief
   Architect, the renderers) and `bim-emerging.html` (Emerging BIM: Motif,
   Snaptrude, Qonic, Arcol, Forma, Rayon...). The two BIM pages are filter
@@ -456,21 +456,19 @@ promote them as each is ready, not to land them all at once.
   `assets/js/chooser.js` (its header is the data-* contract), one style
   block, global.css "CHOOSER". **`pdf-markup.html` is a software sheet**
   (2026-10-14, on `claude/determined-bardeen-etpcp6`, pending the
-  operator's call): a catalog with one claim. Operator: "I genuinely want
-  a catalog of the available scaled measure and callout tools as well as
-  the real time collaboration". The claim: callouts, clouds and scaled
-  measurement are in most paid apps on every platform, so the tools differ
-  on live markup and revision overlays. One "Runs on" filter
-  (`assets/js/platform-filter.js`: starts on the visitor's platform, stores
-  nothing, only hides rows) over 18 tools in three groups (made for drawing
-  sets, PDF editors, project platforms), each with a mark and a few words
-  for produces sets, mark up together live, markups list (where Bluebeam
-  leads), then overlays revisions, measures to scale (with snapping, which
-  the operator requires) and callouts and clouds (where others match it),
-  then price and a note that decides or locates. The claim: use Bluebeam
-  if you produce sets in it or review them live; for markup, measuring
-  and overlays, other apps match it. Adequate Design Review (the
-  operator's product) is not listed until it leaves beta. Facts were checked against vendor documentation in October
+  operator's call): a catalog of PDF work on a project, which the
+  operator's DocCheck/Adequate site points to for "a replacement for
+  BlueBeam". Six jobs, seven columns: produce (from Revit or AutoCAD),
+  manage (the set while you work in it), assemble (the set as it leaves
+  your hands), mark up, review live, take off, check (compare and overlay
+  count here, as a way to verify). 21 tools in four groups (made for
+  drawing sets, PDF editors, project platforms, checking tools), behind
+  one "Runs on" filter (`assets/js/platform-filter.js`: starts on the
+  visitor's platform, stores nothing, only hides rows). The claim:
+  Bluebeam's Complete plan covers five of the jobs in one app; other tools
+  each cover part, often for less; checking tools are a newer, separate
+  kind. Adequate Design Review (the operator's product) is not listed
+  until it leaves beta. Facts were checked against vendor documentation in October
   2026; a dashed ring, "not checked", marks what could not be. A full dot
   is a feature the app has (the note names its plan); a half dot is a
   limited form (the note names what is missing). Styles: global.css "SOFTWARE SHEET".

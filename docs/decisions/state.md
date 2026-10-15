@@ -193,6 +193,21 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   others match. The claim: "Use Bluebeam if you produce drawing sets in it
   or review them live with your consultants ... If you mark up, measure
   and compare revisions, other apps match it."
+  Then, operator: the page is "PDF management of AEC. Production, markup,
+  binding, takeoffs, and qa", linked from the Adequate/DocCheck site "to
+  build trust in what I do offer". Two refinements: compare and overlay
+  file under QA as a verification method, not a markup job; and set work
+  splits into manage (the set while you work in it) and assemble (the set
+  as it leaves your hands), since slip-sheeting is both. Three research
+  passes (produce and bind, takeoff, AI checkers) fed a rebuild: seven
+  columns (produce, manage, assemble, mark up, review live, take off,
+  check), a job key, 21 tools in four groups, the new group "Checking
+  tools" (Nomic, Helonic, InspectMind). None of the AI checkers was found
+  to record checks that passed; Solibri (IFC, not PDF) does, and is named
+  in the note. Stru could not be identified (stru.ai, a StruAI SDK and
+  Structured AI may be one company or several) and CodeComply.ai has no
+  published platform or price, so both wait. The page is renamed PDF Tools
+  for Drawing Sets (URL unchanged); the cover card follows.
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

@@ -593,10 +593,14 @@ h2.section-label { line-height: inherit; }
 .sheet-how, .schedule-key { font-size: var(--text-sm); font-weight: 400; color: var(--ink-2); line-height: 1.55; }
 .sheet-how { margin: calc(-1 * var(--space-sm)) 0 var(--space-lg); }
 .schedule-key { margin-top: var(--space-md); max-width: 46em; }
+.job-key { margin: var(--space-md) 0 0; max-width: 46em; font-size: var(--text-sm); line-height: 1.5; }
+.job-key > div { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: 0.75rem; padding: 0.3rem 0; border-bottom: var(--border-light); }
+.job-key dt { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); padding-top: 0.15em; }
+.job-key dd { margin: 0; font-weight: 400; color: var(--ink); }
 
 .schedule { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--text-sm); }
-.schedule .s-col-tool { width: 24%; }
-.schedule .s-col-cap { width: 9.5%; }
+.schedule .s-col-tool { width: 19%; }
+.schedule .s-col-cap { width: 9.3%; }
 .schedule thead th { text-align: left; vertical-align: bottom; padding: 0 0.9rem 0.5rem 0; border-bottom: var(--border-heavy);
                      font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
 .schedule tbody th, .schedule td { text-align: left; vertical-align: top; padding: 0.7rem 0.9rem 0.75rem 0; border-bottom: var(--border-light); font-weight: 400; line-height: 1.5; }

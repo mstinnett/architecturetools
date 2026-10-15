@@ -140,7 +140,7 @@ AT-0 should make the site feel whole even if the numbered sets are still thin.
 > The calculator shelf under the feature carries Stairs, Slope, Tile and Scale
 > Resolution, each plate its page's own figure for its worked example. The
 > second list, **What tool to buy or use**, holds the Computer Chooser and the
-> three software choosers (PDF Markup & Review, BIM & Design Platforms,
+> three software choosers (PDF Tools for Drawing Sets, BIM & Design Platforms,
 > Emerging BIM).
 >
 > The cover lists **only what is live** rather than stubbing the unbuilt set
