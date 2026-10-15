@@ -109,7 +109,7 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── test-feedback.mjs           # node tools/test-feedback.mjs — the feedback collector + inbox
 │   ├── test-hosting.mjs            # node tools/test-hosting.mjs — the router + what gets published
 │   ├── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
-│   └── pdf-bench/                  # PDF-app speed harness: heavy test set, engine + app timings (README.md)
+│   └── pdf-bench/                  # PDF-app page-load comparison (PolyPDF, Drawboard…): test set, run card, timings (README.md)
 ├── calculators/                    # convert.html + the 3 lib modules it uses are LIVE on main; the rest is dev-only
 │   ├── convert.html                # Precise Unit Converter — engine-powered, LIVE
 │   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)

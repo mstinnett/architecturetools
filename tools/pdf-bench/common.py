@@ -1,10 +1,11 @@
 """
-common.py - what every pdf-bench tool shares: the test steps, the view
-geometry, device identification and the one results format.
+common.py - what every pdf-bench tool shares: the protocol (which steps,
+which sheet each lands on), the view geometry, device identification and the
+one results format.
 
-Every timing tool (engines.py, drive.py, settle.py, the Swift PDFKit bench)
-writes rows in RESULT_FIELDS order, one measurement per row, so report.py can
-pool runs from Windows, macOS and iPadOS into one table.
+Every timing tool (settle.py, drive.py, and the optional engines.py and Swift
+PDFKit bench) writes rows in RESULT_FIELDS order, one measurement per row, so
+report.py can pool runs from Windows, macOS and iPadOS into one table.
 """
 
 import csv
@@ -16,18 +17,25 @@ import subprocess
 import sys
 import uuid
 
-# The protocol, in order. GUI runs (drive.py, settle.py) and engine runs
-# (engines.py, PDFKitBench.swift) use the same names, so their rows line up.
+# Step names. Every app timing is input -> fully sharp, measured off the
+# screen, so it is the whole app (its engine, caching, prefetch, tiling and
+# UI) - the time a user actually waits.
 STEPS = {
-    'open':   'open the file until the first sheet is fully drawn',
-    'fit':    'fit the test sheet to the window; time to fully sharp',
-    'zoom':   'zoom to 400% of fit on the dense area; time to fully sharp',
-    'pan':    'drag across the zoomed sheet; frame rate while moving, sharp after release',
-    'flip':   'next sheet, one step at a time through the set; time per sheet',
-    'jump':   'go to a sheet by number or bookmark; time to fully sharp',
-    'thumbs': 'render every sheet as a thumbnail (engines) / scroll the thumbnail panel (apps)',
-    'search': 'find the search target across the whole set',
+    'open':    'tap/open the file, app freshly launched, until the first sheet is fully sharp',
+    'flip':    'next sheet, in order (prefetching apps get credit for it, as they should)',
+    'jump':    'go to a far-off sheet not yet seen (no prefetch can help): raw page load',
+    'revisit': 'go back to a sheet seen a moment ago (cache behaviour)',
+    'fit':     'fit the sheet to the window; time to fully sharp',
+    'zoom':    'zoom to 4x fit on the dense area; time to fully sharp',
+    'pan':     'drag across the zoomed sheet; frame rate while moving, sharp after release',
+    'search':  'find the search target across the whole set',
+    'thumbs':  'engines only: every sheet as a thumbnail',
 }
+
+# The page-load run, the default for apps. On the single complex sheet only
+# open (and fit/zoom/pan) mean anything.
+PAGELOAD = 'open,flip*10,jump*5,revisit*3'
+SHEET_ONLY = 'open,zoom,pan,fit'
 
 RESULT_FIELDS = [
     'run_id', 'date', 'platform', 'os_version', 'device', 'cpu', 'ram_gb',
@@ -76,6 +84,43 @@ def test_page(manifest, override=None):
     if 'test_page' in manifest:
         return manifest['test_page']
     return max(manifest['pages'], key=lambda p: p['segments'] + 20 * p['xobject_draws'])['index']
+
+
+def step_targets(manifest, steps):
+    """The sheet (0-based index) each step in `steps` lands on, or None when
+    a step doesn't move between sheets. open -> the first sheet, flip -> the
+    next, jump -> the manifest's jump targets in turn (far apart, never seen),
+    revisit -> those same targets again, in the same order, search -> the sheet
+    holding the target."""
+    if not manifest:
+        return [None] * len(steps)
+    n = len(manifest['pages'])
+    jumps = manifest.get('jumps') or [manifest.get('test_page', 0)]
+    pos, out, j, r = 0, [], 0, 0
+    for step in steps:
+        if step == 'open':
+            pos = 0
+        elif step == 'flip':
+            pos = min(pos + 1, n - 1)
+        elif step == 'jump':
+            pos = jumps[j % len(jumps)]
+            j += 1
+        elif step == 'revisit':
+            pos = jumps[r % len(jumps)]
+            r += 1
+        elif step == 'search':
+            pos = manifest['search']['page_index']
+        else:
+            out.append(pos)
+            continue
+        out.append(pos)
+    return out
+
+
+def page_label(manifest, index):
+    if index is None:
+        return ''
+    return manifest['pages'][index]['label'] if manifest else str(index + 1)
 
 
 def _run(cmd):

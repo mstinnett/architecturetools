@@ -3,13 +3,15 @@
 test_bench.py - checks the harness itself. Run: python3 test_bench.py
 
   - make_set.py is deterministic and its manifest matches the PDF
+  - the page-load protocol: open, flips, jumps to sheets never seen, revisits,
+    and the run card that tells a tester what to do
   - engines.py runs whichever engines are installed and writes rows
   - settle.py recovers known timings from a synthetic recording: taps in
     the audio, a progressive blur-to-sharp render, a pan, a frozen app that
     paints nothing for two seconds, and a step cut short by the next input.
     Both a constant-frame-rate video (OBS, QuickTime) and a variable-frame-
     rate one (the iPad's own screen recorder) are checked.
-  - report.py pools the lot
+  - report.py pools the lot and ranks apps against apps on the same device
 
 Needs ffmpeg, numpy and Pillow; engines are tested when installed.
 Works in a temporary folder and leaves nothing behind.
@@ -226,9 +228,11 @@ def test_settle(tmp):
         check('settle.py runs (%s)' % kind, r.returncode == 0, r.stderr[-400:])
         print('      ' + '\n      '.join(r.stdout.strip().splitlines()))
         got = rows(out) if os.path.exists(out) else []
-        by_rep = {}
+        by_rep = {}                                         # step number -> {metric: row}
         for g in got:
-            by_rep.setdefault(int(g['rep']), {})[g['metric']] = g
+            if g['metric'] == 'response':                   # each step's rows start with its response
+                by_rep[len(by_rep)] = {}
+            by_rep[len(by_rep) - 1][g['metric']] = g
         check('one input per tap, double-tap merged (%s)' % kind, len(by_rep) == len(SCRIPT), '%d inputs' % len(by_rep))
         tol = 45.0                                          # a frame at 60 fps + audio/video alignment
         for n, (step, tap, events, resp, settle_ms, settled) in enumerate(SCRIPT):
@@ -248,10 +252,43 @@ def test_settle(tmp):
     return results
 
 
+# ---------------------------------------------------------------------------
+# the page-load protocol: which sheet each step lands on, and the run card
+# ---------------------------------------------------------------------------
+
+def test_protocol(tmp):
+    sys.path.insert(0, HERE)
+    import common
+    import settle
+    pdf = os.path.join(tmp, 'set24.pdf')
+    r = run('make_set.py', '--preset', 'set', '--sheets', '24', '--density', '0.1', '--out', pdf)
+    check('make_set builds a small set', r.returncode == 0, r.stderr[-300:])
+    m = common.load_manifest(pdf)
+    steps = settle.expand_steps(common.PAGELOAD)
+    targets = common.step_targets(m, steps)
+    flips = [t for s, t in zip(steps, targets) if s == 'flip']
+    jumps = [t for s, t in zip(steps, targets) if s == 'jump']
+    revisits = [t for s, t in zip(steps, targets) if s == 'revisit']
+    check('open lands on the first sheet, flips walk forward', targets[0] == 0 and flips == list(range(1, 11)), str(flips))
+    check('jumps go to sheets the flips never reached', all(j > 10 for j in jumps) and len(set(jumps)) == len(jumps),
+          str(jumps))
+    check('consecutive jumps land far apart', all(abs(a - b) >= 4 for a, b in zip(jumps, jumps[1:])), str(jumps))
+    check('the heaviest sheet is a jump target', m['test_page'] in jumps or m['test_page'] <= 10,
+          'test page %d' % m['test_page'])
+    check('revisits return to the first jump targets', revisits == jumps[:len(revisits)], str(revisits))
+    r = run('runcard.py', pdf)
+    check('runcard.py runs', r.returncode == 0, r.stderr[-300:])
+    labels = [m['pages'][j]['label'] for j in jumps]
+    check('run card names every jump sheet', all(l in r.stdout for l in labels), ', '.join(labels))
+    check('run card prints the settle.py command', '--steps %s' % common.PAGELOAD in r.stdout)
+
+
 def test_report(paths):
     r = run('report.py', *[p for p in paths if p])
     check('report.py runs', r.returncode == 0, r.stderr[-300:])
-    check('report has a table per file', r.stdout.count('### ') >= 1 and '| tool' in r.stdout)
+    check('report has an app table per device', '| app |' in r.stdout and '### test' in r.stdout)
+    check('report ranks apps on the same device', '**fastest**' in r.stdout and '×' in r.stdout)
+    check('report keeps engines in their own section', '## Engines' in r.stdout)
     check('report flags lower bounds', '†' in r.stdout)
     print(r.stdout)
 
@@ -264,6 +301,7 @@ def main():
     tmp = tempfile.mkdtemp(prefix='pdf-bench-test-')
     try:
         pdf = test_make_set(tmp)
+        test_protocol(tmp)
         engine_csv = test_engines(tmp, pdf)
         video_csvs = test_settle(tmp)
         test_report([engine_csv] + video_csvs)

@@ -18,7 +18,7 @@
     "verified": true,
     "note": "Checked under Xvfb at 1920x1200. Chrome's viewer pans by scrolling, not dragging, and its fit key toggles, so fit and zoom type into the zoom box: pass --fit-pct. Flip clicks the grey margin first to take focus back from the zoom box; search is incremental, so its clock starts at the typing.",
     "roi": "0.16,0.12,0.83,0.88",
-    "quit": "pkill -f 'chrome.*pdf-bench-profile' || true",
+    "quit": "pkill -f -- '--user-data-dir=/tmp/pdf-bench-profile' || true",
     "steps": {
       "open": ["run:${{CHROMIUM:-chromium}} --user-data-dir=/tmp/pdf-bench-profile --start-maximized {file}"],
       "fit": ["sclick:0.469,0.096", "key:ctrl+a", "type:{fit_pct}", "key:enter"],

@@ -1153,6 +1153,24 @@ def sheet_list(n, rng):
     return sheets
 
 
+def jump_targets(n, heaviest, count=5):
+    """Sheets spread across the set, visited in an order that never lands
+    next to the previous one; the heaviest sheet is one of them. In a full
+    set they lie beyond the first 11 sheets, which the flip steps have seen."""
+    if n < 2:
+        return []
+    lo = 11 if n > 20 else 1
+    picks = []
+    for frac in (0.9, 0.25, 0.65, 0.05, 0.45)[:count]:
+        i = lo + int(round(frac * (n - 1 - lo)))
+        if i not in picks:
+            picks.append(i)
+    if heaviest not in picks and heaviest >= lo and n > 20:
+        nearest = min(range(len(picks)), key=lambda k: abs(picks[k] - heaviest))
+        picks[nearest] = heaviest
+    return picks
+
+
 def build(out, sheets_n, density, seed):
     t_start = time.time()
     rng = Rng(seed)
@@ -1358,10 +1376,11 @@ def build(out, sheets_n, density, seed):
         'sha256': sha.hexdigest(), 'content_fingerprint': fingerprint,
         'seed': seed, 'density': density, 'page_size_pt': [SHEET_W, SHEET_H],
         'search': {'text': SEARCH_TARGET, 'page_index': target_index if sheets_n > 1 else 0},
-        # The test sheet: the heaviest. Engines time fit/zoom on it, and the
-        # app protocol's jump step goes there before fit/zoom/pan.
+        # The test sheet (the heaviest) for zoom/pan, and the jump step's
+        # targets: far apart and away from the first sheets, so no app can
+        # have prefetched them - each jump is a cold page load.
         'test_page': heaviest,
-        'jump': {'page_index': heaviest},
+        'jumps': jump_targets(len(sheets), heaviest),
         'totals': {k: sum(p[k] for p in manifest_pages) for k in ('segments', 'curves', 'text_ops', 'xobject_draws', 'markups', 'links')},
         'pages': manifest_pages,
     }

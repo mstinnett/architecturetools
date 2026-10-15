@@ -21,10 +21,10 @@ Recordings:  iPadOS  Control Center > Screen Recording, long-press > Microphone 
 Variable-frame-rate recordings (the iPad's) are fine: frame times come from
 the file, not from an assumed frame rate.
 
-Usage:
-  python3 settle.py ipad.mov --steps open,fit,zoom,pan,flip*10,jump,search \\
+Usage (runcard.py prints the exact command for a test file):
+  python3 settle.py polypdf-1.mov --steps open,flip*10,jump*5,revisit*3 --rep 1 \\
       --tool PolyPDF --tool-version 2.1 --device "iPad Pro 13 M4" --platform iPadOS \\
-      --file complex-sheet.pdf --roi 0,0.06,1,0.94 --plot ipad.png
+      --file drawing-set.pdf --roi 0,0.06,1,0.94 --plot polypdf-1.png
   python3 settle.py win.mp4 --marks win.marks.csv ...     # fixed or logged marks
 
 Run it once, look at the --plot timeline (marks, response, settle), and if a
@@ -311,7 +311,8 @@ def save_frames(video, results, out_dir):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n\n')[0], formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('video')
-    ap.add_argument('--steps', default='', help="protocol order, e.g. open,fit,zoom,pan,flip*10,jump,search")
+    ap.add_argument('--steps', default='', help="what was done, in order (runcard.py prints it), e.g. %s" % common.PAGELOAD)
+    ap.add_argument('--rep', default='', help='which repetition this recording is (1 = first-ever open of the file)')
     ap.add_argument('--marks', default='audio', help="'audio' (default), 'change', or a CSV of seconds[,step]")
     ap.add_argument('--roi', default='0,0,1,1', help='canvas region as fractions x,y,w,h from top-left')
     ap.add_argument('--quiet', type=float, default=1.5, help='seconds of stillness that count as settled')
@@ -381,10 +382,10 @@ def main(argv=None):
             'method': 'video', 'tool': args.tool, 'tool_version': args.tool_version,
             'file': name, 'fingerprint': fingerprint}
     out = common.Results(args.out, base)
-    flip_n = 0
+    targets = common.step_targets(pdf_manifest, [r['step'] for r in results])
     print('settle.py: %s  %d frames, %d inputs (%s), change threshold %.4f'
           % (os.path.basename(args.video), len(times) + 1, len(marks), args.marks if args.marks in ('audio', 'change') else 'file', threshold))
-    print('  %-3s %-8s %8s %10s %10s  %s' % ('#', 'step', 'at', 'response', 'settle', 'notes'))
+    print('  %-3s %-8s %-6s %8s %10s %10s  %s' % ('#', 'step', 'sheet', 'at', 'response', 'settle', 'notes'))
     for r in results:
         notes = []
         if not r['settled']:
@@ -393,20 +394,17 @@ def main(argv=None):
             notes.append('no change seen')
         if args.marks == 'change':
             notes.append('marks from first change')
-        page = ''
-        if r['step'] == 'flip':
-            flip_n += 1
-            page = str(flip_n)
+        page = common.page_label(pdf_manifest, targets[r['n']])
         note = '; '.join(notes)
         if r['response'] is not None:
-            out.add(r['step'], 'response', r['response'], page=page, rep=r['n'], notes=note)
-            out.add(r['step'], 'settle', r['settle'], page=page, rep=r['n'], notes=note)
+            out.add(r['step'], 'response', r['response'], page=page, rep=args.rep, notes=note)
+            out.add(r['step'], 'settle', r['settle'], page=page, rep=args.rep, notes=note)
         if 'fps' in r:
-            out.add(r['step'], 'fps', r['fps'], unit='fps', page=page, rep=r['n'], notes='frames that changed while moving')
-            out.add(r['step'], 'sharp_after_stop', r['sharp_after_stop'], page=page, rep=r['n'], notes=note)
+            out.add(r['step'], 'fps', r['fps'], unit='fps', page=page, rep=args.rep, notes='frames that changed while moving')
+            out.add(r['step'], 'sharp_after_stop', r['sharp_after_stop'], page=page, rep=args.rep, notes=note)
         extra = ('  %.0f fps moving, sharp %.0f ms after stop' % (r['fps'], r['sharp_after_stop'])) if 'fps' in r else ''
-        print('  %-3d %-8s %7.2fs %10s %10s  %s%s' % (
-            r['n'] + 1, r['step'], r['mark'],
+        print('  %-3d %-8s %-6s %7.2fs %10s %10s  %s%s' % (
+            r['n'] + 1, r['step'], page, r['mark'],
             '-' if r['response'] is None else '%.0f ms' % r['response'],
             '-' if r['settle'] is None else '%.0f ms' % r['settle'], note, extra))
     out.close()

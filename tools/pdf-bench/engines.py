@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-engines.py - time the PDF engines themselves, headless, on any desktop OS.
+engines.py - optional diagnostics: time PDF rendering libraries headless.
 
-An app can never be faster than the engine it draws with, so this is the
-floor under every GUI number. Same steps as the GUI protocol (common.STEPS),
-same results format. Each engine runs in its own process, so its peak memory
-is its own.
+Not an app comparison. Apps wrap their engines in their own caching, prefetch
+and tiling, so these numbers don't predict page loads; settle.py and drive.py
+measure those. Useful to ask "is this app slower than the library it likely
+uses?". Same results format; report.py keeps engine rows in their own section.
+Each engine runs in its own process, so its peak memory is its own.
 
   pdfium   pip install pypdfium2   Chrome, Edge, and many apps built on PDFium
   mupdf    pip install pymupdf     MuPDF (SumatraPDF, many mobile viewers)

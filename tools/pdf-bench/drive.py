@@ -12,8 +12,8 @@ and recordings line up; this one just does the reps for you.
          > Screen Recording, then restart the terminal.
 
 Usage:
-  python3 drive.py --profile acrobat-win --file complex-sheet.pdf --steps fit,zoom,pan --reps 5
-  python3 drive.py --profile preview-mac --file drawing-set.pdf --steps open,flip*20,jump,search
+  python3 drive.py --profile acrobat-win --file drawing-set.pdf          # the page-load run, 5 reps
+  python3 drive.py --profile preview-mac --file complex-sheet.pdf --steps open,zoom,pan,fit --fit-pct 24
   python3 drive.py --list                          # profiles in apps.json
 
 Before a run: open the file in the app (unless the steps start with `open`,
@@ -129,7 +129,9 @@ def perform(action, screen, fields, gui, background=None):
         time.sleep(float(arg))
     elif kind == 'run':
         quoted = dict(fields, file='"%s"' % fields['file'])
-        subprocess.Popen(arg.format(**quoted), shell=True)
+        # Detached: the app must not hold this terminal's output or die with it.
+        subprocess.Popen(arg.format(**quoted), shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
     elif kind == 'scroll':
         main, opts = parse_opts(arg)
         clicks, _, at = main.partition('@')
@@ -226,16 +228,25 @@ def timed_step(actions, screen, fields, gui, quiet, threshold, timeout, first_wa
     return r
 
 
-def baseline_threshold(screen, seconds=1.0):
-    """Watch the still screen first: anything that flickers on its own
-    (a caret, an animated cursor) raises the bar for 'changed'."""
-    fracs, prev, end = [], screen.grab(), time.perf_counter() + seconds
-    while time.perf_counter() < end:
-        cur = screen.grab()
-        fracs.append(settle.change_fraction(prev, cur))
-        prev = cur
-    floor = max(fracs) * 1.5 if fracs else 0.0
-    return max(settle.MIN_CHANGE, floor), len(fracs) / seconds
+MAX_FLICKER = 0.02         # a "still" screen may flicker this share of blocks, no more
+
+
+def baseline_threshold(screen, seconds=1.0, tries=5):
+    """Watch the still screen first: small things that flicker on their own
+    (a caret, an animated cursor) raise the bar for 'changed'. A screen that
+    is still busy (an app launching or closing) is waited out, never taken
+    as the noise floor. Returns (threshold, capture fps), or None."""
+    for _ in range(tries):
+        fracs, prev, end = [], screen.grab(), time.perf_counter() + seconds
+        while time.perf_counter() < end:
+            cur = screen.grab()
+            fracs.append(settle.change_fraction(prev, cur))
+            prev = cur
+        flicker = max(fracs) if fracs else 0.0
+        if flicker <= MAX_FLICKER:
+            return max(settle.MIN_CHANGE, flicker * 1.5), len(fracs) / seconds
+        time.sleep(1.0)
+    return None
 
 
 # =============================================================================
@@ -266,7 +277,7 @@ def main(argv=None):
     ap.add_argument('--apps', default=os.path.join(_HERE, 'apps.json'))
     ap.add_argument('--list', action='store_true')
     ap.add_argument('--file', help='the PDF under test (its manifest adds the fingerprint)')
-    ap.add_argument('--steps', default='fit,zoom,pan,flip*5')
+    ap.add_argument('--steps', default=common.PAGELOAD, help='default: the page-load run, %s' % common.PAGELOAD)
     ap.add_argument('--reps', type=int, default=5)
     ap.add_argument('--roi', help='canvas as fractions x,y,w,h of the screen (default: the profile\'s)')
     ap.add_argument('--quiet', type=float, default=1.5)
@@ -292,7 +303,12 @@ def main(argv=None):
     if not profile.get('verified'):
         print('note: profile %r is unverified - watch the first rep and fix apps.json if a step misfires' % args.profile)
     steps = settle.expand_steps(args.steps)
-    missing = [s for s in set(steps) if not profile.get('steps', {}).get(s)]
+
+    def actions_for(step):
+        """A revisit is a jump to a sheet already seen: same recipe."""
+        recipes = profile.get('steps', {})
+        return recipes.get(step) or (recipes.get('jump') if step == 'revisit' else None)
+    missing = [s for s in set(steps) if not actions_for(s)]
     if missing:
         print('drive.py: profile %r has no actions for: %s' % (args.profile, ', '.join(sorted(missing))))
         return 2
@@ -305,10 +321,9 @@ def main(argv=None):
 
     manifest = common.load_manifest(args.file) if args.file else None
     name, fingerprint = common.file_identity(args.file, manifest) if args.file else ('', '')
-    jump = manifest.get('jump', {}).get('page_index', 0) if manifest else 0
+    targets = common.step_targets(manifest, steps)
     fields = {'file': os.path.abspath(args.file) if args.file else '',
-              'jump_number': str(jump + 1),
-              'jump_label': manifest['pages'][jump]['label'] if manifest else '1',
+              'jump_number': '1', 'jump_label': '1',          # set per step below
               'search': manifest['search']['text'] if manifest else ''}
     fit_pct = args.fit_pct or profile.get('fit_pct')
     zoom_pct = args.zoom_pct or profile.get('zoom_pct') or (fit_pct and fit_pct * common.ZOOM)
@@ -318,7 +333,7 @@ def main(argv=None):
         fields['zoom_pct'] = '%g' % round(zoom_pct)
     needed = set()
     for step in set(steps):
-        acts = profile['steps'][step]
+        acts = actions_for(step)
         for a in ([acts] if isinstance(acts, str) else acts):
             needed.update(f for _, f, _, _ in string.Formatter().parse(a.partition(':')[2]) if f)
     unknown = sorted(needed - set(fields))
@@ -335,21 +350,25 @@ def main(argv=None):
     for n in range(args.countdown, 0, -1):
         print('  starting in %d - click into the app window, then hands off' % n)
         time.sleep(1)
-    threshold, cap = baseline_threshold(screen)
+    baseline = baseline_threshold(screen)
+    if baseline is None:
+        print('drive.py: the canvas never sat still for a second - close whatever is animating, '
+              'or narrow --roi to the drawing area')
+        return 2
+    threshold, cap = baseline
     print('  capture %.0f fps, change threshold %.4f' % (cap, threshold))
 
     for rep in range(args.reps):
-        flip_n, steps_done = 0, 1
-        for step in steps:
+        steps_done = 1
+        for step, target in zip(steps, targets):
             if step == 'open' and profile.get('quit'):
                 subprocess.run(profile['quit'], shell=True)
                 time.sleep(2.0)
-            actions = profile['steps'][step]
-            r = timed_step(actions, screen, fields, pyautogui, args.quiet, threshold, args.timeout, args.first_wait)
-            page = ''
-            if step == 'flip':
-                flip_n += 1
-                page = str(flip_n)
+            page = common.page_label(manifest, target)
+            if target is not None:
+                fields['jump_number'], fields['jump_label'] = str(target + 1), page
+            r = timed_step(actions_for(step), screen, fields, pyautogui, args.quiet, threshold, args.timeout,
+                           args.first_wait)
             if args.shots:
                 screen.save(os.path.join(args.shots, 'rep%d-%02d-%s.png' % (rep + 1, steps_done, step)))
             steps_done += 1
@@ -360,15 +379,16 @@ def main(argv=None):
             if r['settle'] is None:
                 print('  rep %d %-7s no change within %.0fs - a no-op, or a misfired key (see --shots)'
                       % (rep + 1, step, args.first_wait))
-                out.add(step, 'settle', '', page=page, rep=rep, notes='no change seen; ' + note)
+                out.add(step, 'settle', '', page=page, rep=rep + 1, notes='no change seen; ' + note)
                 continue
-            out.add(step, 'response', r['response'], page=page, rep=rep, notes=note)
-            out.add(step, 'settle', r['settle'], page=page, rep=rep, notes=note)
+            out.add(step, 'response', r['response'], page=page, rep=rep + 1, notes=note)
+            out.add(step, 'settle', r['settle'], page=page, rep=rep + 1, notes=note)
             extra = ''
             if 'sharp_after_stop' in r:
-                out.add(step, 'sharp_after_stop', r['sharp_after_stop'], page=page, rep=rep, notes=note)
+                out.add(step, 'sharp_after_stop', r['sharp_after_stop'], page=page, rep=rep + 1, notes=note)
                 extra = '  sharp %.0f ms after the drag' % r['sharp_after_stop']
-            print('  rep %d %-7s response %6.0f ms  settle %7.0f ms%s' % (rep + 1, step, r['response'], r['settle'], extra))
+            print('  rep %d %-7s %-6s response %6.0f ms  settle %7.0f ms%s'
+                  % (rep + 1, step, page, r['response'], r['settle'], extra))
             time.sleep(0.5)
     out.close()
     print('rows appended to %s' % args.out)

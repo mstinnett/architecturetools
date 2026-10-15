@@ -1,248 +1,200 @@
-# pdf-bench — how fast is each PDF app on a heavy drawing set?
+# pdf-bench — page-load times, PolyPDF vs Drawboard vs the rest
 
-A harness for timing construction-PDF apps (PolyPDF, Bluebeam Revu, Drawboard,
-Acrobat, PDF Expert, Preview, browser viewers) on one complex sheet and on a
-large set, on **Windows, macOS and iPadOS**. Results from every device land
-in one CSV format and pool into one table.
+A harness for comparing construction-PDF apps the way users experience them:
+**how long from my tap until the sheet is fully sharp?** It works on PolyPDF,
+Drawboard, Bluebeam Revu, Acrobat, PDF Expert, Preview and browser viewers, on
+**iPadOS, Windows and macOS**.
 
-It answers two questions per platform:
-
-1. **How fast can it be?** The engine floor. An app is never faster than the
-   PDF engine it draws with. `engines.py` times PDFium, MuPDF and Poppler
-   headless. `pdfkit/` times Apple's PDFKit, the engine under Preview, Safari
-   and most iPad PDF apps, on the Mac and on the iPad itself.
-2. **How fast is it for a user?** Input to *fully sharp*, measured from the
-   screen, so any app can be timed, including closed iPad apps. `drive.py`
-   drives desktop apps and watches live. `settle.py` reads a screen recording
-   from any device.
-
-Comparing the two layers tells you where the time goes. If PolyPDF on an iPad
-takes about as long as bare PDFKit on that iPad, the engine is the ceiling, and
-an app on a faster engine would beat it on the same hardware. If PolyPDF takes
-several times longer, the app is adding the delay (for example layer
-processing, thumbnails, or its line detection if that runs on open).
+Every app is treated as a black box. Each one has its own engine, caching,
+prefetching, tiling and progressive rendering, so nothing inside the app is
+measured. The harness only watches the screen. The clock starts at the input
+(a tap, click or key) and stops when the screen stops changing, which is when
+the last sharp tile has landed. The result is the whole app, the time a user
+actually waits.
 
 ```
-make_set.py ──► complex-sheet.pdf / drawing-set.pdf  (+ .json manifest, same bytes everywhere)
-                    │
-     ┌──────────────┼───────────────────────────────┐
- engines.py     pdfkit/ (Mac CLI, iPad app)     drive.py (Win/Mac, live)   settle.py (any recording)
-     └──────────────┴──────────────┬────────────────┴──────────────────────┘
-                               results.csv  ──►  report.py  ──►  one table per test file
+make_set.py ──► drawing-set.pdf (+ manifest)        same bytes on every device
+runcard.py  ──► the steps a tester follows           same sheets, same order, every app
+        record the screen (mic on) ─► settle.py ┐
+        or, on a desktop:          drive.py    ├─► results.csv ─► report.py
+                                                ┘   apps ranked per device
 ```
 
-## 1. The test file
+## What is measured
 
-```sh
-python3 make_set.py --preset sheet     # complex-sheet.pdf: 1 sheet, ~13 MB
-python3 make_set.py --preset set       # drawing-set.pdf: 120 sheets, ~75 MB, ~12M path segments
-```
-
-Standard library only, deterministic from `--seed`. Sheets are ARCH E1 (42×30
-in). Each one carries the features that make real CD sets slow:
-
-- hatch exported as loose segments (wall poché, brick, earth, stipple dots);
-- fill patterns drawn through clip paths, including even-odd holes;
-- CAD text both as exploded strokes and as a Type 3 stroke font;
-- Helvetica schedules, so search has work to do;
-- 25 AutoCAD-style optional-content layers;
-- reused Form XObject blocks: title block, furniture, light fixtures, trees;
-- a 3600×2400 aerial underlay and an indexed-colour rendering;
-- alpha shadows and an axial shading;
-- dashed linetypes and hairlines;
-- Bluebeam-style markups with appearance streams (clouds, callouts, arrows, ink, rectangles);
-- sheet-to-sheet links, bookmarks by discipline, and page labels (`A-101`…).
-
-The set mixes cover, site, plans, elevations, sections, details, schedules and
-RCP/MEP plans, and about one sheet in twelve is "heavy". `--sheets` and `--density`
-scale it up.
-
-**Generate once and copy the same file to every device.** The `.json` manifest
-records the SHA-256, a content fingerprint, per-sheet counts, the test sheet
-(the heaviest), the zoom focus point and the search target (`HW-SET 47B`).
-Every result row carries the fingerprint, so mismatched files can't be pooled
-by accident. On the iPad, copy the manifest across too: the PDFKit app reads it.
-
-## 2. What is measured
-
-| step | engines (`engines.py`, PDFKit) | apps (`drive.py`, `settle.py`) |
+| measure | what the tester does | what it shows |
 |---|---|---|
-| `open` | parse + page count | launch/open until the first sheet is fully drawn |
-| `jump` | — | go to the test sheet (bookmark, thumbnail or page box) |
-| `fit` | render the test sheet to fit a 2560×1600 view | fit the sheet; input to fully sharp |
-| `zoom` | render a 2560×1600 view at 400% of fit, on the dense area | zoom to 400% of fit; input to fully sharp |
-| `pan` | — | drag across the zoomed sheet: frames per second while moving, then time to sharp after the drag stops |
-| `flip` | render every sheet at fit, one at a time | next sheet; time per sheet |
-| `thumbs` | every sheet at 256 px | — |
-| `search` | find the target across the set | type the target; time to land on it |
+| **open** | tap the file, app freshly launched | time to first sheet fully sharp, including launch and parse |
+| **first open** | the same, the first time the app sees the file | any indexing or thumbnailing the app does up front |
+| **next sheet** | ten times, sheet by sheet | sequential paging (prefetching apps get credit for it, as they should) |
+| **jump** | to five far-apart sheets the app hasn't shown yet | **raw page load**: nothing can have been prefetched |
+| **revisit** | back to three of those sheets | caching: does a seen sheet come back instantly? |
+| zoom, pan, search | optional | re-render after zoom; sharpness after a drag; find across the set |
 
-For apps, two times are recorded per input: **response** (the first frame that
-changed) and **settle** (the last frame that changed before the screen went
-still, i.e. fully sharp). Settle is the headline number because progressive
-renderers show a blurry sheet early and sharpen later. Engine numbers are
-single-threaded renders. Apps that tile across cores can beat them, so
-compare engines with engines and apps with apps.
+Each cell in the report is a median (with p90 and sample count) over five
+recordings. Apps are ranked only against other apps **on the same device**,
+as a multiple of the fastest.
 
-**Zoom must mean the same thing everywhere.** "400%" in an app's zoom box is
-400% of actual size, which on an E1 sheet is about 16× fit. The protocol zooms
-to 4× the app's own fit percentage. Fit the sheet, read the zoom box (say
-24%), and zoom to 96%. `drive.py --fit-pct 24` does the arithmetic.
-
-## 3. Setup
+## 1. Make the test file and the run card
 
 ```sh
-pip install numpy pillow pypdfium2 pymupdf      # engines + analysis, all platforms
-pip install mss pyautogui                        # drive.py (Windows, macOS)
-# ffmpeg 5.1+ on PATH for settle.py; poppler (pdftoppm) optional
-python3 test_bench.py                            # checks the harness itself
+python3 make_set.py --preset set       # drawing-set.pdf: 120 sheets, 75 MB, ~12M vector segments
+python3 runcard.py drawing-set.pdf     # the tester's step list (add --desktop for click/key wording)
 ```
 
-## 4. Per platform
+The set is ARCH E1 sheets with the things that make real CD sets slow:
 
-### Windows
+- exploded hatch, clipped fills and CAD-style text;
+- 25 layers and reused blocks;
+- an aerial underlay and transparency;
+- markups with appearance streams;
+- bookmarks, page labels and sheet links.
 
-```sh
-python engines.py drawing-set.pdf --device "ThinkPad P1 G7"
-python engines.py complex-sheet.pdf --device "ThinkPad P1 G7" --save renders   # check the PNGs
-python drive.py --list
-python drive.py --profile acrobat-win --file drawing-set.pdf \
-    --steps open,jump,fit,zoom,pan,fit,flip*10,search --reps 5 --fit-pct 24 --shots shots
-```
+It mixes cover, site, plans, elevations, sections, details, schedules and
+RCP/MEP sheets, and about one in twelve is heavy. It is deterministic. Generate
+it once and copy the same file to every device; results carry a fingerprint,
+so different files never get pooled.
 
-Profiles in `apps.json` are key recipes per app. Only `chromium-linux` has been
-checked (see §7). The Windows and Mac entries are best guesses marked
-`"verified": false`, and Bluebeam and Drawboard still need their keys filled
-in. Watch one rep with `--shots` and fix the recipe before trusting the
-numbers. For any app without a reliable recipe, record the screen with OBS
-(display capture + mic) and use `settle.py` as for the iPad.
+The run card names the exact sheets. A tester opens the file, flips through
+the first ten sheets, jumps to five far-off ones (M-110, A-302, A-703, A-112,
+A-513), then revisits three of them. `--steps` changes the sequence (e.g.
+`open,flip*20,jump*5,revisit*5`).
 
-### macOS
+Your own drawing sets work too: `settle.py` doesn't need a manifest. Write the
+step list by hand and pass it with `--steps`. A real project set next to the
+synthetic one is worth having.
 
-```sh
-python3 engines.py drawing-set.pdf --device "MacBook Pro M4 Pro"
-swiftc -O pdfkit/PDFKitBench.swift pdfkit/main.swift -o pdfkit-bench
-./pdfkit-bench drawing-set.pdf --out results.csv --device "MacBook Pro M4 Pro"
-python3 drive.py --profile preview-mac --file drawing-set.pdf --steps jump,fit,zoom,pan,fit,flip*10 --fit-pct 24
-```
+## 2. iPad (PolyPDF, Drawboard, Bluebeam, PDF Expert…)
 
-Allow Terminal under Privacy & Security → Accessibility and → Screen Recording.
-Many iPad apps also run on Apple-silicon Macs ("Designed for iPad"). That gives a
-quick driver-based number but says nothing about iPad hardware.
+Nothing can drive an iPad app from outside, so record the screen. The
+recording's microphone hears each tap, and those taps are the clock starts.
 
-### iPadOS
-
-**Engine floor, on the iPad:** in Swift Playgrounds, create an App, replace its
-files with `pdfkit/PDFKitBench.swift` + `pdfkit/iPadApp.swift`, and run it. Pick
-the PDF and its `.json` together, wait, then share the CSV back.
-
-**Apps, by screen recording:** nothing can drive an iPad app from outside, so
-the input marks come from the recording's microphone.
-
-1. Copy the PDF to the iPad and import it into each app. Use Do Not Disturb,
-   keep the iPad plugged in, turn Low Power Mode off, and close other apps.
-   Settings → Sounds → Keyboard Clicks on, so typing is audible.
-2. Control Center → long-press Screen Recording → **Microphone On** → record.
-3. Do each step as one input, then wait until the sheet is fully sharp **and
-   three more seconds**:
-   - `open`: tap the file in the app's library;
-   - `jump`: tap the test sheet's thumbnail or bookmark;
-   - `fit` / `zoom`: double-tap, or tap the app's zoom control;
-   - `pan`: tap the bezel with a fingernail, then swipe;
-   - `flip`: tap next page;
-   - `search`: type the target.
-
-   Make every touch a firm fingernail tap on the glass. The tap is the clock
-   start. Two taps under 0.5 s apart (a double-tap) count as one input. Don't
-   talk.
-4. AirDrop the video to a computer:
+1. Copy the PDF to the iPad (AirDrop → Files) and import it into each app.
+2. Turn on Do Not Disturb, plug in, turn Low Power Mode off, and close other
+   apps. Settings → Sounds → Keyboard Clicks on. Use landscape.
+3. Force-quit the app. Control Center → long-press Screen Recording →
+   **Microphone On** → start.
+4. Follow the run card: **one firm fingernail tap per step**. Do anything else
+   you touch along the way (scrolling thumbnails, opening the bookmark panel)
+   quietly, with the pad of a finger. After each step, wait until the sheet is
+   fully sharp, then count three more seconds. Don't talk.
+5. Stop. Make five recordings per app. Recording 1 is the first time the app
+   sees the file.
+6. AirDrop the videos to a computer with ffmpeg and run the command the card
+   prints:
 
 ```sh
-python3 settle.py polypdf.mov --steps open,jump,fit,zoom,pan,fit,flip*10,search \
+python3 settle.py polypdf-1.mov --steps open,flip*10,jump*5,revisit*3 --rep 1 \
     --tool PolyPDF --tool-version 2.1 --device "iPad Pro 13 M4" --platform iPadOS \
-    --file drawing-set.pdf --roi 0,0.07,1,0.93 --plot polypdf.png --frames polypdf-frames
+    --file drawing-set.pdf --roi 0,0.07,1,0.93 --plot polypdf-1.png
 ```
 
-`--roi` is the drawing canvas as `x,y,w,h` fractions from the top-left. Exclude
-the status bar clock and any spinner. Open the `--plot` timeline: blue lines
-are inputs, green are "fully sharp", and orange means the screen was still
-changing when the next input came (that number is a lower bound, so redo the
-step and wait longer). If a mark is wrong (a bump, a cough), edit
-`polypdf.marks.csv` and rerun with `--marks polypdf.marks.csv`. `--frames`
-saves the response and settle frames for each step. Look at them: "settled"
-should mean sharp.
+`--roi` is the drawing canvas as `x,y,w,h` fractions from the top-left. Leave
+out the status-bar clock and any spinner, or the screen never looks still.
+Check the plot: one blue line per tap and a green line where the sheet went
+sharp. Orange means it was still changing at the next tap; that number is a
+lower bound, so redo that step with a longer wait. A stray mark (a bump, a
+cough)? Edit `polypdf-1.marks.csv` and rerun with `--marks polypdf-1.marks.csv`.
+`--frames DIR` saves the frame at each response and settle point, so you can
+confirm "settled" means sharp.
 
-## 5. Protocol (keep it fair)
+## 3. Windows and macOS (Drawboard, Bluebeam, Acrobat, Preview…)
 
-- **Same bytes:** check the fingerprint column. **Same sheet, same view:**
-  maximised window, single-page mode, markups and all layers visible, iPad in
-  landscape.
-- **Five reps per step.** Report the median and the 90th percentile. A cold
-  `open` (app quit first; on iPad, swipe it away) is reported separately from
-  warm runs.
-- **Power and heat:** plugged in, best-performance power mode, Low Power Mode
-  off. Pause between apps so the device cools; long iPad runs throttle.
-- **Record app versions and settings** (hardware acceleration, render
-  quality, PolyPDF's line detection). If a setting could plausibly matter,
-  measure both ways.
-- **Desktop recordings work too:** OBS or QuickTime with the mic on (a
-  mechanical keyboard helps). `drive.py` is the easy path; a recording is the
-  check on it.
+**Either** record exactly as on the iPad. Use OBS, QuickTime or Win+Alt+R with
+the mic on: a mechanical keyboard's clicks make good marks. Use
+`runcard.py --desktop` and `settle.py --platform Windows`.
 
-## 6. Results
+**Or** let `drive.py` do the inputs and watch the screen live. It is the same
+detector and the same numbers, with five reps and no human timing:
 
 ```sh
-python3 report.py results.csv ipad-*.csv --md report.md
+pip install numpy pillow mss pyautogui
+python3 drive.py --list
+python3 drive.py --profile acrobat-win --file drawing-set.pdf --device "ThinkPad P1 G7" --shots shots
 ```
 
-There is one table per test file. Rows are tool · method · device, columns are
-steps, and each cell is the median (90th percentile). For app rows it also
-lists who is fastest per step and how many times slower the slowest is. `†`
-marks a cell that includes a lower bound.
+The default steps are the page-load run. Jump and revisit type the target into
+the app's page box. Each app needs a recipe in `apps.json` (its next-page key,
+its go-to-page keys).
 
-The CSV is long format, one measurement per row: `run_id, date, platform,
-os_version, device, cpu, ram_gb, method, tool, tool_version, file, fingerprint,
-step, page, rep, metric, value, unit, notes`. `method` is `engine`, `live` or
-`video`. `metric` is `time`, `total`, `response`, `settle`, `fps`,
-`sharp_after_stop` or `peak_rss`.
+- **Unverified:** the Acrobat, Edge and Preview recipes are best guesses.
+- **Still to fill in:** Bluebeam and Drawboard.
 
-## 7. What has and hasn't been verified
+Run one rep with `--shots` and look at the screenshots before trusting the
+numbers. On macOS, allow Terminal under Privacy & Security → Accessibility
+and → Screen Recording.
 
-- **Checked in a Linux container:**
-  - `make_set.py` is deterministic, and PDFium, MuPDF and Poppler all render
-    its output with the same content.
-  - `engines.py` runs on all three engines.
-  - `settle.py` recovers known timings within one frame from synthetic
-    constant- and variable-frame-rate recordings (`test_bench.py`, 65 checks).
-    Those recordings include encoder noise, a frozen app, a cut-off step and a
-    double-tap.
-  - `drive.py` ran end to end against Chromium's PDF viewer under Xvfb.
-- **Not run here:**
-  - the Swift PDFKit bench (no Apple toolchain in the container);
-  - `drive.py` on Windows or macOS;
-  - the Windows and Mac app recipes in `apps.json`;
-  - a real iPad recording.
+## 4. The comparison
 
-  Do a short shakedown run on each before collecting numbers.
-- **Accuracy:**
-  - Recordings resolve to one frame, about 17 ms at 60 fps. Audio/video
-    alignment adds a few tens of ms.
+```sh
+python3 report.py ipad-*.csv windows.csv mac.csv --md report.md
+```
+
+You get one table per test file and device: each app's open / next sheet /
+jump / revisit, then each app as a multiple of the fastest on that device.
+For example, "PolyPDF: jump 3.4×, revisit 1.2×" means PolyPDF loads unseen
+sheets slowly but caches well. `†` marks a cell that includes a lower bound.
+
+The CSV has one measurement per row: `run_id, date, platform, os_version,
+device, cpu, ram_gb, method, tool, tool_version, file, fingerprint, step,
+page, rep, metric, value, unit, notes`. `page` is the sheet the step landed
+on, so slow sheets can be picked out.
+
+## 5. Keeping it fair
+
+- **Same file and same sheets everywhere.** Check the fingerprint column.
+  Same view settings in every app: single page, all layers and markups on.
+- **Same device for any app-vs-app claim.** Cross-device numbers describe the
+  device as much as the app.
+- **App settings recorded.** Note hardware acceleration and render quality.
+  If PolyPDF's line detection runs on open, measure it on and off. Any setting
+  that could plausibly matter gets measured both ways, and the version goes in
+  `--tool-version`.
+- **Reps 2–5 may be helped by the app's disk cache** (thumbnails, render
+  caches) even after a force-quit. That's real behaviour, but the report
+  shows the first open separately so it isn't hidden in the median.
+- **Heat.** Pause between apps; a hot iPad throttles.
+
+## 6. Accuracy and what's been verified
+
+- **Resolution:**
+  - A recording resolves to one frame, about 17 ms at 60 fps.
+  - Tap-to-video alignment adds a few tens of ms.
   - Live capture resolves to one capture interval, about 20–50 ms.
-  - Both are small next to multi-second renders, but don't read meaning into
-    differences under ~100 ms.
-  - Live capture caps the pan frame rate at the capture rate. Use a 60 fps
-    recording for smoothness.
-  - Engines differ in drawing style (PDFium draws hairlines heavier). Use
-    `engines.py --save` to confirm content parity.
+  - Differences under ~100 ms aren't meaningful. Page loads on heavy sheets
+    are measured in seconds.
+- **Encoder noise is ignored.** Keyframes and quality top-ups in screen
+  recordings don't register as change: the comparison uses blocks, not
+  pixels.
+- **A frozen app counts.** An app that shows nothing for two seconds and then
+  paints is timed from the tap.
+- **Panning** is detected by phase correlation, so sharpening in place isn't
+  mistaken for movement.
+- **Checked here** (`python3 test_bench.py`, 76 checks): the harness recovers
+  known timings from synthetic recordings, both constant-frame-rate and
+  variable-frame-rate. `drive.py` ran end to end against Chromium's PDF viewer
+  on Linux.
+- **Not yet run:** a real iPad recording, and `drive.py` on Windows or macOS.
+  Do a short shakedown on each first.
+
+## Appendix: engine timings (optional)
+
+`engines.py` (PDFium, MuPDF, Poppler) and `pdfkit/` (Apple's PDFKit, as a Mac
+command-line tool or a Swift Playgrounds app on the iPad) time the rendering
+libraries headless. They **don't predict app page loads**, because each app
+wraps its engine differently, and the report keeps them in a separate
+section. They're only useful for diagnosis, for example to see whether an
+app is slower than the engine it probably uses.
 
 ## Files
 
 | file | what |
 |---|---|
-| `make_set.py` | the test sheet / set generator (stdlib only) |
-| `engines.py` | PDFium / MuPDF / Poppler timings |
-| `pdfkit/PDFKitBench.swift` | PDFKit timings, shared by the Mac CLI (`main.swift`) and the iPad app (`iPadApp.swift`) |
-| `drive.py` + `apps.json` | live desktop driver and per-app input recipes |
-| `settle.py` | timings from a screen recording (any platform) |
-| `common.py` | steps, view geometry, device info, the results format |
-| `report.py` | pools CSVs into the comparison table |
+| `make_set.py` | the test set generator (standard library only) |
+| `runcard.py` | the tester's step list and the analysis command |
+| `settle.py` | times any app from a screen recording (iPad, Windows, macOS) |
+| `drive.py` + `apps.json` | drives desktop apps and times them live |
+| `report.py` | the per-device app comparison |
+| `common.py` | the protocol (steps, which sheet each lands on), device info, results format |
 | `test_bench.py` | the harness's own checks |
+| `engines.py`, `pdfkit/` | optional engine diagnostics |
