@@ -207,7 +207,10 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   in the note. Stru could not be identified (stru.ai, a StruAI SDK and
   Structured AI may be one company or several) and CodeComply.ai has no
   published platform or price, so both wait. The page is renamed PDF Tools
-  for Drawing Sets (URL unchanged); the cover card follows.
+  for Drawing Sets (URL unchanged); the cover card follows. After review:
+  seven jobs named in the claim (mark up and review live are separate),
+  "covers" replaced (voice.md bans it), and the checking tools' notes say
+  what each checks; the no-passed-checks finding is one sentence by Solibri.
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

@@ -458,15 +458,15 @@ promote them as each is ready, not to land them all at once.
   (2026-10-14, on `claude/determined-bardeen-etpcp6`, pending the
   operator's call): a catalog of PDF work on a project, which the
   operator's DocCheck/Adequate site points to for "a replacement for
-  BlueBeam". Six jobs, seven columns: produce (from Revit or AutoCAD),
+  BlueBeam". Seven jobs, one column each: produce (from Revit or AutoCAD),
   manage (the set while you work in it), assemble (the set as it leaves
   your hands), mark up, review live, take off, check (compare and overlay
   count here, as a way to verify). 21 tools in four groups (made for
   drawing sets, PDF editors, project platforms, checking tools), behind
   one "Runs on" filter (`assets/js/platform-filter.js`: starts on the
   visitor's platform, stores nothing, only hides rows). The claim:
-  Bluebeam's Complete plan covers five of the jobs in one app; other tools
-  each cover part, often for less; checking tools are a newer, separate
+  Bluebeam's Complete plan does six of the seven jobs in one app; other
+  tools each do part, often for less; checking tools are a newer, separate
   kind. Adequate Design Review (the operator's product) is not listed
   until it leaves beta. Facts were checked against vendor documentation in October
   2026; a dashed ring, "not checked", marks what could not be. A full dot
@@ -475,8 +475,8 @@ promote them as each is ready, not to land them all at once.
   The BIM pages follow if the pattern holds.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
-  editorial and labelled so. Adequate Design Review is listed on the PDF
-  page with a disclosure. Prices are rounded from third-party sources —
+  editorial and labelled so. Adequate Design Review (the operator's
+  product) is not listed until it leaves beta. Prices are rounded from third-party sources —
   re-check vendor facts when updating.
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
