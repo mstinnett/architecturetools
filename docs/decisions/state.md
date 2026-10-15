@@ -176,6 +176,23 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
   (Bluebeam lists it unsupported on iOS), Procore, Revizto or Master PDF
   (grid only); Fieldwire snaps angles only. Those now carry half marks
   that say so, and the claim drops "on every platform".
+  Then, operator: "we won't list my product until it exits beta" (the
+  DocCheck marketing site, mstinnett/doccheck, links to the architecture.tools
+  home page for "a replacement for BlueBeam", not to this page); and "add
+  in the other Bluebeam exclusives ... building sets, stamping, managing
+  large sets with Revit, and managing lots of markup. A full production
+  environment. Not just live studio sessions." Adequate's row is gone, and
+  it stays off until it leaves beta. A "Produces sets" column leads the
+  table (publishing from Revit, hyperlinking, slip-sheeting, stamping a
+  whole set). Bluebeam: Revit and CAD plugins on Core, Batch Link, Batch
+  Slip Sheet and Batch Sign & Seal on Complete, multi-file markup
+  summaries on Complete. PolyPDF Pro's Revision Packages and NCS sheet
+  links, Autodesk Docs' sheet extraction, links and version sets, and the
+  other platforms' sheet links earn half marks. Columns now lead with
+  where Bluebeam leads (produces sets, live, markups list), then what
+  others match. The claim: "Use Bluebeam if you produce drawing sets in it
+  or review them live with your consultants ... If you mark up, measure
+  and compare revisions, other apps match it."
 
 - 2026-10-14 — **Phones: grids and a category bar, nothing sideways**
   (operator: "limiting the horizontal scrolling on mobile … multicolumn

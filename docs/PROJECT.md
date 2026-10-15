@@ -462,12 +462,15 @@ promote them as each is ready, not to land them all at once.
   measurement are in most paid apps on every platform, so the tools differ
   on live markup and revision overlays. One "Runs on" filter
   (`assets/js/platform-filter.js`: starts on the visitor's platform, stores
-  nothing, only hides rows) over 19 tools in three groups (made for drawing
+  nothing, only hides rows) over 18 tools in three groups (made for drawing
   sets, PDF editors, project platforms), each with a mark and a few words
-  for callouts and clouds, measures to scale (with snapping, which the
-  operator requires), mark up together live,
-  overlays revisions and markups list, then price and a note that decides
-  or locates. Facts were checked against vendor documentation in October
+  for produces sets, mark up together live, markups list (where Bluebeam
+  leads), then overlays revisions, measures to scale (with snapping, which
+  the operator requires) and callouts and clouds (where others match it),
+  then price and a note that decides or locates. The claim: use Bluebeam
+  if you produce sets in it or review them live; for markup, measuring
+  and overlays, other apps match it. Adequate Design Review (the
+  operator's product) is not listed until it leaves beta. Facts were checked against vendor documentation in October
   2026; a dashed ring, "not checked", marks what could not be. A full dot
   is a feature the app has (the note names its plan); a half dot is a
   limited form (the note names what is missing). Styles: global.css "SOFTWARE SHEET".

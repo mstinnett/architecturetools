@@ -595,8 +595,8 @@ h2.section-label { line-height: inherit; }
 .schedule-key { margin-top: var(--space-md); max-width: 46em; }
 
 .schedule { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--text-sm); }
-.schedule .s-col-tool { width: 27%; }
-.schedule .s-col-cap { width: 11%; }
+.schedule .s-col-tool { width: 24%; }
+.schedule .s-col-cap { width: 9.5%; }
 .schedule thead th { text-align: left; vertical-align: bottom; padding: 0 0.9rem 0.5rem 0; border-bottom: var(--border-heavy);
                      font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
 .schedule tbody th, .schedule td { text-align: left; vertical-align: top; padding: 0.7rem 0.9rem 0.75rem 0; border-bottom: var(--border-light); font-weight: 400; line-height: 1.5; }

@@ -5,35 +5,37 @@
      A catalog, read top down: the claim (.sheet-frame), one "Runs on"
      filter, then every tool that runs there, grouped (drawing-set apps, PDF
      editors, project platforms), with a mark per capability and a few words
-     on how: callouts and clouds, measures to scale, mark up together live,
-     overlays revisions, markups list. Then price, and a note per tool that
-     decides or locates (docs/voice.md); it never restates the marks.
-     global.css "SOFTWARE SHEET" styles it; assets/js/platform-filter.js
-     shows the filter and hides rows (a group heading hides when none of its
-     tools show).
-     Without script the filter stays hidden and every row shows.
+     on how. The columns lead with where Bluebeam leads (produces sets, mark
+     up together live, markups list), then what others match (overlays
+     revisions, measures to scale, callouts and clouds), then price, and a
+     note per tool that decides or locates (docs/voice.md); it never
+     restates the marks. global.css "SOFTWARE SHEET" styles it;
+     assets/js/platform-filter.js shows the filter and hides rows (a group
+     heading hides when none of its tools show). Without script the filter
+     stays hidden and every row shows.
 
-     Facts were checked against vendor documentation in October 2026; a
-     dashed ring (.cap-unk) marks what could not be; add it to the key when
-     one is used. A full dot is a
-     feature the app has (the note names the plan it needs); a half dot is
-     a limited form (the note names what is missing). The claim: callouts, clouds and scaled
-     measurement are in most paid apps on every platform, so the tools differ
-     on live markup and revision overlays. Measuring counts only with
-     snapping to the drawing (operator: "snapping is required for
-     measurement"). Adding a tool is one row in its
-     group. Copy follows docs/voice.md. -->
+     The claim (operator, October 2026): Bluebeam is a production
+     environment, not only live sessions. It publishes from Revit, links,
+     slip-sheets and stamps whole sets, manages markups across them, and
+     hosts live reviews; other apps match it on markup, measuring and
+     overlays. Measuring counts only with snapping (operator: "snapping is
+     required for measurement"). Facts were checked against vendor
+     documentation in October 2026. A full dot is a feature the app has
+     (the note names the plan); a half dot is a limited form (the note names
+     what is missing); a dashed ring (.cap-unk) marks what could not be
+     checked; add it to the key when one is used. Which tools are listed
+     is in docs/decisions/state.md. Adding a tool is one row in its group. Copy follows docs/voice.md. -->
 <html lang="en" data-family="material">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDF Markup &amp; Review Software -- architecture.tools</title>
-<meta name="description" content="PDF markup apps and project platforms for architects, compared on callouts and clouds, scaled measurement, live markup, revision overlays and markups lists, on Windows, Mac, iPad, Linux or the web: Bluebeam, Drawboard, PolyPDF, Acrobat, Foxit, PDF Expert, PDF-XChange, Xodo PDF Studio and more.">
+<meta name="description" content="PDF markup apps and project platforms for architects, compared on producing sets, live markup, markups lists, revision overlays, scaled measurement, callouts and clouds, on Windows, Mac, iPad, Linux or the web: Bluebeam, Drawboard, PolyPDF, Acrobat, Foxit, PDF Expert, PDF-XChange, Xodo PDF Studio and more.">
 <link rel="canonical" href="https://architecture.tools/pdf-markup.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://architecture.tools/pdf-markup.html">
 <meta property="og:title" content="PDF Markup &amp; Review Software -- architecture.tools">
-<meta property="og:description" content="Callouts, clouds and measuring to scale with snapping are in most paid PDF apps. They differ most on live markup and on overlaying two revisions of a sheet.">
+<meta property="og:description" content="Use Bluebeam if you produce drawing sets in it or review them live with your consultants. For marking up, measuring and comparing revisions, other apps match it, several for a one-time price.">
 <meta name="twitter:card" content="summary">
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
 <script>
@@ -68,7 +70,7 @@
   </div>
 
   <p class="chooser-updated">Updated October 2026</p>
-  <p class="sheet-frame">Callouts, clouds and measuring to scale with snapping are in most paid PDF apps. The apps differ most in two things: marking up live with your team and consultants, and overlaying two revisions of a sheet to show what changed.</p>
+  <p class="sheet-frame">Use Bluebeam if you produce drawing sets in it or review them live with your consultants. It publishes sheets from Revit, hyperlinks and slip-sheets a set, stamps a whole set at once and hosts live reviews, and no other app here does all of that. If you mark up, measure and compare revisions, other apps match it, several for a one-time price and on a Mac.</p>
 
   <div class="platform-filter" id="platformFilter" role="group" aria-labelledby="platformFilterLabel" hidden>
     <span class="section-label" id="platformFilterLabel">Runs on</span>
@@ -84,202 +86,212 @@
 
   <section class="sheet-section" id="tools" aria-labelledby="tools-label">
     <h2 class="section-label" id="tools-label">The tools<span data-platform-on></span></h2>
-    <p class="sheet-how"><span id="platformCount" aria-live="polite">All 19 tools</span>. <span class="cap-key" aria-hidden="true"><span class="cap cap-yes"></span>&nbsp;yes &nbsp; <span class="cap cap-part"></span>&nbsp;partly, as noted &nbsp; <span class="cap cap-no"></span>&nbsp;no</span></p>
+    <p class="sheet-how"><span id="platformCount" aria-live="polite">All 18 tools</span>. <span class="cap-key" aria-hidden="true"><span class="cap cap-yes"></span>&nbsp;yes &nbsp; <span class="cap cap-part"></span>&nbsp;partly, as noted &nbsp; <span class="cap cap-no"></span>&nbsp;no</span></p>
     <table class="schedule" data-platform-rows data-platform-count>
-      <colgroup><col class="s-col-tool"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-price"></colgroup>
+      <colgroup><col class="s-col-tool"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-cap"><col class="s-col-price"></colgroup>
       <thead>
         <tr>
           <th scope="col">Tool</th>
-          <th scope="col">Callouts and clouds</th>
-          <th scope="col">Measures to scale</th>
+          <th scope="col">Produces sets</th>
           <th scope="col">Mark up together live</th>
-          <th scope="col">Overlays revisions</th>
           <th scope="col">Markups list</th>
+          <th scope="col">Overlays revisions</th>
+          <th scope="col">Measures to scale</th>
+          <th scope="col">Callouts and clouds</th>
           <th scope="col">Price</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="s-group"><th colspan="7" scope="rowgroup">Made for drawing sets</th></tr>
+        <tr class="s-group"><th colspan="8" scope="rowgroup">Made for drawing sets</th></tr>
         <tr id="bluebeam" data-platforms="win">
-          <th scope="row"><a href="https://www.bluebeam.com/product/markups-and-data/" rel="noopener">Bluebeam Revu</a><span class="s-maker">Bluebeam</span><span class="s-note">The standard in US architecture and construction. Use it if your consultants do. The Complete plan adds Batch Link, which hyperlinks every sheet reference in a set.</span><span class="s-runs">Runs on Windows</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes, Callout, Cloud, Cloud+" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Callout, Cloud, Cloud+</span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping, count and angle on Core and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping, count and angle on Core and up</span></td>
+          <th scope="row"><a href="https://www.bluebeam.com/product/markups-and-data/" rel="noopener">Bluebeam Revu</a><span class="s-maker">Bluebeam</span><span class="s-note">The standard in US architecture and construction. Use it if you produce sets in it or host Studio Sessions.</span><span class="s-runs">Runs on Windows</span></th>
+          <td data-label="Produces sets" data-text="Yes, Revit plugin on Core, Batch Link and Slip Sheet on Complete" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Revit plugin on Core, Batch Link and Slip Sheet on Complete</span></td>
           <td data-label="Mark up together live" data-text="Yes, Studio Sessions, hosted on Core and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Studio Sessions, hosted on Core and up</span></td>
+          <td data-label="Markups list" data-text="Yes, Custom columns, CSV, multi-file summaries on Complete" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Custom columns, CSV, multi-file summaries on Complete</span></td>
           <td data-label="Overlays revisions" data-text="Yes, Core and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Core and up</span></td>
-          <td data-label="Markups list" data-text="Yes, Status, custom columns, CSV" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Status, custom columns, CSV</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping, count and angle on Core and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping, count and angle on Core and up</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes, Callout, Cloud, Cloud+" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Callout, Cloud, Cloud+</span></td>
           <td data-label="Price">About $260&ndash;440 per user a year</td>
         </tr>
         <tr id="bluebeam-cloud" data-platforms="web ipad iphone">
           <th scope="row"><a href="https://www.bluebeam.com/product/bluebeam-cloud/" rel="noopener">Bluebeam Cloud</a><span class="s-maker">Bluebeam</span><span class="s-note">Use it on a Mac or an iPad to join your consultants&rsquo; Studio Sessions.</span><span class="s-runs">Runs on web, iPad, iPhone</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="No snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found</span></td>
+          <td data-label="Produces sets" data-text="Sets are built in Revu" class="s-cap"><span class="cap cap-no" role="img" aria-label="No" title="No"></span><span class="cap-note">Sets are built in Revu</span></td>
           <td data-label="Mark up together live" data-text="Yes, Studio Sessions" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Studio Sessions</span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Smart Overlay, Max plan" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Smart Overlay, Max plan</span></td>
           <td data-label="Markups list" data-text="Sortable on the web, full list due on mobile" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Sortable on the web, full list due on mobile</span></td>
+          <td data-label="Overlays revisions" data-text="Yes, Smart Overlay, Max plan" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Smart Overlay, Max plan</span></td>
+          <td data-label="Measures to scale" data-text="No snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">In every Bluebeam plan. Read-only without one</td>
         </tr>
         <tr id="drawboard-projects" data-platforms="win ipad iphone web">
           <th scope="row"><a href="https://www.drawboard.com/projects" rel="noopener">Drawboard Projects</a><span class="s-maker">Drawboard</span><span class="s-note">Use it to replace Bluebeam across a firm. Each drawing keeps its revisions, and markups can be moved onto the newest one.</span><span class="s-runs">Runs on Windows, iPad, iPhone, web</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Produces sets" data-text="Revisions stack by title block, no sheet links found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Revisions stack by title block, no sheet links found</span></td>
           <td data-label="Mark up together live" data-text="Yes, Guests join free" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Guests join free</span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Up to 5 revisions" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Up to 5 revisions</span></td>
           <td data-label="Markups list" data-text="Yes, Issues with status, CSV" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Issues with status, CSV</span></td>
+          <td data-label="Overlays revisions" data-text="Yes, Up to 5 revisions" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Up to 5 revisions</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">From about $270 per user a year</td>
         </tr>
         <tr id="drawboard-pdf" data-platforms="win mac ipad iphone android web">
           <th scope="row"><a href="https://www.drawboard.com/pdf" rel="noopener">Drawboard PDF</a><span class="s-maker">Drawboard</span><span class="s-note">Use it on a Windows tablet with a pen.</span><span class="s-runs">Runs on Windows, Mac, iPad, iPhone, Android, web</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping on Pro Plus and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping on Pro Plus and up</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="Yes, Store + Share" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Store + Share</span></td>
-          <td data-label="Overlays revisions" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Markups list" data-text="History and CSV, no status" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">History and CSV, no status</span></td>
+          <td data-label="Overlays revisions" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping on Pro Plus and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping on Pro Plus and up</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">Free. Pro Plus about $84 a year</td>
         </tr>
         <tr id="polypdf" data-platforms="mac win ipad iphone">
           <th scope="row"><a href="https://www.polypdf.com" rel="noopener">PolyPDF</a><span class="s-maker">Euclidean Software</span><span class="s-note">It imports Bluebeam tool chests (.btx). Use it to replace Bluebeam on a Mac without a subscription.</span><span class="s-runs">Runs on Mac, Windows, iPad, iPhone</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Count, angle, snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Count, angle, snapping</span></td>
+          <td data-label="Produces sets" data-text="Revision packages and sheet links on Pro, no Revit plugin" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Revision packages and sheet links on Pro, no Revit plugin</span></td>
           <td data-label="Mark up together live" data-text="Beta, on your own server" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Beta, on your own server</span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Pro" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Pro</span></td>
           <td data-label="Markups list" data-text="Yes, Markup Table with status" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Markup Table with status</span></td>
-          <td data-label="Price">About $75 one-time on Mac and Windows. iPad free, $99 for Pro</td>
-        </tr>
-        <tr id="adequate" data-platforms="win mac linux">
-          <th scope="row"><a href="https://adequate.design" rel="noopener">Adequate Design Review</a><span class="s-maker">Adequate Design &middot; in beta</span><span class="s-note">For checking a set against your own checklists, offline. &dagger;&nbsp;I make it.</span><span class="s-runs">Runs on Windows, Mac, Linux</span></th>
+          <td data-label="Overlays revisions" data-text="Yes, Pro" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Pro</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Count, angle, snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Count, angle, snapping</span></td>
           <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
-          <td data-label="Mark up together live" data-text="One reviewer" class="s-cap"><span class="cap cap-no" role="img" aria-label="No" title="No"></span><span class="cap-note">One reviewer</span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Aligned overlay" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Aligned overlay</span></td>
-          <td data-label="Markups list" data-text="Checklist log, PDF report" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Checklist log, PDF report</span></td>
-          <td data-label="Price">$400 one-time after the beta</td>
+          <td data-label="Price">About $75 one-time on Mac and Windows. iPad free, $99 for Pro</td>
         </tr>
       </tbody>
       <tbody>
-        <tr class="s-group"><th colspan="7" scope="rowgroup">PDF editors</th></tr>
+        <tr class="s-group"><th colspan="8" scope="rowgroup">PDF editors</th></tr>
         <tr id="acrobat" data-platforms="win mac ipad iphone android web">
           <th scope="row"><a href="https://www.adobe.com/acrobat/acrobat-pro.html" rel="noopener">Adobe Acrobat Pro</a><span class="s-maker">Adobe</span><span class="s-note">Use it if your firm already pays for it. Measure in the Windows or Mac app.</span><span class="s-runs">Runs on Windows, Mac, iPad, iPhone, Android, web</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Snapping, typed scale only" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Snapping, typed scale only</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="Shared review, not live" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Shared review, not live</span></td>
-          <td data-label="Overlays revisions" data-text="Side by side, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Side by side, no overlay</span></td>
           <td data-label="Markups list" data-text="Yes, Status, Word or FDF export" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Status, Word or FDF export</span></td>
+          <td data-label="Overlays revisions" data-text="Side by side, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Side by side, no overlay</span></td>
+          <td data-label="Measures to scale" data-text="Snapping, typed scale only" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Snapping, typed scale only</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">About $240 a year</td>
         </tr>
         <tr id="foxit" data-platforms="win mac ipad iphone android web">
           <th scope="row"><a href="https://www.foxit.com/pdf-editor/" rel="noopener">Foxit PDF Editor</a><span class="s-maker">Foxit</span><span class="s-note">Its 2026 releases added sheet-number page labels and saved symbol toolboxes. Consider it if your firm buys Foxit already.</span><span class="s-runs">Runs on Windows, Mac, iPad, iPhone, Android, web</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping, angle and volume" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping, angle and volume</span></td>
+          <td data-label="Produces sets" data-text="Sheet-number page labels only" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Sheet-number page labels only</span></td>
           <td data-label="Mark up together live" data-text="Shared review, not live" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Shared review, not live</span></td>
-          <td data-label="Overlays revisions" data-text="Text compare, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Text compare, no overlay</span></td>
           <td data-label="Markups list" data-text="Yes, Status, CSV summary" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Status, CSV summary</span></td>
+          <td data-label="Overlays revisions" data-text="Text compare, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Text compare, no overlay</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping, angle and volume" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping, angle and volume</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">About $130 a year, $160 with mobile apps, or $210 one-time</td>
         </tr>
         <tr id="pdf-expert" data-platforms="mac ipad iphone">
           <th scope="row"><a href="https://pdfexpert.com" rel="noopener">PDF Expert</a><span class="s-maker">Readdle</span><span class="s-note">Use it on an iPad with an Apple Pencil. Documents, Readdle&rsquo;s iPad file manager, has the same PDF tools.</span><span class="s-runs">Runs on Mac, iPad, iPhone</span></th>
-          <td data-label="Callouts and clouds" data-text="Both on iPad, no cloud on Mac" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Both on iPad, no cloud on Mac</span></td>
-          <td data-label="Measures to scale" data-text="No snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
-          <td data-label="Overlays revisions" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Markups list" data-text="Summary export, no status" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Summary export, no status</span></td>
+          <td data-label="Overlays revisions" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
+          <td data-label="Measures to scale" data-text="No snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found</span></td>
+          <td data-label="Callouts and clouds" data-text="Both on iPad, no cloud on Mac" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Both on iPad, no cloud on Mac</span></td>
           <td data-label="Price">Pro about $80 a year</td>
         </tr>
         <tr id="pdf-xchange" data-platforms="win">
           <th scope="row"><a href="https://www.pdf-xchange.com/product/pdf-xchange-editor" rel="noopener">PDF-XChange Editor</a><span class="s-maker">PDF-XChange</span><span class="s-note">Use it to measure and mark up alone on Windows for the lowest one-time price here.</span><span class="s-runs">Runs on Windows</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
-          <td data-label="Overlays revisions" data-text="Text compare, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Text compare, no overlay</span></td>
           <td data-label="Markups list" data-text="Yes, Status, data export" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Status, data export</span></td>
+          <td data-label="Overlays revisions" data-text="Text compare, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Text compare, no overlay</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">About $62 one-time</td>
         </tr>
         <tr id="xodo-pdf-studio" data-platforms="win mac linux">
           <th scope="row"><a href="https://xodo.com/industries/architecture-engineering-construction" rel="noopener">Xodo PDF Studio</a><span class="s-maker">Apryse</span><span class="s-note">Qoppa&rsquo;s PDF Studio, now Xodo&rsquo;s desktop app. Xodo&rsquo;s web and phone editors are separate products. Use it on Linux, or on a Mac for overlays and a full markups list without a subscription.</span><span class="s-runs">Runs on Windows, Mac, Linux</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Overlay Comparison" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Overlay Comparison</span></td>
           <td data-label="Markups list" data-text="Yes, Status, CSV" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Status, CSV</span></td>
+          <td data-label="Overlays revisions" data-text="Yes, Overlay Comparison" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Overlay Comparison</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">$240 one-time, or $120 a year</td>
         </tr>
         <tr id="pdfelement" data-platforms="win mac ipad iphone android web">
           <th scope="row"><a href="https://pdf.wondershare.com" rel="noopener">PDFelement</a><span class="s-maker">Wondershare</span><span class="s-note">Consider it for one inexpensive editor that measures on Windows, Mac and iPad.</span><span class="s-runs">Runs on Windows, Mac, iPad, iPhone, Android, web</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
-          <td data-label="Overlays revisions" data-text="Side by side, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Side by side, no overlay</span></td>
           <td data-label="Markups list" data-text="Filters, status not checked" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Filters, status not checked</span></td>
+          <td data-label="Overlays revisions" data-text="Side by side, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Side by side, no overlay</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">About $80&ndash;90 a year</td>
         </tr>
         <tr id="nitro" data-platforms="win mac">
           <th scope="row"><a href="https://www.gonitro.com" rel="noopener">Nitro PDF Pro</a><span class="s-maker">Nitro</span><span class="s-note">An office PDF editor. Consider it if your firm buys Nitro already.</span><span class="s-runs">Runs on Windows, Mac</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
-          <td data-label="Overlays revisions" data-text="Differences as a new file, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Differences as a new file, no overlay</span></td>
           <td data-label="Markups list" data-text="Sortable summary, status not checked" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Sortable summary, status not checked</span></td>
+          <td data-label="Overlays revisions" data-text="Differences as a new file, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Differences as a new file, no overlay</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">About $180 per user a year</td>
         </tr>
         <tr id="power-pdf" data-platforms="win mac">
           <th scope="row"><a href="https://www.tungstenautomation.com/products/power-pdf" rel="noopener">Power PDF</a><span class="s-maker">Tungsten Automation, formerly Kofax</span><span class="s-note">Consider it for live markup in one office without a subscription.</span><span class="s-runs">Runs on Windows, Mac</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="Yes, Local network, Advanced" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Local network, Advanced</span></td>
-          <td data-label="Overlays revisions" data-text="Visual compare report, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Visual compare report, no overlay</span></td>
           <td data-label="Markups list" data-text="Status, printed summary only" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Status, printed summary only</span></td>
+          <td data-label="Overlays revisions" data-text="Visual compare report, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Visual compare report, no overlay</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">About $180 one-time (Advanced)</td>
         </tr>
         <tr id="master-pdf" data-platforms="win mac linux">
           <th scope="row"><a href="https://code-industry.net/masterpdfeditor/" rel="noopener">Master PDF Editor</a><span class="s-maker">Code Industry</span><span class="s-note">Use it on Linux when Xodo PDF Studio costs more than you need.</span><span class="s-runs">Runs on Windows, Mac, Linux</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
-          <td data-label="Measures to scale" data-text="Typed scale, no snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Typed scale, no snapping found</span></td>
+          <td data-label="Produces sets" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
           <td data-label="Mark up together live" data-text="No" class="s-cap s-no"><span class="cap cap-no" role="img" aria-label="No" title="No"></span></td>
-          <td data-label="Overlays revisions" data-text="Text compare, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Text compare, no overlay</span></td>
           <td data-label="Markups list" data-text="Status, no CSV" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Status, no CSV</span></td>
+          <td data-label="Overlays revisions" data-text="Text compare, no overlay" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Text compare, no overlay</span></td>
+          <td data-label="Measures to scale" data-text="Typed scale, no snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Typed scale, no snapping found</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Price">About $80 one-time</td>
         </tr>
       </tbody>
       <tbody>
-        <tr class="s-group"><th colspan="7" scope="rowgroup">Project platforms</th></tr>
+        <tr class="s-group"><th colspan="8" scope="rowgroup">Project platforms</th></tr>
         <tr id="autodesk" data-platforms="web ipad iphone android">
           <th scope="row"><a href="https://construction.autodesk.com/products/autodesk-docs/" rel="noopener">Autodesk Docs and Build</a><span class="s-maker">Autodesk &middot; now named Forma</span><span class="s-note">Mark up here when the project&rsquo;s sheets are in Autodesk Docs. Each markup is saved with its sheet version, and Build hyperlinks sheet callouts automatically.</span><span class="s-runs">Runs on web, iPad, iPhone, Android</span></th>
-          <td data-label="Callouts and clouds" data-text="Yes, Cloud callout" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Cloud callout</span></td>
-          <td data-label="Measures to scale" data-text="Yes, Snapping on the web" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping on the web</span></td>
+          <td data-label="Produces sets" data-text="Splits sets, links sheets, version sets" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Splits sets, links sheets, version sets</span></td>
           <td data-label="Mark up together live" data-text="Published markups, not live" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Published markups, not live</span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Compare sheets" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Compare sheets</span></td>
           <td data-label="Markups list" data-text="Filters, status on issues only" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Filters, status on issues only</span></td>
+          <td data-label="Overlays revisions" data-text="Yes, Compare sheets" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Compare sheets</span></td>
+          <td data-label="Measures to scale" data-text="Yes, Snapping on the web" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Snapping on the web</span></td>
+          <td data-label="Callouts and clouds" data-text="Yes, Cloud callout" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Cloud callout</span></td>
           <td data-label="Price">Not published</td>
         </tr>
         <tr id="procore" data-platforms="web ipad iphone android">
           <th scope="row"><a href="https://www.procore.com/project-management/drawings" rel="noopener">Procore</a><span class="s-maker">Procore</span><span class="s-note">The contractor&rsquo;s platform during construction. Mark up here when the contractor runs the project in Procore.</span><span class="s-runs">Runs on web, iPad, iPhone, Android</span></th>
-          <td data-label="Callouts and clouds" data-text="Clouds, no callout" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Clouds, no callout</span></td>
-          <td data-label="Measures to scale" data-text="No snapping found, seen only by you" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found, seen only by you</span></td>
+          <td data-label="Produces sets" data-text="Links sheets and tracks revisions" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Links sheets and tracks revisions</span></td>
           <td data-label="Mark up together live" data-text="Published markups, not live" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Published markups, not live</span></td>
-          <td data-label="Overlays revisions" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
           <td data-label="Markups list" data-text="Filters, no status" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Filters, no status</span></td>
+          <td data-label="Overlays revisions" data-text="Yes" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span></td>
+          <td data-label="Measures to scale" data-text="No snapping found, seen only by you" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found, seen only by you</span></td>
+          <td data-label="Callouts and clouds" data-text="Clouds, no callout" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Clouds, no callout</span></td>
           <td data-label="Price">Priced by construction volume</td>
         </tr>
         <tr id="fieldwire" data-platforms="web ipad iphone android">
           <th scope="row"><a href="https://www.fieldwire.com" rel="noopener">Fieldwire</a><span class="s-maker">Hilti</span><span class="s-note">For site visits and construction administration. Works offline on a tablet.</span><span class="s-runs">Runs on web, iPad, iPhone, Android</span></th>
-          <td data-label="Callouts and clouds" data-text="Clouds, no leader callout" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Clouds, no leader callout</span></td>
-          <td data-label="Measures to scale" data-text="Reads the scale, angle snapping only" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Reads the scale, angle snapping only</span></td>
+          <td data-label="Produces sets" data-text="Links sheets and tracks versions" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Links sheets and tracks versions</span></td>
           <td data-label="Mark up together live" data-text="Synced markups, not live" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Synced markups, not live</span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Pro and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Pro and up</span></td>
           <td data-label="Markups list" data-text="Filters, status not checked" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Filters, status not checked</span></td>
+          <td data-label="Overlays revisions" data-text="Yes, Pro and up" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Pro and up</span></td>
+          <td data-label="Measures to scale" data-text="Reads the scale, angle snapping only" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Reads the scale, angle snapping only</span></td>
+          <td data-label="Callouts and clouds" data-text="Clouds, no leader callout" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Clouds, no leader callout</span></td>
           <td data-label="Price">Free for 5 users. Pro about $39 per user a month</td>
         </tr>
         <tr id="revizto" data-platforms="win mac ipad">
           <th scope="row"><a href="https://revizto.com" rel="noopener">Revizto</a><span class="s-maker">Revizto</span><span class="s-note">For coordinating the model and its sheets. Issues are tracked across both.</span><span class="s-runs">Runs on Windows, Mac, iPad</span></th>
-          <td data-label="Callouts and clouds" data-text="Arrow and text, clouds not checked" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Arrow and text, clouds not checked</span></td>
-          <td data-label="Measures to scale" data-text="No snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found</span></td>
+          <td data-label="Produces sets" data-text="Sheet versions" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Sheet versions</span></td>
           <td data-label="Mark up together live" data-text="Syncs on save, not live" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Syncs on save, not live</span></td>
-          <td data-label="Overlays revisions" data-text="Yes, Compare sheets" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Compare sheets</span></td>
           <td data-label="Markups list" data-text="Yes, Issues with status" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Issues with status</span></td>
+          <td data-label="Overlays revisions" data-text="Yes, Compare sheets" class="s-cap"><span class="cap cap-yes" role="img" aria-label="Yes" title="Yes"></span><span class="cap-note">Compare sheets</span></td>
+          <td data-label="Measures to scale" data-text="No snapping found" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">No snapping found</span></td>
+          <td data-label="Callouts and clouds" data-text="Arrow and text, clouds not checked" class="s-cap"><span class="cap cap-part" role="img" aria-label="Partly" title="Partly"></span><span class="cap-note">Arrow and text, clouds not checked</span></td>
           <td data-label="Price">Not published</td>
         </tr>
       </tbody>
     </table>
-    <p class="schedule-key">The marks describe each main app. Web, iPad and phone versions often do less. Measuring to scale means setting a sheet to its drawing scale and taking lengths and areas off it with points that snap to the drawing&rsquo;s lines. Without snapping, a mark is half. A markups list here means every markup in a table you can sort, give a status and export. Prices are rounded. Check the vendor before you buy.</p>
+    <p class="schedule-key">The marks describe each main app. Web, iPad and phone versions often do less. Producing sets means publishing sheets from Revit or CAD, hyperlinking sheet references across a set, swapping in revised sheets and stamping a whole set at once. Measuring to scale means setting a sheet to its drawing scale and taking lengths and areas off it with points that snap to the drawing&rsquo;s lines. Without snapping, a mark is half. A markups list here means every markup in a table you can sort, give a status and export. Prices are rounded. Check the vendor before you buy.</p>
     <p class="schedule-key">Not in the table: Preview, Okular and Xournal++ mark up a PDF for free, with no callouts, clouds or scaled measurement. Morpholio Trace measures to scale on an iPad but draws in pixels, for sketching over a plan rather than redlining it. Ncored, made by an architecture studio to open 50&ndash;200&nbsp;MB CAD and BIM exports, does not list scaled measurement.</p>
   </section>
 
