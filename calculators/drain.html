@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drain -- architecture.tools</title>
+<meta name="description" content="Minimum slope for drainage, both ways: the height a pipe or surface uses over its run, pipe and hangers included, or the length an available height allows. Drop rounded to how it is built, with the rounding that lands under the minimum flagged.">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the slope math lives in
+     lib/slope.js and the drainage data in lib/drain.js. Local rules cover
+     the what-drains pickers, the three-field row (as slope.html), the
+     section figure and the flags. */
+  html, body { overflow-x: hidden; }
+
+  .what-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-md); }
+  .what { display: flex; flex-direction: column; min-width: 0; max-width: 100%; }
+  .what label, .tri label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+               text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .what select { font-size: var(--text-base); padding: 0.4rem 1.8rem 0.4rem 0.55rem; max-width: 100%;
+                 background-image: linear-gradient(45deg, transparent 50%, var(--ink-3) 50%), linear-gradient(135deg, var(--ink-3) 50%, transparent 50%);
+                 background-position: calc(100% - 14px) 55%, calc(100% - 9px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+  .what-cite { font-size: var(--text-xs); color: var(--ink-2); margin: -0.4rem 0 var(--space-md); max-width: 42em; }
+
+  .tri-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-sm); }
+  .tri { display: flex; flex-direction: column; }
+  .tri-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+               font-size: 1.05rem; font-weight: 400; width: 11rem; max-width: 100%;
+               color: var(--ink); background: var(--card);
+               padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+               box-shadow: var(--shadow-well); border-radius: var(--radius);
+               outline: none; -webkit-appearance: none; appearance: none; }
+  .tri-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .tri-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 13em; }
+  .tri-tag { display: none; margin-left: 0.4em; padding: 0 0.4em; border-radius: var(--radius);
+             background: var(--accent-soft); color: var(--accent); letter-spacing: 0.06em; }
+  .tri.is-answer .tri-tag { display: inline; }
+  .tri.is-answer .tri-input { font-family: var(--font-body); font-weight: 500; font-size: 1.2rem;
+             color: var(--accent); background: transparent; box-shadow: none;
+             border-color: transparent; border-bottom: 2px solid var(--accent); border-radius: 0;
+             padding-left: 0; }
+  .tri.is-answer .tri-input:focus { box-shadow: 0 2px 0 0 var(--accent-soft); }
+  .tri.is-answer .tri-input::placeholder { color: var(--ink-3); font-weight: 400; font-size: 1rem; }
+  .tri-hint { font-size: var(--text-xs); color: var(--ink-2); margin: 0 0 var(--space-md); max-width: 42em; }
+  .allow-input { width: 9rem; }
+
+  /* the section figure */
+  svg.dr { display: block; max-width: 100%; }
+  svg.dr text { font-family: var(--font-body); font-size: 13px; fill: var(--ink-2); }
+  svg.dr .dr-val { fill: var(--ink); font-size: 14px; }
+  svg.dr .dr-ans { fill: var(--accent); font-size: 15px; font-weight: 500; }
+  svg.dr .dr-note { font-size: 12px; font-style: italic; }
+  svg.dr .dr-limit { stroke: var(--nl-axis); stroke-width: 1; }
+  svg.dr .dr-pipe { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+  svg.dr .dr-surf { stroke: var(--accent); stroke-width: 3; fill: none; }
+  svg.dr .dr-dim { stroke: var(--ink-3); stroke-width: 1; fill: none; }
+  svg.dr .dr-allow { fill: url(#drHatch); stroke: none; }
+  svg.dr .dr-hatch { stroke: var(--nl-hatch); stroke-width: 0.8; opacity: 0.45; }
+
+  .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
+                color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
+  .flag { font-size: var(--text-xs); padding: 0.05rem 0.4rem; border-radius: var(--radius); white-space: nowrap; }
+  .flag.bad { background: var(--accent); color: var(--accent-ink); }
+  .flag.ok { color: var(--ink-2); border: var(--border-light); }
+  .snap-resid { width: auto; min-width: 120px; }
+  .lede-line { font-size: var(--text-base); margin: 0 0 var(--space-sm); }
+  .lede-line b { font-weight: 500; color: var(--accent); }
+
+  .inc-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: var(--space-sm) 0 0; }
+
+  .ref-list { font-size: var(--text-sm); }
+  .ref-list > div { display: flex; flex-wrap: wrap; gap: 0 0.8rem; padding: 0.4rem 0.2rem; border-bottom: var(--border-light); }
+  .ref-list .r-what { flex: 1 1 14em; color: var(--ink); }
+  .ref-list .r-min { flex: 0 0 9em; }
+  .ref-list .r-cite { flex: 0 0 11em; color: var(--ink-2); text-align: right; margin-left: auto; }
+  .ref-list > div.sel { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+  .ref-foot { font-size: var(--text-xs); color: var(--ink-2); margin-top: var(--space-sm); max-width: 44em; }
+  @media (max-width: 600px) { .ref-list .r-cite { flex-basis: auto; text-align: left; margin-left: 0; } }
+
+  .engine-note { margin-top: var(--space-xl); padding-top: var(--space-md); border-top: var(--border-light); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Drain</span>
+    </nav>
+    <h1>Drain</h1>
+    <p>Pick what drains and it sets the minimum slope. Enter a length to see the
+       height the run uses, pipe and hangers included, or enter the height you
+       have to see how far it reaches.</p>
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL") -->
+
+  <!-- slot 1a · WHAT DRAINS: sets the minimum (and the pipe's outside diameter) -->
+  <div class="section-label">What drains</div>
+  <div class="what-row">
+    <div class="what">
+      <label for="whatSel">item</label>
+      <select id="whatSel" class="field-select"></select>
+    </div>
+    <div class="what" id="sizeWrap">
+      <label for="sizeSel">nominal size</label>
+      <select id="sizeSel" class="field-select"></select>
+    </div>
+    <div class="what" id="matWrap">
+      <label for="matSel">pipe</label>
+      <select id="matSel" class="field-select"></select>
+    </div>
+  </div>
+  <p class="what-cite" id="whatCite"></p>
+
+  <!-- slot 1b · INPUT: two of three. The two most recently edited fields
+       govern; the third is the answer (Slope.edit/answerOf) -->
+  <div class="section-label">Length · height · slope — enter any two</div>
+  <div class="tri-row">
+    <div class="tri" data-key="run">
+      <label for="runInput">length <span class="tri-tag">calculated</span></label>
+      <input type="text" id="runInput" class="tri-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 30'  ·  9m" autofocus>
+      <div class="tri-note" id="runNote"></div>
+    </div>
+    <div class="tri" data-key="height">
+      <label for="heightInput">height <span class="tri-tag">calculated</span></label>
+      <input type="text" id="heightInput" class="tri-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 12&quot;  ·  300mm">
+      <div class="tri-note" id="heightNote"></div>
+    </div>
+    <div class="tri" data-key="slope">
+      <label for="slopeInput">slope <span class="tri-tag">calculated</span></label>
+      <input type="text" id="slopeInput" class="tri-input" spellcheck="false" maxlength="40"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 1/8&quot;/ft  ·  2%">
+      <div class="tri-note" id="slopeNote"></div>
+    </div>
+    <div class="tri">
+      <label for="allowInput">hangers, insulation <span style="text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <input type="text" id="allowInput" class="tri-input allow-input" spellcheck="false" maxlength="40"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 1&quot;">
+      <div class="tri-note" id="allowNote"></div>
+    </div>
+  </div>
+  <p class="tri-hint">Height is the whole vertical space: the drop, the pipe's outside
+     diameter and the allowance above it. The third of length, height and slope is
+     calculated. Type in it and the oldest of the other two is calculated instead.</p>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <div id="drainOut" style="display:none;">
+      <!-- slot 5 · ANSWER CARD: the section + the drop as it is built -->
+      <div class="answer-card">
+        <p class="lede-line" id="lede"></p>
+        <div class="figure-wrap" id="figure"></div>
+        <div class="snap-rows" id="rows"></div>
+        <div class="inc-row" id="incRow">
+          <span class="section-label" style="margin:0;">Drop built to</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- slot 6 · the minimums, cited — the selected one marked -->
+    <div class="ratio-box">
+      <div class="section-label">Minimum slopes</div>
+      <div class="ref-list" id="refList"></div>
+      <p class="ref-foot">Model-code values. Your jurisdiction adopts a code edition with
+         its own amendments, so check the adopted text. Outside diameters are the pipe
+         barrel; hubs and no-hub couplings are larger, so add them to the allowance
+         where they sit in the tight spot.</p>
+    </div>
+  </div>
+
+  <!-- slot 7 · the engine's auditable footnote -->
+  <div class="engine-note">
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="slope.html">Slope</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../privacy.html">Privacy &amp; analytics</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../feedback.html">Feedback</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/slope.js"></script>
+<script src="lib/drain.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960, FT = 12 * IN;
+  var MAX_UNITS = 96000000000;
+  var KEYS = ['run', 'height', 'slope'];
+  var INCS = [
+    { id: '8', label: '1/8"', units: IN / 8, sys: 'imperial' },
+    { id: '4', label: '1/4"', units: IN / 4, sys: 'imperial' },
+    { id: '1mm', label: '1 mm', units: MM, sys: 'metric' },
+    { id: '5mm', label: '5 mm', units: 5 * MM, sys: 'metric' }
+  ];
+  function outOfRange(u) { return !Number.isSafeInteger(u) || Math.abs(u) > MAX_UNITS; }
+
+  var state = {
+    gov: Slope.govFromParams(KEYS, []),
+    what: 'dwv', size: '4', mat: 'pvc',
+    allow: '',
+    inc: null,                // build increment id; null = by unit system
+    defaultUnit: 'in',
+    blankAnswer: null,
+    target: 'imperial'
+  };
+
+  var els = {};
+  ['whatSel','sizeSel','matSel','sizeWrap','matWrap','whatCite','runInput','heightInput','slopeInput',
+   'allowInput','runNote','heightNote','slopeNote','allowNote','echo','echoLine','echoAssume','drainOut',
+   'lede','figure','rows','incRow','refList','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+  var field = { run: els.runInput, height: els.heightInput, slope: els.slopeInput };
+  var note = { run: els.runNote, height: els.heightNote, slope: els.slopeNote };
+  KEYS.forEach(function (k) { field[k].dataset.ph = field[k].placeholder; });
+  var esc = UI.esc;
+
+  /* ---- reading ------------------------------------------------------------- */
+  function readDim(text, allowZero) {
+    if (!text || !text.trim()) return null;
+    var r = parseLength(text, { defaultUnit: state.defaultUnit });
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length', result: r };
+    if (outOfRange(r.units) || r.units < 0 || (!allowZero && r.units === 0)) return { error: r.units <= 0 ? 'must be more than zero' : 'out of range', result: r };
+    return { units: r.units, result: r };
+  }
+  function syncDetected(res) {
+    if (!res || !res.result || !res.result.interpretation) return;
+    var sys = res.result.unitSystem;
+    if (sys !== 'imperial' && sys !== 'metric') return;
+    var stated = (res.result.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!stated) return;
+    state.target = sys;
+    state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+  }
+
+  /* ---- formatting ---------------------------------------------------------- */
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
+  function fmtLen(u) {
+    if (state.target === 'metric') return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+  // a vertical size: inches (to the 1/64) up to 4 feet, the way plenums,
+  // joists and slab recesses are spoken; metric as fmtLen
+  function fmtV(u) {
+    if (state.target === 'metric' || u >= 4 * FT) return fmtLen(u);
+    var k = u * 64 / IN;
+    if (Math.abs(k - Math.round(k)) > 1e-9) return sig(u / IN, 3) + '"';
+    k = Math.round(k);
+    var w = Math.floor(k / 64), r = k % 64;
+    if (!r) return w + '"';
+    var g = gcd(r, 64);
+    return (w ? w + ' ' : '') + (r / g) + '/' + (64 / g) + '"';
+  }
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  // a longest run: floored to the 1/8" (or the mm), so it never overstates
+  function fmtRunMax(u) {
+    var g = state.target === 'metric' ? MM : IN / 8;
+    return fmtLen(Math.floor(u / g) * g);
+  }
+  // an exact (off-grid) drop, short: 3 decimals of an inch, 1 of a mm
+  function fmtExact(u) {
+    if (state.target === 'metric') return sig(u / MM, 1) + ' mm';
+    if (u >= 4 * FT) return fmtLen(u);
+    return sig(u / IN, 3) + '"';
+  }
+  function fmtDiff(u) {
+    var a = Math.abs(u);
+    return state.target === 'metric' ? sig(a / MM, 1) + ' mm' : (a >= 4 * FT ? fmtLen(a) : sig(a / IN, 3) + '"');
+  }
+  function slopeText(r) {
+    // the drainage regime reads in inches per foot, with percent beside it
+    var inft = 12 * r;
+    var f = Slope.faceOf(r);
+    var pct = sig(100 * r, 100 * r < 1 ? 3 : 2) + '%';
+    if (/"\/ft$/.test(f)) return f + ' (' + pct + ')';
+    if (r < 1 / 20) return sig(inft, 3) + '"/ft (' + pct + ')';
+    return f === pct ? f : f + ' (' + pct + ')';
+  }
+  function incNow() {
+    var id = state.inc || (state.target === 'metric' ? '5mm' : '8');
+    for (var i = 0; i < INCS.length; i++) if (INCS[i].id === id) return INCS[i];
+    return INCS[0];
+  }
+
+  /* ---- what drains --------------------------------------------------------- */
+  function item() { return Drain.itemById(state.what) || Drain.ITEMS[0]; }
+  function limits() { return Drain.minFor(item(), item().piped ? state.size : undefined); }
+  function minText(lim) {
+    // a parseable face for the slope field
+    var it = item();
+    if (it.group === 'Site') return sig(100 * lim.min, 2) + '%';
+    return Slope.faceOf(lim.min);
+  }
+  function od() {
+    var it = item();
+    if (!it.piped) return 0;
+    var u = Drain.odUnits(state.mat, state.size);
+    return u == null ? 0 : u;
+  }
+  function buildPickers() {
+    var groups = {};
+    els.whatSel.innerHTML = '';
+    Drain.ITEMS.forEach(function (it) {
+      if (!groups[it.group]) { groups[it.group] = document.createElement('optgroup'); groups[it.group].label = it.group; els.whatSel.appendChild(groups[it.group]); }
+      var o = document.createElement('option'); o.value = it.id; o.textContent = it.label; groups[it.group].appendChild(o);
+    });
+    els.whatSel.value = state.what;
+    syncPipePickers();
+  }
+  function syncPipePickers() {
+    var it = item();
+    els.sizeWrap.style.display = it.piped ? '' : 'none';
+    els.matWrap.style.display = it.piped ? '' : 'none';
+    if (!it.piped) return;
+    if (it.pipes.indexOf(state.size) < 0) state.size = it.pipes.indexOf('4') >= 0 ? '4' : it.pipes[0];
+    els.sizeSel.innerHTML = it.pipes.map(function (p) { return '<option value="' + esc(p) + '">' + esc(p.replace('-', ' ')) + '"</option>'; }).join('');
+    els.sizeSel.value = state.size;
+    var mats = Object.keys(Drain.MATERIALS).filter(function (m) { return Drain.odUnits(m, state.size) != null; });
+    if (mats.indexOf(state.mat) < 0) state.mat = mats[0];
+    els.matSel.innerHTML = mats.map(function (m) { return '<option value="' + m + '">' + esc(Drain.MATERIALS[m].label) + '</option>'; }).join('');
+    els.matSel.value = state.mat;
+  }
+  // a new item sets the slope field to its minimum, unless the slope is the
+  // answer (length and height given: then the page checks it instead)
+  function applyMinimum() {
+    if (Slope.answerOf(KEYS, state.gov) === 'slope') return;
+    state.gov = Slope.edit(state.gov, 'slope', minText(limits()));
+    // keep slope as the most recent edit only if it was governing already;
+    // otherwise it joins as the newest input, which is what a pick means
+  }
+
+  /* ---- main render --------------------------------------------------------- */
+  function render() {
+    var t = state.gov.text;
+    var answer = Slope.answerOf(KEYS, state.gov);
+    var run = readDim(t.run), height = readDim(t.height);
+    var slope = Slope.parseSlope(t.slope);
+    var allow = readDim(state.allow, true);
+    syncDetected(run && !run.error ? run : (height && !height.error ? height : null));
+    syncURL();
+
+    var lim = limits(), it = item(), odU = od(), alU = allow && !allow.error ? allow.units : 0;
+    els.whatCite.innerHTML = esc('Minimum ' + lim.minFace + (lim.maxFace ? ', maximum ' + lim.maxFace : '') + ' (' + lim.cite + '). ' + it.note)
+      + (it.piped ? ' ' + esc('Outside diameter ' + fmtV(odU) + ' (' + Drain.MATERIALS[state.mat].cite + ').') : '');
+
+    note.run.innerHTML = run && run.error ? esc(run.error) : '';
+    note.height.innerHTML = height && height.error ? esc(height.error) : '';
+    els.allowNote.innerHTML = allow && allow.error ? esc(allow.error) : '';
+    var sn = '';
+    if (slope && slope.error) sn = esc(slope.error);
+
+    var runU = run && !run.error ? run.units : null;
+    var hU = height && !height.error ? height.units : null;
+    var ratio = slope && !slope.error ? slope.ratio : null;
+    var bad = (run && run.error) || (height && height.error) || (slope && slope.error) || (allow && allow.error);
+
+    // height → drop: what is left for the fall once the pipe and allowance are in
+    var dropU = null, short = null;
+    if (hU != null) {
+      dropU = Drain.dropFrom(hU, odU, alU);
+      if (dropU <= 0) { short = -dropU; dropU = null; }
+    }
+    var solved = null;
+    if (!bad && short == null && (runU != null || dropU != null) && answer) {
+      try { solved = Slope.solve({ rise: dropU, run: runU, ratio: ratio }); } catch (e) { solved = null; }
+      if (solved && (solved.leg === 'slopeonly' || outOfRange(solved.rise) || outOfRange(solved.run))) solved = null;
+    }
+    if (short != null) note.height.innerHTML = esc('pipe and allowance take ' + fmtV(odU + alU) + ', no room to fall');
+
+    var s = solved ? solved.rise / solved.run : ratio;
+    if (!sn && s != null) {
+      var c = Drain.check(s, lim.min, lim.max);
+      if (c === 'under') sn = esc('under the ' + lim.minFace + ' minimum');
+      else if (c === 'over') sn = esc('over the ' + lim.maxFace + ' maximum');
+    }
+    note.slope.innerHTML = sn;
+
+    renderFields(answer, solved, odU, alU);
+    renderEcho(solved, lim, odU, alU);
+    renderRefs(lim);
+    if (!solved) { els.drainOut.style.display = 'none'; els.mathNote.innerHTML = ''; return; }
+    els.drainOut.style.display = '';
+    renderAnswer(solved, answer, lim, odU, alU, hU);
+  }
+
+  function renderFields(answer, solved, odU, alU) {
+    KEYS.forEach(function (k) {
+      var el = field[k], wrap = el.closest('.tri'), isAns = k === answer;
+      wrap.classList.toggle('is-answer', isAns);
+      el.placeholder = isAns ? 'calculated' : el.dataset.ph;
+      if (isAns) {
+        var v = '';
+        if (solved) {
+          if (k === 'slope') v = Slope.faceOf(solved.rise / solved.run);
+          else if (k === 'run') v = fmtRunMax(solved.run);
+          else v = fmtV(Drain.heightUsed(solved.rise, odU, alU));
+        }
+        el.value = state.blankAnswer === k ? '' : v;
+        el.setAttribute('aria-description', 'calculated from the other two. Typing here makes it an input.');
+      } else {
+        if (el.value !== state.gov.text[k]) el.value = state.gov.text[k];
+        el.removeAttribute('aria-description');
+      }
+    });
+  }
+
+  function renderEcho(solved, lim, odU, alU) {
+    var it = item();
+    var parts = [esc(it.label) + (it.piped ? ', ' + esc(state.size.replace('-', ' ')) + '" ' + esc(state.mat === 'ci' ? 'cast iron' : 'PVC') : '')];
+    var html = '<span class="tok stated">' + parts.join('') + '</span>';
+    state.gov.order.forEach(function (k) {
+      html += '<span class="op"> · ' + (k === 'run' ? 'length' : k) + ' </span><span class="tok stated">' + esc(state.gov.text[k]) + '</span>';
+    });
+    if (solved) {
+      var s = solved.rise / solved.run;
+      html += '<span class="eq">=</span><span class="result">' + esc('drop ' + fmtExact(solved.rise) + ' · height ' + fmtV(Drain.heightUsed(solved.rise, odU, alU)) + ' · ' + slopeText(s)) + '</span>';
+    } else {
+      html += '<span class="eq">—</span><span class="op">two of length, height and slope</span>';
+    }
+    els.echoLine.innerHTML = html;
+    var asm = [];
+    if (odU) asm.push('pipe outside diameter ' + fmtV(odU));
+    if (alU) asm.push('allowance ' + fmtV(alU) + ' above the pipe');
+    if (!alU && odU) asm.push('no allowance for hangers or insulation');
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + esc(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- the answer ---------------------------------------------------------- */
+  function rowHtml(name, gloss, value, resid, primary) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+  function flagFor(r, lim, hNeeded, hAvail) {
+    var c = Drain.check(r, lim.min, lim.max);
+    if (c === 'under') return '<span class="flag bad">under the minimum</span>';
+    if (c === 'over') return '<span class="flag bad">over the maximum</span>';
+    if (hAvail != null && hNeeded > hAvail) return '<span class="flag bad">over the height by ' + esc(fmtDiff(hNeeded - hAvail)) + '</span>';
+    return '<span class="flag ok">meets the minimum</span>';
+  }
+
+  function renderAnswer(solved, answer, lim, odU, alU, hAvail) {
+    var L = solved.run, d = solved.rise, s = d / L;
+    var hUsed = Drain.heightUsed(d, odU, alU);
+    var inc = incNow(), rd = Drain.roundDrop(d, inc.units);
+    var hGov = answer !== 'height';             // a typed height is a limit
+    var hLimit = hGov ? hAvail : null;
+
+    // the rounded drops, as built
+    var down = rd.down, up = rd.up;
+    var sDown = down / L, sUp = up / L;
+    var cDown = Drain.check(sDown, lim.min, lim.max), cUp = Drain.check(sUp, lim.min, lim.max);
+    var upFits = hLimit == null || Drain.heightUsed(up, odU, alU) <= hLimit;
+
+    // the lede: one sentence, the build instruction
+    var lede, cS = Drain.check(s, lim.min, lim.max);
+    if (answer === 'slope' && cS === 'under') {
+      // the height is short for this length: what the minimum needs, and
+      // how far the height reaches at the minimum
+      var need = Drain.roundDrop(Math.ceil(L * lim.min), inc.units).up;
+      lede = 'Under the ' + esc(lim.minFace) + ' minimum. At this length the minimum needs a height of <b>'
+        + esc(fmtV(Drain.heightUsed(need, odU, alU))) + '</b>, or this height reaches <b>' + esc(fmtRunMax(Math.floor(d / lim.min))) + '</b> at the minimum.';
+    } else if (answer === 'slope' && cS === 'over') {
+      var most = Drain.roundDrop(Math.floor(L * lim.max), inc.units).down;
+      lede = 'Over the ' + esc(lim.maxFace) + ' maximum. At this length the drop can be at most <b>' + esc(fmtV(most)) + '</b>.';
+    } else if (down === up && Drain.check(sDown, lim.min, lim.max) !== 'ok') {
+      lede = 'The drop lands on ' + esc(inc.label) + ' steps at ' + esc(fmtV(down)) + ', which is ' + (cDown === 'under' ? 'under the minimum' : 'over the maximum') + '.';
+    } else if (down === up) lede = 'The drop lands on ' + esc(inc.label) + ' steps: build it to <b>' + esc(fmtV(down)) + '</b>.';
+    else if (cDown === 'under' && cUp === 'ok' && upFits) lede = 'Round the drop up to <b>' + esc(fmtV(up)) + '</b>. Rounding down to ' + esc(fmtV(down)) + ' puts it under the ' + esc(lim.minFace) + ' minimum.';
+    else if (cDown === 'under' && !upFits) lede = 'Rounding down to ' + esc(fmtV(down)) + ' is under the minimum and rounding up to ' + esc(fmtV(up)) + ' is over the height. Shorten the run to <b>' + esc(fmtRunMax(Math.floor(down / lim.min))) + '</b> to fall ' + esc(fmtV(down)) + ' at the minimum.';
+    else if (cUp === 'over' && cDown === 'ok') lede = 'Round the drop down to <b>' + esc(fmtV(down)) + '</b>. Rounding up puts it over the ' + esc(lim.maxFace) + ' maximum.';
+    else if (cDown === 'ok' && cUp === 'ok') lede = 'Either rounding meets the minimum: <b>' + esc(fmtV(down)) + '</b> or ' + esc(fmtV(up)) + '.';
+    else lede = 'The slope is under the ' + esc(lim.minFace) + ' minimum at either rounding.';
+    els.lede.innerHTML = lede;
+
+    els.figure.innerHTML = figure(L, d, odU, alU, answer);
+
+    var r = '';
+    // the answer leads
+    if (answer === 'height') r += rowHtml('Height used', 'drop + pipe + allowance', esc(fmtV(hUsed)), flagFor(s, lim, hUsed, null), true);
+    if (answer === 'run') r += rowHtml('Longest run', 'at ' + esc(Slope.faceOf(s)), esc(fmtRunMax(L)), 'floored to the ' + (state.target === 'metric' ? 'mm' : '1/8"'), true);
+    if (answer === 'slope') r += rowHtml('Slope', 'over this length', esc(slopeText(s)), flagFor(s, lim, hUsed, null), true);
+    r += rowHtml('Drop', 'exact', esc(fmtExact(d)), solved.leg === 'rise' && solved.quant ? esc(NumberLine.formatResidual(solved.quant, state.target)) : '', false);
+    r += '<div class="rows-label">Drop as built, to ' + esc(inc.label) + '</div>';
+    if (down === up) {
+      r += rowHtml('On a step', esc(slopeText(sDown)), esc(fmtV(down)), flagFor(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit), false);
+    } else {
+      r += rowHtml('Rounded down', esc(slopeText(sDown)), esc(fmtV(down)) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(down, odU, alU))) + '</span>', flagFor(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit), false);
+      r += rowHtml('Rounded up', esc(slopeText(sUp)), esc(fmtV(up)) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(up, odU, alU))) + '</span>', flagFor(sUp, lim, Drain.heightUsed(up, odU, alU), hLimit), false);
+    }
+    if (answer === 'run' && down !== d && down > 0) {
+      // with the drop set out in steps, the longest run at the minimum is a
+      // little shorter
+      r += rowHtml('Longest run, drop rounded down', 'at ' + esc(Slope.faceOf(s)), esc(fmtRunMax(Math.floor(down / s))), '', false);
+    }
+    els.rows.innerHTML = r;
+
+    var incHtml = '<span class="section-label" style="margin:0;">Drop built to</span>';
+    INCS.forEach(function (x) {
+      incHtml += '<button type="button" class="mini-pill' + (x.id === inc.id ? ' active' : '') + '" aria-pressed="' + (x.id === inc.id) + '" data-inc="' + x.id + '">' + esc(x.label) + '</button>';
+    });
+    els.incRow.innerHTML = incHtml;
+
+    var lines = [
+      'length = <b>' + L + '</b> units · drop = <b>' + d + '</b> units (1 unit = 1/960 mm)',
+      'pipe OD = ' + odU + ' · allowance = ' + alU + ' · height = drop + OD + allowance = <b>' + hUsed + '</b>',
+      'slope = ' + d + '/' + L + ' = ' + sig(s, 6) + ' · minimum ' + sig(lim.min, 6) + (lim.max ? ' · maximum ' + sig(lim.max, 6) : ''),
+      'drop at ' + inc.label + ' (' + inc.units + ' units): floor ' + down + ' · ceil ' + up
+    ];
+    if (solved.quant) lines.push('solved leg quantized to the lattice (true value off by ' + esc(NumberLine.formatResidual(solved.quant, state.target)) + ')');
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- the section figure ---------------------------------------------------
+     The run in elevation: structure above, the allowance hatched under it,
+     the pipe (or surface) falling from high end to low end. A drainage slope
+     drawn to true scale is a flat line, so the vertical is stretched and the
+     figure says by how much. */
+  function figure(L, d, odU, alU, answer) {
+    var W = els.figure.clientWidth || Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    W = Math.max(300, Math.min(W, 680));
+    var hLabel = fmtV(d + odU + alU);
+    var Hpx = 230, mL = Math.max(64, hLabel.length * 8.5 + 30), mR = 92, mT = alU ? 46 : 30, mB = 46;
+    var bw = W - mL - mR, bh = Hpx - mT - mB;
+    var total = d + odU + alU;
+    var sx = bw / L, sy = bh / total;
+    var ex = sy / sx;
+    var x0 = mL, x1 = mL + bw, yTop = mT, yBot = mT + bh;
+    function Y(u) { return yTop + u * sy; }
+    var o = '<svg class="dr" xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + Hpx + '" viewBox="0 0 ' + W + ' ' + Hpx + '" role="img" aria-label="Section of the run: the drop over the length, pipe and allowance in the height">';
+    o += '<defs><pattern id="drHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="dr-hatch" x1="0" y1="0" x2="0" y2="6"/></pattern></defs>';
+    // the height zone: top and bottom limits
+    o += '<line class="dr-limit" x1="' + x0 + '" y1="' + yTop + '" x2="' + x1 + '" y2="' + yTop + '"/>';
+    o += '<line class="dr-limit" x1="' + x0 + '" y1="' + yBot + '" x2="' + x1 + '" y2="' + yBot + '"/>';
+    if (alU) o += '<rect class="dr-allow" x="' + x0 + '" y="' + yTop + '" width="' + bw + '" height="' + (alU * sy).toFixed(1) + '"/>';
+    var a0 = Y(alU), a1 = Y(alU + d);
+    if (odU) {
+      o += '<polygon class="dr-pipe" points="' + [x0, a0, x1, a1, x1, Y(alU + d + odU), x0, Y(alU + odU)].map(function (v) { return v.toFixed(1); }).join(' ') + '"/>';
+    } else {
+      o += '<line class="dr-surf" x1="' + x0 + '" y1="' + a0.toFixed(1) + '" x2="' + x1 + '" y2="' + a1.toFixed(1) + '"/>';
+    }
+    // dimensions: total height (left), drop (right), length (below)
+    var ansCls = function (k) { return answer === k ? 'dr-ans' : 'dr-val'; };
+    o += '<path class="dr-dim" d="M' + (x0 - 14) + ' ' + yTop + 'V' + yBot + 'M' + (x0 - 19) + ' ' + yTop + 'h10M' + (x0 - 19) + ' ' + yBot + 'h10"/>';
+    o += '<text class="' + ansCls('height') + '" x="' + (x0 - 22) + '" y="' + ((yTop + yBot) / 2 + 5) + '" text-anchor="end">' + esc(hLabel) + '</text>';
+    o += '<path class="dr-dim" d="M' + (x1 + 12) + ' ' + a0.toFixed(1) + 'V' + a1.toFixed(1) + 'M' + (x1 + 7) + ' ' + a0.toFixed(1) + 'h10M' + (x1 + 7) + ' ' + a1.toFixed(1) + 'h10"/>';
+    o += '<text class="dr-val" x="' + (x1 + 20) + '" y="' + ((a0 + a1) / 2 + 5) + '">' + esc(fmtExact(d)) + '</text>';
+    o += '<text x="' + (x1 + 20) + '" y="' + ((a0 + a1) / 2 + 20) + '">drop</text>';
+    o += '<path class="dr-dim" d="M' + x0 + ' ' + (yBot + 16) + 'H' + x1 + 'M' + x0 + ' ' + (yBot + 11) + 'v10M' + x1 + ' ' + (yBot + 11) + 'v10"/>';
+    o += '<text class="' + ansCls('run') + '" x="' + ((x0 + x1) / 2) + '" y="' + (yBot + 36) + '" text-anchor="middle">' + esc(answer === 'run' ? fmtRunMax(L) : fmtLen(L)) + '</text>';
+    o += '<text class="dr-note" x="' + x0 + '" y="' + (alU ? mT - 28 : mT - 12) + '">' + (ex > 1.05 ? esc('vertical drawn ' + sig(ex, ex < 10 ? 1 : 0) + '× the horizontal') : 'true scale') + '</text>';
+    if (alU) o += '<text class="dr-note" x="' + x0 + '" y="' + (mT - 10) + '">hatched: allowance</text>';
+    o += '</svg>';
+    return o;
+  }
+
+  /* ---- the minimums list ---------------------------------------------------- */
+  function renderRefs(lim) {
+    var h = '';
+    Drain.ITEMS.forEach(function (it) {
+      if (it.id === 'dwv') {
+        [['2½" and smaller', '1/4"/ft', ['1-1/2', '2']], ['3" to 6"', '1/8"/ft', ['3', '4', '6']], ['8" and larger', '1/16"/ft', ['8']]].forEach(function (b) {
+          var sel = state.what === 'dwv' && b[2].indexOf(state.size) >= 0;
+          h += '<div' + (sel ? ' class="sel"' : '') + '><span class="r-what">Drain pipe, ' + esc(b[0]) + '</span><span class="r-min">' + esc(b[1]) + '</span><span class="r-cite">' + esc(it.cite) + '</span></div>';
+        });
+        return;
+      }
+      var face = it.minFace + (it.maxFace ? ' to ' + it.maxFace : '');
+      h += '<div' + (state.what === it.id ? ' class="sel"' : '') + '><span class="r-what">' + esc(it.label) + '</span><span class="r-min">' + esc(face) + '</span><span class="r-cite">' + esc(it.cite) + '</span></div>';
+    });
+    els.refList.innerHTML = h;
+  }
+
+  /* ---- URL: ?run=&height=&slope= (two of three, edit order) plus the
+     pickers. From Slope (lib/slope.js contract) rise arrives as a drop and
+     becomes a height: drop + pipe + allowance. ---- */
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var q = new URLSearchParams();
+      q.set('what', state.what);
+      if (item().piped) { q.set('size', state.size); q.set('mat', state.mat); }
+      state.gov.order.forEach(function (k) { q.set(k, state.gov.text[k]); });
+      if (state.allow) q.set('allow', state.allow);
+      if (state.inc) q.set('inc', state.inc);
+      try { history.replaceState(null, '', '?' + q.toString()); } catch (e) { /* sandboxed view */ }
+    }, 250);
+  }
+  function loadURL() {
+    var p = new URLSearchParams(location.search), entries = [], any = false;
+    if (p.get('what') && Drain.itemById(p.get('what'))) state.what = p.get('what');
+    if (p.get('size')) state.size = p.get('size');
+    if (p.get('mat') && Drain.MATERIALS[p.get('mat')]) state.mat = p.get('mat');
+    if (p.get('allow')) state.allow = p.get('allow').slice(0, 40);
+    if (p.get('inc') && INCS.some(function (x) { return x.id === p.get('inc'); })) state.inc = p.get('inc');
+    buildPickers();
+    p.forEach(function (v, k) {
+      if (k === 'rise') {
+        // a drop from Slope: carry it in as the height it uses
+        var r = readDim(v.slice(0, 80));
+        syncDetected(r && !r.error ? r : null);
+        if (r && !r.error) { var al = readDim(state.allow, true); entries.push(['height', fmtV(Drain.heightUsed(r.units, od(), al && !al.error ? al.units : 0))]); any = true; }
+      } else if (KEYS.indexOf(k) >= 0) { entries.push([k, v.slice(0, k === 'slope' ? 40 : 80)]); any = true; }
+    });
+    return any ? entries : null;
+  }
+
+  /* ---- wiring --------------------------------------------------------------- */
+  KEYS.forEach(function (k) {
+    var el = field[k];
+    el.addEventListener('input', function () {
+      state.blankAnswer = el.value === '' && Slope.answerOf(KEYS, state.gov) === k ? k : null;
+      state.gov = Slope.edit(state.gov, k, el.value);
+      render();
+    });
+    el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
+    el.addEventListener('blur', function () { if (state.blankAnswer === k) { state.blankAnswer = null; render(); } });
+  });
+  els.allowInput.addEventListener('input', function () { state.allow = els.allowInput.value; render(); });
+  els.whatSel.addEventListener('change', function () { state.what = els.whatSel.value; syncPipePickers(); applyMinimum(); syncFields(); render(); });
+  els.sizeSel.addEventListener('change', function () { state.size = els.sizeSel.value; syncPipePickers(); applyMinimum(); syncFields(); render(); });
+  els.matSel.addEventListener('change', function () { state.mat = els.matSel.value; render(); });
+  els.incRow.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-inc]') : null;
+    if (!b) return;
+    state.inc = b.dataset.inc;
+    render();
+  });
+  function syncFields() { KEYS.forEach(function (k) { field[k].value = state.gov.text[k]; }); }
+
+  // initial state — URL params override the worked example: 28'-6" of 4" PVC
+  // drain at its minimum, height calculated. The drop falls between 1/8"
+  // steps, so the first thing shown is the rounding that matters
+  var entries = loadURL();
+  if (!entries) entries = [['run', "28'-6\""], ['slope', minText(limits())]];
+  state.gov = Slope.govFromParams(KEYS, entries);
+  els.allowInput.value = state.allow;
+  syncFields();
+  render();
+})();
+</script>
+</body>
+</html>
