@@ -480,7 +480,6 @@
     var hypU = Math.round(Math.sqrt(riseU * riseU + runU * runU));
 
     var isConv = solved.leg === 'slopeonly';
-    var solvedResid = quant ? ' (' + NumberLine.formatResidual(quant, state.target) + ')' : '';
 
     // families curated to the slope's regime
     var fams = [['Percent', 'percent']];
@@ -515,8 +514,8 @@
     width = Math.min(width, 680);
     els.figure.innerHTML = SlopeFig.slopefig({
       rise: riseU, run: runU,
-      riseLabel: isConv ? '' : fmtLen(riseU) + (solved.leg === 'rise' ? solvedResid : ''),
-      runLabel: isConv ? '' : fmtLen(runU) + (solved.leg === 'run' ? solvedResid : ''),
+      riseLabel: isConv ? '' : fmtLen(riseU),
+      runLabel: isConv ? '' : fmtLen(runU),
       angleLabel: sig(deg, deg < 1 ? 3 : 2) + '°',
       hypoLabel: isConv ? '' : fmtShort(hypU),
       refLo: wedge ? ss.lo.ratio : null, refHi: wedge ? ss.hi.ratio : null,
