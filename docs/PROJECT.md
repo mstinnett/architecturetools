@@ -16,13 +16,16 @@ The site uses a minimal, high-contrast design language. No framework, no build t
 
 This file records actual repo and shipping state, and that now differs by branch:
 
-- **`main` — the live site: the AT-0 cover, the picker, five calculators and
-  three software choosers.** `index.html` is the cover sheet; the picker is
-  back at `picker.html`; the calculators are the Precise Unit Converter
-  (`calculators/convert.html`) and, promoted from `dev` 2026-10-13, Stairs,
-  Slope, Tile and Scale Resolution; the choosers are `pdf-markup.html`,
-  `bim-platforms.html` and `bim-emerging.html`; plus their support files. `components.html`, `site-screen.html`, and the rest of `calculators/`
-  were trimmed off `main` in `f01b200`.
+- **`main` — the live site: the AT-0 cover, the picker and the Precise Unit
+  Converter.** `index.html` is the cover sheet; the picker is back at
+  `picker.html`; the only published calculator is the converter
+  (`calculators/convert.html` + `lib/`). `components.html`, `site-screen.html`,
+  and the rest of `calculators/` were trimmed off `main` in `f01b200`.
+- **`new-layout` — the cover redesign, not yet on `main`.** Carries the
+  stack-of-lists cover plus Stairs, Slope, Tile and Scale Resolution (staged
+  2026-10-13 — "promoted" in commit `874e409` means staged here, not
+  published) and the three software choosers (`pdf-markup.html`,
+  `bim-platforms.html`, `bim-emerging.html`). None of these are live.
 - **`dev` — the workbench (this branch).** The full site below **plus** the
   calculator engine (`calculators/lib/`) and the shipped Precise Unit Converter
   (`calculators/convert.html`). Finished tools promote to `main` one at a time.
@@ -152,9 +155,9 @@ Notes:
 - `/a/`, `/c/`, and `/l/` are the long-term structural homes (not created yet).
 - `calculators/index.html` (a C-0 cover) is not built yet; add it once the
   engine-based tools settle.
-- On `main` the live pages are the cover, the picker, the converter, Stairs,
-  Slope, Tile, Scale Resolution and the three software choosers; the rest of
-  this tree is `dev`-only until promoted.
+- On `main` the live pages are the cover, the picker and the converter.
+  Stairs, Slope, Tile, Scale Resolution and the three software choosers are
+  staged on `new-layout`, unpublished; the rest of this tree is `dev`-only.
 
 ---
 

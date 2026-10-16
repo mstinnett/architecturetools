@@ -19,9 +19,11 @@ _Last updated: 2026-10-13 (hosting moves from GitHub Pages to a Cloudflare Worke
 - **Two branches (read `docs/HANDOFF.md` first):**
   - **`main` — the live site: the AT-0 cover (`index.html`, home) + the picker
     (`picker.html`) + the Precise Unit Converter** (`calculators/convert.html`
-    + the three lib modules it loads — promoted 2026-06-09) **+ Stairs, Slope,
-    Tile and Scale Resolution** (promoted 2026-10-13) **+ the three software
-    choosers** (`pdf-markup.html`, `bim-platforms.html`, `bim-emerging.html`).
+    + the three lib modules it loads — promoted 2026-06-09). **That is all
+    that is published.** Stairs, Slope, Tile and Scale Resolution (staged
+    2026-10-13) and the three software choosers (`pdf-markup.html`,
+    `bim-platforms.html`, `bim-emerging.html`) sit on `new-layout` with the
+    cover redesign and are **not live** (operator, 2026-10-16).
     Plus `assets/`,
     `data/`, `tools/`, `docs/`, the `build-data` workflow, `CNAME`,
     `.nojekyll`. Interim nav (SITE_FRAMEWORK "Hierarchy"): title-block crumb
