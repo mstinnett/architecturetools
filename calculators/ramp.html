@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" data-family="accessibility">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramp -- architecture.tools</title>
+<meta name="description" content="Ramp layout from a rise: runs capped at 30 inches of rise, landings counted, straight, 90° or switchback plans drawn to scale, and the floor area the ramp takes. Run lengths built to a fraction, with what rounding does to the slope. ADA 2010 and ICC A117.1 §405 cited.">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the layout math lives in
+     lib/ramp.js, the slope parsing in lib/slope.js. Local rules cover the
+     small input row, the plan figure, the flags and the citation line. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .in-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-start; margin-bottom: var(--space-md); }
+  .in { display: flex; flex-direction: column; }
+  .in label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+              text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .in-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+              font-size: 1.05rem; font-weight: 400; width: 9rem; max-width: 100%;
+              color: var(--ink); background: var(--card);
+              padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+              box-shadow: var(--shadow-well); border-radius: var(--radius);
+              outline: none; -webkit-appearance: none; appearance: none; }
+  .in-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .in-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 12em; }
+  .opt-cluster { flex-wrap: wrap; }
+
+  /* the plan + unfolded section — true scale */
+  svg.rp { display: block; max-width: 100%; }
+  svg.rp text { font-family: var(--font-body); font-size: 12px; fill: var(--ink-2);
+                stroke: var(--answer-surface); stroke-width: 3px; paint-order: stroke; }
+  svg.rp .rp-run { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.25; }
+  svg.rp .rp-land { fill: var(--answer-surface); stroke: var(--ink-2); stroke-width: 1; }
+  svg.rp .rp-end { fill: none; stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 4 3; }
+  svg.rp .rp-arrow { stroke: var(--accent); stroke-width: 1.25; fill: none; }
+  svg.rp .rp-dim { stroke: var(--ink-3); stroke-width: 0.75; fill: none; }
+  svg.rp .rp-prof { stroke: var(--accent); stroke-width: 1.5; fill: none; }
+  svg.rp .rp-ground { stroke: var(--ink-3); stroke-width: 0.75; }
+  svg.rp .rp-cap { font-size: 11px; font-style: italic; }
+
+  /* flags — a fact the reader should see before building */
+  .flags:empty { display: none; }
+  .flags { margin: var(--space-md) 0 0; padding: 0; list-style: none; }
+  .flags li { font-size: var(--text-sm); color: var(--ink); padding: 0.4rem 0.6rem; margin-bottom: 0.35rem;
+              border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: var(--radius); }
+  .flags li.quiet { border-left-color: var(--ink-3); background: transparent; color: var(--ink-2); }
+
+  .cite { margin-top: var(--space-md); font-size: var(--text-xs); color: var(--ink-2); line-height: 1.7; }
+  .cite b { color: var(--ink); font-weight: 400; }
+  .warn { color: var(--accent); }
+
+  .engine-note { margin-top: var(--space-xl); padding-top: var(--space-md);
+    border-top: var(--border-light); }
+  @media (max-width: 600px) {
+    .snap-name { width: 118px; }
+    .snap-resid { width: auto; max-width: 7.5em; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <!-- the set trail is a label until a C-0 index earns its page on main -->
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Ramp</span>
+    </nav>
+    <h1>Ramp</h1>
+    <p>Type the rise. It breaks into runs of no more than 30&Prime; of rise
+       each, with landings between, and the plan is drawn to scale with the
+       floor area the ramp takes. Run lengths come back built to a fraction,
+       with what that rounding does to the slope.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the rise -->
+  <div class="section-label">Rise — the level change</div>
+  <div class="field-wrap">
+    <input type="text" id="riseInput" class="dim-input" spellcheck="false" maxlength="80"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 30&quot;  ·  4'-2&quot;  ·  650mm" autofocus>
+    <div class="field-note" id="riseNote"></div>
+    <div class="bare-ask" id="bareAsk"></div>
+  </div>
+
+  <!-- slot 2 · tool controls -->
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">Slope</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-slope="1:12">1:12</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-slope="1:16">1:16</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-slope="1:20">1:20</button>
+      <input type="text" id="slopeInput" class="in-input" spellcheck="false" maxlength="40" style="width:7rem;"
+             autocomplete="off" autocapitalize="off" aria-label="slope, any form" placeholder="or type: 7%">
+    </div>
+  </div>
+  <div class="in-note" id="slopeNote" style="max-width:none;margin:-0.9rem 0 var(--space-md);"></div>
+
+  <div class="in-row">
+    <div class="in">
+      <label for="widthInput">clear width</label>
+      <input type="text" id="widthInput" class="in-input" spellcheck="false" maxlength="40" autocomplete="off" autocapitalize="off" placeholder="36&quot;">
+      <div class="in-note" id="widthNote"></div>
+    </div>
+    <div class="in">
+      <label for="landInput">landing length</label>
+      <input type="text" id="landInput" class="in-input" spellcheck="false" maxlength="40" autocomplete="off" autocapitalize="off" placeholder="60&quot;">
+      <div class="in-note" id="landNote"></div>
+    </div>
+  </div>
+
+  <div class="opt-line">
+    <div class="opt-cluster">
+      <span class="section-label">At each landing</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-turn="straight">straight on</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-turn="l">turn 90°</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-turn="u">turn back 180°</button>
+    </div>
+    <div class="opt-cluster">
+      <button type="button" class="mini-pill" aria-pressed="false" id="endsPill">top and bottom landings</button>
+    </div>
+    <div class="opt-cluster">
+      <span class="section-label">Build runs to</span>
+      <span id="gridPills"></span>
+    </div>
+  </div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 5 · ANSWER CARD: the plan figure + the numbers -->
+    <div class="answer-card" id="rampCard" style="display:none;">
+      <div class="answer-card-label" id="rampLabel"></div>
+      <div class="figure-wrap" id="figure"></div>
+      <div class="snap-rows" id="rampRows"></div>
+      <ul class="flags" id="flags"></ul>
+    </div>
+    <div class="cite" id="citeLine" style="display:none;"></div>
+  </div>
+
+  <!-- slot 7 · the engine's auditable footnote — bottom of page, never mixed -->
+  <div class="engine-note">
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="slope.html">Slope</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../privacy.html">Privacy &amp; analytics</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../feedback.html">Feedback</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/slope.js"></script>
+<script src="lib/ramp.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960, FT = 12 * IN;
+  var MAX_UNITS = 96000000000;
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+
+  /* The reference figures, located not ruled. ADA 2010 Standards §405 and
+     ICC A117.1 §405 carry the same numbers; IBC §1012 points to them for
+     accessible ramps. Checked October 2026 against the Access Board's ramp
+     guide and jurisdiction tip sheets for the 2021 IBC. */
+  var REF = {
+    max: 1 / 12,            // 405.2 running slope
+    walk: 1 / 20,           // 106.5 a ramp is steeper than 1:20; 403.3 walking surfaces 1:20 max
+    segRise: 30 * IN,       // 405.6 rise per run
+    width: 36 * IN,         // 405.5 clear width between handrails
+    landing: 60 * IN,       // 405.7.3 landing length
+    handrail: 6 * IN        // 405.8 handrails where rise is more than 6"
+  };
+  var CITE = '<b>ADA 2010 Standards and ICC A117.1, §405</b> (IBC §1012 points to them): running slope 1:12 max (405.2). '
+    + 'Rise per run 30" max (405.6). Clear width 36" min between handrails (405.5). Landings at the top and bottom of each run, '
+    + 'level, at least as wide as the run, 60" long min (405.7.2, 405.7.3), and a turning space where the ramp changes direction, '
+    + 'usually drawn 60" × 60" (405.7.4, 304.3). Cross slope 1:48 max (405.3). Handrails on both sides where the rise is more than 6" (405.8). '
+    + 'A surface 1:20 or shallower is a walking surface, not a ramp (106.5, 403.3). Existing sites with no room for 1:12 may go to 1:10 for a rise of 6" or less, '
+    + '1:8 for 3" or less (Table 405.2). An IBC means-of-egress ramp may need corridor width (1012.5.1). Check the edition and amendments your project is under.';
+
+  var GRIDS = { imperial: [[IN / 8, '1/8"'], [IN / 4, '1/4"'], [IN / 2, '1/2"']],
+                metric:   [[MM, '1 mm'], [5 * MM, '5 mm'], [10 * MM, '10 mm']] };
+
+  var state = {
+    rise: '', slope: '1:12', width: '', landing: '',
+    turn: 'straight', ends: true, gridIx: 0,
+    defaultUnit: 'in', target: 'imperial'
+  };
+
+  var els = {};
+  ['riseInput','riseNote','bareAsk','slopeInput','slopeNote','widthInput','widthNote','landInput','landNote',
+   'endsPill','gridPills','echo','echoLine','echoAssume','rampCard','rampLabel','figure','rampRows','flags','citeLine','mathNote']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+  var escapeHtml = UI.esc;
+
+  function fmtLen(u) {
+    if (state.target === 'metric') return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
+  // a slope as 1:n, to two places, e.g. 1:11.97
+  function oneTo(r) { return '1:' + sig(1 / r, 2); }
+  function fmtArea(a) {
+    if (state.target === 'metric') return sig(a / (1e6 * MM * MM), 2) + ' m²';
+    return sig(a / (FT * FT), 1) + ' sq ft';
+  }
+
+  function readLen(text, fallback) {
+    if (!text || !text.trim()) return { units: fallback, fallback: true };
+    var r = parseLength(text, { defaultUnit: state.defaultUnit });
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length' };
+    if (outOfRange(r.units) || r.units <= 0) return { error: r.units <= 0 ? 'must be more than zero' : 'out of range' };
+    return { units: r.units, result: r };
+  }
+
+  /* ---- field notes + bare ask (as the converter) --------------------------- */
+  function pendingNote(text, result) {
+    if (!text || !result || !result.spans) return '';
+    var lines = [];
+    result.spans.forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = text.slice(sp.start, sp.end).trim();
+      if (!frag) return;
+      lines.push('ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : ''));
+    });
+    return lines.join('<br>');
+  }
+  function renderBareAsk(result) {
+    els.bareAsk.innerHTML = '';
+    if (!result || result.dimension !== 1 || result.units == null) return;
+    var terms = result.interpretation.terms || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;
+    function pick(u, label) {
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+  }
+
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  /* ---- the figure: plan over an unfolded section, one true scale ------------ */
+  function figure(plan, segRise, k, width) {
+    var pad = 14, gap = 34, capH = 18;
+    var bw = plan.bbox.w, bh = plan.bbox.h;
+    var maxPlanH = width < 500 ? 300 : 380;
+    // plan and section each at their own true scale: the section is as long
+    // as the path walked, which would shrink a switchback plan to nothing
+    var s = Math.min((width - 2 * pad) / bw, maxPlanH / bh);
+    var t = (width - 2 * pad) / plan.path;
+    var planH = bh * s, secRise = k * segRise * t;
+    var secH = Math.max(secRise, 2) + 6;
+    var H = pad + planH + 16 + capH + gap + secH + 16 + capH;
+    var o = '<svg class="rp" viewBox="0 0 ' + width + ' ' + Math.ceil(H) + '" width="' + width + '" height="' + Math.ceil(H) + '" role="img" aria-label="Ramp plan and unfolded section, drawn to scale">';
+    var ox = (width - bw * s) / 2, oy = pad;
+    function X(x) { return ox + x * s; }
+    function Y(y) { return oy + (bh - y) * s; }   // y up in plan
+    plan.rects.forEach(function (r) {
+      var cls = r.kind === 'run' ? 'rp-run' : r.kind === 'end' ? 'rp-end' : 'rp-land';
+      o += '<rect class="' + cls + '" x="' + X(r.x).toFixed(1) + '" y="' + Y(r.y + r.h).toFixed(1) + '" width="' + (r.w * s).toFixed(1) + '" height="' + (r.h * s).toFixed(1) + '"/>';
+      if (r.kind === 'run') {
+        // an arrow up the slope, along the run's centerline
+        var cx = X(r.x + r.w / 2), cy = Y(r.y + r.h / 2);
+        var horiz = r.dir === 'x' || r.dir === '-x';
+        var len = (horiz ? r.w : r.h) * s * 0.6, sgn = r.dir === '-x' ? -1 : 1;
+        if (len > 16) {
+          var x1, y1, x2, y2;
+          if (horiz) { x1 = cx - sgn * len / 2; x2 = cx + sgn * len / 2; y1 = y2 = cy; }
+          else { y1 = cy + len / 2; y2 = cy - len / 2; x1 = x2 = cx; }
+          var hx = horiz ? -sgn * 6 : 0, hy = horiz ? 0 : 6;
+          o += '<path class="rp-arrow" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + 'L' + x2.toFixed(1) + ' ' + y2.toFixed(1)
+             + 'M' + (x2 + hx + (horiz ? 0 : -4)).toFixed(1) + ' ' + (y2 + hy + (horiz ? -4 : 0)).toFixed(1) + 'L' + x2.toFixed(1) + ' ' + y2.toFixed(1)
+             + 'L' + (x2 + hx + (horiz ? 0 : 4)).toFixed(1) + ' ' + (y2 + hy + (horiz ? 4 : 0)).toFixed(1) + '"/>';
+        }
+      }
+    });
+    // overall dimensions under and beside the plan
+    var dy = oy + planH + 12;
+    o += '<path class="rp-dim" d="M' + X(0).toFixed(1) + ' ' + dy + 'H' + X(bw).toFixed(1) + 'M' + X(0).toFixed(1) + ' ' + (dy - 4) + 'v8M' + X(bw).toFixed(1) + ' ' + (dy - 4) + 'v8"/>';
+    o += '<text x="' + (width / 2).toFixed(1) + '" y="' + (dy + 14) + '" text-anchor="middle">' + escapeHtml(fmtLen(bw)) + ' × ' + escapeHtml(fmtLen(bh)) + ' overall, in plan</text>';
+    // the unfolded section: the path walked, flattened, at the same scale
+    var sy = dy + 14 + gap + secH, sx0 = (width - plan.path * t) / 2;
+    o += '<line class="rp-ground" x1="' + sx0.toFixed(1) + '" y1="' + sy.toFixed(1) + '" x2="' + (sx0 + plan.path * t).toFixed(1) + '" y2="' + sy.toFixed(1) + '"/>';
+    var d = '';
+    plan.profile.forEach(function (p, i) {
+      d += (i ? 'L' : 'M') + (sx0 + p[0] * t).toFixed(1) + ' ' + (sy - p[1] * segRise * t).toFixed(1);
+    });
+    o += '<path class="rp-prof" d="' + d + '"/>';
+    o += '<text class="rp-cap" x="' + (width / 2).toFixed(1) + '" y="' + (sy + 16).toFixed(1) + '" text-anchor="middle">unfolded section, ' + escapeHtml(fmtLen(plan.path)) + ' walked'
+       + (width >= 500 ? ', rise and run at one scale' : '') + '</text>';
+    return o + '</svg>';
+  }
+
+  /* ---- main render ----------------------------------------------------------- */
+  function render() {
+    var riseRes = state.rise.trim() ? parseLength(state.rise, { defaultUnit: state.defaultUnit }) : null;
+    if (riseRes && riseRes.interpretation) {
+      var sys = riseRes.unitSystem;
+      var stated = (riseRes.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+      if (stated && (sys === 'imperial' || sys === 'metric')) {
+        if (sys !== state.target) state.gridIx = 0;
+        state.target = sys;
+        state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+      }
+    }
+    syncURL();
+    els.riseNote.innerHTML = pendingNote(state.rise, riseRes);
+    renderBareAsk(riseRes);
+
+    var slope = Slope.parseSlope(state.slope);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-slope]'), function (b) {
+      UI.press(b, !!slope && !slope.error && Math.abs(slope.ratio - Slope.parseSlope(b.dataset.slope).ratio) < 1e-9);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-turn]'), function (b) { UI.press(b, b.dataset.turn === state.turn); });
+    UI.press(els.endsPill, state.ends);
+    var grids = GRIDS[state.target];
+    els.gridPills.innerHTML = grids.map(function (g, i) {
+      return '<button type="button" class="mini-pill' + (i === state.gridIx ? ' active' : '') + '" aria-pressed="' + (i === state.gridIx) + '" data-grid="' + i + '">' + g[1] + '</button>';
+    }).join(' ');
+
+    var sn = '';
+    if (slope && slope.error) sn = escapeHtml(slope.error);
+    else if (!slope) sn = 'needs a slope';
+    els.slopeNote.innerHTML = sn;
+
+    var wR = readLen(state.width, REF.width), lR = readLen(state.landing, REF.landing);
+    els.widthNote.innerHTML = wR.error ? escapeHtml(wR.error) : '';
+    els.landNote.innerHTML = lR.error ? escapeHtml(lR.error) : '';
+
+    var riseOk = riseRes && riseRes.dimension === 1 && riseRes.units != null && !outOfRange(riseRes.units) && riseRes.units > 0;
+    var ratio = slope && !slope.error ? slope.ratio : null;
+
+    // echo
+    if (!riseRes) { els.echo.style.display = 'none'; }
+    else {
+      var html = '';
+      ((riseRes.interpretation && riseRes.interpretation.parts) || []).forEach(function (p) {
+        if (p.type === 'op' || p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+        else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+      });
+      if (riseOk && ratio) html += '<span class="op"> at ' + escapeHtml(Slope.faceOf(ratio)) + '</span>';
+      else if (!riseOk) html += '<span class="eq">—</span><span class="op">' + (riseRes.units != null && riseRes.units <= 0 ? 'must be more than zero' : 'the rise needs to be a single length') + '</span>';
+      els.echoLine.innerHTML = html;
+      els.echoLine.dataset.base = html;
+      els.echoAssume.innerHTML = ((riseRes.interpretation && riseRes.interpretation.assumptions) || [])
+        .map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+      els.echo.style.display = '';
+    }
+
+    var grid = grids[state.gridIx][0];
+    var R = riseOk && ratio && !wR.error && !lR.error
+      ? Ramp.runs({ rise: riseRes.units, ratio: ratio, grid: grid, maxSegRise: REF.segRise, walkLimit: REF.walk }) : null;
+    if (!R) {
+      els.rampCard.style.display = 'none';
+      els.citeLine.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    var riseU = riseRes.units, W = wR.units, L = lR.units;
+    var run = R.built.longer;
+    var P = Ramp.plan({ k: R.k, run: run, width: W, landing: L, turn: state.turn, ends: state.ends });
+    if (outOfRange(P.bbox.w) || outOfRange(P.bbox.h)) { els.rampCard.style.display = 'none'; return; }
+    var landings = R.k - 1;
+
+    els.echoLine.innerHTML = els.echoLine.dataset.base + '<span class="eq">=</span><span class="result">'
+      + escapeHtml(fmtArea(P.area)) + ' of floor</span><span class="op"> · ' + R.k + (R.k === 1 ? ' run' : ' runs')
+      + ' · ' + escapeHtml(fmtLen(P.bbox.w)) + ' × ' + escapeHtml(fmtLen(P.bbox.h)) + '</span>';
+
+    els.rampCard.style.display = '';
+    els.citeLine.style.display = '';
+    els.citeLine.innerHTML = CITE;
+    var turnWord = { straight: 'in line', l: 'turning 90°', u: 'switching back' }[state.turn];
+    els.rampLabel.textContent = !R.isRamp ? 'A walking surface, one run'
+      : R.k === 1 ? 'One run, no landing between'
+      : R.k + ' runs, ' + landings + (landings === 1 ? ' landing' : ' landings') + ' between, ' + turnWord;
+
+    var width = els.figure.clientWidth;
+    if (!width) width = Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    els.figure.innerHTML = figure(P, R.segRise, R.k, width);
+
+    // the rows
+    var rows = '';
+    var endsNote = state.ends ? 'runs, landings, top and bottom landings' : 'runs and landings between, no top or bottom landing';
+    rows += rowHtml('Floor taken', endsNote, escapeHtml(fmtArea(P.area)),
+      '<span class="snap-dec">' + escapeHtml(fmtLen(P.bbox.w)) + ' × ' + escapeHtml(fmtLen(P.bbox.h)) + ' overall</span>', true);
+    var segRiseTxt = R.segRise === Math.round(R.segRise) ? fmtLen(R.segRise) : NumberLine.formatTrue(Math.round(R.segRise), state.target);
+    rows += rowHtml('Runs', R.isRamp ? 'rise split equally, 30" max each (405.6)' : 'one run, 1:20 or shallower',
+      R.k + ' × ' + escapeHtml(fmtLen(run)) + ' <span class="snap-gloss">' + escapeHtml(segRiseTxt) + ' rise each, at ' + escapeHtml(oneTo(R.slope.longer)) + '</span>', '—');
+
+    // rounding, the converter way: the run built longer holds the slope at
+    // or under what was asked; built to the nearest step it can be shorter,
+    // and a shorter run is steeper
+    var exactTxt = NumberLine.formatTrue(Math.round(R.runExact), state.target);
+    var nearShort = R.built.nearest < R.runExact - 1e-6;
+    rows += rowHtml('Run, exact', 'rise ÷ slope', escapeHtml(exactTxt), '—', false, 'is-ref');
+    rows += rowHtml('Built longer', 'to ' + grids[state.gridIx][1] + ', for a max: used above',
+      escapeHtml(fmtLen(R.built.longer)), escapeHtml(oneTo(R.slope.longer)), false);
+    rows += rowHtml('Built nearest', 'to ' + grids[state.gridIx][1],
+      escapeHtml(fmtLen(R.built.nearest)) + (nearShort ? ' <span class="snap-gloss warn">shorter than exact, so steeper</span>' : ''),
+      '<span' + (nearShort && R.slope.nearest > REF.max + 1e-12 ? ' class="warn"' : '') + '>' + escapeHtml(oneTo(R.slope.nearest)) + '</span>', false);
+
+    if (landings > 0) {
+      var landTxt = state.turn === 'l' ? fmtLen(Math.max(W, L)) + ' × ' + fmtLen(Math.max(W, L))
+        : state.turn === 'u' ? fmtLen(L) + ' × ' + fmtLen(2 * W) + ' across both runs'
+        : fmtLen(L) + ' × ' + fmtLen(W);
+      rows += rowHtml('Landings between', 'level, 1:48 max any way (405.7.1)', landings + ' × ' + escapeHtml(landTxt), '—');
+    }
+    if (state.ends) rows += rowHtml('Top and bottom', '60" long min (405.7.3)', '2 × ' + escapeHtml(fmtLen(L) + ' × ' + fmtLen(W)), '—');
+    rows += rowHtml('Length walked', 'along the centerline', escapeHtml(fmtLen(P.path)), '—');
+    rows += rowHtml('Handrails', 'where the rise is more than 6" (405.8)',
+      !R.isRamp ? 'not a ramp' : riseU > REF.handrail ? 'both sides' : 'not required, 6" or less', '—', false, 'is-ref');
+    els.rampRows.innerHTML = rows;
+
+    // flags: facts to see before building
+    var f = [];
+    if (ratio > REF.max * (1 + 1e-9)) {
+      var exc = ratio <= 1 / 10 + 1e-12 ? (riseU <= 6 * IN ? ' Table 405.2 allows up to 1:10 on an existing site for a rise of 6" or less.' : ' Table 405.2 allows 1:10 on an existing site only for a rise of 6" or less.')
+        : ratio <= 1 / 8 + 1e-12 ? (riseU <= 3 * IN ? ' Table 405.2 allows up to 1:8 on an existing site for a rise of 3" or less.' : ' Table 405.2 allows 1:8 on an existing site only for a rise of 3" or less.')
+        : ' Nothing in 405 allows steeper than 1:8.';
+      f.push('Steeper than the 1:12 maximum (405.2).' + exc);
+    }
+    if (!R.isRamp) f.push('At 1:20 or shallower this is a walking surface, not a ramp (106.5, 403.3). The 30" run limit, landings and handrails of 405 do not apply. It is drawn as one run.');
+    if (nearShort && R.slope.nearest > REF.max + 1e-12 && ratio <= REF.max * (1 + 1e-9)) f.push('Built to the nearest ' + grids[state.gridIx][1] + ', each run is ' + escapeHtml(fmtLen(R.built.nearest)) + ' and the slope is ' + escapeHtml(oneTo(R.slope.nearest)) + ', over the 1:12 maximum. Build the runs longer.');
+    if (W < REF.width) f.push('Clear width under 36" (405.5).');
+    if (L < REF.landing) f.push('Landing length under 60" (405.7.3).');
+    if (state.turn === 'u' && R.k > 1) f.push('<span>Switchback widths are clear widths with the runs touching. Handrails and edge protection between the runs add to the overall width.</span>');
+    els.flags.innerHTML = f.map(function (t, i) { return '<li' + (t.indexOf('<span>') === 0 ? ' class="quiet"' : '') + '>' + t + '</li>'; }).join('');
+
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
+      + 'rise = <b>' + riseU + '</b> units · slope = ' + sig(ratio, 6) + ' (' + escapeHtml(Slope.faceOf(ratio)) + ')<br>'
+      + 'runs = ' + (R.isRamp ? 'ceil(' + riseU + ' / ' + REF.segRise + ')' : '1, a walking surface') + ' = <b>' + R.k + '</b> · rise per run = ' + sig(R.segRise, 3) + ' units<br>'
+      + 'run exact = ' + sig(R.segRise, 3) + ' / ' + sig(ratio, 6) + ' = ' + sig(R.runExact, 2) + ' units, floating point<br>'
+      + 'built to grid ' + grid + ': longer = <b>' + R.built.longer + '</b> · nearest = <b>' + R.built.nearest + '</b><br>'
+      + 'plan = ' + P.bbox.w + ' × ' + P.bbox.h + ' units · floor = Σ rectangles = <b>' + P.area + '</b> units² · path = ' + P.path + ' units';
+  }
+
+  /* ---- shareable URL ----------------------------------------------------------
+     Reads slope.js's handoff contract (?rise=&run=&slope=: any two, the third
+     follows) plus this page's own w, l, turn, ends, g. */
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var q = new URLSearchParams();
+      var example = state.rise === '30"' && state.slope === '1:12' && !state.width && !state.landing && state.turn === 'straight' && state.ends && state.gridIx === 0;
+      if (!example) {
+        if (state.rise) q.set('rise', state.rise);
+        if (state.slope) q.set('slope', state.slope);
+        if (state.width) q.set('w', state.width);
+        if (state.landing) q.set('l', state.landing);
+        if (state.turn !== 'straight') q.set('turn', state.turn);
+        if (!state.ends) q.set('ends', '0');
+        if (state.gridIx) q.set('g', String(state.gridIx));
+      }
+      var qs = q.toString();
+      try { history.replaceState(null, '', qs ? '?' + qs : location.pathname); } catch (e) { /* sandboxed view */ }
+    }, 250);
+  }
+  function initFromURL() {
+    var p = new URLSearchParams(location.search);
+    var got = false;
+    function g(k, n) { var v = p.get(k); if (v != null) got = true; return v != null ? v.slice(0, n) : null; }
+    var rise = g('rise', 80), run = g('run', 80), slope = g('slope', 40);
+    // a handoff with run and slope, or rise and run: the rise or slope follows
+    if (rise == null && run != null && slope != null) {
+      var rr = parseLength(run, { defaultUnit: 'in' }), sl = Slope.parseSlope(slope);
+      if (rr && rr.units > 0 && sl && !sl.error) rise = fmtLenRaw(Math.round(rr.units * sl.ratio), rr.unitSystem);
+    } else if (slope == null && rise != null && run != null) {
+      var a = parseLength(rise, { defaultUnit: 'in' }), b = parseLength(run, { defaultUnit: 'in' });
+      if (a && b && a.units > 0 && b.units > 0) slope = Slope.faceOf(a.units / b.units);
+    }
+    var w = g('w', 40), l = g('l', 40), t = g('turn', 10), e = g('ends', 2), gi = g('g', 2);
+    if (rise != null) state.rise = rise;
+    if (slope != null) state.slope = slope;
+    if (w != null) state.width = w;
+    if (l != null) state.landing = l;
+    if (t === 'l' || t === 'u' || t === 'straight') state.turn = t;
+    if (e === '0') state.ends = false;
+    if (gi === '1' || gi === '2') state.gridIx = +gi;
+    return got;
+  }
+  function fmtLenRaw(u, sys) {
+    return sys === 'metric' ? NumberLine.formatTrue(u, 'metric') : NumberLine.formatSnapped(Snap.snap(u, IN / 64, 'nearest'), 'imperial', 64);
+  }
+
+  /* ---- wiring ------------------------------------------------------------------ */
+  function bind(el, key) {
+    el.addEventListener('input', function () { state[key] = el.value; render(); });
+    el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
+  }
+  bind(els.riseInput, 'rise'); bind(els.slopeInput, 'slope');
+  bind(els.widthInput, 'width'); bind(els.landInput, 'landing');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-slope]'), function (b) {
+    b.addEventListener('click', function () { state.slope = b.dataset.slope; els.slopeInput.value = state.slope; render(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-turn]'), function (b) {
+    b.addEventListener('click', function () { state.turn = b.dataset.turn; render(); });
+  });
+  els.endsPill.addEventListener('click', function () { state.ends = !state.ends; render(); });
+  els.gridPills.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-grid]') : null;
+    if (b) { state.gridIx = +b.dataset.grid; render(); }
+  });
+  els.bareAsk.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-bare]') : null;
+    if (b) { state.defaultUnit = b.dataset.bare; render(); }
+  });
+
+  // initial state — URL params override the worked example (a 30" rise at 1:12)
+  if (!initFromURL()) state.rise = '30"';
+  els.riseInput.value = state.rise;
+  els.slopeInput.value = state.slope;
+  els.widthInput.value = state.width;
+  els.landInput.value = state.landing;
+  render();
+})();
+</script>
+</body>
+</html>
