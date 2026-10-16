@@ -1,5 +1,5 @@
 /* chooser.js — the filter-and-sort behaviour shared by the software choosers
-   (pdf-markup.html, bim-platforms.html, bim-emerging.html).
+   (pdf-markup.html).
 
    Every item is a static <article class="tool"> in the page, so a chooser
    reads in full without JavaScript and is indexable. This script only hides

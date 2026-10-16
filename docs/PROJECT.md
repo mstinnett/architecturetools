@@ -25,7 +25,8 @@ This file records actual repo and shipping state, and that now differs by branch
   stack-of-lists cover plus Stairs, Slope, Tile and Scale Resolution (staged
   2026-10-13 — "promoted" in commit `874e409` means staged here, not
   published) and the three software choosers (`pdf-markup.html`,
-  `bim-platforms.html`, `bim-emerging.html`). None of these are live.
+  `bim.html`, which replaced `bim-platforms.html` and `bim-emerging.html`,
+  now redirect stubs). None of these are live.
 - **`dev` — the workbench (this branch).** The full site below **plus** the
   calculator engine (`calculators/lib/`) and the shipped Precise Unit Converter
   (`calculators/convert.html`). Finished tools promote to `main` one at a time.
@@ -450,13 +451,17 @@ promote them as each is ready, not to land them all at once.
 - **Software choosers** (landed 2026-10-08, merged to the lists cover
   2026-10-13), three named live pages in the picker's register, indexed on
   the cover in the **What tool to buy or use** list:
-  `pdf-markup.html` (PDF Markup & Review), `bim-platforms.html` (BIM & Design
-  Platforms: Revit, Archicad, Vectorworks, Rhino, SketchUp, AutoCAD, Chief
-  Architect, the renderers) and `bim-emerging.html` (Emerging BIM: Motif,
-  Snaptrude, Qonic, Arcol, Forma, Rayon...). Each is filter controls over
-  static `<article class="tool">` cards (readable without JS, indexable),
-  then short answers and context. One behaviour, `assets/js/chooser.js` (its
-  header is the data-* contract); one style block, global.css "CHOOSER".
+  `pdf-markup.html` (PDF Markup & Review) is filter controls over static
+  `<article class="tool">` cards (readable without JS, indexable), then
+  short answers and context, with one behaviour, `assets/js/chooser.js`
+  (its header is the data-* contract), and one style block, global.css
+  "CHOOSER". `bim.html` (2026-10-16, operator: "not a quiz — the only quiz
+  is the computer chooser") is information, not a chooser: a timeline of
+  product introductions (each year sourced in `data-src`, unpinned years
+  marked "c."), a table of the tools today (year, platforms, drawings,
+  IFC, Revit files, shared model, price), and a dated, hand-curated space
+  to watch. It replaced `bim-platforms.html` and `bim-emerging.html`,
+  which are now redirect stubs.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
   editorial and labelled so. Adequate Design Review is listed on the PDF
