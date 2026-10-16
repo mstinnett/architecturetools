@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<!-- BIM — a history of the design software architects use, the tools as
+     they stand, and a dated space to watch. Replaces bim-platforms.html and
+     bim-emerging.html (both now redirect here).
+     data-family: building, the site's amber.
+
+     Information, not a chooser: no filters. Every year carries its source
+     in data-src; years marked "c." could not be pinned to one year from the
+     sources found and say so on the page. The space-to-watch list is
+     curated by hand and dated. Copy follows docs/voice.md. -->
+<html lang="en" data-family="building">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIM Software, 1982 to Now -- architecture.tools</title>
+<meta name="description" content="A timeline of architects' design software from AutoCAD in 1982 to the browser BIM tools of 2026, with each tool's year, platforms, drawings, IFC, Revit exchange and price, and a dated list of what to watch from AEC Magazine and others.">
+<link rel="canonical" href="https://architecture.tools/bim.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://architecture.tools/bim.html">
+<meta property="og:title" content="BIM Software, 1982 to Now -- architecture.tools">
+<meta property="og:description" content="When each design tool arrived, what it does today, and what to watch.">
+<meta name="twitter:card" content="summary">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
+<style>
+  /* ---- page-specific only: the timeline, the tools table, the watch list ---- */
+  .bim-section { margin-top: var(--space-2xl); }
+  .bim-section > .section-label { padding-bottom: var(--space-sm); border-bottom: 2px solid var(--black); margin-bottom: var(--space-lg); }
+  .bim-intro { font-size: var(--text-base); font-weight: 300; line-height: 1.65; max-width: 46em; color: var(--ink-2); margin: calc(-1 * var(--space-sm)) 0 var(--space-lg); }
+
+  /* timeline — a horizontal axis of decades on wide screens; each decade's
+     events stack under it. Below 760px it turns vertical: one rule down the
+     left, decades as headings along it. */
+  .tl-key { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; font-size: var(--text-xs); color: var(--ink-3); margin-bottom: var(--space-lg); }
+  .tl-key span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .tl-key i { display: inline-block; width: 8px; height: 8px; border: 1.5px solid var(--accent); }
+  .tl-key i.rel { background: var(--accent); }
+  .timeline { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 1rem; }
+  .tl-decade { min-width: 0; }
+  .tl-dec-label { position: relative; font-size: var(--text-sm); letter-spacing: 0.08em; color: var(--ink); padding: 0 0 0.6rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--ink-2); }
+  .tl-dec-label::after { content: ""; position: absolute; left: 0; bottom: -5px; width: 1px; height: 9px; background: var(--ink-2); }
+  .tl-items { list-style: none; padding: 0; margin: 0; }
+  .tl-item { position: relative; padding: 0 0 0.75rem 0.95rem; line-height: 1.4; }
+  .tl-item::before { content: ""; position: absolute; left: 0; top: 0.42em; width: 7px; height: 7px; border: 1.5px solid var(--accent); box-sizing: border-box; }
+  .tl-item.is-rel::before { background: var(--accent); }
+  .tl-year { display: block; font-size: var(--text-xs); letter-spacing: 0.06em; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .tl-year.is-approx, .since-y.is-approx { font-style: italic; }
+  .tl-name { display: block; font-size: var(--text-sm); font-weight: 400; color: var(--ink); }
+  .tl-item.is-evt .tl-name { font-weight: 300; }
+  .tl-what { display: block; font-size: var(--text-xs); font-weight: 300; color: var(--ink-2); line-height: 1.45; }
+
+  /* tools table — a row per tool, columns of facts. Below 760px each row
+     becomes a block and each cell carries its own label. */
+  .bim-table-group { margin-bottom: var(--space-xl); }
+  .bim-table-group > h3 { font-size: var(--text-md); font-weight: 400; margin-bottom: var(--space-sm); }
+  .bim-table-group > p { font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); line-height: 1.55; margin-bottom: var(--space-md); max-width: 46em; }
+  .bim-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .bim-table th { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); text-align: left; padding: 0 0.5rem 0.4rem; border-bottom: 1px solid var(--ink-2); vertical-align: bottom; }
+  .bim-table td { font-size: var(--text-sm); font-weight: 300; padding: 0.6rem 0.5rem; border-bottom: var(--border-light); vertical-align: top; line-height: 1.45; overflow-wrap: anywhere; }
+  .bim-table th:first-child, .bim-table td:first-child { padding-left: 0; }
+  .bim-table col.c-since { width: 4.6rem; }
+  .bim-table col.c-tool { width: 30%; }
+  .bim-table col.c-plats { width: 6.5rem; }
+  .bim-table col.c-price { width: 15%; }
+  .since-y { display: block; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .since-note { display: block; font-size: var(--text-xs); color: var(--ink-3); line-height: 1.35; margin-top: 0.15rem; }
+  .tool-cell a { font-size: var(--text-base); font-weight: 400; color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule-2); }
+  .tool-cell a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .tool-cell .maker { display: block; margin-top: 0.15rem; font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  .tool-cell .line { display: block; margin-top: 0.3rem; color: var(--ink-2); }
+  .plats { list-style: none; padding: 0; margin: 0; }
+  .plats li { display: block; }
+  .cap.is-yes { color: var(--accent); }
+  .cap.is-part { color: var(--ink); }
+  .cap.is-no, .cap.is-na { color: var(--ink-3); }
+  .price { color: var(--ink-2); }
+
+  /* space to watch */
+  .watch-list { list-style: none; padding: 0; margin: 0; max-width: 760px; }
+  .watch-item { display: grid; grid-template-columns: 7.5rem 1fr; gap: 0.25rem 1.25rem; padding: 0.7rem 0; border-bottom: var(--border-light); }
+  .watch-item time { font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); padding-top: 0.2em; font-variant-numeric: tabular-nums; }
+  .watch-item p { font-size: var(--text-base); font-weight: 300; line-height: 1.55; }
+  .watch-item a, .bim-notes a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule-2); white-space: nowrap; }
+  .watch-item a { font-size: var(--text-sm); color: var(--ink-2); }
+  .watch-item a:hover, .bim-notes a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .bim-notes { max-width: 720px; }
+  .bim-notes p { font-size: var(--text-base); font-weight: 300; line-height: 1.65; margin-bottom: var(--space-md); }
+
+  @media (max-width: 760px) {
+    .timeline { display: block; border-left: 1px solid var(--ink-2); margin-left: 3px; }
+    .tl-decade { padding-left: 1rem; }
+    .tl-dec-label { border-bottom: 0; padding: 0 0 0.5rem; margin: 0 0 0.25rem; font-weight: 400; }
+    .tl-dec-label::after { left: calc(-1rem - 4px); bottom: auto; top: 0.35em; width: 9px; height: 1px; }
+    .tl-decade + .tl-decade { margin-top: var(--space-md); }
+
+    .bim-table, .bim-table tbody, .bim-table tr, .bim-table td { display: block; width: auto; }
+    .bim-table thead, .bim-table colgroup { display: none; }
+    .bim-table tr { padding: 0.75rem 0; border-bottom: var(--border-light); display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1rem; }
+    .bim-table td { border: 0; padding: 0; }
+    .bim-table td.since, .bim-table td.tool-cell, .bim-table td.price { grid-column: 1 / -1; }
+    .bim-table td.since { order: -1; }
+    .bim-table td.since .since-y, .bim-table td.since .since-note { display: inline; margin-right: 0.5rem; }
+    .bim-table td[data-label]::before { content: attr(data-label); display: block; font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+    .bim-table td.since::before { display: none; }
+    .plats li { display: inline; }
+    .plats li + li::before { content: ", "; }
+
+    .watch-item { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wide">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Software</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">BIM</span>
+    </nav>
+    <h1>BIM software, from 1982 to now</h1>
+    <p>When each design tool arrived, what it does today, and what to watch next.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <p class="chooser-updated">Updated October 2026</p>
+
+  <section class="bim-section" id="timeline">
+    <h2 class="section-label">Timeline</h2>
+    <p class="bim-intro">Desktop drafting in the 1980s, model-based BIM from the late 1980s
+       and 2000, renderers in the 2010s, and browser-based tools since 2020.
+       A year is a first release unless the entry says otherwise.</p>
+    <div class="tl-key" aria-hidden="true">
+      <span><i class="rel"></i> First release</span>
+      <span><i></i> Rename, acquisition or standard</span>
+      <span><em>c.</em>&nbsp;Approximate year</span>
+    </div>
+    <ol class="timeline">
+      <li class="tl-decade">
+        <div class="tl-dec-label">1980s</div>
+        <ol class="tl-items">
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/AutoCAD"><span class="tl-year">1982</span> <span class="tl-name">AutoCAD</span> <span class="tl-what">Autodesk ships it in December, for CP/M and the IBM PC</span></li>
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/Graphisoft"><span class="tl-year">1984</span> <span class="tl-name">Radar CH</span> <span class="tl-what">Graphisoft, for the Apple Lisa. Renamed ArchiCAD in 1987</span></li>
+          <li class="tl-item is-rel" data-src="https://www.allplan.com/about-us/"><span class="tl-year">1984</span> <span class="tl-name">Allplan</span> <span class="tl-what">Nemetschek, 3D building models for architects and engineers</span></li>
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/Vectorworks"><span class="tl-year">1985</span> <span class="tl-name">MiniCAD</span> <span class="tl-what">Graphsoft, on the Mac. Renamed VectorWorks later</span></li>
+          <li class="tl-item is-rel" data-src="https://communities.bentley.com/products/microstation/w/microstation__wiki/history-of-microstation"><span class="tl-year">1986</span> <span class="tl-name">MicroStation</span> <span class="tl-what">Bentley Systems, version 1, after PseudoStation in 1985</span></li>
+          <li class="tl-item is-evt" data-src="https://en.wikipedia.org/wiki/Graphisoft"><span class="tl-year">1987</span> <span class="tl-name">ArchiCAD</span> <span class="tl-what">Radar CH released as ArchiCAD, the &quot;Virtual Building&quot;</span></li>
+        </ol>
+      </li>
+      <li class="tl-decade">
+        <div class="tl-dec-label">1990s</div>
+        <ol class="tl-items">
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/Chief_Architect_Software"><span class="tl-year">1992</span> <span class="tl-name">Chief Architect</span> <span class="tl-what">Home design on Windows 3.1</span></li>
+          <li class="tl-item is-evt" data-src="https://en.wikipedia.org/wiki/BuildingSMART"><span class="tl-year">1996</span> <span class="tl-name">IFC</span> <span class="tl-what">First version of the open model exchange format, from the alliance Autodesk started in 1994</span></li>
+          <li class="tl-item is-rel" data-src="https://wiki.mcneel.com/rhino/rhinohistory"><span class="tl-year">1998</span> <span class="tl-name">Rhino</span> <span class="tl-what">McNeel, version 1.0 in October</span></li>
+          <li class="tl-item is-evt" data-src="https://www.nationalarchives.gov.uk/PRONOM/fmt/1138"><span class="tl-year is-approx" title="Approximate year">c.&nbsp;1998</span> <span class="tl-name">VectorWorks</span> <span class="tl-what">MiniCAD renamed at version 8. Sources give 1998 and 1999</span></li>
+        </ol>
+      </li>
+      <li class="tl-decade">
+        <div class="tl-dec-label">2000s</div>
+        <ol class="tl-items">
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/Autodesk_Revit"><span class="tl-year">2000</span> <span class="tl-name">Revit</span> <span class="tl-what">Revit Technology Corporation, version 1 in April</span></li>
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/SketchUp"><span class="tl-year">2000</span> <span class="tl-name">SketchUp</span> <span class="tl-what">@Last Software, in August</span></li>
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/Chaos_(company)"><span class="tl-year">2002</span> <span class="tl-name">V-Ray</span> <span class="tl-what">Chaos, first version, for 3ds Max</span></li>
+          <li class="tl-item is-evt" data-src="https://en.wikipedia.org/wiki/Autodesk_Revit"><span class="tl-year">2002</span> <span class="tl-name">Revit to Autodesk</span> <span class="tl-what">Bought for $133 million</span></li>
+          <li class="tl-item is-rel" data-src="https://www.3ds.com/newsroom/press-releases/gehry-technologies-extends-partnership-dassault-systemes-develop-solutions-building-industry"><span class="tl-year">2004</span> <span class="tl-name">Digital Project</span> <span class="tl-what">Gehry Technologies, building design on CATIA</span></li>
+          <li class="tl-item is-rel" data-src="https://bricscad.octave.com/about"><span class="tl-year">2004</span> <span class="tl-name">BricsCAD</span> <span class="tl-what">Bricsys, version 1, a DWG editor</span></li>
+          <li class="tl-item is-rel" data-src="https://architosh.com/2016/04/twinmotion-developer-ka-ra-has-joined-the-abvent-group/"><span class="tl-year is-approx" title="Approximate year">c.&nbsp;2005</span> <span class="tl-name">Twinmotion</span> <span class="tl-what">KA-RA, founded 2004. A second version was out by about 2008</span></li>
+          <li class="tl-item is-evt" data-src="https://en.wikipedia.org/wiki/Industry_Foundation_Classes"><span class="tl-year">2005</span> <span class="tl-name">buildingSMART</span> <span class="tl-what">The IFC alliance takes its current name</span></li>
+          <li class="tl-item is-evt" data-src="https://en.wikipedia.org/wiki/SketchUp"><span class="tl-year">2006</span> <span class="tl-name">SketchUp to Google</span> <span class="tl-what">Bought from @Last Software</span></li>
+          <li class="tl-item is-rel" data-src="https://en.wikipedia.org/wiki/Grasshopper_3D"><span class="tl-year">2007</span> <span class="tl-name">Grasshopper</span> <span class="tl-what">Released in September as Explicit History, for Rhino</span></li>
+        </ol>
+      </li>
+      <li class="tl-decade">
+        <div class="tl-dec-label">2010s</div>
+        <ol class="tl-items">
+          <li class="tl-item is-rel" data-src="https://lumion.com/about"><span class="tl-year">2010</span> <span class="tl-name">Lumion</span> <span class="tl-what">Act-3D, in December</span></li>
+          <li class="tl-item is-rel" data-src="https://dynamobim.org/qa-about-dynamo/"><span class="tl-year is-approx" title="Approximate year">c.&nbsp;2011</span> <span class="tl-name">Dynamo</span> <span class="tl-what">Visual programming for Revit, begun by Ian Keough. Shown in 2009, staffed by Autodesk in 2011</span></li>
+          <li class="tl-item is-evt" data-src="https://en.wikipedia.org/wiki/SketchUp"><span class="tl-year">2012</span> <span class="tl-name">SketchUp to Trimble</span> <span class="tl-what">Bought from Google</span></li>
+          <li class="tl-item is-rel" data-src="https://blog.enscape3d.com/10-years-of-real-time-rendering-innovation"><span class="tl-year">2015</span> <span class="tl-name">Enscape</span> <span class="tl-what">Real-time rendering inside Revit, first as a beta</span></li>
+          <li class="tl-item is-rel" data-src="https://aecmag.com/data-management/speckle-the-open-source-cloud-data-platform/"><span class="tl-year is-approx" title="Approximate year">c.&nbsp;2015</span> <span class="tl-name">Speckle</span> <span class="tl-what">Begins as open-source research at UCL&#x27;s Bartlett</span></li>
+          <li class="tl-item is-evt" data-src="https://bricscad.octave.com/about"><span class="tl-year">2015</span> <span class="tl-name">BricsCAD BIM</span> <span class="tl-what">Bricsys adds BIM to its DWG engine</span></li>
+          <li class="tl-item is-rel" data-src="https://siliconcanals.com/news/10-innovative-and-fastest-growing-tech-startups-from-oslo-in-2019/"><span class="tl-year">2016</span> <span class="tl-name">Spacemaker</span> <span class="tl-what">Founded in Oslo, AI site planning</span></li>
+          <li class="tl-item is-rel" data-src="https://www.cbinsights.com/compare/hypar-vs-swapp-1"><span class="tl-year">2018</span> <span class="tl-name">Hypar</span> <span class="tl-what">Founded by Ian Keough and Anthony Hauck</span></li>
+          <li class="tl-item is-rel" data-src="https://www.higharc.com/about"><span class="tl-year">2018</span> <span class="tl-name">Higharc</span> <span class="tl-what">Founded, design software for homebuilders</span></li>
+          <li class="tl-item is-evt" data-src="https://aecmag.com/news/epic-games-acquires-architect-friendly-viz-tool-then-gives-it-away-free/"><span class="tl-year">2019</span> <span class="tl-name">Twinmotion to Epic Games</span> <span class="tl-what">Bought from Abvent and made free for most firms</span></li>
+        </ol>
+      </li>
+      <li class="tl-decade">
+        <div class="tl-dec-label">2020s</div>
+        <ol class="tl-items">
+          <li class="tl-item is-rel" data-src="https://www.cgchannel.com/2021/05/dimension-5-ships-d5-render/"><span class="tl-year">2020</span> <span class="tl-name">D5 Render</span> <span class="tl-what">Out of public beta and on sale at version 1.6, in May</span></li>
+          <li class="tl-item is-evt" data-src="https://www.geoweeknews.com/articles/autodesk-acquires-spacemaker-ai-software-for-urban-planning/"><span class="tl-year">2020</span> <span class="tl-name">Spacemaker to Autodesk</span> <span class="tl-what">Bought for $240 million</span></li>
+          <li class="tl-item is-rel" data-src="https://seedcamp.com/views/rayon-builds-the-next-generation-collaborative-space-design-software-with-2m-funding/"><span class="tl-year">2021</span> <span class="tl-name">Rayon</span> <span class="tl-what">Founded in Paris, shared 2D plans in the browser</span></li>
+          <li class="tl-item is-rel" data-src="https://architosh.com/2022/12/snaptrude-v1-0-released-cloud-era-platform-for-architecture"><span class="tl-year">2022</span> <span class="tl-name">Snaptrude</span> <span class="tl-what">Version 1.0 in December, founded 2017</span></li>
+          <li class="tl-item is-evt" data-src="https://en.wikipedia.org/wiki/Enscape"><span class="tl-year">2022</span> <span class="tl-name">Enscape joins Chaos</span> <span class="tl-what">The makers of Enscape and V-Ray merge</span></li>
+          <li class="tl-item is-rel" data-src="https://aecmag.com/technology/qonic-beta-construction-bim/"><span class="tl-year">2023</span> <span class="tl-name">Qonic</span> <span class="tl-what">Open beta, from the founders of Bricsys</span></li>
+          <li class="tl-item is-evt" data-src="https://architosh.com/2023/05/amy-bunszel-of-autodesk-talks-to-architosh-about-forma"><span class="tl-year">2023</span> <span class="tl-name">Forma</span> <span class="tl-what">Spacemaker released as Autodesk Forma</span></li>
+          <li class="tl-item is-rel" data-src="https://digital.bnpmedia.com/article/BIM/4969674/845102/article.html"><span class="tl-year">2025</span> <span class="tl-name">Motif</span> <span class="tl-what">First product, browser model review, in March</span></li>
+          <li class="tl-item is-rel" data-src="https://www.businesswire.com/news/home/20250602591994/en"><span class="tl-year">2025</span> <span class="tl-name">Arcol</span> <span class="tl-what">Public launch in June, founded 2021</span></li>
+          <li class="tl-item is-rel" data-src="https://github.com/pascalorg/editor"><span class="tl-year is-approx" title="Approximate year">c.&nbsp;2025</span> <span class="tl-name">Pascal Editor</span> <span class="tl-what">Open-source browser building editor, in beta</span></li>
+          <li class="tl-item is-evt" data-src="https://blogs.autodesk.com/forma/2026/04/07/introduction-to-forma-building-design/"><span class="tl-year">2026</span> <span class="tl-name">Forma Building Design</span> <span class="tl-what">Schematic design in Forma, included with Revit</span></li>
+          <li class="tl-item is-evt" data-src="https://aecmag.com/bim/autodesk-confirms-forma-will-replace-revit-over-time/"><span class="tl-year">2026</span> <span class="tl-name">Forma to replace Revit</span> <span class="tl-what">Autodesk says &quot;over time&quot;, with no date</span></li>
+        </ol>
+      </li>
+    </ol>
+  </section>
+
+  <section class="bim-section" id="tools">
+    <h2 class="section-label">The tools today</h2>
+    <p class="bim-intro">In the order they arrived. &ldquo;Revit files&rdquo; means it opens
+       or exchanges RVT. &ldquo;Shared model&rdquo; means several people work in one
+       model. Prices are rounded and change often, so check the vendor
+       before you buy.</p>
+
+    <div class="bim-table-group">
+      <h3>Desktop design and visualization</h3>
+      <table class="bim-table">
+        <colgroup><col class="c-since"><col class="c-tool"><col class="c-plats"><col><col><col><col><col class="c-price"></colgroup>
+        <thead><tr><th scope="col">Since</th><th scope="col">Tool</th><th scope="col">Runs on</th><th scope="col">Drawings</th><th scope="col">IFC</th><th scope="col">Revit files</th><th scope="col">Shared model</th><th scope="col">Price</th></tr></thead>
+        <tbody>
+        <tr data-src="https://en.wikipedia.org/wiki/AutoCAD">
+          <td class="since" data-label="Since"><span class="since-y">1982</span></td>
+          <td class="tool-cell"><a href="https://www.autodesk.com/products/autocad/overview" rel="noopener">AutoCAD</a><span class="maker">Autodesk &middot; 2D drafting</span><span class="line">DWG drafting. Plans, sections and schedules are coordinated by hand.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li><li>Web</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">In 2D</td>
+          <td class="cap is-no" data-label="IFC">No</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">About $2,000 a year. AutoCAD LT about $540</td>
+        </tr>
+        <tr data-src="https://www.allplan.com/about-us/">
+          <td class="since" data-label="Since"><span class="since-y">1984</span></td>
+          <td class="tool-cell"><a href="https://www.allplan.com" rel="noopener">Allplan</a><span class="maker">Nemetschek &middot; BIM, architecture and structure</span><span class="line">Architecture and structure in one model, with reinforcement and precast detailing. Common in Germany.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Yes</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-yes" data-label="Shared model">Allplan Share, Bimplus</td>
+          <td class="price" data-label="Price">From about &euro;263 a month</td>
+        </tr>
+        <tr data-src="https://en.wikipedia.org/wiki/Graphisoft">
+          <td class="since" data-label="Since"><span class="since-y">1987</span><span class="since-note">Radar CH 1984</span></td>
+          <td class="tool-cell"><a href="https://graphisoft.com/solutions/archicad" rel="noopener">Archicad</a><span class="maker">Graphisoft &middot; BIM</span><span class="line">BIM on Windows and Mac, with Teamwork for several people in one model. Perpetual licenses are being retired.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Yes</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-yes" data-label="Revit files">Yes</td>
+          <td class="cap is-yes" data-label="Shared model">Teamwork, BIMcloud</td>
+          <td class="price" data-label="Price">Studio about $2,400 a year</td>
+        </tr>
+        <tr data-src="https://en.wikipedia.org/wiki/Chief_Architect_Software">
+          <td class="since" data-label="Since"><span class="since-y">1992</span></td>
+          <td class="tool-cell"><a href="https://www.chiefarchitect.com" rel="noopener">Chief Architect Premier</a><span class="maker">Chief Architect &middot; Residential design</span><span class="line">House plans to framing, roofs, cabinets, 3D views and permit sets. Home Designer is the consumer version.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Residential</td>
+          <td class="cap is-no" data-label="IFC">No</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">About $2,000 a year</td>
+        </tr>
+        <tr data-src="https://en.wikipedia.org/wiki/Vectorworks">
+          <td class="since" data-label="Since"><span class="since-y is-approx">c.&nbsp;1998</span><span class="since-note">MiniCAD 1985</span></td>
+          <td class="tool-cell"><a href="https://www.vectorworks.net/architect" rel="noopener">Vectorworks Architect</a><span class="maker">Vectorworks &middot; BIM, 2D and 3D</span><span class="line">2D drafting, 3D modeling and BIM in one app, also used for landscape work.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Yes</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-yes" data-label="Revit files">Yes</td>
+          <td class="cap is-yes" data-label="Shared model">Project Sharing</td>
+          <td class="price" data-label="Price">About $1,530 a year</td>
+        </tr>
+        <tr data-src="https://wiki.mcneel.com/rhino/rhinohistory">
+          <td class="since" data-label="Since"><span class="since-y">1998</span></td>
+          <td class="tool-cell"><a href="https://www.rhino3d.com" rel="noopener">Rhino + Grasshopper</a><span class="maker">McNeel &middot; 3D and freeform modeling</span><span class="line">NURBS modeling with Grasshopper for parametric design. VisualARQ adds BIM objects and IFC.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li></ul></td>
+          <td class="cap is-part" data-label="Drawings">Limited without add-ons</td>
+          <td class="cap is-no" data-label="IFC">No</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">$995 one-time, Grasshopper included</td>
+        </tr>
+        <tr data-src="https://en.wikipedia.org/wiki/Autodesk_Revit">
+          <td class="since" data-label="Since"><span class="since-y">2000</span></td>
+          <td class="tool-cell"><a href="https://www.autodesk.com/products/revit/overview" rel="noopener">Revit</a><span class="maker">Autodesk &middot; BIM</span><span class="line">The RVT format US structural and MEP engineers exchange. Revit LT, about $540, drops worksharing, rendering and the API.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Yes</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-yes" data-label="Revit files">Native</td>
+          <td class="cap is-yes" data-label="Shared model">Cloud worksharing, sold separately</td>
+          <td class="price" data-label="Price">About $3,000 a year. AEC Collection about $3,700</td>
+        </tr>
+        <tr data-src="https://en.wikipedia.org/wiki/SketchUp">
+          <td class="since" data-label="Since"><span class="since-y">2000</span></td>
+          <td class="tool-cell"><a href="https://www.sketchup.com" rel="noopener">SketchUp</a><span class="maker">Trimble &middot; 3D modeling</span><span class="line">Surface modeling on every platform here, with a large library of models and extensions.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li><li>iPad</li><li>Web</li></ul></td>
+          <td class="cap is-part" data-label="Drawings">Limited, through LayOut</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-part" data-label="Revit files">Studio importer</td>
+          <td class="cap is-yes" data-label="Shared model">Trimble Connect</td>
+          <td class="price" data-label="Price">Pro $399 a year. Studio about $820, with V-Ray</td>
+        </tr>
+        <tr data-src="https://en.wikipedia.org/wiki/Chaos_(company)">
+          <td class="since" data-label="Since"><span class="since-y">2002</span></td>
+          <td class="tool-cell"><a href="https://www.chaos.com/vray" rel="noopener">V-Ray</a><span class="maker">Chaos &middot; Rendering</span><span class="line">Photographic rendering inside SketchUp, Rhino, Revit, 3ds Max and Archicad. On a Mac, SketchUp and Rhino only.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li></ul></td>
+          <td class="cap is-na" data-label="Drawings">&mdash;</td>
+          <td class="cap is-na" data-label="IFC">&mdash;</td>
+          <td class="cap is-na" data-label="Revit files">&mdash;</td>
+          <td class="cap is-na" data-label="Shared model">&mdash;</td>
+          <td class="price" data-label="Price">Solo about $540 a year</td>
+        </tr>
+        <tr data-src="https://bricscad.octave.com/about">
+          <td class="since" data-label="Since"><span class="since-y">2004</span><span class="since-note">BIM 2015</span></td>
+          <td class="tool-cell"><a href="https://www.bricsys.com" rel="noopener">BricsCAD BIM</a><span class="maker">Bricsys &middot; BIM and 2D drafting</span><span class="line">BIM on native DWG with AutoCAD-style commands. The only native Linux version here.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li><li>Linux</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Yes</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">One-time license or subscription</td>
+        </tr>
+        <tr data-src="https://architosh.com/2016/04/twinmotion-developer-ka-ra-has-joined-the-abvent-group/">
+          <td class="since" data-label="Since"><span class="since-y is-approx">c.&nbsp;2005</span></td>
+          <td class="tool-cell"><a href="https://www.twinmotion.com" rel="noopener">Twinmotion</a><span class="maker">Epic Games &middot; Visualization</span><span class="line">Unreal Engine rendering in its own app, with Direct Link from the modeling apps.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li></ul></td>
+          <td class="cap is-na" data-label="Drawings">&mdash;</td>
+          <td class="cap is-na" data-label="IFC">&mdash;</td>
+          <td class="cap is-na" data-label="Revit files">&mdash;</td>
+          <td class="cap is-na" data-label="Shared model">&mdash;</td>
+          <td class="price" data-label="Price">Free under $1M annual revenue, then $445 a seat a year</td>
+        </tr>
+        <tr data-src="https://lumion.com/about">
+          <td class="since" data-label="Since"><span class="since-y">2010</span></td>
+          <td class="tool-cell"><a href="https://lumion.com" rel="noopener">Lumion</a><span class="maker">Lumion &middot; Visualization</span><span class="line">Renderings and animation in its own app, with a large library of trees, people and materials. LiveSync from the modeling apps.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li></ul></td>
+          <td class="cap is-na" data-label="Drawings">&mdash;</td>
+          <td class="cap is-na" data-label="IFC">&mdash;</td>
+          <td class="cap is-na" data-label="Revit files">&mdash;</td>
+          <td class="cap is-na" data-label="Shared model">&mdash;</td>
+          <td class="price" data-label="Price">Pro about $1,150 a year</td>
+        </tr>
+        <tr data-src="https://blog.enscape3d.com/10-years-of-real-time-rendering-innovation">
+          <td class="since" data-label="Since"><span class="since-y">2015</span></td>
+          <td class="tool-cell"><a href="https://www.chaos.com/enscape" rel="noopener">Enscape</a><span class="maker">Chaos &middot; Visualization</span><span class="line">Real-time rendering inside Revit, SketchUp, Rhino, Archicad and Vectorworks. On a Mac, without hardware ray tracing.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li><li>Mac</li></ul></td>
+          <td class="cap is-na" data-label="Drawings">&mdash;</td>
+          <td class="cap is-na" data-label="IFC">&mdash;</td>
+          <td class="cap is-na" data-label="Revit files">&mdash;</td>
+          <td class="cap is-na" data-label="Shared model">&mdash;</td>
+          <td class="price" data-label="Price">About $575 a year</td>
+        </tr>
+        <tr data-src="https://www.cgchannel.com/2021/05/dimension-5-ships-d5-render/">
+          <td class="since" data-label="Since"><span class="since-y">2020</span></td>
+          <td class="tool-cell"><a href="https://www.d5render.com" rel="noopener">D5 Render</a><span class="maker">D5 &middot; Visualization</span><span class="line">Ray-traced real-time rendering in its own app, with LiveSync from SketchUp, Revit, Rhino and Archicad.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Windows</li></ul></td>
+          <td class="cap is-na" data-label="Drawings">&mdash;</td>
+          <td class="cap is-na" data-label="IFC">&mdash;</td>
+          <td class="cap is-na" data-label="Revit files">&mdash;</td>
+          <td class="cap is-na" data-label="Shared model">&mdash;</td>
+          <td class="price" data-label="Price">Pro about $360 a year. Free for non-commercial use</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bim-table-group">
+      <h3>Browser-based tools</h3>
+      <p>AEC Magazine calls these BIM 2.0: they run in the browser, several
+         people work in one model at once, and the model is data rather than
+         a file. None produces a full construction set the way Revit does
+         today, and most now work beside Revit rather than replacing it.</p>
+      <table class="bim-table">
+        <colgroup><col class="c-since"><col class="c-tool"><col class="c-plats"><col><col><col><col><col class="c-price"></colgroup>
+        <thead><tr><th scope="col">Since</th><th scope="col">Tool</th><th scope="col">Runs on</th><th scope="col">Drawings</th><th scope="col">IFC</th><th scope="col">Revit files</th><th scope="col">Shared model</th><th scope="col">Price</th></tr></thead>
+        <tbody>
+        <tr data-src="https://aecmag.com/data-management/speckle-the-open-source-cloud-data-platform/">
+          <td class="since" data-label="Since"><span class="since-y is-approx">c.&nbsp;2015</span><span class="since-note">Research at UCL</span></td>
+          <td class="tool-cell"><a href="https://speckle.systems" rel="noopener">Speckle</a><span class="maker">Speckle &middot; Moving model data</span><span class="line">Moves data between Revit, Rhino and the newer tools, with version history and a web viewer. Open source.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-no" data-label="Drawings">No</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-yes" data-label="Revit files">Connectors</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">Free tier and self-hosting. Team $99 a month</td>
+        </tr>
+        <tr data-src="https://www.cbinsights.com/compare/hypar-vs-swapp-1">
+          <td class="since" data-label="Since"><span class="since-y">2018</span><span class="since-note">Founded</span></td>
+          <td class="tool-cell"><a href="https://hypar.io" rel="noopener">Hypar</a><span class="maker">Hypar &middot; Space planning</span><span class="line">Test fits and space plans from rules and plain-language prompts, handed to Revit.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-no" data-label="Drawings">No</td>
+          <td class="cap is-no" data-label="IFC">No</td>
+          <td class="cap is-yes" data-label="Revit files">Add-in, both ways</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">Free projects. Paid plans, price not published</td>
+        </tr>
+        <tr data-src="https://www.higharc.com/about">
+          <td class="since" data-label="Since"><span class="since-y">2018</span><span class="since-note">Founded</span></td>
+          <td class="tool-cell"><a href="https://higharc.com" rel="noopener">Higharc</a><span class="maker">Higharc &middot; Homebuilder plans</span><span class="line">Design, plan sets, estimating and sales configurators for US production homebuilders.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Plan sets</td>
+          <td class="cap is-no" data-label="IFC">No</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">Not published</td>
+        </tr>
+        <tr data-src="https://seedcamp.com/views/rayon-builds-the-next-generation-collaborative-space-design-software-with-2m-funding/">
+          <td class="since" data-label="Since"><span class="since-y">2021</span><span class="since-note">Founded</span></td>
+          <td class="tool-cell"><a href="https://rayon.design" rel="noopener">Rayon</a><span class="maker">Rayon &middot; 2D plans, interiors</span><span class="line">Shared 2D plans in the browser. Imports DWG, DXF and PDF. 3D and AI agents due by the end of 2026.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-no" data-label="Drawings">No</td>
+          <td class="cap is-no" data-label="IFC">No</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-yes" data-label="Shared model">Yes</td>
+          <td class="price" data-label="Price">Free for 3 models. Pro about &euro;19 an editor a month, billed yearly</td>
+        </tr>
+        <tr data-src="https://architosh.com/2022/12/snaptrude-v1-0-released-cloud-era-platform-for-architecture">
+          <td class="since" data-label="Since"><span class="since-y">2022</span><span class="since-note">Founded 2017</span></td>
+          <td class="tool-cell"><a href="https://www.snaptrude.com" rel="noopener">Snaptrude</a><span class="maker">Snaptrude &middot; Concept to schematic</span><span class="line">Models from a brief or a sketch, with live drawings and several people in a model at once.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-part" data-label="Drawings">Schematic</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-yes" data-label="Revit files">Two-way, by its own account</td>
+          <td class="cap is-yes" data-label="Shared model">Yes</td>
+          <td class="price" data-label="Price">Free for 3 projects. $60 a month individual, $100 a user a month for firms</td>
+        </tr>
+        <tr data-src="https://architosh.com/2023/05/amy-bunszel-of-autodesk-talks-to-architosh-about-forma">
+          <td class="since" data-label="Since"><span class="since-y">2023</span><span class="since-note">Spacemaker 2016</span></td>
+          <td class="tool-cell"><a href="https://www.autodesk.com/products/forma/overview" rel="noopener">Forma</a><span class="maker">Autodesk &middot; Site and early design</span><span class="line">Site analysis and schematic design. Building Design added April 2026. Autodesk says it will replace Revit over time.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-no" data-label="Drawings">No</td>
+          <td class="cap is-no" data-label="IFC">No</td>
+          <td class="cap is-yes" data-label="Revit files">Native, Revit is a Forma client</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">Included with Revit and the AEC Collection</td>
+        </tr>
+        <tr data-src="https://aecmag.com/technology/qonic-beta-construction-bim/">
+          <td class="since" data-label="Since"><span class="since-y">2023</span><span class="since-note">Open beta</span></td>
+          <td class="tool-cell"><a href="https://qonic.com" rel="noopener">Qonic</a><span class="maker">Qonic &middot; Coordination and BIM</span><span class="line">Opens large RVT and IFC models in the browser for coordination, quantities and editing, with annotated drawings.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li><li>iPad</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Since April 2026</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-yes" data-label="Revit files">Opens RVT, plugin</td>
+          <td class="cap is-yes" data-label="Shared model">Yes</td>
+          <td class="price" data-label="Price">Free up to 5,000 m&sup2;. Paid plans by floor area, unlimited users</td>
+        </tr>
+        <tr data-src="https://www.businesswire.com/news/home/20250602591994/en">
+          <td class="since" data-label="Since"><span class="since-y">2025</span><span class="since-note">Founded 2021</span></td>
+          <td class="tool-cell"><a href="https://arcol.io" rel="noopener">Arcol</a><span class="maker">Arcol &middot; Early-stage design</span><span class="line">Massing, plans, area metrics and presentation boards in one shared browser file.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-no" data-label="Drawings">No</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-part" data-label="Revit files">Massing export, paid plans</td>
+          <td class="cap is-yes" data-label="Shared model">Yes</td>
+          <td class="price" data-label="Price">Free solo tier. Team $100 an editor a month, viewers free</td>
+        </tr>
+        <tr data-src="https://www.enr.com/articles/63682-motif-debuts-browser-based-bim-design-platform-that-uses-ai-for-skills-not-scripts">
+          <td class="since" data-label="Since"><span class="since-y">2025</span><span class="since-note">Design 2026</span></td>
+          <td class="tool-cell"><a href="https://motif.io" rel="noopener">Motif</a><span class="maker">Motif &middot; Browser BIM</span><span class="line">Browser BIM where AI agents model and check requirements in the same model as the team. Built by former Autodesk leaders.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-yes" data-label="Drawings">Sheets from the model</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-part" data-label="Revit files">Streams in, nothing back</td>
+          <td class="cap is-yes" data-label="Shared model">Yes</td>
+          <td class="price" data-label="Price">$150 per active user a month. Viewing free, AI credits extra</td>
+        </tr>
+        <tr data-src="https://github.com/pascalorg/editor">
+          <td class="since" data-label="Since"><span class="since-y is-approx">c.&nbsp;2025</span><span class="since-note">Beta</span></td>
+          <td class="tool-cell"><a href="https://github.com/pascalorg/editor" rel="noopener">Pascal Editor</a><span class="maker">Open source &middot; Browser 3D editor</span><span class="line">An open-source building editor built for AI agents to drive. Not production BIM.</span></td>
+          <td data-label="Runs on"><ul class="plats"><li>Web</li></ul></td>
+          <td class="cap is-no" data-label="Drawings">No</td>
+          <td class="cap is-yes" data-label="IFC">Yes</td>
+          <td class="cap is-no" data-label="Revit files">No</td>
+          <td class="cap is-no" data-label="Shared model">No</td>
+          <td class="price" data-label="Price">Free, open source</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="bim-section" id="watch">
+    <h2 class="section-label">Space to watch</h2>
+    <p class="bim-intro">Announcements from the last two years, newest first, from AEC
+       Magazine, the vendors and the trade press. Each links to its source.</p>
+    <ol class="watch-list">
+      <li class="watch-item">
+        <time datetime="2026-09-29">29 Sep 2026</time>
+        <p>Rayon raises a &euro;10 million Series A. Its fourth version, due by the end of 2026, adds 3D, generative tools and AI agents to its 2D plans. <a href="https://aecmag.com/cad/rayon-raises-e10m-for-3d-and-agentic-ai/" rel="noopener">AEC Magazine</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-09-15">15 Sep 2026</time>
+        <p>Autodesk says Forma will replace Revit &ldquo;over time&rdquo;, with no date. Revit becomes a Forma Connected Client, and Autodesk says it will keep developing it in the meantime. <a href="https://aecmag.com/bim/autodesk-confirms-forma-will-replace-revit-over-time/" rel="noopener">AEC Magazine</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-09-08">8 Sep 2026</time>
+        <p>Motif releases Motif Design, browser BIM in which AI agents work in the same model as the team. Revit and Rhino models stream in, and nothing exports back to Revit yet. <a href="https://www.enr.com/articles/63682-motif-debuts-browser-based-bim-design-platform-that-uses-ai-for-skills-not-scripts" rel="noopener">ENR</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-07">Jul 2026</time>
+        <p>NeoBIM, the AI design company led by Enscape co-founder Moritz Luck, shows its buildOS tools at the AIA 2026 expo. <a href="https://architosh.com/2026/07/aia26-expo-show-floor-report-5-neobim-and-other-ai-apps/" rel="noopener">Architosh</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-06-02">2 Jun 2026</time>
+        <p>Graphisoft announces a browser-based collaboration layer across the Nemetschek tools, with early access in 2026, and a native Archicad connection to Autodesk Forma. <a href="https://aecmag.com/collaboration/graphisoft-to-preview-collaboration-layer-and-archicad-forma-connection/" rel="noopener">AEC Magazine</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-05-13">13 May 2026</time>
+        <p>At NXT BLD in London, Arcol, Motif, Snaptrude, Qonic, Hypar and Autodesk share one BIM 2.0 panel, and Graebert demonstrates AutoDrawings, generated 2D drawings for Revit and IFC models. <a href="https://aecmag.com/nxt-bld/11-themes-for-nxt-bld-2026/" rel="noopener">AEC Magazine</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-04-09">9 Apr 2026</time>
+        <p>Qonic adds drawing generation: annotated plans and sections from BIM or IFC models that update with the model, exported to DWG. <a href="https://aecmag.com/bim/qonic-introduces-native-drawing-generation/" rel="noopener">AEC Magazine</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-04-07">7 Apr 2026</time>
+        <p>Autodesk releases Forma Building Design for schematic design, included with Revit and the AEC Collection. <a href="https://blogs.autodesk.com/forma/2026/04/07/introduction-to-forma-building-design/" rel="noopener">Autodesk</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2026-04-07">7 Apr 2026</time>
+        <p>Revit 2027 adds Autodesk Assistant, which takes plain-language requests, and previews Revit as a client of the Forma cloud. <a href="https://www.autodesk.com/blogs/aec/2026/04/07/whats-new-in-revit-2027/" rel="noopener">Autodesk</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2025-06-25">25 Jun 2025</time>
+        <p>Snaptrude 3.0 splits early design into four modes that work alone or together. <a href="https://www.dezeen.com/2025/06/25/snaptrude-3-0/" rel="noopener">Dezeen</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2025-06-02">2 Jun 2025</time>
+        <p>Arcol launches publicly after a closed beta, for shared massing and feasibility in the browser. <a href="https://www.businesswire.com/news/home/20250602591994/en" rel="noopener">Business Wire</a></p>
+      </li>
+      <li class="watch-item">
+        <time datetime="2025-01-30">30 Jan 2025</time>
+        <p>Motif, founded by former Autodesk co-CEO Amar Hanspal, raises $46 million. Its first product, for reviewing models in the browser, follows in March. <a href="https://www.vcaonline.com/news/2025013009/motif-raises-46-million-from-capitalg-and-redpoint-to-revolutionize-the-aec-software-industry/" rel="noopener">VCA Online</a></p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="bim-section bim-notes" id="notes">
+    <h2 class="section-label">Also in development</h2>
+    <p><strong>Skema</strong>, an AI design assistant that syncs Rhino and
+       Revit. <strong>Swapp</strong>, AI that drafts design development and
+       construction sets inside Revit. <strong>Nemetschek Creator</strong>,
+       Graphisoft's browser tool for massing and layout, in early access.</p>
+    <p>Once you know your software, the <a href="picker.html">Computer
+       Chooser</a> picks the machine to run it on.</p>
+  </section>
+
+  <div class="page-footer">
+    <a class="back-link" href="index.html">&larr; architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="privacy.html">Privacy &amp; analytics</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="feedback.html">Feedback</a>
+  </div>
+</div>
+
+<script src="assets/js/ui.js"></script>
+</body>
+</html>

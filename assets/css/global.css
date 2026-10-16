@@ -506,8 +506,8 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
 /* ---- FOOTER ---- */
 .page-footer { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--rule-2); font-size: var(--text-xs); color: var(--ink-3); font-weight: 300; line-height: 1.7; }
 
-/* ---- CHOOSER — the software choosers (pdf-markup, bim-platforms,
-   bim-emerging): the picker's control columns over a grid of tool cards.
+/* ---- CHOOSER — the software choosers (pdf-markup; bim.html is
+   information, not a chooser, and styles itself): the picker's control columns over a grid of tool cards.
    Behaviour is assets/js/chooser.js; the markup contract is in its header. ---- */
 .chooser-lede { font-size: var(--text-base); font-weight: 300; line-height: 1.65; max-width: 46em; margin-bottom: var(--space-xl); }
 .chooser-updated { font-size: var(--text-xs); color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--space-md); }
