@@ -12,3 +12,6 @@ scratch/*
 
 # Local Cloudflare build output (`wrangler dev`, docs/HOSTING.md)
 .wrangler/
+
+# agent worktrees (temporary, per session)
+.claude/worktrees/
