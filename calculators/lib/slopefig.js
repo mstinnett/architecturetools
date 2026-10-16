@@ -17,6 +17,10 @@
                 draws as a dashed ray from the origin, labelled
        labels — preformatted strings (the tool page owns all formatting; this
                 module never formats values)
+       compare — optional [{ ratio, label, ratioHi? }]: accent rays to compare
+                against. With ratioHi the entry is a RANGE (an angle of
+                repose, a stair band): both rays draw and the sector between
+                them is tinted.
 
    Steep slopes flip the long leg: above 1:1 the triangle is drawn against
    the vertical, so the figure stays legible from 0.1% to 45°+ without
@@ -110,6 +114,17 @@
       var r = ratioOf(c.ratio);
       if (r != null && r > 0) rays.push({ r: r, label: c.label, cmp: true });
     });
+    // ranges: tint the sector between the two rays, clipped to the box (the
+    // box's top-right corner joins them when one ray exits right, one top)
+    (opts.compare || []).forEach(function (c) {
+      if (c.ratioHi == null) return;
+      var a = rayEnd(ratioOf(c.ratio)), b = rayEnd(ratioOf(c.ratioHi));
+      var pts = [[x0, y0], [a.x, a.y]];
+      if (a.y > mT + 0.5 && b.y <= mT + 0.5) pts.push([x0 + boxW, mT]);
+      pts.push([b.x, b.y]);
+      svg += '<path d="M ' + pts.map(function (q) { return q[0] + ' ' + q[1]; }).join(' L ') + ' Z" style="fill:var(--accent,#004C80)" fill-opacity="0.12" stroke="none"/>';
+      rays.push({ r: ratioOf(c.ratioHi), label: null, cmp: true });
+    });
     var stack = [];   // top-clipped labels, to be stacked below the tip
     rays.forEach(function (ray) {
       var e = rayEnd(ray.r);
@@ -197,6 +212,8 @@ if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.m
   // compare rays draw an accent line + label, no extra hatch
   var cmp = SF.slopefig({ rise: 7 * FT, run: 22 * FT, compare: [{ ratio: 1 / 12, label: '1:12' }] });
   ok('compare ray labelled', cmp.indexOf('>1:12</text>') > 0);
+  var band = SF.slopefig({ rise: 7 * FT, run: 22 * FT, compare: [{ ratio: Math.tan(Math.PI / 6), ratioHi: Math.tan(35 * Math.PI / 180), label: 'sand' }] });
+  ok('range tints a sector', band.indexOf('fill-opacity="0.12"') > 0);
 
   // steep slope stays in the box (legs clipped by scale, not distorted)
   var steep = SF.slopefig({ rise: 100 * FT, run: 2 * FT });
