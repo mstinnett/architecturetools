@@ -9,7 +9,7 @@ Mark items `- [ ]` (open) or `- [x]` (done). Keep the most important open
 item on top. New findings are surfaced here or to the queue — never
 silently appended elsewhere.
 
-All build work happens on `new-layout` (`dev` merged in 2026-10-16); finished tools promote to `main` one at a
+All build work happens on `dev` (`new-layout` merged in and deleted 2026-10-16); finished tools promote to `main` one at a
 time (see `docs/HANDOFF.md` §2).
 
 ## Open — product direction (operator, 2026-10-16)
@@ -36,15 +36,14 @@ what" before it ships. Shipping state for the staged pages is in `state.md`.
 - [ ] **CAD basis: interval-on-curve node.** The piece that unlocks trim/extend/fillet/break as re-evaluable nodes (docs/In Progress/cad-basis.md roadmap #1). Then the depth policy (LatticePoint vs RatPoint types), offset, mirror-about-rational-line, dimension nodes.
 - [ ] **CAD basis: the feet-inch keypad on the demo page.** The Construction-Master-anatomy keypad (touch-cad-ui.md §7) as a reusable piece over parse-length — the Fit tool's dim fields adopt it after.
 
-Built 2026-10-16 on `new-layout` (above, checked): `lib/slope.js` + Slope,
+Built 2026-10-16 (above, checked; now on `dev`): `lib/slope.js` + Slope,
 `lib/drain.js` + Drain, `lib/ramp.js` + Ramp, `lib/roof.js` + Roof, Tile
 Layout (surface work kept as `calculators/tile-surface.html`), the PDF list,
 `bim.html` (old BIM URLs redirect), and `sizes.html`. All on the cover. Open:
 
 - [ ] **Verify before publishing.** Slope's common-slope values (written from memory). Drain: IPC 417.5.2 shower wording (page cites IRC P2709.1), IMC condensate section number, PVC ODs for 3"–8". Roof: IRC R903.2.2 30" cricket rule. Ramp: re-read §405 against the Access Board text (couldn't load it). Sizes: gypsum board sizes, door rough-opening allowances, typical slab thicknesses above code, common window sizes. BIM: the five "c." years. PDF: Adequate Design Review "in beta", PolyPDF sync status, Bluebeam price.
-- [ ] **Sizes: which slabs?** Page covers concrete slab-on-grade and countertop slabs; operator to say which (or both).
+- [x] **Sizes: which slabs?** Operator meant concrete; countertops kept as their own section (heights, depths, ADA rows, slab sizes).
 - [ ] **Tile Surface product.** The CAD-like surface tile tool, from `calculators/tile-surface.html` (dev's corner + Pattern The Surface page) on the `cad/` exact kernel.
-- [ ] **Move `dev` to match `new-layout`** — needs the operator's go-ahead to push `dev`.
 
 ## Open — calculator engine (the active thread)
 

@@ -4,7 +4,7 @@ The autonomous work system's long-running memory. The `architect` agent
 boots from this file every run and updates it after each Rung 2 fit-check.
 Keep it lean — a live picture, not a log.
 
-_Last updated: 2026-10-16 (`dev` merged into `new-layout`, which is the branch going forward; Slope rebuilt on `lib/slope.js`; Tile Layout split from the surface work; PDF list and BIM history pages)_
+_Last updated: 2026-10-16 (`new-layout` merged into `dev` and deleted — `dev` is the one work branch; Slope rebuilt on `lib/slope.js`; Tile Layout split from the surface work; PDF list and BIM history pages)_
 
 ## Live architectural picture
 
@@ -22,7 +22,7 @@ _Last updated: 2026-10-16 (`dev` merged into `new-layout`, which is the branch g
     + the three lib modules it loads — promoted 2026-06-09). **That is all
     that is published.** Stairs, Slope, Tile and Scale Resolution (staged
     2026-10-13) and the three software choosers (`pdf-markup.html`,
-    `bim-platforms.html`, `bim-emerging.html`) sit on `new-layout` with the
+    `bim-platforms.html`, `bim-emerging.html`) sit on `dev` with the
     cover redesign and are **not live** (operator, 2026-10-16).
     Plus `assets/`,
     `data/`, `tools/`, `docs/`, the `build-data` workflow, `CNAME`,

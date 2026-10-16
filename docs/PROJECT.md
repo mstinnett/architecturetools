@@ -21,13 +21,7 @@ This file records actual repo and shipping state, and that now differs by branch
   `picker.html`; the only published calculator is the converter
   (`calculators/convert.html` + `lib/`). `components.html`, `site-screen.html`,
   and the rest of `calculators/` were trimmed off `main` in `f01b200`.
-- **`new-layout` — the cover redesign, not yet on `main`.** Carries the
-  stack-of-lists cover plus Stairs, Slope, Tile and Scale Resolution (staged
-  2026-10-13 — "promoted" in commit `874e409` means staged here, not
-  published) and the three software choosers (`pdf-markup.html`,
-  `bim.html`, which replaced `bim-platforms.html` and `bim-emerging.html`,
-  now redirect stubs). None of these are live.
-- **`dev` — the workbench (this branch).** The full site below **plus** the
+- **`dev` — the workbench (this branch; `new-layout` was merged in and deleted 2026-10-16).** Carries the stack-of-lists cover, Stairs, Slope, Roof, Ramp, Drain, Tile Layout, Scale Resolution, Common Sizes, the PDF list and the BIM history, none of them published yet. The full site below **plus** the
   calculator engine (`calculators/lib/`) and the shipped Precise Unit Converter
   (`calculators/convert.html`). Finished tools promote to `main` one at a time.
 
@@ -189,9 +183,8 @@ Notes:
 - `calculators/index.html` is the built C-0 cover (from `dev`, noindexed);
   the long-term `/c/` home can alias it later.
 - On `main` the live pages are the cover, the picker and the converter.
-  `new-layout` is the branch going forward: it carries the cover redesign,
-  the staged calculators and choosers, and (merged 2026-10-16) everything
-  from `dev`. Unpromoted pages keep their noindex.
+  `dev` carries the cover redesign and the staged calculators and choosers
+  (`new-layout` merged in and deleted 2026-10-16). Unpromoted pages keep their noindex.
 
 ---
 
@@ -535,7 +528,7 @@ intentional while the numbered set structure grows around them.
 These seed `docs/decisions/backlog.md` (the work source); keep the two in step.
 The backlog leads with the calculator-engine thread (HANDOFF §5).
 
-1. Ship the `new-layout` set: Slope (base + linker), Drain, Ramp, Roof,
+1. Ship the cover set on `dev`: Slope (base + linker), Drain, Ramp, Roof,
    Tile Layout, the PDF list and the BIM history — see the backlog's
    "product direction" section
 2. Operator taste pass over the other `dev` tools + C-0, then promote one at
