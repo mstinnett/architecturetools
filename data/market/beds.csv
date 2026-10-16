@@ -1,0 +1,44 @@
+# beds — market seed, snapshot 2026-07 · one row per real SKU · see README.md
+class,size,state,retailer,tier,model,w_in,d_in,url,note
+bed-frame,twin,,IKEA,mass,MALM bed frame high (Twin),44.5,79.13,https://www.ikea.com/us/en/p/malm-bed-frame-white-40249490/,platform; 44.5w x 79.13L per IKEA measurements
+bed-frame,full,,IKEA,mass,SLATTUM upholstered bed frame (Full),54.75,77.13,https://www.ikea.com/us/en/p/slattum-upholstered-bed-frame-vissle-dark-gray-40571253/,upholstered; no king made in this model
+bed-frame,full,,IKEA,mass,NEIDEN bed frame pine (Full),54.75,76.75,https://www.ikea.com/us/en/p/neiden-bed-frame-pine-80395248/,"minimal solid pine, low headboard"
+bed-frame,full,,IKEA,mass,ASKVOLL bed frame (Full),55.5,78,https://www.ikea.com/us/en/p/askvoll-bed-frame-white-s49019705/,"low platform, minimal headboard"
+bed-frame,full,,Burrow,mid,Chorus Bed (Full),57,79,https://burrow.com/products/chorus-bed,wood platform
+bed-frame,queen,,Zinus,mass,Suzanne 14in Metal & Wood Platforma (Queen),59.6,79.5,https://www.homedepot.com/p/Zinus-GOOD-DESIGN-Winner-Suzanne-Brown-Queen-14-in-Metal-and-Wood-Platforma-Bed-Frame-IRPF-14Q/313936732,"metal/bamboo platform, no headboard; frame ~ mattress footprint (small outlier)"
+bed-frame,queen,,IKEA,mass,VEVELSTAD bed frame (Queen),60.25,81.89,https://www.ikea.com/us/en/p/vevelstad-bed-frame-white-50506436/,"slatted low platform, headboard sold separately; sources vary L 79.5-81.9 - flagged"
+bed-frame,queen,,IKEA,mass,SLATTUM upholstered bed frame (Queen),61.38,81.88,https://www.ikea.com/us/en/p/slattum-upholstered-bed-frame-vissle-dark-gray-70571256/,upholstered
+bed-frame,queen,,West Elm,mid,Simple Bed Frame (Queen),62,83,https://www.westelm.com/products/simple-bed-frame-h8586/,low wood platform
+bed-frame,queen,,Article,mid,Nera Low Profile Bed Walnut (Queen),62,82,https://www.article.com/product/31362/nera-queen-low-profile-bed-walnut,"low-profile platform, chevron headboard; validated vs king (W delta = mattress delta)"
+bed-frame,queen,,IKEA,mass,BRIMNES bed frame with storage (Queen),62.25,82,https://www.ikea.com/us/en/p/brimnes-bed-frame-with-storage-white-s69902945/,"storage, 4 drawers"
+bed-frame,queen,,IKEA,mass,IDANAS bed frame (Queen),62.62,88.25,https://www.ikea.com/us/en/p/idanaes-bed-frame-white-30458912/,"panel bed, tall 47in headboard + footboard; L 88.25 long - flagged (corroborated across two reads)"
+bed-frame,queen,,Ashley,mass,Piperton Queen Platform Bed EB1221-113,62.64,81.5,https://www.ashleyfurniture.com/p/piperton_queen_platform_bed/EB1221-113.html,low panel platform
+bed-frame,queen,,IKEA,mass,NORDLI bed frame with storage (Queen),63,79.53,https://www.ikea.com/us/en/p/nordli-bed-frame-with-storage-white-00349849/,"storage platform, no attached headboard - flush; L~79.5 ~ mattress footprint (short outlier)"
+bed-frame,queen,,IKEA,mass,TARVA bed frame pine (Queen),63,82.25,https://www.ikea.com/us/en/p/tarva-bed-frame-pine-s29930097/,"solid pine, low panel headboard"
+bed-frame,queen,,Burrow,mid,Chorus Bed (Queen),63,85,https://burrow.com/products/chorus-bed,"wood platform, optional upholstered headboard"
+bed-frame,queen,,Room & Board,upper,Hudson Bed (Queen),64,86,https://www.roomandboard.com/catalog/bedroom/beds/hudson-bed,solid wood platform w/ headboard; sources 63-64w / 85-86L
+bed-frame,queen,,IKEA,mass,SONGESAND bed frame (Queen),64.96,81.89,https://www.ikea.com/us/en/p/songesand-bed-frame-brown-luroey-s59241069/,"panel/wood, high legs; 165x208cm converted"
+bed-frame,queen,,Thuma,mid,The Classic Bed (Queen),65,85,https://www.thuma.co/products/classic-bed,"wood platform, PillowBoard headboard"
+bed-frame,queen,,CB2,mid,Drommen Acacia Wood Platform Bed (Queen),65.25,91.5,https://www.cb2.com/drommen-acacia-wood-bed/f29541,"acacia platform, tall headboard + footboard; L 91.5 long - flagged"
+bed-frame,queen,,IKEA,mass,HEMNES bed frame (Queen),65.75,83.88,https://www.ikea.com/us/en/p/hemnes-bed-frame-black-brown-s19931592/,"solid pine panel bed, 47in headboard"
+bed-frame,queen,,West Elm,mid,Andes Upholstered Storage Bed (Queen),66,87,https://www.westelm.com/products/andes-bed-wood-legs-h8478/,"upholstered, tall 49.5in headboard"
+bed-frame,queen,,IKEA,mass,MALM bed frame (Queen),66.13,83.13,https://www.ikea.com/us/en/p/malm-bed-frame-white-s19931605/,"platform, low veneer headboard; per dimensions.com/IKEA"
+bed-frame,queen,,Floyd,mid,The Bed Frame with Headboard (Queen),66.5,86,https://floydhome.com/products/the-bed-frame,birch platform w/ headboard
+bed-frame,queen,,Crate & Barrel,mid,Tate Upholstered Bed 45in (Queen),67,89.5,https://www.crateandbarrel.com/tate-queen-upholstered-bed-45/s116428,"upholstered, 45in headboard; long - flagged"
+bed-frame,queen,,Arhaus,upper,Devereaux Leather Tufted Bed (Queen),67,91,https://www.arhaus.com/products/devereaux-leather-tufted-bed,leather tufted upholstered; L 91 long - flagged
+bed-frame,queen,,Pottery Barn,mid,Farmhouse Bed (Queen),68.5,87.5,https://www.potterybarn.com/products/farmhouse-bed/,"wood panel/farmhouse, tall headboard + footboard"
+bed-frame,queen,,IKEA,mass,TUFJORD upholstered bed frame (Queen),69.25,88.63,https://www.ikea.com/us/en/p/tufjord-upholstered-bed-frame-tallmyra-white-black-10573258/,upholstered storage; wide 69.25w + long 88.6L - flagged
+bed-frame,queen,,Design Within Reach,upper,"Parallel Bed, Wide (Queen)",77.75,88.75,https://www.dwr.com/bedroom-beds/parallel-bed/1632.html,upholstered; headboard 77.75w spans far beyond mattress by design (footboard 68w) - wide outlier flagged
+bed-frame,king,,Article,mid,Nera Low Profile Bed Walnut (King),78,82,https://www.article.com/product/31353/nera-king-low-profile-bed-walnut,low-profile platform; with-nightstands SKU runs 117w
+bed-frame,king,,IKEA,mass,BRIMNES bed frame with storage (King),78.38,95.25,https://www.ikea.com/us/en/p/brimnes-bed-frame-with-storage-white-s59931608/,storage; L 95.25 unusually long due to side drawers - flagged
+bed-frame,king,,Room & Board,upper,Hudson Bed (King),79,85,https://www.roomandboard.com/catalog/bedroom/beds/hudson-bed,solid wood platform w/ headboard
+bed-frame,king,,West Elm,mid,Simple Bed Frame (King),79.7,82.5,https://www.westelm.com/products/simple-bed-frame-h8586/,low wood platform; sources vary 78-79.7w / 82.5-83L
+bed-frame,king,,Thuma,mid,The Classic Bed (King),80.5,84.5,https://www.thuma.co/products/classic-bed,"wood platform, PillowBoard headboard"
+bed-frame,king,,IKEA,mass,HEMNES bed frame (King),81.5,83.88,https://www.ikea.com/us/en/p/hemnes-bed-frame-black-brown-s49931581/,solid pine panel bed
+bed-frame,king,,CB2,mid,Drommen Acacia Wood Platform Bed (King),81.75,91.5,https://www.cb2.com/drommen-acacia-wood-platform-king-bed/s213846,acacia platform; L 91.5 long - flagged
+bed-frame,king,,IKEA,mass,MALM bed frame (King),82.5,83.5,https://www.ikea.com/us/en/p/malm-bed-frame-white-s49931604/,"platform, low veneer headboard"
+bed-frame,king,,Crate & Barrel,mid,Tate Upholstered Bed 45in (King),83,89.5,https://www.crateandbarrel.com/tate-king-upholstered-bed-45/s116565,"upholstered, 45in headboard"
+bed-frame,king,,Arhaus,upper,Beck Bed (King),83,89.5,https://www.arhaus.com/products/beck-bed,upholstered; long - flagged (frame cavity 77x80.75)
+bed-frame,king,,IKEA,mass,TUFJORD upholstered bed frame (King),85,88.63,https://www.ikea.com/us/en/p/tufjord-upholstered-bed-frame-tallmyra-white-black-30573257/,upholstered storage; wide 85w - flagged; L taken = queen (same frame length)
+bed-frame,king,,Pottery Barn,mid,Farmhouse Bed (King),85.5,87,https://www.potterybarn.com/products/farmhouse-bed/,"wood panel/farmhouse, tall headboard + footboard"
+bed-frame,king,,Floyd,mid,The Bed Frame with Headboard (King),89,86,https://floydhome.com/products/the-bed-frame,"platform; W 89 unusually wide for king (per dimensions.com/floydhome) - flagged, may include headboard overhang"

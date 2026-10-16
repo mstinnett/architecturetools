@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" data-family="building">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Homeowner Questionnaire -- architecture.tools</title>
+<meta name="description" content="A curated programming worksheet for residential clients — firms print it and hand it out before the first working session. Constraints before wishlist, activities not rooms, need/want/dream with the collisions kept.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     A PRINT-FIRST worksheet: the screen view is a faithful preview of the
+     handout. Answer space is ruled lines, checks are printed squares, the
+     need/want/dream sorter is a fixed table. The only interactive element
+     is the screen-only print button. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  /* the firm's fill-in strip */
+  .intake { display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; margin: var(--space-lg) 0 0; font-size: var(--text-sm); }
+  .intake .f { display: flex; align-items: baseline; gap: 0.4rem; }
+  .intake .f .blank { display: inline-block; border-bottom: 1px solid var(--ink-3); }
+  .intake .f .lbl { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+
+  .qmodule { margin: var(--space-xl) 0; }
+  .qmodule > .section-label { border-bottom: 1px solid var(--ink-2); padding-bottom: 0.3rem; }
+  .qwhy { font-size: var(--text-sm); color: var(--ink-2); max-width: 46em; margin-bottom: var(--space-md); line-height: 1.55; }
+
+  .q { margin-bottom: var(--space-lg); break-inside: avoid; }
+  .q .qlabel { font-size: var(--text-base); color: var(--ink); font-weight: 400; }
+  .q .hint { display: block; font-size: var(--text-sm); color: var(--ink-2); margin-top: 0.1rem; max-width: 44em; line-height: 1.5; }
+
+  /* ruled answer lines — the worksheet's writing space */
+  .lines { margin-top: 0.55rem; max-width: 44em; }
+  .lines .ln { height: 1.7rem; border-bottom: 1px solid var(--rule-2); }
+
+  /* printed checkboxes */
+  .ck { display: flex; align-items: baseline; gap: 0.55rem; margin: 0.45rem 0; font-size: var(--text-base); max-width: 44em; }
+  .ck .box { display: inline-block; width: 0.85rem; height: 0.85rem; border: 1.5px solid var(--ink-2); flex-shrink: 0; position: relative; top: 2px; }
+  .ck .ck-hint { color: var(--ink-2); font-size: var(--text-sm); }
+  .ck .tail { flex: 1; border-bottom: 1px solid var(--rule-2); min-width: 4em; position: relative; top: -2px; }
+
+  /* the need / want / dream table */
+  .nwd { width: 100%; max-width: 44em; border-collapse: collapse; margin-top: 0.55rem; }
+  .nwd th { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--ink-3); text-align: left; padding: 0 0.4rem 0.3rem; border-bottom: 1px solid var(--ink-2); }
+  .nwd th.m, .nwd td.m { width: 3.6em; text-align: center; }
+  .nwd td { border-bottom: 1px solid var(--rule-2); height: 1.9rem; padding: 0 0.4rem; }
+  .nwd td.m { border-left: 1px solid var(--rule); }
+  .nwd td.m::after { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border: 1.5px solid var(--ink-2); }
+
+  .actions { margin: var(--space-xl) 0 0; display: flex; gap: 0.6rem; align-items: center; }
+  .actions .note { font-size: var(--text-xs); color: var(--ink-3); }
+
+  /* ---- print: the handout itself ---- */
+  @media print {
+    /* Print is the product here: the site's 18px screen base reads like a
+       large-print flyer on letter paper, so this one page re-bases the rem
+       scale to document type for print only. (The site-wide no-override rule
+       is about screen consistency; the screen view keeps 18px.) */
+    html { font-size: 12.5px; }
+    body { background: #fff; }
+    .page { box-shadow: none; border: none; max-width: none; padding: 0; }
+    .page-crumb, .actions, .page-footer, .no-print { display: none !important; }
+    .page-header { margin-bottom: 1rem; padding-bottom: 0.8rem; }
+    /* modules may break between questions; a question never splits, and the
+       sorter table keeps its header with at least its first rows */
+    .qmodule { margin: 0.9rem 0; break-inside: auto; }
+    .q { margin-bottom: 0.85rem; }
+    .qwhy { margin-bottom: 0.6rem; }
+    .lines .ln { height: 1.55rem; border-bottom-color: #999; }
+    .nwd td { height: 1.7rem; border-bottom-color: #999; }
+    .nwd thead { break-after: avoid; }
+    .ck .box, .nwd td.m::after { border-color: #555; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Homeowner Questionnaire</span>
+    </nav>
+    <h1>Homeowner Questionnaire</h1>
+    <p>Before our first working session, please fill this in — in pen, in your
+       own words. There are no wrong answers, and nothing here commits you to
+       anything. If two of your answers pull against each other, write down
+       both: <strong>those collisions are the most useful thing you can hand
+       your architect.</strong></p>
+    <div class="intake">
+      <span class="f"><span class="lbl">client</span><span class="blank" style="width:14em;"></span></span>
+      <span class="f"><span class="lbl">project address</span><span class="blank" style="width:16em;"></span></span>
+      <span class="f"><span class="lbl">date</span><span class="blank" style="width:7em;"></span></span>
+      <span class="f"><span class="lbl">prepared by</span><span class="blank" style="width:14em;"></span></span>
+    </div>
+  </div>
+
+  <!-- 1 · the project in your words -->
+  <div class="qmodule">
+    <div class="section-label">1 · The project, in your words</div>
+    <div class="q">
+      <span class="qlabel">What do you want to do, in one or two sentences?</span>
+      <span class="hint">Your words, not drawing words — "make the back of the house work for a family that lives in the kitchen."</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">Why now?</span>
+      <span class="hint">A baby, a sale, working from home, a repair that grew. Whatever set this in motion shapes the priorities more than any wishlist.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">Who makes the decisions — and who else has a real say?</span>
+      <span class="hint">A spouse or partner, a parent helping fund it, an HOA board. Everyone whose yes matters, even informally.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div></div>
+    </div>
+  </div>
+
+  <!-- 2 · the practical frame -->
+  <div class="qmodule">
+    <div class="section-label">2 · The practical frame</div>
+    <p class="qwhy">These set the box the design lives inside. Numbers before
+       rooms isn't backwards — knowing the box first is what lets the design
+       spend your money where you care most.</p>
+    <div class="q">
+      <span class="qlabel">The budget you're actually comfortable with — a range is fine.</span>
+      <span class="hint">Construction needs a contingency on top, typically 10–20% held in reserve. A number with that in mind is worth more than a hopeful one.</span>
+      <div class="lines"><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">Any hard dates?</span>
+      <span class="hint">A lease ending, a school year, a birth. "Soon" is fine — say which kind of soon.</span>
+      <div class="lines"><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">What do you already have or know? Check what applies:</span>
+      <div class="ck"><span class="box"></span>We own the property</div>
+      <div class="ck"><span class="box"></span>We have a survey <span class="ck-hint">— the drawing of your legal lot lines</span></div>
+      <div class="ck"><span class="box"></span>We have drawings of the existing house</div>
+      <div class="ck"><span class="box"></span>There's an HOA or deed restrictions</div>
+      <div class="ck"><span class="box"></span>We're on septic, not city sewer <span class="ck-hint">— matters early if bathrooms or bedrooms are involved</span></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">Anything fixed about the site or house we should know?</span>
+      <span class="hint">A tree you'd never remove, the view you bought the house for, known problems — water, settling, old wiring.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div></div>
+    </div>
+  </div>
+
+  <!-- 3 · how you live -->
+  <div class="qmodule">
+    <div class="section-label">3 · How you live</div>
+    <p class="qwhy">Describe activities, not rooms. "We host twelve for dinner
+       a few times a year" says more than "big dining room" — it might not even
+       be a dining room that solves it.</p>
+    <div class="q">
+      <span class="qlabel">What actually happens in this place — and who does it?</span>
+      <span class="hint">Cooking together or one cook? Homework at the counter? Two video calls at once? Instruments, gear, a dog that needs washing?</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">How many people, day to day — and at the peak?</span>
+      <span class="hint">"Four daily, ten at Thanksgiving, kids' friends most Fridays."</span>
+      <div class="lines"><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">What needs to be near what? What needs to be far apart?</span>
+      <span class="hint">Bedroom away from the street; laundry near bedrooms; office where the doorbell can't end a meeting.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">Walk through a normal day — morning and evening.</span>
+      <span class="hint">Where do shoes, bags, mail, and the leash actually land? Where does the day bottleneck? This finds the rooms no one thinks to ask for.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+    </div>
+  </div>
+
+  <!-- 4 · need / want / dream -->
+  <div class="qmodule">
+    <div class="section-label">4 · Need · want · dream</div>
+    <p class="qwhy">List everything, then mark one column for each.
+       <strong>Need</strong> — the project fails without it.
+       <strong>Want</strong> — real, but you'd trade it.
+       <strong>Dream</strong> — if the budget smiles.
+       Be stingy with Need: when everything is a need, nothing is. And don't
+       trim the dreams — they tell us what the project is really about.</p>
+    <table class="nwd">
+      <thead><tr><th>item</th><th class="m">need</th><th class="m">want</th><th class="m">dream</th></tr></thead>
+      <tbody>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+        <tr><td></td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5 · comfort, character, the long run -->
+  <div class="qmodule">
+    <div class="section-label">5 · Comfort, character, and the long run</div>
+    <div class="q">
+      <span class="qlabel">Comfort and energy — what do you care about?</span>
+      <span class="hint">Drafty-room grudges, a too-hot bedroom, utility bills, solar someday, quiet. Say it even without the technical name.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">Should this house work for someone with stairs trouble — now or someday?</span>
+      <span class="hint">A bedroom and full bath that could live on the main floor, wider doorways, a step-free way in. Planning it now is cheap; retrofitting it isn't.</span>
+      <div class="lines"><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">How much upkeep are you honestly willing to do?</span>
+      <span class="hint">"We'll oil the deck every year" and "we never will" are both fine answers — they lead to different materials.</span>
+      <div class="lines"><div class="ln"></div></div>
+    </div>
+    <div class="q">
+      <span class="qlabel">Three images you love, one you hate — and a few words on why.</span>
+      <span class="hint">Links, magazine pages, photos of places you've been. Bring them to the session; the one you hate is as useful as the three you love.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+    </div>
+  </div>
+
+  <!-- 6 · before the session -->
+  <div class="qmodule">
+    <div class="section-label">6 · Before our session</div>
+    <p class="qwhy">Worth gathering now — each one saves a week later. Check
+       what you can bring; note on the line what you can't find.</p>
+    <div class="ck"><span class="box"></span>Deed, and any HOA covenants or easement documents<span class="tail"></span></div>
+    <div class="ck"><span class="box"></span>The survey, if one exists<span class="tail"></span></div>
+    <div class="ck"><span class="box"></span>Any existing drawings — old permit sets, even the realtor floor plan<span class="tail"></span></div>
+    <div class="ck"><span class="box"></span>Budget confirmed with whoever shares the decision<span class="tail"></span></div>
+    <div class="ck"><span class="box"></span>If on septic: the system's location and last inspection, if known<span class="tail"></span></div>
+    <div class="q" style="margin-top: var(--space-md);">
+      <span class="qlabel">And the questions you want to ask us.</span>
+      <span class="hint">Write them down now — first meetings eat memory.</span>
+      <div class="lines"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+    </div>
+  </div>
+
+  <div class="actions no-print">
+    <button type="button" class="option-pill" id="printBtn">print / save as PDF</button>
+    <span class="note">designed for letter paper — the print strips this chrome</span>
+  </div>
+
+  <div class="page-footer">
+    <p>A programming worksheet for residential clients — firms print and hand
+       it out before the first working session. Nothing on it is a contract or
+       a design decision.</p>
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<script>
+document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+</script>
+</body>
+</html>

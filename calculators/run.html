@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Run Solver -- architecture.tools</title>
+<meta name="description" content="Fit a repeating module into a run — tiles with joints, on-center spacing, balusters, equal sections. The leftover is drawn to scale, never hidden.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell (input well, echo, constraint dial, answer card,
+     figure text, mathnote) is shared via global.css; the engine lives in the
+     imported lib/ modules. Local rules cover only this tool's parameter
+     fields and mode pills. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .mode-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: var(--space-lg); }
+
+  /* parameter fields — small recessed wells in a row, mono like the run */
+  .param-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-end; margin-bottom: var(--space-md); }
+  .param { display: flex; flex-direction: column; }
+  .param label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+                 text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .param-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+                 font-size: 1.05rem; font-weight: 400; width: 9.5em;
+                 color: var(--ink); background: var(--card);
+                 padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+                 box-shadow: var(--shadow-well); border-radius: var(--radius);
+                 outline: none; -webkit-appearance: none; appearance: none; }
+  .param-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .param-input.num { width: 5.5em; }
+  .param-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; }
+  .param-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+
+  /* a second answer card directly under the first reads as the alternative */
+  .answer-card + .answer-card { margin-top: var(--space-md); }
+  .alt-note { font-size: var(--text-sm); color: var(--ink-2); margin-top: var(--space-sm); line-height: 1.6; }
+  .fact { color: var(--ink); font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Run Solver</span>
+    </nav>
+    <h1>Run Solver</h1>
+    <p>How many modules fit this run, and what's left over? Tiles with joints,
+       on-center spacing, balusters, equal sections — type the run in any
+       format, and what won't divide evenly is drawn to scale, never hidden.</p>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3):
+       input → echo → constraint → answer card → footnote. -->
+
+  <!-- slot 1 · INPUT: the run, parser-fed -->
+  <div class="section-label">Run</div>
+  <div class="field-wrap">
+    <input type="text" id="runInput" class="dim-input" spellcheck="false" maxlength="120"
+           autocomplete="off" autocapitalize="off" placeholder="e.g. 10'  ·  12'-4 1/2&quot;  ·  3.6m" autofocus>
+    <div class="field-note" id="fieldNote"></div>
+    <div class="bare-ask" id="bareAsk"></div>
+  </div>
+
+  <!-- slot 2 · tool controls: the mode, then its parameters -->
+  <div class="section-label">Module</div>
+  <div class="mode-row" id="modeRow">
+    <button type="button" class="option-pill" aria-pressed="false" data-mode="tiles">tile + joint<span class="pill-detail">count &amp; end cut</span></button>
+    <button type="button" class="option-pill" aria-pressed="false" data-mode="onCenter">on-center<span class="pill-detail">studs · joists · pickets</span></button>
+    <button type="button" class="option-pill" aria-pressed="false" data-mode="balusters">balusters<span class="pill-detail">smallest count for a max gap</span></button>
+    <button type="button" class="option-pill" aria-pressed="false" data-mode="sections">equal sections<span class="pill-detail">n parts + gaps</span></button>
+  </div>
+  <div class="param-row" id="paramRow"></div>
+  <p class="section-note" id="modeNote" style="font-size:var(--text-sm);color:var(--ink-2);margin:0.4rem 0 0;"></p>
+
+  <div id="results">
+    <!-- slot 3 · ECHO: the parsed reading (stated vs inferred) -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <!-- slot 4 · CONSTRAINT: the grid the solved dimension snaps to -->
+    <div id="solveOut" style="display:none;">
+      <div id="gridWrap">
+        <div class="section-label" id="gridLabel">Snap the answer to</div>
+        <div class="grid-presets" id="gridPresets"></div>
+      </div>
+
+      <!-- slot 5 · ANSWER CARD(S): figure + rows; tiles adds the balanced
+           alternative as a second card — both options shown, neither chosen -->
+      <div class="answer-card" id="cardA">
+        <div class="answer-card-label" id="cardALabel"></div>
+        <div class="figure-wrap" id="figureA"></div>
+        <div class="snap-rows" id="rowsA"></div>
+      </div>
+      <div class="answer-card" id="cardB" style="display:none;">
+        <div class="answer-card-label" id="cardBLabel"></div>
+        <div class="figure-wrap" id="figureB"></div>
+        <div class="snap-rows" id="rowsB"></div>
+      </div>
+      <div class="alt-note" id="altNote"></div>
+    </div>
+
+    <!-- slot 7 · the engine's auditable footnote -->
+    <div class="mathnote" id="mathNote"></div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/partition.js"></script>
+<script src="lib/runbar.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960;
+  var MAX_UNITS = 96000000000;          // 100 km — same input cap as the converter
+  var MAX_SEGMENTS = 1200;              // beyond this the figure is noise; rows still tell all
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+
+  var state = {
+    runText: '',
+    defaultUnit: 'in',
+    mode: 'tiles',
+    // parameter TEXT is the source of truth (chips only fill the field)
+    params: {
+      tiles:     { a: '12"',     b: '1/4"' },
+      onCenter:  { a: '16"' },
+      balusters: { a: '1 1/2"',  b: '4"' },
+      sections:  { a: '5',       b: '0',  ends: 'between' }
+    },
+    grid: { imperial: { denom: 16 }, metric: { mm: 1 } },
+    gridUiSystem: null,
+    target: 'imperial'                  // follows the run's detected system
+  };
+
+  var PARAM_DEFS = {
+    tiles:     [ { key: 'a', label: 'tile',          kind: 'dim' },
+                 { key: 'b', label: 'joint',         kind: 'dim', zeroOk: true,
+                   chips: { imperial: ['1/16"', '1/8"', '3/16"', '1/4"', '3/8"', '1/2"'], metric: ['1.5mm', '2mm', '3mm', '5mm'] } } ],
+    onCenter:  [ { key: 'a', label: 'max spacing',   kind: 'dim',
+                   chips: { imperial: ['12"', '16"', '19.2"', '24"'], metric: ['300mm', '400mm', '600mm'] } } ],
+    balusters: [ { key: 'a', label: 'baluster width', kind: 'dim' },
+                 { key: 'b', label: 'max gap',       kind: 'dim',
+                   chips: { imperial: ['4"'], metric: ['100mm'] } } ],
+    sections:  [ { key: 'a', label: 'sections',      kind: 'count' },
+                 { key: 'b', label: 'gap',           kind: 'dim', zeroOk: true } ]
+  };
+
+  // stable infeasibility codes from partition.js → this page's copy
+  var REASON_COPY = {
+    'gaps-exceed-run':    'the gaps alone exceed the run — fewer sections or a smaller gap',
+    'item-exceeds-run':   'a single module plus its joint is longer than the run',
+    'balusters-overfill': 'balusters at this width fill the rail before the gap closes'
+  };
+
+  var els = {};
+  ['runInput','fieldNote','bareAsk','modeRow','paramRow','modeNote','echo','echoLine','echoAssume',
+   'solveOut','gridWrap','gridLabel','gridPresets','cardA','cardALabel','figureA','rowsA',
+   'cardB','cardBLabel','figureB','rowsB','altNote','mathNote'].forEach(function (id) {
+    els[id] = document.getElementById(id);
+  });
+
+  var escapeHtml = UI.esc;
+
+  /* ---- display: one length formatter for the whole page ------------------ */
+  // clean fraction / whole mm when the value lands on a friendly grid, else
+  // the engine's true-value precision — formatting policy is numberline's
+  function fmt(u) {
+    if (state.target === 'metric') {
+      return u % MM === 0 ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatTrue(u, 'metric');
+    }
+    return NumberLine.formatSnapped(u, 'imperial', 64);   // falls back to decimal off-grid
+  }
+  function pct(part, whole) { return Math.round(part / whole * 100); }
+
+  function currentGridCount() {
+    if (state.target === 'imperial') return Math.round(IN / state.grid.imperial.denom);
+    return Math.round(state.grid.metric.mm * MM);
+  }
+  function currentDenom() { return state.target === 'imperial' ? state.grid.imperial.denom : null; }
+
+  /* ---- parsing the run and the parameters -------------------------------- */
+  function parseDim(text, defUnit) { return parseLength(text, { defaultUnit: defUnit }); }
+
+  // a parameter must resolve to one positive in-range length (joint/gap may be 0)
+  function paramStatus(def, result) {
+    if (!result || result.units == null || result.dimension !== 1) return 'needs a length';
+    if (outOfRange(result.units)) return 'out of range';
+    if (result.units < 0) return 'must not be negative';
+    if (result.units === 0 && !def.zeroOk) return 'must be more than zero';
+    return null;   // good
+  }
+
+  /* ---- field notes: anything typed that didn't parse --------------------- */
+  function pendingNote(text, result) {
+    if (!text || !result || !result.spans) return '';
+    var lines = [];
+    result.spans.forEach(function (sp) {
+      if (sp.status !== 'pending') return;
+      var frag = text.slice(sp.start, sp.end).trim();
+      if (!frag) return;
+      lines.push('ignoring <span class="pending">' + escapeHtml(frag) + '</span>'
+        + (sp.reason ? ' <span class="why">— ' + escapeHtml(sp.reason) + '</span>' : ''));
+    });
+    return lines.join('<br>');
+  }
+
+  /* ---- contextual bare-unit choice for the run ---------------------------- */
+  function renderBareAsk(result) {
+    els.bareAsk.innerHTML = '';
+    if (!result || result.dimension !== 1 || result.units == null) return;
+    var terms = result.interpretation.terms || [];
+    var hasLength = terms.some(function (t) { return t.role === 'length'; });
+    var anyStated = terms.some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!hasLength || anyStated) return;
+    function pick(u, label) {
+      var on = state.defaultUnit === u;
+      return '<button type="button" class="pick' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-bare="' + u + '">' + label + '</button>';
+    }
+    els.bareAsk.innerHTML = 'no unit — read as' + pick('in', 'inches') + pick('mm', 'mm');
+    Array.prototype.forEach.call(els.bareAsk.querySelectorAll('.pick'), function (el) {
+      el.addEventListener('click', function () { state.defaultUnit = el.dataset.bare; render(); });
+    });
+  }
+
+  /* ---- parameter fields (rebuilt on mode/system change only) -------------- */
+  var paramUi = null;   // 'mode/system' the row was built for
+  function buildParams() {
+    var defs = PARAM_DEFS[state.mode];
+    var html = '';
+    defs.forEach(function (def) {
+      html += '<div class="param"><label for="param_' + def.key + '">' + def.label + '</label>';
+      if (def.kind === 'count') {
+        html += '<input class="param-input num" id="param_' + def.key + '" type="number" inputmode="numeric" min="1" max="10000" step="1">';
+      } else {
+        html += '<input class="param-input" id="param_' + def.key + '" type="text" spellcheck="false" maxlength="60" autocomplete="off" autocapitalize="off">';
+      }
+      var chips = def.chips && def.chips[state.target];
+      if (chips) {
+        html += '<div class="param-chips">';
+        chips.forEach(function (c) { html += '<button type="button" class="grid-box" aria-pressed="false" data-fill="' + def.key + '" data-val="' + escapeHtml(c) + '">' + escapeHtml(c) + '</button>'; });
+        html += '</div>';
+      }
+      html += '<div class="param-note" id="paramNote_' + def.key + '"></div></div>';
+    });
+    if (state.mode === 'sections') {
+      html += '<div class="param"><label>gaps sit</label><div class="param-chips" style="margin-top:0;">'
+            + '<button type="button" class="grid-box" aria-pressed="false" data-ends="between">between</button>'
+            + '<button type="button" class="grid-box" aria-pressed="false" data-ends="around">around</button>'
+            + '<button type="button" class="grid-box" aria-pressed="false" data-ends="each">one each</button>'
+            + '</div><div class="param-note" id="endsNote"></div></div>';
+    }
+    els.paramRow.innerHTML = html;
+    paramUi = state.mode + '/' + state.target;
+
+    defs.forEach(function (def) {
+      var input = document.getElementById('param_' + def.key);
+      input.value = state.params[state.mode][def.key];
+      input.addEventListener('input', function () {
+        state.params[state.mode][def.key] = input.value;
+        render();
+      });
+      input.addEventListener('focus', function () { setTimeout(function () { input.select(); }, 0); });
+    });
+    Array.prototype.forEach.call(els.paramRow.querySelectorAll('[data-fill]'), function (chip) {
+      chip.addEventListener('click', function () {
+        var input = document.getElementById('param_' + chip.dataset.fill);
+        input.value = chip.dataset.val;
+        state.params[state.mode][chip.dataset.fill] = chip.dataset.val;
+        render();
+      });
+    });
+    Array.prototype.forEach.call(els.paramRow.querySelectorAll('[data-ends]'), function (pill) {
+      pill.addEventListener('click', function () {
+        state.params.sections.ends = pill.dataset.ends;
+        render();
+      });
+    });
+  }
+  function updateParamActive(parsed) {
+    // chips light when the field text equals them; ends pills track state
+    Array.prototype.forEach.call(els.paramRow.querySelectorAll('[data-fill]'), function (chip) {
+      UI.press(chip, state.params[state.mode][chip.dataset.fill] === chip.dataset.val);
+    });
+    Array.prototype.forEach.call(els.paramRow.querySelectorAll('[data-ends]'), function (pill) {
+      UI.press(pill, state.params.sections.ends === pill.dataset.ends);
+    });
+    var endsNote = document.getElementById('endsNote');
+    if (endsNote) {
+      var gloss = { between: 'n parts, n−1 gaps', around: 'gaps at both ends too', each: 'one trailing gap per part' };
+      endsNote.textContent = gloss[state.params.sections.ends];
+    }
+    // per-field notes: misread fragments or a status
+    PARAM_DEFS[state.mode].forEach(function (def) {
+      var note = document.getElementById('paramNote_' + def.key);
+      if (!note) return;
+      if (def.kind === 'count') { note.innerHTML = ''; return; }
+      var p = parsed[def.key];
+      var status = paramStatus(def, p && p.result);
+      var pend = p ? pendingNote(p.text, p.result) : '';
+      note.innerHTML = status && p && p.text ? escapeHtml(status) : pend;
+    });
+  }
+
+  /* ---- grid preset control (as the converter's, built per system) --------- */
+  function buildGridPresets() {
+    var html = '';
+    function box(attr, v, label) { return '<button type="button" class="grid-box" aria-pressed="false" data-' + attr + '="' + v + '">' + label + '</button>'; }
+    if (state.target === 'imperial') {
+      var labels = { 2: '1/2', 4: '1/4', 8: '1/8', 16: '1/16', 32: '1/32', 64: '1/64' };
+      html += '<div class="grid-row">';
+      [2, 4, 8, 16, 32, 64].forEach(function (d) { html += box('denom', d, labels[d]); });
+      html += '<span class="grid-group-label" style="margin-left:.3rem;">custom 1/</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="numeric" min="1" max="256" step="1" placeholder="n">';
+      html += '</div>';
+    } else {
+      html += '<div class="grid-row"><span class="grid-group-label">mm</span>';
+      [1, 5, 10].forEach(function (m) { html += box('mm', m, m); });
+      html += '<span class="grid-group-label" style="margin-left:.3rem;">custom</span>';
+      html += '<input class="grid-custom" id="gridCustom" type="number" inputmode="decimal" min="0.2" step="any" placeholder="mm">';
+      html += '</div>';
+    }
+    els.gridPresets.innerHTML = html;
+    state.gridUiSystem = state.target;
+
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      box.addEventListener('click', function () {
+        if (box.dataset.denom) state.grid.imperial.denom = +box.dataset.denom;
+        if (box.dataset.mm) state.grid.metric.mm = +box.dataset.mm;
+        render();
+      });
+    });
+    var custom = document.getElementById('gridCustom');
+    if (custom) custom.addEventListener('input', function () {
+      var v = parseFloat(custom.value);
+      if (!(v > 0)) return;
+      if (state.target === 'imperial') state.grid.imperial.denom = Math.min(256, Math.max(1, Math.round(v)));
+      else state.grid.metric.mm = Math.min(100000, Math.max(0.2, v));
+      render();
+    });
+  }
+  function renderGridPresets() {
+    if (state.gridUiSystem !== state.target) buildGridPresets();
+    var active = state.target === 'imperial' ? state.grid.imperial.denom : state.grid.metric.mm;
+    var attr = state.target === 'imperial' ? 'denom' : 'mm';
+    Array.prototype.forEach.call(els.gridPresets.querySelectorAll('.grid-box'), function (box) {
+      UI.press(box, +box.dataset[attr] === active);
+    });
+  }
+
+  /* ---- echo --------------------------------------------------------------- */
+  function tokensOf(result) {
+    var parts = (result && result.interpretation && result.interpretation.parts) || [];
+    var html = '';
+    parts.forEach(function (p) {
+      if (p.type === 'op' || p.type === 'paren') html += '<span class="op">' + escapeHtml(p.text) + '</span>';
+      else html += '<span class="tok ' + (p.inferred ? 'inferred' : 'stated') + '">' + escapeHtml(p.text) + '</span>';
+    });
+    return html;
+  }
+  function renderEcho(runRes, parsed) {
+    if (!runRes) { els.echo.style.display = 'none'; return; }
+    var html = tokensOf(runRes);
+    if (runRes.dimension === 1 && runRes.units != null) {
+      if (outOfRange(runRes.units)) html += '<span class="eq">=</span><span class="op">out of range (max ' + (MAX_UNITS / 960000) + ' m)</span>';
+      else html += '<span class="eq">=</span><span class="result">' + escapeHtml(fmt(runRes.units)) + '</span>';
+    } else {
+      html += '<span class="eq">—</span><span class="op">the run needs to be a single length</span>';
+    }
+    // the parameters, echoed in the same stated/inferred register
+    PARAM_DEFS[state.mode].forEach(function (def) {
+      var p = parsed[def.key];
+      if (def.kind === 'count') {
+        html += '<span class="op"> · </span><span class="tok stated">' + escapeHtml(String(p.count)) + '</span><span class="op">' + def.label + '</span>';
+      } else if (p && p.result && !paramStatus(def, p.result)) {
+        html += '<span class="op"> · </span><span class="op">' + def.label + '</span> ' + tokensOf(p.result);
+      }
+    });
+    els.echoLine.innerHTML = html;
+
+    var asm = (runRes.interpretation && runRes.interpretation.assumptions) || [];
+    PARAM_DEFS[state.mode].forEach(function (def) {
+      var p = parsed[def.key];
+      if (p && p.result && p.result.interpretation) asm = asm.concat(p.result.interpretation.assumptions || []);
+    });
+    // de-duplicate (the same "no unit — read as …" can come from every field)
+    var seen = {};
+    asm = asm.filter(function (a) { if (seen[a]) return false; seen[a] = true; return true; });
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + escapeHtml(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- answer rendering ---------------------------------------------------
+     Surface, don't decide: every viable rounding of the solved dimension is a
+     row with its signed residual; the figure draws one layout to scale with
+     the leftover hatched. Alternatives (balanced tile ends) get their own
+     card — shown beside the flush layout, never silently substituted. */
+
+  function rowHtml(name, gloss, value, resid, primary, cls) {
+    return '<div class="snap-row' + (primary ? ' is-primary' : '') + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+
+  function drawFigure(el, layout, labels, extraSegs) {
+    var segs = extraSegs || RunBar.layoutSegments(layout);
+    if (segs.length > MAX_SEGMENTS) {
+      el.innerHTML = '<div class="alt-note">' + segs.length + ' pieces — too many to draw legibly; the rows carry the numbers.</div>';
+      return;
+    }
+    // label the first of each kind + every cut
+    var seenKind = {};
+    segs.forEach(function (s) {
+      if (s.kind === 'cut') { s.label = labels.cut || 'leftover'; return; }
+      if (!seenKind[s.kind] && !(s.kind === 'gap' && s.w === 0)) { s.label = labels[s.kind]; seenKind[s.kind] = true; }
+    });
+    var width = el.clientWidth || Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    el.innerHTML = RunBar.runbar({
+      run: layout ? layout.run : segs.reduce(function (a, s) { return a + s.w; }, 0),
+      segments: segs, targetSystem: state.target, denom: currentDenom(), width: width
+    });
+  }
+
+  function showInfeasible(layout) {
+    els.cardALabel.textContent = '';
+    els.figureA.innerHTML = '';
+    els.rowsA.innerHTML = rowHtml('No fit', '', escapeHtml(REASON_COPY[layout.reason] || layout.note || 'no layout fits these numbers'), '—', false);
+    els.cardB.style.display = 'none';
+    els.altNote.innerHTML = '';
+    els.mathNote.innerHTML = '';
+  }
+
+  function mathnote(lines) {
+    els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  function renderTiles(run, p) {
+    var L = Partition.tiles(run, p.a, p.b);
+    if (!L.feasible) return showInfeasible(L);
+    els.cardALabel.textContent = 'Flush start — cut at the far end';
+    drawFigure(els.figureA, L, { item: 'tile', gap: 'joint', cut: 'end cut' });
+    var html = rowHtml('Full tiles', 'whole tiles from the start', '<span class="fact">' + L.count + '</span> × ' + escapeHtml(fmt(L.item)), '—', true);
+    if (L.exact) {
+      html += rowHtml('End cut', 'none — the run closes exactly', 'on module', '0', false, 'is-exact');
+    } else {
+      html += rowHtml('End cut', pct(L.residual, L.item) + '% of a tile', escapeHtml(fmt(L.residual)),
+                      escapeHtml(NumberLine.formatResidual(-L.residual, state.target)), false);
+    }
+    els.rowsA.innerHTML = html;
+
+    // the balanced alternative — equal cuts both ends, one fewer full tile
+    if (L.balanced) {
+      els.cardB.style.display = '';
+      els.cardBLabel.textContent = 'Balanced — equal cuts both ends, one fewer full tile';
+      var bal = L.balanced;
+      var segs = [{ w: bal.endTile, kind: 'cut' }, { w: L.gap, kind: 'gap' }];
+      for (var i = 0; i < bal.fullTiles; i++) {
+        segs.push({ w: L.item, kind: 'item' });
+        segs.push({ w: L.gap, kind: 'gap' });
+      }
+      segs.push({ w: bal.endTileAlt, kind: 'cut' });
+      drawFigure(els.figureB, null, { item: 'tile', gap: 'joint', cut: 'end' }, segs);
+      var rows = rowHtml('Full tiles', '', '<span class="fact">' + bal.fullTiles + '</span> × ' + escapeHtml(fmt(L.item)), '—', false)
+               + rowHtml('End pieces', bal.endTile === bal.endTileAlt ? 'equal both ends' : 'one unit apart — the run is odd on the lattice',
+                         escapeHtml(fmt(bal.endTile)) + (bal.endTile === bal.endTileAlt ? ' × 2' : ' + ' + escapeHtml(fmt(bal.endTileAlt))), '—', true);
+      els.rowsB.innerHTML = rows;
+    } else {
+      els.cardB.style.display = 'none';
+    }
+
+    // joint relaxation — what joint would close the run on whole tiles
+    // (information only: check the change against your spec's allowed joint
+    // variation, e.g. ANSI A108.02, before relying on it)
+    var alt = '';
+    if (!L.exact) {
+      if (L.count >= 2) {
+        var jSame = Partition.floorDiv(run - L.count * L.item, L.count - 1);
+        if (jSame >= 0) alt += 'Keeping <span class="fact">' + L.count + ' whole tiles</span>, joints of <span class="fact">'
+          + escapeHtml(fmt(jSame)) + '</span> would close the run (joint as typed: ' + escapeHtml(fmt(L.gap)) + '). ';
+      }
+      var nUp = L.count + 1;
+      var jUp = Partition.floorDiv(run - nUp * L.item, nUp - 1);
+      if (jUp >= 0) alt += 'Fitting <span class="fact">' + nUp + ' whole tiles</span> needs joints of <span class="fact">' + escapeHtml(fmt(jUp)) + '</span>. ';
+      if (alt) alt += '<br>Joint changes are information, not a recommendation — check them against the joint-width variation your spec allows (e.g. ANSI A108.02).';
+    }
+    els.altNote.innerHTML = alt;
+
+    mathnote([
+      'module = tile + joint = ' + L.item + ' + ' + L.gap + ' = ' + (L.item + L.gap) + ' units',
+      'count = floor((run + joint) / module) = floor((' + run + ' + ' + L.gap + ') / ' + (L.item + L.gap) + ') = <b>' + L.count + '</b>',
+      'run identity: ' + L.count + '·' + L.item + ' + ' + L.gapCount + '·' + L.gap + ' + <b>' + L.residual + '</b> = ' + run + ' units'
+    ]);
+  }
+
+  function renderOnCenter(run, p) {
+    var g = currentGridCount();
+    var near = Partition.onCenter(run, p.a, { grid: g, dir: 'nearest' });
+    if (!near.feasible) return showInfeasible(near);
+    var down = Partition.onCenter(run, p.a, { grid: g, dir: 'floor' });
+    var up   = Partition.onCenter(run, p.a, { grid: g, dir: 'ceil' });
+
+    els.cardALabel.textContent = near.intervals + ' equal spaces · ' + near.count + ' points';
+    drawFigure(els.figureA, near, { item: '', gap: 'spacing', cut: 'drift' });
+
+    var truePerfect = run / near.intervals;   // exact only as a float; rows carry the snaps
+    var html = '';
+    [{ L: down, name: 'Round down', gloss: 'spacing won\'t exceed this' },
+     { L: near, name: 'Nearest',    gloss: 'closest to equal' },
+     { L: up,   name: 'Round up',   gloss: 'fewest pieces of drift the other way' }].forEach(function (r) {
+      if (r.L !== near && r.L.spacing === near.spacing) return;   // coincident — one row speaks
+      var over = r.L.spacing > p.a;
+      html += rowHtml(r.name, r.gloss + (over ? ' — exceeds the max spacing' : ''),
+                      escapeHtml(fmt(r.L.spacing)) + (over ? ' <span class="snap-gloss">over ' + escapeHtml(fmt(p.a)) + '</span>' : ''),
+                      escapeHtml(NumberLine.formatResidual(r.L.drift, state.target)) + ' drift',
+                      r.L === near);
+    });
+    html += rowHtml('Unsnapped', 'exactly equal, off any grid', escapeHtml(NumberLine.formatTrue(Math.round(truePerfect), state.target)), '—', false, 'is-ref');
+    els.rowsA.innerHTML = html;
+    els.cardB.style.display = 'none';
+    els.altNote.innerHTML = '';
+
+    mathnote([
+      'intervals = ceil(run / max) = ceil(' + run + ' / ' + p.a + ') = <b>' + near.intervals + '</b>',
+      'spacing = snap(run / intervals → grid ' + g + ') = <b>' + near.spacing + '</b> units',
+      'drift = run − intervals·spacing = ' + run + ' − ' + near.intervals + '·' + near.spacing + ' = <b>' + near.drift + '</b> units ('
+        + escapeHtml(NumberLine.formatResidual(near.drift, state.target)) + ' across the run)'
+    ]);
+  }
+
+  function renderBalusters(run, p) {
+    var g = currentGridCount();
+    var L = Partition.balusters(run, p.a, p.b, { grid: g });
+    if (!L.feasible) return showInfeasible(L);
+    els.cardALabel.textContent = L.count + ' balusters · ' + L.gapCount + ' openings';
+    drawFigure(els.figureA, L, { item: 'baluster', gap: 'gap', cut: 'slack' });
+    var html = rowHtml('Balusters', 'smallest count that closes the gap', '<span class="fact">' + L.count + '</span> × ' + escapeHtml(fmt(L.item)), '—', false)
+      + rowHtml('Gap', 'equal openings, snapped down — stays ≤ the max', escapeHtml(fmt(L.gap)) + ' <span class="snap-gloss">max allowed ' + escapeHtml(fmt(p.b)) + '</span>', '—', true)
+      + (L.exact
+          ? rowHtml('Slack', 'none — the rail closes exactly', 'on grid', '0', false, 'is-exact')
+          : rowHtml('Slack', 'rounding left over after ' + L.gapCount + ' equal gaps', escapeHtml(fmt(L.residual)),
+                    escapeHtml(NumberLine.formatResidual(L.residual, state.target)), false));
+    els.rowsA.innerHTML = html;
+    els.cardB.style.display = 'none';
+    els.altNote.innerHTML = 'The max-gap figure is yours to set — common guardrail references give 4&Prime; (102&nbsp;mm) for guards. Check the edition and section that govern your project.';
+
+    mathnote([
+      'count = ceil((rail − maxGap) / (width + maxGap)) = ceil((' + run + ' − ' + p.b + ') / (' + p.a + ' + ' + p.b + ')) = <b>' + L.count + '</b>',
+      'gap = snapDown((rail − count·width) / (count+1) → grid ' + g + ') = <b>' + L.gap + '</b> units',
+      'rail identity: ' + L.count + '·' + L.item + ' + ' + L.gapCount + '·' + L.gap + ' + <b>' + L.residual + '</b> = ' + run + ' units'
+    ]);
+  }
+
+  function renderSections(run, p) {
+    var g = currentGridCount();
+    var ends = state.params.sections.ends;
+    var mk = function (dir) { return Partition.sections(run, p.count, { gap: p.b, ends: ends, grid: g, dir: dir }); };
+    var near = mk('nearest');
+    if (!near.feasible) return showInfeasible(near);
+    var down = mk('floor'), up = mk('ceil');
+
+    els.cardALabel.textContent = p.count + ' equal sections' + (p.b > 0 ? ' · ' + near.gapCount + ' gaps' : '');
+    drawFigure(els.figureA, near, { item: 'section', gap: 'gap', cut: 'left over' });
+    var html = '';
+    [{ L: down, name: 'Round down', gloss: 'sections leave slack' },
+     { L: near, name: 'Nearest',    gloss: 'closest to equal' },
+     { L: up,   name: 'Round up',   gloss: 'sections overrun — something gets trimmed' }].forEach(function (r) {
+      if (r.L !== near && r.L.item === near.item) return;
+      html += rowHtml(r.name, r.gloss, escapeHtml(fmt(r.L.item)),
+                      escapeHtml(NumberLine.formatResidual(r.L.residual, state.target)), r.L === near);
+    });
+    var availF = run - near.gapCount * near.gap;
+    html += rowHtml('Unsnapped', 'exactly equal, off any grid', escapeHtml(NumberLine.formatTrue(Math.round(availF / p.count), state.target)), '—', false, 'is-ref');
+    els.rowsA.innerHTML = html;
+    els.cardB.style.display = 'none';
+    els.altNote.innerHTML = '';
+
+    mathnote([
+      'available = run − gaps = ' + run + ' − ' + near.gapCount + '·' + near.gap + ' = ' + availF + ' units',
+      'section = snap(available / ' + p.count + ' → grid ' + g + ') = <b>' + near.item + '</b> units',
+      'identity: ' + p.count + '·' + near.item + ' + ' + near.gapCount + '·' + near.gap + ' + <b>' + near.residual + '</b> = ' + run + ' units'
+    ]);
+  }
+
+  /* ---- main render -------------------------------------------------------- */
+  function syncDetected(runRes) {
+    if (!runRes || runRes.dimension !== 1) return;
+    var sys = runRes.unitSystem;
+    if (sys !== 'imperial' && sys !== 'metric') return;
+    var stated = (runRes.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+    if (!stated) return;
+    state.target = sys;                                       // readouts follow the run
+    state.defaultUnit = sys === 'metric' ? 'mm' : 'in';
+  }
+
+  function parseParams() {
+    var defUnit = state.target === 'metric' ? 'mm' : 'in';
+    var out = {};
+    PARAM_DEFS[state.mode].forEach(function (def) {
+      var text = state.params[state.mode][def.key];
+      if (def.kind === 'count') {
+        var n = parseInt(text, 10);
+        out[def.key] = { text: text, count: (Number.isInteger(n) && n >= 1 && n <= 10000) ? n : null };
+      } else {
+        out[def.key] = { text: text, result: text ? parseDim(text, defUnit) : null };
+      }
+    });
+    return out;
+  }
+
+  function render() {
+    var runRes = state.runText ? parseDim(state.runText, state.defaultUnit) : null;
+    syncDetected(runRes);
+    if (paramUi !== state.mode + '/' + state.target) buildParams();
+    var parsed = parseParams();
+    syncURL();
+
+    els.fieldNote.innerHTML = pendingNote(state.runText, runRes);
+    renderBareAsk(runRes);
+    renderEcho(runRes, parsed);
+    updateParamActive(parsed);
+    // the tiles mode treats the joint as one number; the Tile page treats it
+    // as the range it really is — point there for the deeper questions
+    els.modeNote.innerHTML = state.mode === 'tiles'
+      ? 'Here the joint is one number. <a href="tile.html">Tile</a> treats it as a range — what wall runs uncut, and each cut as the range it really is.'
+      : '';
+
+    var runOk = runRes && runRes.dimension === 1 && runRes.units != null
+             && !outOfRange(runRes.units) && runRes.units > 0;
+    var ready = runOk;
+    var vals = {};
+    PARAM_DEFS[state.mode].forEach(function (def) {
+      var p = parsed[def.key];
+      if (def.kind === 'count') {
+        if (p.count == null) ready = false; else vals.count = p.count;
+      } else {
+        if (!p.result || paramStatus(def, p.result)) ready = false;
+        else vals[def.key] = p.result.units;
+      }
+    });
+
+    if (!ready) {
+      els.solveOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    els.solveOut.style.display = '';
+    // tiles solves a count, not a dimension — no snap dial to show
+    els.gridWrap.style.display = state.mode === 'tiles' ? 'none' : '';
+    if (state.mode !== 'tiles') renderGridPresets();
+
+    var run = runRes.units;
+    try {
+      if (state.mode === 'tiles') renderTiles(run, vals);
+      else if (state.mode === 'onCenter') renderOnCenter(run, vals);
+      else if (state.mode === 'balusters') renderBalusters(run, vals);
+      else renderSections(run, vals);
+    } catch (e) {
+      // an engine throw is a programmer error — surface it rather than a blank
+      els.rowsA.innerHTML = rowHtml('Error', '', escapeHtml(String(e && e.message || e)), '—', false);
+      els.figureA.innerHTML = ''; els.cardB.style.display = 'none';
+      els.altNote.innerHTML = ''; els.mathNote.innerHTML = '';
+    }
+  }
+
+  /* ---- shareable URL ------------------------------------------------------ */
+  // recent readings — the URL carries the whole state, so a recent
+  // restores the full reading (shared component: ui.js UI.recents)
+  var recents = UI.recents({ key: 'run', anchor: document.getElementById('runInput'), entry: function () {
+    var r = document.querySelector('#echoLine .result');
+    return { face: (state.runText || '') + ' · ' + state.mode, result: r ? r.textContent : '' };
+  } });
+
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var params = new URLSearchParams();
+      if (state.runText && state.runText !== "10'") params.set('r', state.runText);
+      if (state.mode !== 'tiles') params.set('m', state.mode);
+      var defs = PARAM_DEFS[state.mode], defaults = { tiles: { a: '12"', b: '1/4"' } }[state.mode] || {};
+      defs.forEach(function (def) {
+        var v = state.params[state.mode][def.key];
+        if (v !== defaults[def.key]) params.set(def.key, v);
+      });
+      if (state.mode === 'sections' && state.params.sections.ends !== 'between') params.set('e', state.params.sections.ends);
+      if (state.target === 'imperial' ? state.grid.imperial.denom !== 16 : state.grid.metric.mm !== 1) {
+        params.set('g', state.target === 'imperial' ? String(state.grid.imperial.denom) : state.grid.metric.mm + 'mm');
+      }
+      var q = params.toString();
+      try { history.replaceState(null, '', q ? '?' + q : location.pathname); } catch (e) { /* sandboxed view */ }
+      recents.note();
+    }, 250);
+  }
+  function initFromURL() {
+    var params = new URLSearchParams(location.search);
+    var m = params.get('m');
+    if (m && PARAM_DEFS[m]) state.mode = m;
+    PARAM_DEFS[state.mode].forEach(function (def) {
+      var v = params.get(def.key);
+      if (v != null) state.params[state.mode][def.key] = v.slice(0, 60);
+    });
+    var e = params.get('e');
+    if (e === 'between' || e === 'around' || e === 'each') state.params.sections.ends = e;
+    var g = params.get('g');
+    if (g) {
+      var mm = /^([\d.]+)mm$/.exec(g);
+      if (mm && +mm[1] > 0) state.grid.metric.mm = Math.min(100000, Math.max(0.2, +mm[1]));
+      else if (/^\d+$/.test(g)) state.grid.imperial.denom = Math.min(256, Math.max(1, +g));
+    }
+    var r = params.get('r');
+    return r != null ? r.slice(0, 120) : null;
+  }
+
+  /* ---- wiring -------------------------------------------------------------- */
+  var runInput = els.runInput;
+  runInput.addEventListener('input', function () { state.runText = runInput.value; render(); });
+  runInput.addEventListener('focus', function () { setTimeout(function () { runInput.select(); }, 0); });
+
+  Array.prototype.forEach.call(els.modeRow.querySelectorAll('[data-mode]'), function (pill) {
+    pill.addEventListener('click', function () {
+      state.mode = pill.dataset.mode;
+      setModeActive();
+      render();
+    });
+  });
+  function setModeActive() {
+    Array.prototype.forEach.call(els.modeRow.querySelectorAll('[data-mode]'), function (pill) {
+      UI.press(pill, pill.dataset.mode === state.mode);
+    });
+  }
+
+  // initial state — URL params override the worked example (10' of 12" tile)
+  var urlRun = initFromURL();
+  setModeActive();
+  runInput.value = urlRun != null ? urlRun : "10'";
+  state.runText = runInput.value;
+  render();
+})();
+</script>
+</body>
+</html>

@@ -89,7 +89,20 @@ They are part of the site structure, but they do not need premature renaming or 
 ├── c/
 │   └── index.html                  # C-0 calculators cover/index (future or alias)
 ├── l/
-│   └── index.html                  # L-0 library/reference cover (future)
+│   ├── index.html                  # L-0 library/reference cover (future — deferred until a second L item)
+│   ├── furniture.html              # Furniture Fit — parametric furniture w/ clearances, first draft (dev, noindexed)
+│   └── lib/
+│       ├── catalog.js              # Parametric furniture makers (params → parts + clearance zones + wall rules)
+│       ├── fitmath.js              # Placement math: world boxes, wall sides, snapping, conflicts, slot + market fit
+│       ├── marketbar.js            # Market distribution figure (converter hatch convention on a population)
+│       └── market-data.js          # GENERATED from data/market/*.csv — do not hand-edit
+├── cad/
+│   ├── index.html                  # CAD Basis — exact-kernel demo page (dev, noindexed)
+│   └── lib/                        # The EXACT kernel (BigInt rationals; see docs/In Progress/cad-basis.md)
+│       ├── rat.js                  # Exact rationals over the lattice; toLattice = snap + held remainder
+│       ├── plane.js                # Exact points/transforms; rational half-angle-tangent rotations
+│       ├── geom2.js                # Exact predicates + intersections; outward lattice bbox
+│       └── model.js                # Parametric nodes: insert (powercopy) / array+tweens / fitArray / hatch
 ├── assets/
 │   ├── css/
 │   │   ├── global.css              # Shared theme + components (imports tokens.css)
@@ -109,28 +122,46 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── specs-mac.csv               # Mac spec matrix (one row per cell)
 │   ├── priorities.csv              # Per-profile "where the money matters" note
 │   ├── extras.json                 # Non-tabular data (apps, prebuilts, monitors…)
-│   └── README.md                   # The authoritative data-pipeline contract
+│   ├── README.md                   # The authoritative data-pipeline contract
+│   └── market/                     # Market dimension seed — real SKU footprints (see its README.md)
+│       ├── sofas.csv               # sofa-3 + loveseat rows
+│       ├── dining-tables.csv       # dining-rect rows (fixed / closed / extended states)
+│       ├── beds.csv                # bed-frame rows by mattress size
+│       └── README.md               # Column contract, tiers, provenance, honesty rules
 ├── tools/
 │   ├── build-data.mjs              # Compiles data/ → assets/data/hardware-data.json
 │   ├── test-feedback.mjs           # node tools/test-feedback.mjs — the feedback collector + inbox
 │   ├── test-hosting.mjs            # node tools/test-hosting.mjs — the router + what gets published
+│   ├── build-market.mjs            # Compiles data/market/ → l/lib/market-data.js
 │   └── make2d.py, solve.py, …      # Desk-image render pipeline (see make2d_pipeline.md)
 ├── calculators/                    # convert.html + the 3 lib modules it uses are LIVE on main; the rest is dev-only
+│   ├── index.html                  # C-0 — the calculators set cover (dev, noindexed)
 │   ├── convert.html                # Precise Unit Converter — engine-powered, LIVE
+│   ├── run.html                    # Run Solver — partition tool page (dev, noindexed)
+│   ├── scale.html                  # Scale Resolution — the range a scaled dimension knows (dev, noindexed)
+│   ├── slope.html                  # Slope — rise/run/slope (dev, noindexed)
+│   ├── tile.html                   # Tile — Size The Wall / Lay Out The Wall (dev, noindexed)
+│   ├── area.html                   # Material Coverage — takeoff ÷ unit/rate, waste unbundled (dev, noindexed)
+│   ├── stairs.html                 # Stairs — risers + IRC/IBC citations (dev, noindexed)
+│   ├── occupant-load.html          # Occupant Load — takeoff ÷ Table 1004.5 (dev, noindexed)
+│   ├── egress-width.html           # Egress Width — load×factor ↔ capacity (dev, noindexed)
+│   ├── ramp.html                   # Ramp — rise → runs + landings, §405 (dev, noindexed)
+│   ├── exits.html                  # Exits — count thresholds + half-diagonal (dev, noindexed)
+│   ├── fixture-calc.html           # Plumbing Fixtures — banded ratios, draft-tagged data (dev)
+│   ├── sheet-sizes.html            # Sheet Sizes — ARCH/ANSI fit reference, on the theme (dev)
+│   ├── codes.html                  # Codes & Standards — what applies when + the library (dev)
+│   ├── programming.html            # Homeowner Questionnaire — programming kickoff (dev)
 │   ├── lib/                        # The calculator ENGINE (see docs/HANDOFF.md §3)
 │   │   ├── parse-length.js         # Dimension-expression evaluator (never throws)
 │   │   ├── snap.js                 # Integer-exact snap to a grid (fails loud)
-│   │   ├── numberline.js           # Pure SVG-string figure (no DOM)
 │   │   ├── partition.js            # Run → whole-number layout + residual (fails loud)
+│   │   ├── numberline.js           # Pure SVG-string figure (no DOM)
+│   │   ├── runbar.js               # Layout figure for partition results (no DOM)
+│   │   ├── slopefig.js             # True-angle slope triangle figure (no DOM)
+│   │   ├── stairfig.js             # Stair section figure (no DOM)
+│   │   ├── bands.js                # Banded code-table ratios (1 per N to a cutoff…)
 │   │   └── parse-length.fixtures.js
-│   ├── dimension-converter.html    # LEGACY standalone — superseded by convert.html, retire
-│   ├── slope-calculator.html       # LEGACY standalone — rebuild onto the engine
-│   ├── stair-calculator.html       # LEGACY standalone — rebuild onto the engine
-│   ├── sheet-sizes.html            # LEGACY standalone — rebuild onto the engine
-│   ├── occupant-load.html          # LEGACY — code-lookup lineage, out of engine scope
-│   ├── parking-ratio.html          # LEGACY — code-lookup lineage, out of engine scope
-│   ├── egress-width.html           # LEGACY — code-lookup lineage, out of engine scope
-│   └── fixture-calc.html           # LEGACY — code-lookup lineage, out of engine scope
+│   └── parking-ratio.html          # LEGACY — code-lookup lineage, zoning-adjacent, out of scope
 ├── worker/                         # The Cloudflare Worker — the site's only server code (docs/HOSTING.md)
 │   ├── index.js                    # Router: /api/feedback and /inbox; everything else is static files
 │   ├── feedback.js                 # POST /api/feedback — saves a note to D1 (FEEDBACK_DB)
@@ -148,17 +179,19 @@ They are part of the site structure, but they do not need premature renaming or 
     ├── HANDOFF.md                  # Calculator-engine charter, build plan, provenance
     ├── HOSTING.md                  # Cloudflare Worker hosting, deploys, the move from GitHub Pages
     ├── FEEDBACK.md                 # The feedback form and its private inbox
+    ├── REFERENCES.md               # Citation ledger — every code/standard cited, with status
     ├── voice.md                    # Recommendation-copy voice & glossary
     └── decisions/                  # Autonomous work system (state, backlog, queue, guide)
 ```
 
 Notes:
 - `/a/`, `/c/`, and `/l/` are the long-term structural homes (not created yet).
-- `calculators/index.html` (a C-0 cover) is not built yet; add it once the
-  engine-based tools settle.
+- `calculators/index.html` is the built C-0 cover (from `dev`, noindexed);
+  the long-term `/c/` home can alias it later.
 - On `main` the live pages are the cover, the picker and the converter.
-  Stairs, Slope, Tile, Scale Resolution and the three software choosers are
-  staged on `new-layout`, unpublished; the rest of this tree is `dev`-only.
+  `new-layout` is the branch going forward: it carries the cover redesign,
+  the staged calculators and choosers, and (merged 2026-10-16) everything
+  from `dev`. Unpromoted pages keep their noindex.
 
 ---
 
@@ -238,7 +271,7 @@ Contains:
 - reusable components such as `.section-label`, `.input-group`, `.option-pill`, `.app-toggle`, `.result-row`, `.output-row`, `.field-row`, `.note-box`, `.priority-box`, `.answer-card`, `.card-link`, `.page-footer`, `.spec-block`, `.purchase-path`, `.pick`, `.ref-table`, `.scale-table`
 - type scale from `--text-xs` through `--text-2xl`
 
-**Status:** created but not yet applied everywhere. Continue migrating pages toward shared styles rather than inventing a larger system.
+**Status:** applied across the picker and every `calculators/` page except `parking-ratio.html`. Remaining: `site-screen.html` (own inline styles), a review pass of `components.html` (linked, unreviewed). Continue reusing the shell rather than inventing a larger system.
 
 ### Hardware data — `data/` (source) → `assets/data/hardware-data.json` (generated)
 The picker fetches `assets/data/hardware-data.json` at runtime, but that file is
@@ -330,35 +363,45 @@ charter — engine model, build plan, conventions — is `docs/HANDOFF.md`.
 
 ### The engine (`calculators/lib/`)
 The spine of the family: **parse a dimension expression → resolve it against a
-discrete constraint → show the residual.** Modules: `parse-length.js`
+discrete constraint → show the residual.** Compute modules: `parse-length.js`
 (expression evaluator, never throws), `snap.js` (integer-exact snap to a grid,
-fails loud), `numberline.js` (pure SVG-string figure), and `partition.js`
-(divides a run into a whole number of equal parts — sections, tiles, on-center,
-balusters — and exposes the residual; reuses snap's integer division, fails
-loud). New tools follow the engine conventions: UMD wrapper, pure functions, an
-inline test block, relative asset paths only.
+fails loud), `partition.js` (divides a run into a whole number of equal parts
+and exposes the residual; fails loud). Figure modules (pure SVG strings):
+`numberline.js`, `runbar.js`, `slopefig.js`, `stairfig.js`. New tools follow
+the engine conventions: UMD wrapper, pure functions, an inline test block,
+relative asset paths only.
 
 ### Engine-powered pages
 - `calculators/convert.html` — **Precise Unit Converter. Shipped and frozen.**
-  The first and currently only tool on the engine.
+  Live on `main`.
+- On `dev`, noindexed, awaiting the operator's taste pass then one-at-a-time
+  promotion. Drafting family: `run.html` (Run Solver — the partition tool),
+  `scale.html` (**Scale Resolution**, rebuilt 2026-07 on the crossing model),
+  `slope.html` (coherence-passed 2026-07), `area.html` (**Material Coverage**,
+  2026-07), `tile.html` (**Tile** — Size The Wall / Lay Out The Wall, 2026-07),
+  `stairs.html`. Egress family: `occupant-load.html`, `egress-width.html`,
+  `exits.html`, `fixture-calc.html` (chained: area → occupant load → width /
+  exits / fixtures). Accessibility family: `ramp.html`. Plus the **C-0 cover**
+  `calculators/index.html`. Every engine tool carries the shared recents
+  component (`assets/js/ui.js`). Governing frame (2026-07-09, suite map):
+  **design tools, not construction tools** — pick the dimension so the module
+  lands clean; a field calculator's design inverse is our tool.
 
-### Next on the engine (see HANDOFF §5)
-The `partition.js` primitive is built (tile cuts, n-sections, on-center,
-balusters); its **tool page** is the next build. Then slope, then area +
-coverage, then a scale converter.
+### Next on the engine
+Promotions (after the operator's taste pass), then data completion: replace
+the fixtures page's draft-tagged ratios and add exits' single-exit/travel
+tables from checked copies — the backlog records the per-value provenance
+procedure. New nodes after that: WWR, triangle/squaring, the material layer
+(suite map families 5–6).
 
-### Legacy standalone pages (not on the engine)
-- Rebuild onto the engine, then retire the standalone:
-  `dimension-converter.html` (superseded by `convert.html` — retire, don't port),
-  `slope-calculator.html`, `stair-calculator.html`, `sheet-sizes.html`.
-- A different lineage (code/table lookups, not the dimensional engine) — out of
-  engine scope: `occupant-load.html`, `egress-width.html`, `fixture-calc.html`,
-  `parking-ratio.html`.
-
-### C-0 cover
-A `calculators/index.html` that frames the set, explains what questions it
-answers, and links each tool — still to build, once the engine-based tools
-settle.
+### Standalone pages (not on the engine)
+- `parking-ratio.html` — code/table-lookup lineage, zoning-adjacent (the suite
+  map's default-out family).
+- Retired 2026-06-10 (superseded by engine tools): `dimension-converter.html`,
+  `slope-calculator.html`, `stair-calculator.html`, and the pre-engine
+  `occupant-load.html` / `egress-width.html` / `fixture-calc.html` lookups
+  (rebuilt in place). `sheet-sizes.html` restyled onto the theme and kept as
+  the set's fit reference.
 
 ---
 
@@ -492,14 +535,15 @@ intentional while the numbered set structure grows around them.
 These seed `docs/decisions/backlog.md` (the work source); keep the two in step.
 The backlog leads with the calculator-engine thread (HANDOFF §5).
 
-1. Extend the calculator engine — `partition()`, then slope, area+coverage,
-   scale — and retire the superseded `dimension-converter.html`
-2. Close the provenance loose ends (noindex on dev WIP, a neutral preview host)
-3. Grow the **AT-0** cover as sets fill in (it ships with the two live tools);
-   add a **C-0** calculator index once the engine tools settle
-4. Bring the remaining pages onto `global.css` as they're touched (the picker
-   and converter are on it; the legacy calculators and `site-screen.html`
-   still carry their own inline styles)
+1. Ship the `new-layout` set: Slope (base + linker), Drain, Ramp, Roof,
+   Tile Layout, the PDF list and the BIM history — see the backlog's
+   "product direction" section
+2. Operator taste pass over the other `dev` tools + C-0, then promote one at
+   a time
+3. Replace the draft-tagged code-table values (fixtures ratios; exits'
+   single-exit/travel tables) from checked copies — `docs/REFERENCES.md` is
+   the ledger and must agree with the page tags
+4. Close the provenance loose ends (a neutral preview host)
 5. Add thin A-series pages gradually rather than waiting for a complete set
 
 ---

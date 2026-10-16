@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Codes &amp; Standards -- architecture.tools</title>
+<meta name="description" content="The reference sheet: which codes apply when — IBC or IRC, the trade codes, energy, accessibility, loads — and every standard behind the calculator suite with editions, access, and authoritative links.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The shell is shared via global.css. Local rules cover the library
+     entries, the series tags, and the access labels. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  /* the what-applies-when rows */
+  .when-row { display: flex; gap: 1rem; padding: 0.65rem 0.2rem; border-bottom: var(--border-light); align-items: baseline; }
+  .when-row:last-child { border-bottom: none; }
+  .when-code { width: 13em; flex-shrink: 0; }
+  .when-code .wc-name { font-weight: 400; color: var(--ink); }
+  .when-code .wc-ed { display: block; font-size: var(--text-xs); color: var(--ink-3); }
+  .when-use { flex: 1; font-size: var(--text-sm); color: var(--ink-2); line-height: 1.55; }
+  .when-use b { font-weight: 500; color: var(--ink); }
+
+  /* the library entries */
+  .lib-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: var(--space-md) 0 var(--space-sm); }
+  .lib-search { font-family: inherit; font-size: var(--text-sm); color: var(--ink);
+                background: var(--card); border: 1px solid var(--rule-2); border-radius: var(--radius);
+                box-shadow: var(--shadow-well); padding: 0.4rem 0.6rem; flex: 1; min-width: 11em;
+                outline: none; -webkit-appearance: none; appearance: none; }
+  .lib-search:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .lib-count { font-size: var(--text-xs); color: var(--ink-3); }
+
+  .series-head { display: flex; align-items: baseline; gap: 0.6rem; margin: var(--space-lg) 0 0.2rem;
+                 padding-bottom: 0.35rem; border-bottom: 1px solid var(--ink-2); }
+  .series-tag { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+                background: var(--accent); color: var(--accent-ink); padding: 0.05rem 0.45rem; }
+  .series-name { font-size: var(--text-sm); font-weight: 400; }
+  .series-note { margin-left: auto; font-size: var(--text-xs); color: var(--ink-3); text-align: right; max-width: 40ch; }
+
+  .entry { padding: 0.8rem 0.2rem; border-bottom: var(--border-light); }
+  .entry:last-child { border-bottom: none; }
+  .id-row { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+  .sid { font-weight: 400; color: var(--ink); }
+  .ed-pill { font-size: var(--text-xs); border: 1px solid var(--rule-2); color: var(--ink-2);
+             padding: 0 0.4rem; white-space: nowrap; }
+  .ed-pill:first-of-type { border-color: var(--accent); color: var(--accent); }
+  .access { margin-left: auto; font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+  .access.free { color: var(--accent); }
+  .e-title { font-size: var(--text-sm); color: var(--ink-2); margin-top: 0.15rem; }
+  .governs { font-size: var(--text-sm); color: var(--ink-2); margin-top: 0.3rem; max-width: 64ch; line-height: 1.55; }
+  .governs a { color: var(--ink); font-weight: 400; border-bottom: 1px solid var(--rule-2); text-decoration: none; }
+  .governs a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .planned { font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  .src { font-size: var(--text-xs); }
+  .src a { color: var(--ink-2); border-bottom: 1px solid var(--rule-2); text-decoration: none; }
+  .src a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .lib-empty { padding: var(--space-lg) 0.2rem; color: var(--ink-3); font-size: var(--text-sm); display: none; }
+  @media (max-width: 540px) { .when-row { flex-direction: column; gap: 0.15rem; } .when-code { width: auto; } .series-note { display: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <a href="index.html">Calculators</a> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Codes &amp; Standards</span>
+    </nav>
+    <h1>Codes &amp; Standards</h1>
+    <p>The reference sheet: which codes apply to a project and when, then every
+       standard behind this suite's tools — editions, what each governs, and a
+       link to the authoritative source. Editions shown are model-code
+       baselines. <strong>Your jurisdiction's adopted edition and amendments
+       govern, always.</strong></p>
+  </div>
+
+  <!-- §1 · what applies when — the model-code family -->
+  <div class="section-label">What applies when</div>
+  <div class="answer-card" style="padding-bottom: 1rem;">
+    <div class="when-row"><div class="when-code"><span class="wc-name">IBC</span><span class="wc-ed">International Building Code</span></div>
+      <div class="when-use"><b>Almost every building that isn't a house.</b> Commercial, institutional, industrial, and multifamily (Group R-2 and up). The base document for occupancy, construction type, allowable height/area, fire protection, means of egress, and accessibility scoping.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">IRC</span><span class="wc-ed">International Residential Code</span></div>
+      <div class="when-use"><b>One- and two-family dwellings and townhouses</b> up to three stories with separate egress. A standalone code — its own structural, energy, plumbing, mechanical, and electrical chapters — so a house usually never touches the IBC.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">IEBC</span><span class="wc-ed">International Existing Building Code</span></div>
+      <div class="when-use"><b>The moment the building already exists.</b> Alterations, additions, repairs, and changes of occupancy route through its work-classification levels instead of full new-construction compliance.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">IFC</span><span class="wc-ed">International Fire Code</span></div>
+      <div class="when-use"><b>Operations and the fire marshal's review.</b> Companion to the IBC's chapters 9–10 — systems, hazardous materials, operational fire safety in occupied buildings.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">IPC · IMC · IFGC</span><span class="wc-ed">plumbing · mechanical · fuel gas</span></div>
+      <div class="when-use"><b>The trade scopes on any non-IRC project.</b> Fixture counts (IPC Table 403.1), ventilation and exhaust (IMC), gas piping and appliances (IFGC). Some states adopt UPC/UMC instead — check which family your jurisdiction runs.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">IECC</span><span class="wc-ed">+ ASHRAE 90.1 alternative</span></div>
+      <div class="when-use"><b>Energy, on new work and most alterations.</b> Envelope R/U by climate zone, lighting, systems. Commercial projects may comply via ASHRAE 90.1 instead — one path, declared, not both.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">NEC / NFPA 70</span><span class="wc-ed">National Electrical Code</span></div>
+      <div class="when-use"><b>Electrical, everywhere.</b> Adopted in some edition by every state; the I-codes defer to it.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">NFPA 101</span><span class="wc-ed">Life Safety Code</span></div>
+      <div class="when-use"><b>Alongside the IBC for certain occupancies and reviewers.</b> Healthcare (CMS requires it), many state fire marshals, federal facilities. Where both apply, egress satisfies both — the stricter provision governs in practice.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">ADA 2010 Standards</span><span class="wc-ed">federal civil-rights law</span></div>
+      <div class="when-use"><b>An overlay, not an adopted code.</b> Applies to public accommodations, commercial facilities, and state/local government work regardless of what the jurisdiction adopted — a building can pass plan review and still violate the ADA. Fair Housing design requirements play the same role for 4+ unit residential.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">ICC A117.1</span><span class="wc-ed">accessible + usable buildings</span></div>
+      <div class="when-use"><b>The technical criteria behind IBC Chapter 11.</b> The IBC scopes <em>where and how many</em>; A117.1 specifies <em>how</em> — turning spaces, clear widths, reach ranges. Largely harmonized with the ADA Standards, not identical.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">ASCE 7</span><span class="wc-ed">minimum design loads</span></div>
+      <div class="when-use"><b>Whenever anything is sized structurally.</b> Dead, live, snow, wind, seismic — referenced by IBC Chapter 16; the structural engineer's baseline.</div></div>
+    <div class="when-row"><div class="when-code"><span class="wc-name">Local zoning</span><span class="wc-ed">no national code</span></div>
+      <div class="when-use"><b>Before any of the above — every project.</b> Use, FAR, setbacks, coverage, height, parking. Deliberately excluded from this suite's tools: each is jurisdiction-specific, so there is nothing general to compute from.</div></div>
+  </div>
+
+  <!-- §2 · the library — every standard behind the suite's tools -->
+  <div class="section-label" style="margin-top: var(--space-xl);">The library — standards behind the tools</div>
+  <p style="font-size: var(--text-sm); color: var(--ink-2); max-width: 46em; margin-bottom: var(--space-sm);">
+    Organized on the NCS sheet-series backbone. Entries pointing at a built
+    tool link to it; the rest are marked planned.</p>
+  <div class="lib-controls">
+    <input class="lib-search" id="q" type="search" placeholder="search standards, sections, tools…" aria-label="Search the library">
+    <button type="button" class="mini-pill" aria-pressed="true" data-s="all">all</button>
+    <button type="button" class="mini-pill" aria-pressed="false" data-s="G">G · code</button>
+    <button type="button" class="mini-pill" aria-pressed="false" data-s="A">A · fabric</button>
+    <button type="button" class="mini-pill" aria-pressed="false" data-s="C">C · site</button>
+    <button type="button" class="mini-pill" aria-pressed="false" data-s="AT">AT · conventions</button>
+    <span class="lib-count" id="count"></span>
+  </div>
+  <div id="list"></div>
+  <div class="lib-empty" id="empty">No standards match that filter.</div>
+
+  <div class="page-footer">
+    <p><strong>Access:</strong> free read = readable online at no cost · gov = free federal source ·
+    public domain · paywalled = purchase or library; the link goes to the authoritative index.</p>
+    <p>Journal entries resolve to a scholar search, not a fixed DOI. The suite's
+    internal citation ledger (per-value verification status) is
+    <code>docs/REFERENCES.md</code> in the repository.</p>
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+
+<script src="../assets/js/ui.js"></script>
+<script>
+(function () {
+  'use strict';
+  var esc = UI.esc;
+
+  var SERIES = {
+    G:  { name: 'General — code & verification', note: 'where code summaries and life-safety plans live on a real set' },
+    A:  { name: 'Architectural — building fabric', note: 'the standards that shape the building itself' },
+    C:  { name: 'Civil — site', note: 'site feasibility; zoning held out by design' },
+    AT: { name: 'Tools — conventions & theory', note: 'drawing standards, color systems, source literature' }
+  };
+
+  /* One entry per standard. `tool` is a LIVE page (linked); `planned` is an
+     honest tag for tools not yet built. Editions are model baselines. */
+  var DATA = [
+    // ---------- G : code / verification ----------
+    { s: 'G', id: 'IBC §1004 + Table 1004.5', ed: ['2024', '2021'], title: 'Occupant Load',
+      governs: 'Occupant load factors by use; area ÷ factor, "not less than" the quotient.',
+      tool: { href: 'occupant-load.html', label: 'Occupant Load' },
+      url: 'https://codes.iccsafe.org/codes/IBC/2021', access: 'free' },
+    { s: 'G', id: 'IBC §1005–§1017', ed: ['2024', '2021'], title: 'Egress Sizing & Arrangement',
+      governs: 'Required width (§1005.3), number of exits (§1006), separation (§1007.1.1), travel distance, common path, dead ends.',
+      tool: { href: 'egress-width.html', label: 'Egress Width' }, tool2: { href: 'exits.html', label: 'Exits' },
+      url: 'https://codes.iccsafe.org/codes/IBC/2021', access: 'free' },
+    { s: 'G', id: 'IBC §2902 / IPC §403 + Table 403.1', ed: ['2024', '2021'], title: 'Minimum Plumbing Fixtures',
+      governs: 'Required fixture counts by occupancy and load; the 50/50 sex split (§403.1.1); banded ratios.',
+      tool: { href: 'fixture-calc.html', label: 'Plumbing Fixtures' },
+      url: 'https://codes.iccsafe.org/codes/IPC/2021', access: 'free' },
+    { s: 'G', id: 'IBC §504 / §506 + Table 506.2', ed: ['2024', '2021'], title: 'Allowable Height & Area',
+      governs: 'Allowable area with frontage and sprinkler increases; height and stories by construction type.',
+      planned: 'building size', url: 'https://codes.iccsafe.org/codes/IBC/2021', access: 'free' },
+    { s: 'G', id: 'IBC Chapter 6', ed: ['2021'], title: 'Types of Construction',
+      governs: 'Type I–V classification and the fire-resistance basis everything above keys off.',
+      planned: 'construction type', url: 'https://codes.iccsafe.org/content/IBC2021P2/chapter-6-types-of-construction', access: 'free' },
+    { s: 'G', id: 'IBC Chapter 11', ed: ['2021'], title: 'Accessibility (scoping)',
+      governs: 'Where accessibility applies and how many — accessible route, entrance, and element counts.',
+      planned: 'accessible counts', url: 'https://codes.iccsafe.org/content/IBC2021P1/chapter-11-accessibility', access: 'free' },
+    { s: 'G', id: '2010 ADA Standards §405', ed: ['2010'], title: 'ADA Standards for Accessible Design — Ramps',
+      governs: 'Running slope 1:12 max, 30″ rise per run, 60″ landings, handrails over 6″; the alterations exceptions.',
+      tool: { href: 'ramp.html', label: 'Ramp' },
+      url: 'https://www.access-board.gov/ada/', access: 'gov' },
+    { s: 'G', id: 'ICC A117.1', ed: ['2017', '2009'], title: 'Accessible and Usable Buildings and Facilities',
+      governs: 'Technical accessibility criteria referenced by IBC Chapter 11 — turning space, clear width, reach. 2009 is free-read on ICC.',
+      planned: 'clearances & turning', url: 'https://codes.iccsafe.org/content/icca117-12009', access: 'free' },
+
+    // ---------- A : building fabric ----------
+    { s: 'A', id: 'IBC §1011', ed: ['2024', '2021'], title: 'Means of Egress — Stairways',
+      governs: 'Riser 7″ max / 4″ min, tread 11″ min (§1011.5.2), width (§1011.2), headroom.',
+      tool: { href: 'stairs.html', label: 'Stairs' },
+      url: 'https://codes.iccsafe.org/codes/IBC/2021', access: 'free' },
+    { s: 'A', id: 'IRC §R311.7', ed: ['2024', '2021'], title: 'Means of Egress — Stairways (residential)',
+      governs: 'Residential stair geometry — 7 3/4″ max riser (R311.7.5.1), 10″ min tread (R311.7.5.2), nosing.',
+      tool: { href: 'stairs.html', label: 'Stairs (IRC pill)' },
+      url: 'https://codes.iccsafe.org/codes/IRC/2021', access: 'free' },
+    { s: 'A', id: 'ANSI A108 / A118 / A136.1', ed: ['2024', '2020'], title: 'Installation of Ceramic Tile',
+      governs: 'Setting, mortar coverage (80% dry / 95% wet), and A108.02 cutting, fitting, balanced layout.',
+      tool: { href: 'run.html', label: 'Run Solver — tile mode' },
+      url: 'https://tcnatile.com/resource-center/ansi-standards/', access: 'pay' },
+    { s: 'A', id: 'ANSI A137.1', ed: ['2024', '2017'], title: 'Specifications for Ceramic Tile',
+      governs: 'Tile lot dimensional variance and the minimum grout joint relative to it (the 3× rule) — the spec check behind joint relaxation.',
+      tool: { href: 'run.html', label: 'Run Solver — joint relaxation note' },
+      url: 'https://tcnatile.com/resource-center/ansi-standards/', access: 'pay' },
+    { s: 'A', id: 'TCNA Handbook', ed: ['2024'], title: 'Ceramic, Glass, and Stone Tile Installation',
+      governs: 'Illustrated installation methods; movement-joint method EJ171.',
+      planned: 'tile method context', url: 'https://tcnatile.com/', access: 'pay' },
+    { s: 'A', id: 'IECC §C402 / §R402', ed: ['2024', '2021'], title: 'Energy — Building Envelope',
+      governs: 'Prescriptive R-value / U-factor by climate zone; assembly buildups.',
+      planned: 'envelope R/U', url: 'https://codes.iccsafe.org/codes/IECC/2021', access: 'free' },
+    { s: 'A', id: 'ASHRAE 90.1', ed: ['2022', '2019'], title: 'Energy Standard for Buildings',
+      governs: 'The commercial alternative compliance path the IECC references.',
+      planned: 'envelope (alt path)', url: 'https://www.ashrae.org/technical-resources/bookstore/standard-90-1', access: 'pay' },
+
+    // ---------- C : site ----------
+    { s: 'C', id: 'APWA Uniform Color Code', ed: ['current'], title: 'Utility Marking Colors (811)',
+      governs: 'Red electric · yellow gas · orange comms · blue water · green sewer · purple reclaimed · pink survey · white excavation.',
+      planned: 'site feasibility', url: 'https://call811.com/Faqs-Detail/marking-flags-paint-colors', access: 'gov' },
+
+    // ---------- AT : conventions & theory ----------
+    { s: 'AT', id: 'US National CAD Standard', ed: ['v6', 'v5'], title: 'Uniform Drawing System — Sheet Series',
+      governs: 'The G/A/C sheet-series logic this library — and the whole suite — is organized on.',
+      url: 'https://www.nationalcadstandard.org/ncs5/pdfs/ncs5_uds1.pdf', access: 'pay' },
+    { s: 'AT', id: 'ANSI/ASME Y14.1', ed: ['current'], title: 'Decimal Inch Drawing Sheet Size and Format',
+      governs: 'The ANSI A–E sheet series; ARCH sizes are customary practice beside it.',
+      tool: { href: 'sheet-sizes.html', label: 'Sheet Sizes' },
+      url: 'https://www.asme.org/codes-standards/find-codes-standards/y14-1-decimal-inch-drawing-sheet-size-format', access: 'pay' },
+    { s: 'AT', id: 'OSHA 29 CFR 1910.144 / .145', ed: ['current'], title: 'Safety Color Code & Signs',
+      governs: 'The free federal basis for red = danger and the verdict-color family this suite deliberately avoids.',
+      url: 'https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.145', access: 'gov' },
+    { s: 'AT', id: 'ANSI Z535', ed: ['2017'], title: 'Safety Colors, Signs, Symbols & Labels',
+      governs: 'The codified verdict-color system — the reason these tools locate values in words instead of coloring them.',
+      url: 'https://webstore.ansi.org/search/find?searchText=Z535', access: 'pay' },
+    { s: 'AT', id: 'ISO 7010', ed: ['current'], title: 'Safety Signs (incl. green egress)',
+      governs: 'Green-as-safe-egress convention; the international counterpart to Z535.',
+      url: 'https://www.iso.org/obp/ui/#search/std/ISO%207010', access: 'pay' },
+    { s: 'AT', id: 'ITU-R BS.1116', ed: ['-3'], title: 'Reference Listening Room',
+      governs: 'Standardized listening-room proportions and conditions.',
+      planned: 'room ratio (acoustic)', url: 'https://www.itu.int/rec/R-REC-BS.1116', access: 'free' },
+    { s: 'AT', id: 'IEC 60268-13', ed: ['1998'], title: 'Listening Tests on Loudspeakers',
+      governs: 'Listening-room dimension ratio recommendation (≈1 : 1.4 : 1.9).',
+      planned: 'room ratio (acoustic)', url: 'https://webstore.iec.ch/searchkey?searchKey=60268-13', access: 'pay' },
+    { s: 'AT', id: 'Bolt 1946', ed: ['JASA 18(1)'], title: 'Normal Frequency Statistics in Rectangular Rooms',
+      governs: 'Origin of the Bolt area — the smooth-mode region of room proportions.',
+      planned: 'room ratio', url: 'https://scholar.google.com/scholar?q=Bolt+1946+normal+frequency+statistics+rectangular+rooms', access: 'pay' },
+    { s: 'AT', id: 'Sepmeyer 1965', ed: ['JASA 37'], title: 'Computed Distribution of Normal Modes',
+      governs: 'The Sepmeyer preferred ratios (e.g. 1 : 1.14 : 1.39).',
+      planned: 'room ratio', url: 'https://scholar.google.com/scholar?q=Sepmeyer+1965+normal+modes+rectangular+rooms', access: 'pay' },
+    { s: 'AT', id: 'Louden 1971', ed: ['Acustica 24'], title: 'Dimension Ratios with Good Eigentone Distribution',
+      governs: 'The Louden ratios (e.g. 1 : 1.4 : 1.9).',
+      planned: 'room ratio', url: 'https://scholar.google.com/scholar?q=Louden+1971+dimension+ratios+rectangular+rooms+eigentones', access: 'pay' },
+    { s: 'AT', id: 'Bonello 1981', ed: ['JAES 29(9)'], title: 'A New Criterion for Normal Room Modes',
+      governs: 'The Bonello criterion — monotonic 1/3-octave modal density.',
+      planned: 'room ratio check', url: 'https://scholar.google.com/scholar?q=Bonello+1981+criterion+distribution+normal+room+modes', access: 'pay' },
+    { s: 'AT', id: 'Palladio 1570', ed: ['Book I'], title: 'I Quattro Libri dell’Architettura',
+      governs: 'The seven room proportions — 1:1, 1:√2, 3:4, 2:3, 3:5, 1:2 — and the mean-derived height.',
+      planned: 'room ratio (feel)', url: 'https://archive.org/search?query=quattro+libri+palladio', access: 'pub' }
+  ];
+
+  var ACCESS = { free: 'free read', gov: 'gov', pub: 'public domain', pay: 'paywalled' };
+
+  var list = document.getElementById('list');
+  var empty = document.getElementById('empty');
+  var countEl = document.getElementById('count');
+  var q = document.getElementById('q');
+  var activeS = 'all', term = '';
+
+  function entryText(d) {
+    return (d.id + ' ' + d.title + ' ' + d.governs + ' '
+      + (d.tool ? d.tool.label : '') + ' ' + (d.tool2 ? d.tool2.label : '') + ' '
+      + (d.planned || '')).toLowerCase();
+  }
+  function entryHtml(d) {
+    var eds = d.ed.map(function (e) { return '<span class="ed-pill">' + esc(e) + '</span>'; }).join('');
+    var tools = '';
+    if (d.tool) tools += ' → <a href="' + esc(d.tool.href) + '">' + esc(d.tool.label) + '</a>';
+    if (d.tool2) tools += ' · <a href="' + esc(d.tool2.href) + '">' + esc(d.tool2.label) + '</a>';
+    if (d.planned) tools += ' → <span class="planned">planned · ' + esc(d.planned) + '</span>';
+    return '<div class="entry">'
+      + '<div class="id-row"><span class="sid">' + esc(d.id) + '</span>' + eds
+      + '<span class="access ' + d.access + '">' + ACCESS[d.access] + '</span></div>'
+      + '<div class="e-title">' + esc(d.title) + '</div>'
+      + '<div class="governs">' + esc(d.governs) + tools
+      + ' <span class="src">· <a href="' + esc(d.url) + '" target="_blank" rel="noopener">source ↗</a></span></div>'
+      + '</div>';
+  }
+  function render() {
+    var shown = 0, html = '';
+    ['G', 'A', 'C', 'AT'].forEach(function (key) {
+      var items = DATA.filter(function (d) {
+        return d.s === key
+          && (activeS === 'all' || activeS === key)
+          && (!term || entryText(d).indexOf(term) !== -1);
+      });
+      if (!items.length) return;
+      shown += items.length;
+      html += '<div class="series-head"><span class="series-tag">' + key + '</span>'
+        + '<span class="series-name">' + SERIES[key].name + '</span>'
+        + '<span class="series-note">' + SERIES[key].note + '</span></div>'
+        + items.map(entryHtml).join('');
+    });
+    list.innerHTML = html;
+    countEl.textContent = shown + ' of ' + DATA.length;
+    empty.style.display = shown ? 'none' : 'block';
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-s]'), function (c) {
+    c.addEventListener('click', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-s]'), function (x) { UI.press(x, false); });
+      UI.press(c, true);
+      activeS = c.dataset.s;
+      render();
+    });
+  });
+  q.addEventListener('input', function () { term = q.value.trim().toLowerCase(); render(); });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- dev WIP — remove on promotion to main -->
+<meta name="robots" content="noindex, nofollow">
+<title>Calculators -- architecture.tools</title>
+<meta name="description" content="C-0 — the calculators set. Dimensional tools on one exact engine: every answer shows the rounding it carries, drawn to scale, never hidden.">
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only: the tool index rows ---- */
+  html, body { overflow-x: hidden; }
+  .tool-row { display: flex; align-items: baseline; gap: 1rem; padding: 0.7rem 0.2rem; border-bottom: var(--border-light); }
+  .tool-row:last-child { border-bottom: none; }
+  .tool-name { width: 13.5em; flex-shrink: 0; }
+  .tool-name a { font-size: var(--text-md); font-weight: 400; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule-2); transition: color 0.15s, border-color 0.15s; }
+  .tool-name a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .tool-desc { flex: 1; font-size: var(--text-sm); color: var(--ink-2); line-height: 1.55; }
+  .tool-tag { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .set-note { margin: var(--space-lg) 0 var(--space-xl); font-size: var(--text-sm); color: var(--ink-2); line-height: 1.65; max-width: 46em; }
+  @media (max-width: 540px) { .tool-row { flex-direction: column; gap: 0.15rem; } .tool-name { width: auto; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span aria-current="page">Calculators</span> <span class="crumb-sep">&middot;</span> <span>C-0</span>
+    </nav>
+    <h1>Calculators</h1>
+    <p>Dimensional tools on one exact engine — every length is an integer count
+       of 1/960&nbsp;mm, so the math never drifts. What each tool adds is the part
+       calculators usually hide: the residual. The cut, the slack, the drift,
+       the rounding — drawn to scale, signed, yours to judge.</p>
+  </div>
+
+  <div class="set-note">
+    These tools surface information; they don't decide. None of them will tell
+    you a dimension is right or wrong — they show exactly what each choice
+    costs, against the grid, the limit, or the reference you pick, and leave
+    the call where it belongs.
+  </div>
+
+  <div class="section-label">On the engine</div>
+  <div style="margin-bottom: var(--space-xl);">
+    <div class="tool-row">
+      <span class="tool-name"><a href="convert.html">Precise Unit Converter</a></span>
+      <span class="tool-desc">Any dimension, any format, snapped to a fabrication grid — Min / Nearest / Max with their signed residuals on a dual-scale number line.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="run.html">Run Solver</a></span>
+      <span class="tool-desc">Fit a repeating module into a run — tiles with joints, on-center spacing, balusters, equal sections. The leftover is drawn, flush and balanced layouts side by side.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="scale.html">Scale Resolution</a></span>
+      <span class="tool-desc">The range a measurement actually knows — read a drawing and the scale multiplies sheet error into the field; measure to draw and tape error accumulates against the sheet resolution.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="slope.html">Slope</a></span>
+      <span class="tool-desc">Any two of rise, run, and slope — the missing sides and every form back as values, the cost of rounding to whole numbers shown in rise, common slopes drawn for comparison.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="area.html">Material Coverage</a></span>
+      <span class="tool-desc">The takeoff as you'd say it — chain rooms, subtract openings — divided by a sheet, tile, or coverage rate into a count with both ends of the rounding shown. Waste unbundled: breakage and attic stock are named choices, cut waste belongs to the layout.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="tile.html">Tile</a></span>
+      <span class="tool-desc">Size the wall, lay it out, or pattern it. Size The Wall returns the dimensions where the tile runs uncut — a set-it-here range per whole-tile count, since the joints flex. Lay Out The Wall takes the dimension as drawn: cuts located flush and centered, each cut the range it really is, run ends included, corners turned with offcut reuse counted both ways. Pattern The Surface lays courses at any offset, herringbone either hand, basketweave, or a 45° diamond over the wall — drag the drawing to slide the pattern, whole tiles and cuts counted.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="stairs.html">Stairs</a></span>
+      <span class="tool-desc">Every workable riser count from a total rise, each located against the IRC or IBC figure with its citation, the section drawn to scale with the layout drift hatched.</span>
+    </div>
+  </div>
+
+  <div class="section-label">Life safety — on the engine, citations attached</div>
+  <div style="margin-bottom: var(--space-xl);">
+    <div class="tool-row">
+      <span class="tool-name"><a href="occupant-load.html">Occupant Load</a></span>
+      <span class="tool-desc">A typed area takeoff ÷ an IBC Table 1004.5 factor — exact quotient, the round-up the code's &ldquo;not less than&rdquo; implies, and the gross/net basis said out loud. Carries its count straight into egress width.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="egress-width.html">Egress Width</a></span>
+      <span class="tool-desc">Load × factor both ways — required width from a count, capacity from a width — with the sprinkler condition stated and the component minimums located, including when they govern.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="exits.html">Exits</a></span>
+      <span class="tool-desc">How many ways out a load needs (the 500 / 1,000 thresholds) and how far apart they must sit — the half-diagonal rule computed from your plan, both fractions always shown.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="fixture-calc.html">Plumbing Fixtures</a></span>
+      <span class="tool-desc">The IPC's banded ratios through a §403.1.1 sex split — exact quotients beside every round-up. <span class="tool-tag">part of the table is draft — each value carries its own tag</span></span>
+    </div>
+  </div>
+
+  <div class="section-label">Accessibility</div>
+  <div style="margin-bottom: var(--space-xl);">
+    <div class="tool-row">
+      <span class="tool-name"><a href="ramp.html">Ramp</a></span>
+      <span class="tool-desc">A rise becomes runs and landings at 1:12, 1:16, 1:20, or your slope — the 30&Prime; rise-per-run cap segments the ramp, drawn in plan with the layout drift shown, every figure cited to §405.</span>
+    </div>
+  </div>
+
+  <div class="section-label">Kickoff — programming</div>
+  <div style="margin-bottom: var(--space-xl);">
+    <div class="tool-row">
+      <span class="tool-name"><a href="programming.html">Homeowner Questionnaire</a></span>
+      <span class="tool-desc">A curated worksheet for firms to print and hand a residential client before the first working session — constraints before wishlist, activities not rooms, need/want/dream with the collisions kept. Filled in by hand; the print strips the site chrome.</span>
+    </div>
+  </div>
+
+  <div class="section-label">Reference</div>
+  <div style="margin-bottom: var(--space-xl);">
+    <div class="tool-row">
+      <span class="tool-name"><a href="codes.html">Codes &amp; Standards</a></span>
+      <span class="tool-desc">The reference sheet: which codes apply when — IBC or IRC, the trade codes, energy, accessibility, loads — then every standard behind these tools with editions, access, and authoritative links.</span>
+    </div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="sheet-sizes.html">Sheet Sizes</a></span>
+      <span class="tool-desc">ARCH and ANSI sheets with what fits on each at every standard scale — type a footprint and the largest scale that carries it lights up, drawn on the sheet.</span>
+    </div>
+  </div>
+
+  <div class="section-label">Older pages — a different lineage, not yet rebuilt</div>
+  <div>
+    <div class="tool-row">
+      <span class="tool-name"><a href="parking-ratio.html">Parking Ratio</a></span>
+      <span class="tool-desc">Stall counts from ratios. <span class="tool-tag">table lookup · pre-engine · zoning-adjacent</span></span>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+  </div>
+</div>
+</body>
+</html>

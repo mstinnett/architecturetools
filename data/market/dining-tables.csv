@@ -1,0 +1,57 @@
+# dining tables — market seed, snapshot 2026-07 · one row per real SKU · see README.md
+class,size,state,retailer,tier,model,w_in,d_in,url,note
+dining-rect,,fixed,Room & Board,upper,Parsons Dining Table 48x30,48,30,https://www.roomandboard.com/catalog/dining-and-kitchen/tables/parsons-tables,standard offered size
+dining-rect,,fixed,IKEA,mass,"MELLTORP table, white",49.25,29.5,https://www.ikea.com/us/en/p/melltorp-table-white-s19011777/,125x75cm; seats 4
+dining-rect,,fixed,IKEA,mass,"MORBYLANGA table (small), oak veneer",55.12,33.46,https://www.ikea.com/us/en/p/moerbylanga-table-oak-veneer-brown-stained-50386245/,140x85cm; converted cm/2.54
+dining-rect,,fixed,IKEA,mass,"LISABO table, ash veneer",55.13,30.75,https://www.ikea.com/us/en/p/lisabo-table-ash-veneer-70294339/,"140x78cm; ash veneer top, solid birch legs"
+dining-rect,,fixed,Room & Board,upper,Parsons Dining Table 60x36,60,36,https://www.roomandboard.com/catalog/dining-and-kitchen/tables/parsons-tables,standard offered size
+dining-rect,,fixed,CB2,mid,Blox 63in Rectangular Wood Dining Table,63,35,https://www.cb2.com/blox-63-rectangular-brown-wood-dining-table/s123863,solid mango
+dining-rect,,fixed,Crate & Barrel,mid,Basque 65in Solid Wood Dining Table,65,38,https://www.crateandbarrel.com/basque-65-weathered-light-brown-solid-wood-dining-table/s599723,solid mango
+dining-rect,,fixed,Article,mid,"Seno Walnut Dining Table, 71in",71,37.5,https://www.article.com/product/27599/seno-71-dining-table-walnut,walnut; seats 6
+dining-rect,,fixed,Article,mid,"Madera Solid Wood Dining Table, 71in (oak)",71,39,https://www.article.com/product/15102/madera-71-solid-wood-dining-table-oak,solid oak
+dining-rect,,fixed,Target,mass,Threshold w/ Studio McGee Linden 72in Rectangular Wood Dining Table,72,36,https://whalenfurniture.com/product/72in-linden-natural-rectangular-wood-dining-table/,"Whalen-made, sold at Target as Threshold/Studio McGee; dims from Whalen product page"
+dining-rect,,fixed,West Elm,mid,"Anton Solid Wood Dining Table, 72in",72,39,https://www.westelm.com/products/anton-solid-wood-dining-table-h4231/,mango wood; depth 39in per listing (some sources cite 38in)
+dining-rect,,fixed,CB2,mid,Sydney 72in Rectangular Walnut Dining Table,72,39,https://www.cb2.com/sydney-72-rectangular-walnut-dining-table/s475679,American black walnut
+dining-rect,,fixed,Room & Board,upper,Parsons Dining Table 72x36,72,36,https://www.roomandboard.com/catalog/dining-and-kitchen/tables/parsons-tables,standard offered size
+dining-rect,,fixed,RH,upper,"Reclaimed Russian Oak Parsons Rectangular Dining Table, 72in",72,39,https://rh.com/us/en/catalog/product/product.jsp/prod2510648,offered 60-138in
+dining-rect,,fixed,Room & Board,upper,Parsons Dining Table 80x40,80,40,https://www.roomandboard.com/catalog/dining-and-kitchen/tables/parsons-tables,standard offered size
+dining-rect,,fixed,Crate & Barrel,mid,Basque 82in Solid Wood Dining Table,82,38,https://www.crateandbarrel.com/basque-82-weathered-light-brown-solid-wood-dining-table/s599732,solid mango
+dining-rect,,fixed,West Elm,mid,"Anton Solid Wood Dining Table, 86in",86,39,https://www.westelm.com/products/anton-solid-wood-dining-table-h4231/,mango wood
+dining-rect,,fixed,Arhaus,upper,Kensington Dining Table,86,39,https://www.arhaus.com/products/kensington-dining-table,size from search summary; exact per-SKU width not verified (page blocked); collection spans ~60-118in length
+dining-rect,,fixed,Article,mid,"Seno Walnut Dining Table, 86.5in",86.5,37.5,https://www.article.com/product/27601/seno-86-5-dining-table-walnut,walnut; seats 8
+dining-rect,,fixed,Castlery,mid,Sawyer Rectangular Dining Table (oak veneer),86.6,39.4,https://www.castlery.com/us/products/sawyer-rectangular-dining-table,220x100cm
+dining-rect,,fixed,IKEA,mass,"MORBYLANGA table (large), oak veneer",86.63,39.38,https://www.ikea.com/us/en/p/moerbylanga-table-oak-veneer-brown-stained-20293766/,220x100cm
+dining-rect,,fixed,CB2,mid,Blox 91in Rectangular Wood Dining Table,91,35,https://www.cb2.com/blox-91-rectangular-brown-wood-dining-table/s123851,solid mango
+dining-rect,,fixed,IKEA,mass,"SKOGSTA dining table, acacia",92.5,39.38,https://www.ikea.com/us/en/p/skogsta-dining-table-acacia-black-70419264/,235x100cm; solid acacia
+dining-rect,,fixed,IKEA,mass,"MOCKELBY table, oak",92.52,39.37,https://www.ikea.com/us/en/p/moeckelby-table-oak-00293772/,235x100cm; oak veneer plank top
+dining-rect,,fixed,IKEA,mass,"KLIMPFJALL dining table, gray-brown",94.5,37.38,https://www.ikea.com/us/en/p/klimpfjaell-dining-table-gray-brown-30434657/,240x95cm; trestle base
+dining-rect,,fixed,CB2,mid,Sydney 95.5in Rectangular Walnut Dining Table,95.5,39,https://www.cb2.com/sydney-rectangular-walnut-dining-table-95.5/s475685,American black walnut
+dining-rect,,fixed,Room & Board,upper,Parsons Dining Table 96x48,96,48,https://www.roomandboard.com/catalog/dining-and-kitchen/tables/parsons-tables,standard offered size
+dining-rect,,fixed,RH,upper,"Reclaimed Russian Oak Parsons Rectangular Dining Table, 96in",96,39,https://rh.com/us/en/catalog/product/product.jsp/prod2510648,offered 60-138in
+dining-rect,,fixed,Crate & Barrel,mid,Basque 104in Solid Wood Dining Table,104,38,https://www.crateandbarrel.com/basque-104-weathered-light-brown-solid-wood-dining-table/s599744,solid mango
+dining-rect,,fixed,Room & Board,upper,Corbett Dining Table 104x36,104,36,https://www.roomandboard.com/catalog/dining-and-kitchen/tables/corbett-tables,36in-depth config; resale spec lists 104x36.3in
+dining-rect,,fixed,RH,upper,"Reclaimed Russian Oak Parsons Rectangular Dining Table, 120in",120,39,https://rh.com/us/en/catalog/product/product.jsp/prod2510648,offered 60-138in
+dining-rect,,closed,IKEA,mass,"EKEDALEN extendable (120/180), white",47.25,31.5,https://www.ikea.com/us/en/p/ekedalen-extendable-table-white-70340807/,120x80cm closed; 1 self-storing leaf
+dining-rect,,closed,IKEA,mass,"VANGSTA extendable, white",47.25,29.5,https://www.ikea.com/us/en/p/vangsta-extendable-table-white-80361564/,120x75cm closed; 1 leaf
+dining-rect,,closed,IKEA,mass,"LANEBERG extendable, white",51.13,31.5,https://www.ikea.com/us/en/p/laneberg-extendable-table-white-60416138/,130x80cm closed
+dining-rect,,closed,IKEA,mass,"STRANDTORP extendable, brown",59,37.38,https://www.ikea.com/us/en/p/strandtorp-extendable-table-brown-80388587/,150x95cm closed; 3-position (mid 205cm)
+dining-rect,,closed,IKEA,mass,"NORDVIKEN extendable (small), black",59.88,37.38,https://www.ikea.com/us/en/p/nordviken-extendable-table-black-20368714/,152x95cm closed; self-storing leaf
+dining-rect,,closed,IKEA,mass,"INGATORP extendable, black",61,34.25,https://www.ikea.com/us/en/p/ingatorp-extendable-table-black-90222407/,"155x87cm closed; drop-leaf, 1 stored leaf"
+dining-rect,,closed,IKEA,mass,"EKEDALEN extendable (180/240), white",70.88,35.38,https://www.ikea.com/us/en/p/ekedalen-extendable-table-white-70340765/,180x90cm closed; 1 self-storing leaf
+dining-rect,,closed,Article,mid,Seno Extendable Walnut Dining Table,71,37.5,https://www.article.com/product/27597/seno-71-110-extendable-dining-table-walnut,71in closed
+dining-rect,,closed,West Elm,mid,Extra Deep Mid-Century Extendable Dining Table,72,45,https://www.westelm.com/products/extra-deep-mid-century-extendable-dining-table-walnut-h6599/,72in closed; single drop-in leaf
+dining-rect,,closed,IKEA,mass,"NORDVIKEN extendable (large), black",82.63,41.38,https://www.ikea.com/us/en/p/nordviken-extendable-table-black-70359991/,210x105cm closed
+dining-rect,,closed,Article,mid,Madera Solid Wood Extendable Dining Table (oak),86,39,https://www.article.com/product/15096/madera-86-125-solid-wood-extendable-dining-table-oak,86in closed
+dining-rect,,closed,Pottery Barn,mid,Benchwright Extending Dining Table,86,42,https://www.potterybarn.com/products/benchwright-extending-dining-table-blackened-oak/,86in closed; seats up to 12 extended
+dining-rect,,extended,IKEA,mass,"EKEDALEN extendable (120/180), white",70.88,31.5,https://www.ikea.com/us/en/p/ekedalen-extendable-table-white-70340807/,180cm extended
+dining-rect,,extended,IKEA,mass,"VANGSTA extendable, white",70.88,29.5,https://www.ikea.com/us/en/p/vangsta-extendable-table-white-80361564/,180cm extended
+dining-rect,,extended,IKEA,mass,"LANEBERG extendable, white",74.75,31.5,https://www.ikea.com/us/en/p/laneberg-extendable-table-white-60416138/,190cm extended
+dining-rect,,extended,IKEA,mass,"INGATORP extendable, black",84.65,34.25,https://www.ikea.com/us/en/p/ingatorp-extendable-table-black-90222407/,215cm extended with leaf
+dining-rect,,extended,IKEA,mass,"NORDVIKEN extendable (small), black",87.75,37.38,https://www.ikea.com/us/en/p/nordviken-extendable-table-black-20368714/,223cm fully extended
+dining-rect,,extended,West Elm,mid,Extra Deep Mid-Century Extendable Dining Table,92,45,https://www.westelm.com/products/extra-deep-mid-century-extendable-dining-table-walnut-h6599/,92in with leaf
+dining-rect,,extended,IKEA,mass,"EKEDALEN extendable (180/240), white",94.5,35.38,https://www.ikea.com/us/en/p/ekedalen-extendable-table-white-70340765/,240cm extended
+dining-rect,,extended,IKEA,mass,"STRANDTORP extendable, brown",102.38,37.38,https://www.ikea.com/us/en/p/strandtorp-extendable-table-brown-80388587/,260cm fully extended (2 leaves)
+dining-rect,,extended,Article,mid,Seno Extendable Walnut Dining Table,110,37.5,https://www.article.com/product/27597/seno-71-110-extendable-dining-table-walnut,110in fully extended
+dining-rect,,extended,IKEA,mass,"NORDVIKEN extendable (large), black",113.75,41.38,https://www.ikea.com/us/en/p/nordviken-extendable-table-black-70359991/,289cm fully extended
+dining-rect,,extended,Pottery Barn,mid,Benchwright Extending Dining Table,122,42,https://www.potterybarn.com/products/benchwright-extending-dining-table-blackened-oak/,122in fully extended (2 leaves)
+dining-rect,,extended,Article,mid,Madera Solid Wood Extendable Dining Table (oak),125,39,https://www.article.com/product/15096/madera-86-125-solid-wood-extendable-dining-table-oak,125in fully extended
