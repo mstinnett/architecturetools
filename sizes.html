@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<!-- Common Sizes — nominal and actual lumber, stock lengths, sheet goods,
+     doors, windows and slabs, with metric alongside.
+     data-family: building.
+
+     A reference, not a chooser: no filters, no script beyond the scheme key.
+     Each section is a table plus a short Sources line. Metric is the inch
+     value converted (25.4 mm/in), rounded to the millimetre or tenth; it is
+     not a metric product size. Copy follows docs/voice.md: facts, no advice. -->
+<html lang="en" data-family="building">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Common Sizes -- architecture.tools</title>
+<meta name="description" content="Common construction sizes with metric alongside: nominal and actual lumber, stock and precut stud lengths, engineered joist depths, plywood and gypsum board, doors, windows and egress, concrete and countertop slabs.">
+<link rel="canonical" href="https://architecture.tools/sizes.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://architecture.tools/sizes.html">
+<meta property="og:title" content="Common Sizes -- architecture.tools">
+<meta property="og:description" content="Nominal and actual lumber, stock lengths, sheet goods, doors, windows and slabs, with metric alongside.">
+<meta name="twitter:card" content="summary">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
+<style>
+  /* ---- page-specific only: jump nav, section heads, the size tables ---- */
+  .list-jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; padding: var(--space-sm) 0; margin-bottom: var(--space-xl);
+               border-top: 1px solid var(--rule); border-bottom: 2px solid var(--black); }
+  .list-jump a { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2);
+                 text-decoration: none; padding: 0.35rem 0; }
+  .list-jump a:hover, .list-jump a:focus-visible { color: var(--accent); }
+  .size-group { margin-bottom: var(--space-2xl); max-width: 760px; scroll-margin-top: var(--space-lg); }
+  .group-title { font-size: var(--text-md); font-weight: 400; margin-bottom: 0.2rem; }
+  .group-sub { font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); margin-bottom: var(--space-md); max-width: 640px; }
+  .size-group h3 { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+                   color: var(--ink-2); margin: var(--space-lg) 0 0.4rem; }
+  .size-wrap { overflow-x: auto; border-top: 1px solid var(--rule); }
+  .size-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .size { border-collapse: collapse; width: 100%; font-size: var(--text-sm); font-weight: 300; font-variant-numeric: tabular-nums; }
+  .size th, .size td { padding: 0.4rem 0.6rem 0.4rem 0; border-bottom: var(--border-light); text-align: left; vertical-align: top; }
+  .size thead th { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+  .size th[scope="row"] { font-weight: 400; white-space: nowrap; }
+  .size td { white-space: nowrap; }
+  .size td.note { white-space: normal; color: var(--ink-2); min-width: 12rem; }
+  .size .mm { color: var(--ink-3); }
+  .size .g-group th { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+                      color: var(--ink-2); padding-top: 0.9rem; }
+  .size-notes { font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); margin: var(--space-sm) 0 0; padding-left: 1.1rem; max-width: 640px; }
+  .size-notes li { margin-bottom: 0.3rem; }
+  .sources { font-size: var(--text-xs); font-weight: 300; color: var(--ink-3); margin-top: var(--space-md); max-width: 640px; }
+  .sources a { color: inherit; }
+  .sources a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="page-wide">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Reference</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Common Sizes</span>
+    </nav>
+    <h1>Common sizes</h1>
+    <p>What a 2&times;4, a 3068 door or a 3050 window measures, with metric alongside.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <p class="chooser-updated">Updated October 2026</p>
+  <p class="chooser-lede">US sizes as sold. Metric figures convert the inch value and are not metric product sizes.</p>
+
+  <nav class="list-jump" aria-label="On this page">
+    <a href="#lumber">Lumber</a>
+    <a href="#lengths">Lengths</a>
+    <a href="#engineered">Engineered wood</a>
+    <a href="#sheets">Sheet goods</a>
+    <a href="#doors">Doors</a>
+    <a href="#windows">Windows</a>
+    <a href="#slabs">Slabs</a>
+  </nav>
+
+  <!-- ===== LUMBER ===== -->
+  <section class="size-group" id="lumber" aria-labelledby="lumber-h">
+    <h2 class="group-title" id="lumber-h">Lumber, nominal and actual</h2>
+    <p class="group-sub">The name is the rough-sawn size. Dried and surfaced on four sides, a piece loses &frac12;&Prime; on dimensions under 8&Prime; and &frac34;&Prime; on 8&Prime; and over. A 1&times; board is &frac34;&Prime; thick.</p>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Lumber sizes table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Nominal</th><th scope="col">Actual, inches</th><th scope="col">Actual, mm</th></tr></thead>
+        <tbody>
+          <tr class="g-group"><th colspan="3" scope="colgroup">Boards</th></tr>
+          <tr><th scope="row">1&times;2</th><td>&frac34; &times; 1&frac12;&Prime;</td><td class="mm">19 &times; 38</td></tr>
+          <tr><th scope="row">1&times;3</th><td>&frac34; &times; 2&frac12;&Prime;</td><td class="mm">19 &times; 64</td></tr>
+          <tr><th scope="row">1&times;4</th><td>&frac34; &times; 3&frac12;&Prime;</td><td class="mm">19 &times; 89</td></tr>
+          <tr><th scope="row">1&times;6</th><td>&frac34; &times; 5&frac12;&Prime;</td><td class="mm">19 &times; 140</td></tr>
+          <tr><th scope="row">1&times;8</th><td>&frac34; &times; 7&frac14;&Prime;</td><td class="mm">19 &times; 184</td></tr>
+          <tr><th scope="row">1&times;10</th><td>&frac34; &times; 9&frac14;&Prime;</td><td class="mm">19 &times; 235</td></tr>
+          <tr><th scope="row">1&times;12</th><td>&frac34; &times; 11&frac14;&Prime;</td><td class="mm">19 &times; 286</td></tr>
+          <tr class="g-group"><th colspan="3" scope="colgroup">Dimension lumber</th></tr>
+          <tr><th scope="row">2&times;3</th><td>1&frac12; &times; 2&frac12;&Prime;</td><td class="mm">38 &times; 64</td></tr>
+          <tr><th scope="row">2&times;4</th><td>1&frac12; &times; 3&frac12;&Prime;</td><td class="mm">38 &times; 89</td></tr>
+          <tr><th scope="row">2&times;6</th><td>1&frac12; &times; 5&frac12;&Prime;</td><td class="mm">38 &times; 140</td></tr>
+          <tr><th scope="row">2&times;8</th><td>1&frac12; &times; 7&frac14;&Prime;</td><td class="mm">38 &times; 184</td></tr>
+          <tr><th scope="row">2&times;10</th><td>1&frac12; &times; 9&frac14;&Prime;</td><td class="mm">38 &times; 235</td></tr>
+          <tr><th scope="row">2&times;12</th><td>1&frac12; &times; 11&frac14;&Prime;</td><td class="mm">38 &times; 286</td></tr>
+          <tr class="g-group"><th colspan="3" scope="colgroup">Posts</th></tr>
+          <tr><th scope="row">4&times;4</th><td>3&frac12; &times; 3&frac12;&Prime;</td><td class="mm">89 &times; 89</td></tr>
+          <tr><th scope="row">4&times;6</th><td>3&frac12; &times; 5&frac12;&Prime;</td><td class="mm">89 &times; 140</td></tr>
+          <tr><th scope="row">6&times;6</th><td>5&frac12; &times; 5&frac12;&Prime;</td><td class="mm">140 &times; 140</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>These are dry sizes (19% moisture or less). Lumber surfaced green is slightly larger, for example 1<sup>9</sup>&frasl;<sub>16</sub> &times; 3<sup>9</sup>&frasl;<sub>16</sub>&Prime; for a 2&times;4.</li>
+      <li>6&times;6 and larger timbers are usually sold green and run larger than the dry figure until they dry.</li>
+    </ul>
+    <p class="sources">Sources: <a href="https://www.alsc.org/">American Lumber Standard Committee</a>, Voluntary Product Standard PS 20 (minimum dressed sizes). <a href="https://blog.spib.org/nominal-vs-actual-lumber-sizes/">Southern Pine Inspection Bureau, nominal vs actual sizes</a>.</p>
+  </section>
+
+  <!-- ===== LENGTHS ===== -->
+  <section class="size-group" id="lengths" aria-labelledby="lengths-h">
+    <h2 class="group-title" id="lengths-h">Stock lengths and precut studs</h2>
+    <p class="group-sub">Dimension lumber is stocked in even-foot lengths from 8&prime; to 16&prime;, with 18&prime;, 20&prime; and longer at lumberyards. Precut studs are shorter than their names so the finished wall comes out at the ceiling height.</p>
+    <h3>Stock lengths</h3>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Stock lengths table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Length</th><th scope="col">8&prime;</th><th scope="col">10&prime;</th><th scope="col">12&prime;</th><th scope="col">14&prime;</th><th scope="col">16&prime;</th><th scope="col">18&prime;</th><th scope="col">20&prime;</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">mm</th><td class="mm">2438</td><td class="mm">3048</td><td class="mm">3658</td><td class="mm">4267</td><td class="mm">4877</td><td class="mm">5486</td><td class="mm">6096</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Precut studs</h3>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Precut stud table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Stud</th><th scope="col">mm</th><th scope="col">Framed wall</th><th scope="col">mm</th><th scope="col">For</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">92&frac58;&Prime;</th><td class="mm">2353</td><td>8&prime;-1&frac18;&Prime;</td><td class="mm">2467</td><td>8&prime; ceiling</td></tr>
+          <tr><th scope="row">104&frac58;&Prime;</th><td class="mm">2658</td><td>9&prime;-1&frac18;&Prime;</td><td class="mm">2772</td><td>9&prime; ceiling</td></tr>
+          <tr><th scope="row">116&frac58;&Prime;</th><td class="mm">2962</td><td>10&prime;-1&frac18;&Prime;</td><td class="mm">3077</td><td>10&prime; ceiling</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>Framed wall = stud + one bottom plate + a doubled top plate (3 &times; 1&frac12;&Prime;). The extra 1&frac18;&Prime; over the ceiling height leaves room for the ceiling drywall and a floor finish.</li>
+    </ul>
+    <p class="sources">Sources: lumber dealers' stock lists; <a href="https://www.mathscinotes.com/2016/05/stud-length-requirements/">precut stud lengths and plate arithmetic</a>.</p>
+  </section>
+
+  <!-- ===== ENGINEERED ===== -->
+  <section class="size-group" id="engineered" aria-labelledby="engineered-h">
+    <h2 class="group-title" id="engineered-h">Engineered wood depths</h2>
+    <p class="group-sub">I-joists and LVL come in depths that do not match sawn lumber. A 2&times;12 is 11&frac14;&Prime;, an I-joist or LVL at the same nominal place is 11&frac78;&Prime;.</p>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Engineered wood depths table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Depth</th><th scope="col">mm</th><th scope="col">I-joist</th><th scope="col">LVL</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">9&frac12;&Prime;</th><td class="mm">241</td><td>&#9679;</td><td>&#9679;</td></tr>
+          <tr><th scope="row">11&frac78;&Prime;</th><td class="mm">302</td><td>&#9679;</td><td>&#9679;</td></tr>
+          <tr><th scope="row">14&Prime;</th><td class="mm">356</td><td>&#9679;</td><td>&#9679;</td></tr>
+          <tr><th scope="row">16&Prime;</th><td class="mm">406</td><td>&#9679;</td><td>&#9679;</td></tr>
+          <tr><th scope="row">18&frac34;&Prime;</th><td class="mm">476</td><td>&ndash;</td><td>&#9679;</td></tr>
+          <tr><th scope="row">23&frac78;&Prime;</th><td class="mm">606</td><td>&ndash;</td><td>&#9679;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>APA performance-rated I-joists are made in the four depths shown, tolerance +0 / &minus;&frac18;&Prime;. Some makers add deeper series.</li>
+      <li>LVL is 1&frac34;&Prime; thick per ply. Depths beyond these, and widths for glulam, vary by manufacturer.</li>
+    </ul>
+    <p class="sources">Sources: <a href="https://www.apawood.org/i-joist">APA, I-joists</a> (PRI-400 depths). <a href="https://cwc.ca/">Canadian Wood Council</a>, structural composite lumber (common LVL depths).</p>
+  </section>
+
+  <!-- ===== SHEET GOODS ===== -->
+  <section class="size-group" id="sheets" aria-labelledby="sheets-h">
+    <h2 class="group-title" id="sheets-h">Sheet goods</h2>
+    <p class="group-sub">Panels are 4&prime; wide, 8&prime; long as stock, with 9&prime; and 10&prime; lengths for tall walls. Plywood and OSB are sold by a performance category that is slightly under the old nominal thickness.</p>
+    <h3>Plywood and OSB</h3>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Plywood and OSB thickness table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Called</th><th scope="col">Category</th><th scope="col">mm</th><th scope="col">Typical use</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">3/8&Prime;</th><td>3/8</td><td class="mm">9.5</td><td class="note">Roof sheathing at close rafter spacing</td></tr>
+          <tr><th scope="row">7/16&Prime;</th><td>7/16</td><td class="mm">11.1</td><td class="note">Wall and roof sheathing (OSB)</td></tr>
+          <tr><th scope="row">1/2&Prime;</th><td>15/32</td><td class="mm">11.9</td><td class="note">Wall and roof sheathing</td></tr>
+          <tr><th scope="row">5/8&Prime;</th><td>19/32</td><td class="mm">15.1</td><td class="note">Roof sheathing, subfloor at 16&Prime; o.c.</td></tr>
+          <tr><th scope="row">3/4&Prime;</th><td>23/32</td><td class="mm">18.3</td><td class="note">Subfloor, often span rating 48/24 or 24 o.c.</td></tr>
+          <tr><th scope="row">1-1/8&Prime;</th><td>1-1/8</td><td class="mm">28.6</td><td class="note">Floors at 48&Prime; o.c. (2-4-1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Panel size table, scrolls sideways" style="margin-top:var(--space-sm);">
+      <table class="size">
+        <thead><tr><th scope="col">Panel</th><th scope="col">mm</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">4&prime; &times; 8&prime;</th><td class="mm">1219 &times; 2438</td></tr>
+          <tr><th scope="row">4&prime; &times; 9&prime;</th><td class="mm">1219 &times; 2743</td></tr>
+          <tr><th scope="row">4&prime; &times; 10&prime;</th><td class="mm">1219 &times; 3048</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Gypsum board</h3>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Gypsum board table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Thickness</th><th scope="col">mm</th><th scope="col">Typical use</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">1/4&Prime;</th><td class="mm">6.4</td><td class="note">Curves, overlay on existing walls</td></tr>
+          <tr><th scope="row">3/8&Prime;</th><td class="mm">9.5</td><td class="note">Repair, double layers</td></tr>
+          <tr><th scope="row">1/2&Prime;</th><td class="mm">12.7</td><td class="note">Walls and ceilings in houses</td></tr>
+          <tr><th scope="row">5/8&Prime;</th><td class="mm">15.9</td><td class="note">Type X fire-rated assemblies, ceilings at 24&Prime; o.c.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>Gypsum board is 4&prime; wide (54&Prime; for 9&prime; walls hung horizontally) and 8&prime;, 10&prime;, 12&prime;, 14&prime; or 16&prime; long. Availability past 12&prime; varies by supplier.</li>
+    </ul>
+    <p class="sources">Sources: <a href="https://www.apawood.org/osb">APA, OSB</a> and <a href="https://www.apawood.org/Data/Sites/1/documents/product-support/rated-sheathing-datasheet.pdf">Rated Sheathing data sheet</a> (performance categories, panel sizes). Gypsum board sizes from manufacturer product catalogs (USG, National Gypsum, CertainTeed).</p>
+  </section>
+
+  <!-- ===== DOORS ===== -->
+  <section class="size-group" id="doors" aria-labelledby="doors-h">
+    <h2 class="group-title" id="doors-h">Doors</h2>
+    <p class="group-sub">Door sizes are named width then height in feet and inches: a 3068 is 3&prime;-0&Prime; &times; 6&prime;-8&Prime;. A slab is the door leaf alone. A prehung door comes hung in its frame, and the rough opening is framed for the frame.</p>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Door width table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Width</th><th scope="col">mm</th><th scope="col">Name</th><th scope="col">Typical use</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">2&prime;-0&Prime;</th><td class="mm">610</td><td>2068</td><td class="note">Closets, small baths</td></tr>
+          <tr><th scope="row">2&prime;-4&Prime;</th><td class="mm">711</td><td>2468</td><td class="note">Baths, closets</td></tr>
+          <tr><th scope="row">2&prime;-6&Prime;</th><td class="mm">762</td><td>2668</td><td class="note">Bedrooms, baths</td></tr>
+          <tr><th scope="row">2&prime;-8&Prime;</th><td class="mm">813</td><td>2868</td><td class="note">Bedrooms, older entry doors</td></tr>
+          <tr><th scope="row">3&prime;-0&Prime;</th><td class="mm">914</td><td>3068</td><td class="note">Entry doors, accessible doors</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Door height and thickness table, scrolls sideways" style="margin-top:var(--space-sm);">
+      <table class="size">
+        <thead><tr><th scope="col">Dimension</th><th scope="col">Inches</th><th scope="col">mm</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Height, standard</th><td>6&prime;-8&Prime;</td><td class="mm">2032</td></tr>
+          <tr><th scope="row">Height, tall</th><td>7&prime;-0&Prime;, 8&prime;-0&Prime;</td><td class="mm">2134, 2438</td></tr>
+          <tr><th scope="row">Thickness, interior</th><td>1&frac38;&Prime;</td><td class="mm">35</td></tr>
+          <tr><th scope="row">Thickness, exterior and commercial</th><td>1&frac34;&Prime;</td><td class="mm">44</td></tr>
+          <tr><th scope="row">Rough opening, prehung</th><td>door + 2&Prime; wide, + 2 to 2&frac12;&Prime; high</td><td class="mm">+51, +51 to 64</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>Accessible doors need 32&Prime; of clear width with the door open 90&deg; (ADA 2010 404.2.3). Stops and the door's own thickness take 2 to 3&Prime; off the leaf width, so a 2&prime;-10&Prime; or 3&prime;-0&Prime; door is used.</li>
+      <li>Interior doors taller than 80&Prime; or wider than 36&Prime; are usually made 1&frac34;&Prime; thick.</li>
+      <li>The rough opening is typical framing practice. Each manufacturer publishes its own; check it before framing.</li>
+    </ul>
+    <p class="sources">Sources: <a href="https://www.access-board.gov/ada/#ada-404">2010 ADA Standards, 404.2.3</a>. Door manufacturers' size charts and installation guides.</p>
+  </section>
+
+  <!-- ===== WINDOWS ===== -->
+  <section class="size-group" id="windows" aria-labelledby="windows-h">
+    <h2 class="group-title" id="windows-h">Windows</h2>
+    <p class="group-sub">Window sizes use the same naming as doors: a 3050 is 3&prime;-0&Prime; wide by 5&prime;-0&Prime; high. Stock widths step in 6&Prime; or 4&Prime; and heights in 6&Prime; or 12&Prime;, and each maker's call numbers differ from the actual unit size by a fraction of an inch.</p>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Window size table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Name</th><th scope="col">Nominal</th><th scope="col">mm</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">2030</th><td>2&prime;-0&Prime; &times; 3&prime;-0&Prime;</td><td class="mm">610 &times; 914</td></tr>
+          <tr><th scope="row">2440</th><td>2&prime;-4&Prime; &times; 4&prime;-0&Prime;</td><td class="mm">711 &times; 1219</td></tr>
+          <tr><th scope="row">3040</th><td>3&prime;-0&Prime; &times; 4&prime;-0&Prime;</td><td class="mm">914 &times; 1219</td></tr>
+          <tr><th scope="row">3050</th><td>3&prime;-0&Prime; &times; 5&prime;-0&Prime;</td><td class="mm">914 &times; 1524</td></tr>
+          <tr><th scope="row">3060</th><td>3&prime;-0&Prime; &times; 6&prime;-0&Prime;</td><td class="mm">914 &times; 1829</td></tr>
+          <tr><th scope="row">4040</th><td>4&prime;-0&Prime; &times; 4&prime;-0&Prime;</td><td class="mm">1219 &times; 1219</td></tr>
+          <tr><th scope="row">6050</th><td>6&prime;-0&Prime; &times; 5&prime;-0&Prime;</td><td class="mm">1829 &times; 1524</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Emergency escape and rescue openings</h3>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Egress window table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">IRC R310</th><th scope="col">Inches</th><th scope="col">mm</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Net clear opening</th><td>5.7 sf (5.0 sf at grade floor)</td><td class="mm">0.53 m&sup2; (0.46 m&sup2;)</td></tr>
+          <tr><th scope="row">Clear height, min</th><td>24&Prime;</td><td class="mm">610</td></tr>
+          <tr><th scope="row">Clear width, min</th><td>20&Prime;</td><td class="mm">508</td></tr>
+          <tr><th scope="row">Sill above floor, max</th><td>44&Prime;</td><td class="mm">1118</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>Every sleeping room and habitable basement needs one. The minimum height and width together give only 3.3 sf, so one of them must be larger, which is why bedroom casements and sliders cluster around 2&prime;-0&Prime; to 3&prime;-0&Prime; wide and double-hungs around 3&prime;-0&Prime; &times; 5&prime;-0&Prime; and up.</li>
+      <li>Net clear opening is measured at the opening in normal operation, not the glass or the frame.</li>
+      <li>Rough openings are typically the unit size plus &frac12;&Prime; in each direction. Check the maker's published rough opening.</li>
+      <li>Section numbers vary by edition (R310.2.1&ndash;R310.2.3 in recent IRCs). Use the edition your jurisdiction adopted.</li>
+    </ul>
+    <p class="sources">Sources: <a href="https://www.iccsafe.org/wp-content/uploads/IRC-3-2-EERO-9.27.2018.pdf">ICC, IRC emergency escape and rescue openings</a>; <a href="https://www.stpaul.gov/sites/default/files/2023-06/DSI.Bldg_EgressWindow%202020.pdf">City of Saint Paul egress window handout</a>. Window manufacturers' size tables.</p>
+  </section>
+
+  <!-- ===== SLABS ===== -->
+  <section class="size-group" id="slabs" aria-labelledby="slabs-h">
+    <h2 class="group-title" id="slabs-h">Slabs</h2>
+    <p class="group-sub">Two different things share the word: a concrete slab on the ground, and a stone or quartz slab for countertops.</p>
+    <h3>Concrete slab on grade</h3>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Concrete slab table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Use</th><th scope="col">Thickness</th><th scope="col">mm</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">IRC minimum (R506.1)</th><td>3&frac12;&Prime;</td><td class="mm">89</td></tr>
+          <tr><th scope="row">House floor, basement</th><td>4&Prime;</td><td class="mm">102</td></tr>
+          <tr><th scope="row">Garage, driveway</th><td>4 to 6&Prime;</td><td class="mm">102 to 152</td></tr>
+          <tr><th scope="row">Sidewalk, patio</th><td>4&Prime;</td><td class="mm">102</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>Beyond the code minimum these are common practice. Heavier loads, poor soils and post-tensioned slabs are set by the structural engineer.</li>
+    </ul>
+    <h3>Countertop slabs</h3>
+    <div class="size-wrap" tabindex="0" role="region" aria-label="Countertop slab table, scrolls sideways">
+      <table class="size">
+        <thead><tr><th scope="col">Slab</th><th scope="col">Inches</th><th scope="col">mm</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Quartz, standard</th><td>about 122 &times; 55&frac12;&Prime;</td><td class="mm">3100 &times; 1410</td></tr>
+          <tr><th scope="row">Quartz, jumbo</th><td>about 132 &times; 65&frac12;&Prime;</td><td class="mm">3350 &times; 1660</td></tr>
+          <tr><th scope="row">Thickness, 2 cm</th><td>about &frac34;&Prime;</td><td class="mm">20</td></tr>
+          <tr><th scope="row">Thickness, 3 cm</th><td>about 1&frac14;&Prime;</td><td class="mm">30</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="size-notes">
+      <li>Slab sizes are one manufacturer's (Cambria). Other quartz brands and natural stone vary by a few inches, and natural stone slabs vary piece to piece.</li>
+      <li>3 cm is self-supporting on cabinets. 2 cm on a counter usually sits on a plywood substrate or gets a built-up edge.</li>
+      <li>A jumbo slab is about 11&prime; long, so a straight counter longer than that has a seam.</li>
+    </ul>
+    <p class="sources">Sources: <a href="https://gocodebook.com/us/california/california-residential-code/floors/slabs-decks-and-steel-framing/concrete-slabs-on-ground">IRC R506.1 (as adopted in California)</a>. <a href="https://www.cambriausa.com/content/dam/cusa/sales-marketing-collateral/product-technical-information/slab-size-product-information.pdf">Cambria, slab size product information</a>; <a href="https://www.msisurfaces.com/blogs/post/2026/08/27/quartz-countertop-thickness-2cm-vs-3cm.aspx">MSI, 2 cm vs 3 cm</a>.</p>
+  </section>
+
+  <div class="page-footer">
+    <a class="back-link" href="index.html">&larr; architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="privacy.html">Privacy &amp; analytics</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="feedback.html">Feedback</a>
+  </div>
+</div>
+
+<script src="assets/js/ui.js"></script>
+</body>
+</html>
