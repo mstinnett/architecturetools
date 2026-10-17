@@ -2,24 +2,24 @@
 <!-- PDF Markup Software — apps for marking up, measuring and reviewing drawing sets.
      data-family: material, the site's red-brown, the nearest family to a redline.
 
-     A list, not a chooser: no filters, no sort, no script. Every tool is a
-     numbered <li class="tool"> in its group; what the old filters encoded
-     (platforms, measurement, team review, revision compare, checklist, price
-     model) is shown on every entry and again in the "At a glance" table.
-     Order: grouped by what each tool is built for, alphabetical within a
-     group. Card styles are global.css "CHOOSER"; list-only rules are below.
-     Copy follows docs/voice.md: facts and limits, no verdicts. -->
+     The page is one feature matrix: a row per tool, grouped by what each is
+     built for (alphabetical within a group), columns for platforms and
+     capabilities, then price. One filter, by platform: a row stays when it
+     runs on EVERY selected platform (its data-plat), and ?p= keeps the
+     choice. A tool's name opens its detail row (notes, full price, link).
+     Every row is static HTML, so without JavaScript the matrix reads in full
+     with every detail row open. Copy follows docs/voice.md: no verdicts. -->
 <html lang="en" data-family="material">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDF Markup Software for Architects -- architecture.tools</title>
-<meta name="description" content="Seventeen PDF markup apps for architects, with platforms, scaled measurement, team review, revision comparison and price for each: Bluebeam Revu, Acrobat, Drawboard, PDF Expert, PDF-XChange, PDF Studio, Adequate Design Review and more.">
+<meta name="description" content="Seventeen PDF markup apps for architects in one feature matrix: platforms, scaled measurement, team review, revision comparison and price. Bluebeam Revu, Acrobat, Drawboard, PDF Expert, PDF-XChange, PDF Studio, Adequate Design Review and more.">
 <link rel="canonical" href="https://architecture.tools/pdf-markup.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://architecture.tools/pdf-markup.html">
 <meta property="og:title" content="PDF Markup Software for Architects -- architecture.tools">
-<meta property="og:description" content="Seventeen PDF markup apps, with platforms, measurement, team review and price for each.">
+<meta property="og:description" content="Seventeen PDF markup apps in one feature matrix: platforms, measurement, team review and price.">
 <meta name="twitter:card" content="summary">
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
 <script>
@@ -38,39 +38,51 @@
 </script>
 <link rel="stylesheet" href="assets/css/global.css">
 <style>
-  /* ---- page-specific only: the numbered list and the at-a-glance table ---- */
+  /* ---- page-specific only: the feature matrix and its platform filter ---- */
   .list-disclosure { font-size: var(--text-sm); font-weight: 300; color: var(--ink-3); margin: calc(-1 * var(--space-md)) 0 var(--space-lg); }
-  .list-jump { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; padding: var(--space-sm) 0; margin-bottom: var(--space-xl);
-               border-top: 1px solid var(--rule); border-bottom: 2px solid var(--black); }
-  .list-jump a { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2);
-                 text-decoration: none; padding: 0.35rem 0; }
-  .list-jump a:hover, .list-jump a:focus-visible { color: var(--accent); }
-  .list-group { margin-bottom: var(--space-2xl); max-width: 760px; scroll-margin-top: var(--space-lg); }
-  .group-title { font-size: var(--text-md); font-weight: 400; margin-bottom: 0.2rem; }
-  .group-sub { font-size: var(--text-sm); font-weight: 300; color: var(--ink-3); margin-bottom: var(--space-md); }
-  .tool-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
-  .tool-list .tool { scroll-margin-top: var(--space-lg); }
-  .tool-list .tool-head { display: flex; align-items: baseline; gap: 0.75rem; }
-  .tool-num { font-size: var(--text-md); font-weight: 300; color: var(--accent); width: 1.6rem; flex: none; font-variant-numeric: tabular-nums; }
-  .tool-list .tool-plats, .tool-list .tool-specs, .tool-list .tool-note, .tool-list .tool-disclosure { margin-left: 2.35rem; }
-  #glance { max-width: none; }
-  .glance-wrap { overflow-x: auto; position: relative; border-top: 1px solid var(--rule); }
-  .glance-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .glance { border-collapse: collapse; width: 100%; min-width: 760px; font-size: var(--text-sm); font-weight: 300; }
-  .glance th, .glance td { padding: 0.4rem 0.5rem; border-bottom: var(--border-light); text-align: center; white-space: nowrap; }
-  .glance thead th { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-  .glance th[scope="row"], .glance thead th:first-child { text-align: left; font-weight: 300; }
-  .glance th[scope="row"] a { color: inherit; text-decoration: none; }
-  .glance th[scope="row"] a:hover { color: var(--accent); }
-  .glance .g-group th { text-align: left; font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
-                        color: var(--ink-2); padding-top: 0.9rem; }
-  .glance .g-yes { color: var(--accent); }
-  .glance .g-no { color: var(--ink-3); }
-  .glance .g-word { font-size: var(--text-xs); }
-  .glance .g-price { text-align: left; color: var(--ink-2); }
+  .m-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; padding: var(--space-md) 0; border-top: 1px solid var(--rule); }
+  .m-filter .section-label { margin: 0; }
+  .m-status { display: flex; gap: 0.75rem; align-items: baseline; font-size: var(--text-sm); font-weight: 300; color: var(--ink-3); }
+  .m-clear { background: none; border: 0; padding: 0.35rem 0; font: inherit; font-size: var(--text-sm); color: var(--accent); cursor: pointer;
+             text-decoration: underline; text-underline-offset: 3px; }
+  .m-legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: var(--text-xs); color: var(--ink-3); margin: 0 0 var(--space-sm); }
+  .m-legend .m { margin-right: 0.3rem; }
+  .m-wrap { overflow-x: auto; border-top: 2px solid var(--black); }
+  .m-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .matrix { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 920px; font-size: var(--text-sm); font-weight: 300; }
+  .matrix th, .matrix td { position: relative; padding: 0.55rem 0.45rem; border-bottom: var(--border-light); text-align: center; vertical-align: top; background: var(--card); }  /* relative: keeps the .vh labels inside the scroll box */
+  .matrix thead th { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); vertical-align: bottom; }
+  .matrix thead abbr { text-decoration: none; }
+  .matrix thead .m-band th { border-bottom: 0; padding-bottom: 0; color: var(--ink-2); }
+  .matrix .m-cap1 { border-left: 1px solid var(--rule); }
+  .matrix th:first-child { position: sticky; left: 0; z-index: 1; text-align: left; width: 13rem; min-width: 13rem; box-shadow: 1px 0 0 var(--rule); }
+  .matrix .m-group th { position: static; text-align: left; padding-top: 1.2rem; font-weight: 400; box-shadow: none; }
+  .m-group-name { position: sticky; left: 0.45rem; font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+  .m-group-sub { font-size: var(--text-xs); color: var(--ink-3); font-weight: 300; margin-left: 0.5rem; }
+  .m-open { display: block; width: 100%; background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .m-tool { display: block; font-size: var(--text-base); font-weight: 400; line-height: 1.25; }
+  .js .m-tool::after { content: " +"; color: var(--ink-3); font-weight: 300; }
+  .js .m-open[aria-expanded="true"] .m-tool::after { content: " \2212"; }
+  .m-open:hover .m-tool { color: var(--accent); }
+  .m-maker { display: block; font-size: var(--text-xs); color: var(--ink-3); margin-top: 0.1rem; }
+  .matrix td .m, .m-legend .m { font-size: var(--text-base); line-height: 1.2; }
+  .matrix td .m { display: block; }
+  .m-yes .m, .m-part .m { color: var(--accent); }
+  .m-no .m { color: var(--ink-3); }
+  .m-txt { display: block; max-width: 7.5rem; margin: 0.15rem auto 0; font-size: var(--text-xs); color: var(--ink-2); line-height: 1.3; }
+  .matrix .m-price { text-align: left; color: var(--ink-2); min-width: 8rem; }
+  .matrix .m-detail td { text-align: left; padding: 0 0.45rem 1rem; }
+  .d-body { position: sticky; left: 0.45rem; max-width: 44rem; font-size: var(--text-sm); line-height: 1.6; color: var(--ink-2); }
+  .d-body p { margin: 0 0 0.4rem; }
+  .d-meta { font-size: var(--text-xs); color: var(--ink-3); }
+  .d-meta a { color: inherit; }
+  .d-disclosure { font-style: italic; }
+  .m-none { padding: var(--space-md) 0; color: var(--ink-3); font-size: var(--text-sm); }
   .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (max-width: 600px) {
-    .tool-list .tool-plats, .tool-list .tool-specs, .tool-list .tool-note, .tool-list .tool-disclosure { margin-left: 0; }
+    .matrix th:first-child { width: 8.5rem; min-width: 8.5rem; }
+    .m-tool { font-size: var(--text-sm); }
+    .d-body { max-width: calc(100vw - 4rem); }
   }
 </style>
 </head>
@@ -82,7 +94,7 @@
       <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Software</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">PDF Markup</span>
     </nav>
     <h1>PDF markup software for architects</h1>
-    <p>Apps for redlining drawing sets, measuring from PDFs and running reviews.</p>
+    <p>Apps for redlining drawing sets, measuring from PDFs and running reviews, in one matrix.</p>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
@@ -91,383 +103,152 @@
   </div>
 
   <p class="chooser-updated">Updated October 2026</p>
-  <p class="chooser-lede">Seventeen apps architects use to mark up, measure and review PDF drawings.
-     They are grouped by what each is built for, and listed alphabetically within each group.
-     Every entry gives the platforms, what it can do and the price.</p>
+  <p class="chooser-lede">Seventeen apps architects use to mark up, measure and review PDF drawings,
+     grouped by what each is built for and listed alphabetically within each group.
+     Open a tool&rsquo;s name for its notes and full price.</p>
   <p class="list-disclosure">One of them, Adequate Design Review, is made by the person who runs this site.</p>
 
-  <nav class="list-jump" aria-label="On this page">
-    <a href="#sets">Drawing sets</a>
-    <a href="#review">Review process</a>
-    <a href="#editors">General editors</a>
-    <a href="#notes">Notes and sketching</a>
-    <a href="#glance">At a glance</a>
-    <a href="#platforms">Project platforms</a>
-  </nav>
+  <div class="m-filter" id="controls">
+    <span class="section-label" id="platLabel">Runs on</span>
+    <div class="option-row" role="group" aria-labelledby="platLabel"><button type="button" class="app-toggle" aria-pressed="false" data-plat="win">Windows</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="mac">Mac</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="linux">Linux</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="ipad">iPad</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="web">Web</button></div>
+    <div class="m-status"><span id="resultCount" aria-live="polite">17 tools</span><button type="button" class="m-clear" id="clearPlat" hidden>Clear</button></div>
+  </div>
+  <p class="m-legend"><span><span class="m m-yes" aria-hidden="true">&#9679;</span>Yes</span><span><span class="m m-part" aria-hidden="true">&#9680;</span>Partly, or on a paid tier</span><span><span class="m m-no" aria-hidden="true">&ndash;</span>No</span><span>Platforms are the main app. Web versions and phone apps often do less.</span></p>
 
-  <section class="list-group" id="sets" aria-labelledby="sets-h">
-    <h2 class="group-title" id="sets-h">Built for drawing sets</h2>
-    <p class="group-sub">Markup and scaled measurement organized around sheets.</p>
-    <ol class="tool-list" start="1">
-      <li class="tool" id="bluebeam">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">1</span>
-          <div>
-            <h3 class="tool-name"><a href="https://www.bluebeam.com/product/markups-and-data/" rel="noopener">Bluebeam Revu</a></h3>
-            <div class="tool-kind">Bluebeam &middot; Drawing sets</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>iPad</li><li>iPhone</li><li>Web (Bluebeam Cloud)</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes, with takeoff</dd></div>
-          <div><dt>Team review</dt><dd class="mark-yes">Studio Sessions</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-yes">Sheet comparison</dd></div>
-          <div><dt>Price</dt><dd>About $260&ndash;440 per user per year</dd></div>
-        </dl>
-        <p class="tool-note">Tool chests of saved markups, a markups list you can sort and export, calibrated measurement and takeoff, sheet comparison, and Studio Sessions for live review with consultants.</p>
-        <p class="tool-note">The full app is Windows only. Revu for iPad was retired at the end of 2025, so Mac, iPad and Linux users get Bluebeam Cloud in the browser or the iOS app, which does less.</p>
-      </li>
-      <li class="tool" id="drawboard-pdf">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">2</span>
-          <div>
-            <h3 class="tool-name"><a href="https://www.drawboard.com" rel="noopener">Drawboard PDF</a></h3>
-            <div class="tool-kind">Drawboard &middot; Drawing sets</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li><li>iPad</li><li>Android</li><li>Web</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Pro Plus and Pro Unlimited</dd></div>
-          <div><dt>Team review</dt><dd class="mark-yes">Shared documents</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Free. Paid tiers $6.99&ndash;13.33 a month, billed annually</dd></div>
-        </dl>
-        <p class="tool-note">Drawboard&rsquo;s single-user app, designed around pen input on a tablet. The free tier covers ink, shapes, text and signatures. Pro syncs up to 50 documents. Measurement is in Pro Plus and Pro Unlimited.</p>
-      </li>
-      <li class="tool" id="ncored">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">3</span>
-          <div>
-            <h3 class="tool-name"><a href="https://ncored.com" rel="noopener">Ncored</a></h3>
-            <div class="tool-kind">Noir architects &middot; Drawing sets</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-no">Not listed</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Subscription or one-time license</dd></div>
-        </dl>
-        <p class="tool-note">A PDF editor made by an architecture studio for large CAD and BIM exports, the 50&ndash;200&nbsp;MB sets that make general PDF apps lag on zoom and pan. Redlines, notes, shapes and large-format printing, with files kept on your machine.</p>
-      </li>
-      <li class="tool" id="pdf-studio">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">4</span>
-          <div>
-            <h3 class="tool-name"><a href="https://www.qoppa.com/pdfstudio/" rel="noopener">PDF Studio Pro</a></h3>
-            <div class="tool-kind">Qoppa &middot; Drawing sets</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li><li>Linux</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-yes">Document comparison</dd></div>
-          <div><dt>Price</dt><dd>One-time license</dd></div>
-        </dl>
-        <p class="tool-note">Markup, calibrated measurement and document comparison on Windows, Mac and Linux, for a one-time license.</p>
-      </li>
-      <li class="tool" id="pdf-xchange">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">5</span>
-          <div>
-            <h3 class="tool-name"><a href="https://www.pdf-xchange.com/product/pdf-xchange-editor" rel="noopener">PDF-XChange Editor</a></h3>
-            <div class="tool-kind">PDF-XChange &middot; Drawing sets</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>One-time license</dd></div>
-        </dl>
-        <p class="tool-note">A Windows editor for one person working alone. Clouds, callouts, stamps, and calibrated length, perimeter and area measurement. It has no shared review.</p>
-      </li>
-      <li class="tool" id="polypdf">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">6</span>
-          <div>
-            <h3 class="tool-name"><a href="https://polypdf.com" rel="noopener">PolyPDF</a></h3>
-            <div class="tool-kind">PolyPDF &middot; Drawing sets</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>iPad</li><li>iPhone</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">Not yet</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Free</dd></div>
-        </dl>
-        <p class="tool-note">A new iPad app for drawings. Callouts, discipline colors, and measurement of lengths, areas and angles at a set scale, with line detection that snaps to the drawing. Sync and team review are not out yet.</p>
-      </li>
-    </ol>
-  </section>
-
-  <section class="list-group" id="review" aria-labelledby="review-h">
-    <h2 class="group-title" id="review-h">Built around a review process</h2>
-    <p class="group-sub">A checklist or an issue log, not freehand markup alone.</p>
-    <ol class="tool-list" start="7">
-      <li class="tool" id="adequate">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">7</span>
-          <div>
-            <h3 class="tool-name"><a href="https://adequate.design" rel="noopener">Adequate Design Review</a></h3>
-            <div class="tool-kind">Adequate Design &middot; Checklist review &middot; in beta</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li><li>Linux</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No, runs locally</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-yes">Revision overlay</dd></div>
-          <div><dt>Checklist review</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Price</dt><dd>$400 one-time after the beta</dd></div>
-        </dl>
-        <p class="tool-note">For reviewing a set against a checklist rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.</p>
-        <p class="tool-note">Runs locally and offline on Windows, Mac and Linux, and nothing leaves your machine. It is for one reviewer, not live team sessions.</p>
-        <p class="tool-disclosure">Disclosure: I make it, to replace my own Bluebeam, Excel and Affinity workflow.</p>
-      </li>
-      <li class="tool" id="drawboard-projects">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">8</span>
-          <div>
-            <h3 class="tool-name"><a href="https://www.drawboard.com" rel="noopener">Drawboard Projects</a></h3>
-            <div class="tool-kind">Drawboard &middot; Team review</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>iPad</li><li>Web</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Team review</dt><dd class="mark-yes">Issues, versions, free guests</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Subscription, per user</dd></div>
-        </dl>
-        <p class="tool-note">Drawboard&rsquo;s team product for drawing review. Drawings live in one project with versions, markups sync live, and issues are pinned to a spot on a sheet with an owner and a status. Clients and consultants join as guests without a paid license.</p>
-      </li>
-    </ol>
-  </section>
-
-  <section class="list-group" id="editors" aria-labelledby="editors-h">
-    <h2 class="group-title" id="editors-h">General PDF editors</h2>
-    <p class="group-sub">Full editors that also mark up and, in most cases, measure.</p>
-    <ol class="tool-list" start="9">
-      <li class="tool" id="acrobat">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">9</span>
-          <div>
-            <h3 class="tool-name"><a href="https://www.adobe.com/acrobat/acrobat-pro.html" rel="noopener">Adobe Acrobat Pro</a></h3>
-            <div class="tool-kind">Adobe &middot; General PDF editor</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li><li>iPad</li><li>iPhone</li><li>Android</li><li>Web</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Team review</dt><dd class="mark-yes">Shared review</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-yes">File comparison</dd></div>
-          <div><dt>Price</dt><dd>Subscription</dd></div>
-        </dl>
-        <p class="tool-note">A general PDF editor that many firms already license. Comments, drawing markups, calibrated measurement, file comparison and shared review.</p>
-        <p class="tool-note">It has no tool chest or sortable markups list.</p>
-      </li>
-      <li class="tool" id="foxit">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">10</span>
-          <div>
-            <h3 class="tool-name"><a href="https://www.foxit.com/pdf-editor/" rel="noopener">Foxit PDF Editor</a></h3>
-            <div class="tool-kind">Foxit &middot; General PDF editor</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li><li>iPad</li><li>iPhone</li><li>Android</li><li>Web</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Yes</dd></div>
-          <div><dt>Team review</dt><dd class="mark-yes">Shared review</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-yes">File comparison</dd></div>
-          <div><dt>Price</dt><dd>Subscription</dd></div>
-        </dl>
-        <p class="tool-note">A general PDF editor with measurement, file comparison and shared review. Firms often license it for office documents.</p>
-      </li>
-      <li class="tool" id="master-pdf">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">11</span>
-          <div>
-            <h3 class="tool-name"><a href="https://code-industry.net/masterpdfeditor/" rel="noopener">Master PDF Editor</a></h3>
-            <div class="tool-kind">Code Industry &middot; General PDF editor</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li><li>Linux</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-yes">Distance, perimeter, area</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>One-time license</dd></div>
-        </dl>
-        <p class="tool-note">A full PDF editor with a native Linux version. Annotations, page editing, OCR, and distance, perimeter and area tools.</p>
-        <p class="tool-note">Check how it sets a drawing scale before you rely on it for takeoff.</p>
-      </li>
-      <li class="tool" id="pdf-expert">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">12</span>
-          <div>
-            <h3 class="tool-name"><a href="https://pdfexpert.com" rel="noopener">PDF Expert</a></h3>
-            <div class="tool-kind">Readdle &middot; General PDF editor</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Mac</li><li>iPad</li><li>iPhone</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Subscription</dd></div>
-        </dl>
-        <p class="tool-note">A PDF editor for Mac and iPad with Apple Pencil support. Highlights, shapes, ink, stamps and notes that sync across your devices.</p>
-        <p class="tool-note">It does not measure to scale.</p>
-      </li>
-    </ol>
-  </section>
-
-  <section class="list-group" id="notes" aria-labelledby="notes-h">
-    <h2 class="group-title" id="notes-h">Reading, notes and sketching</h2>
-    <p class="group-sub">Lighter tools for carrying a set, noting a sheet, or drawing over it.</p>
-    <ol class="tool-list" start="13">
-      <li class="tool" id="documents">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">13</span>
-          <div>
-            <h3 class="tool-name"><a href="https://documents.io/app" rel="noopener">Documents</a></h3>
-            <div class="tool-kind">Readdle &middot; Reading sets</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>iPad</li><li>iPhone</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Free, paid tier</dd></div>
-        </dl>
-        <p class="tool-note">A file manager that opens PDFs with annotation built in. For carrying a set to site, pulling files from cloud storage, and noting what you see on the sheet.</p>
-      </li>
-      <li class="tool" id="trace">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">14</span>
-          <div>
-            <h3 class="tool-name"><a href="https://morpholio.com/trace" rel="noopener">Morpholio Trace</a></h3>
-            <div class="tool-kind">Morpholio &middot; Sketching</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Mac</li><li>iPad</li><li>iPhone</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-no">Scale-aware drawing</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Subscription</dd></div>
-        </dl>
-        <p class="tool-note">Digital trace paper for sketching a design response over a plan or photo at scale. It does not track comments.</p>
-      </li>
-      <li class="tool" id="okular">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">15</span>
-          <div>
-            <h3 class="tool-name"><a href="https://okular.kde.org" rel="noopener">Okular</a></h3>
-            <div class="tool-kind">KDE &middot; Quick notes</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Linux</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Free, open source</dd></div>
-        </dl>
-        <p class="tool-note">The default document viewer on KDE Linux desktops. Highlights, notes, lines, shapes and stamps, saved into the PDF. It does not measure.</p>
-      </li>
-      <li class="tool" id="preview">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">16</span>
-          <div>
-            <h3 class="tool-name"><a href="https://support.apple.com/guide/preview/welcome/mac" rel="noopener">Preview &amp; Markup</a></h3>
-            <div class="tool-kind">Apple &middot; Quick notes</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Mac</li><li>iPad</li><li>iPhone</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Free, built in</dd></div>
-        </dl>
-        <p class="tool-note">Built into Apple devices. Enough to circle something on one sheet and send it back, with nothing to install.</p>
-      </li>
-      <li class="tool" id="xournalpp">
-        <div class="tool-head">
-          <span class="tool-num" aria-hidden="true">17</span>
-          <div>
-            <h3 class="tool-name"><a href="https://xournalpp.github.io" rel="noopener">Xournal++</a></h3>
-            <div class="tool-kind">Open source &middot; Sketching</div>
-          </div>
-        </div>
-        <ul class="tool-plats" aria-label="Platforms"><li>Windows</li><li>Mac</li><li>Linux</li></ul>
-        <dl class="tool-specs">
-          <div><dt>Scaled measurement</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Team review</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Compare revisions</dt><dd class="mark-no">No</dd></div>
-          <div><dt>Price</dt><dd>Free, open source</dd></div>
-        </dl>
-        <p class="tool-note">Handwriting and sketching over a PDF in layers, with pen pressure. Runs on Linux with a drawing tablet.</p>
-      </li>
-    </ol>
-  </section>
-
-  <section class="list-group" id="glance" aria-labelledby="glance-h">
-    <h2 class="group-title" id="glance-h">At a glance</h2>
-    <p class="group-sub">Main app platforms. Web versions and phone apps often do less. iPhone and Android are in each entry above.</p>
-    <div class="glance-wrap" tabindex="0" role="region" aria-label="Comparison table, scrolls sideways">
-      <table class="glance">
-        <thead>
-          <tr>
-            <th scope="col">Tool</th>
-            <th scope="col">Win</th><th scope="col">Mac</th><th scope="col">Linux</th><th scope="col">iPad</th><th scope="col">Web</th>
-            <th scope="col">Measure</th><th scope="col">Team</th><th scope="col">Compare</th><th scope="col">Checklist</th>
-            <th scope="col">Price</th>
+  <div class="m-wrap" tabindex="0" role="region" aria-label="Feature matrix, scrolls sideways">
+    <table class="matrix">
+      <thead>
+        <tr class="m-band"><th scope="col"><span class="vh">Tool</span></th><th colspan="5" scope="colgroup">Platforms</th><th colspan="4" scope="colgroup" class="m-cap1">Capabilities</th><th scope="col"><span class="vh">Price</span></th></tr>
+        <tr><th scope="col">Tool</th><th scope="col"><abbr title="Windows">Win</abbr></th><th scope="col"><abbr title="Mac">Mac</abbr></th><th scope="col"><abbr title="Linux">Linux</abbr></th><th scope="col"><abbr title="iPad">iPad</abbr></th><th scope="col"><abbr title="Web">Web</abbr></th><th scope="col" class="m-cap1"><abbr title="Scaled measurement">Measure</abbr></th><th scope="col"><abbr title="Team review">Team</abbr></th><th scope="col"><abbr title="Compare revisions">Compare</abbr></th><th scope="col"><abbr title="Checklist review">Checklist</abbr></th><th scope="col">Price</th></tr>
+      </thead>
+      <tbody>
+          <tr class="m-group" data-group="sets"><th colspan="11" scope="colgroup" id="sets"><span class="m-group-name">Built for drawing sets</span> <span class="m-group-sub">Markup and scaled measurement organized around sheets.</span></th></tr>
+          <tr class="m-row" id="bluebeam" data-group="sets" data-plat="win ipad web">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="bluebeam-d"><span class="m-tool">Bluebeam Revu</span><span class="m-maker">Bluebeam</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-part"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">iPad: partly, iOS app</span><span class="m-txt">iOS app</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes, Bluebeam Cloud</span><span class="m-txt">Bluebeam Cloud</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, with takeoff</span><span class="m-txt">with takeoff</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Team review: yes, Studio Sessions</span><span class="m-txt">Studio Sessions</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, sheet comparison</span><span class="m-txt">sheet comparison</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Subscription</td>
           </tr>
-        </thead>
-        <tbody>
-          <tr class="g-group"><th colspan="11" scope="colgroup">Built for drawing sets</th></tr>
-          <tr><th scope="row"><a href="#bluebeam">1.&nbsp;Bluebeam Revu</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Subscription</td></tr>
-          <tr><th scope="row"><a href="#drawboard-pdf">2.&nbsp;Drawboard PDF</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes g-word">paid tiers</td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Free tier, subscription</td></tr>
-          <tr><th scope="row"><a href="#ncored">3.&nbsp;Ncored</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Subscription or one-time</td></tr>
-          <tr><th scope="row"><a href="#pdf-studio">4.&nbsp;PDF Studio Pro</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">One-time</td></tr>
-          <tr><th scope="row"><a href="#pdf-xchange">5.&nbsp;PDF-XChange Editor</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">One-time</td></tr>
-          <tr><th scope="row"><a href="#polypdf">6.&nbsp;PolyPDF</a></th><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Free</td></tr>
-          <tr class="g-group"><th colspan="11" scope="colgroup">Built around a review process</th></tr>
-          <tr><th scope="row"><a href="#adequate">7.&nbsp;Adequate Design Review</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-price">One-time</td></tr>
-          <tr><th scope="row"><a href="#drawboard-projects">8.&nbsp;Drawboard Projects</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Subscription</td></tr>
-          <tr class="g-group"><th colspan="11" scope="colgroup">General PDF editors</th></tr>
-          <tr><th scope="row"><a href="#acrobat">9.&nbsp;Adobe Acrobat Pro</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Subscription</td></tr>
-          <tr><th scope="row"><a href="#foxit">10.&nbsp;Foxit PDF Editor</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Subscription</td></tr>
-          <tr><th scope="row"><a href="#master-pdf">11.&nbsp;Master PDF Editor</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">One-time</td></tr>
-          <tr><th scope="row"><a href="#pdf-expert">12.&nbsp;PDF Expert</a></th><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Subscription</td></tr>
-          <tr class="g-group"><th colspan="11" scope="colgroup">Reading, notes and sketching</th></tr>
-          <tr><th scope="row"><a href="#documents">13.&nbsp;Documents</a></th><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Free tier, subscription</td></tr>
-          <tr><th scope="row"><a href="#trace">14.&nbsp;Morpholio Trace</a></th><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Subscription</td></tr>
-          <tr><th scope="row"><a href="#okular">15.&nbsp;Okular</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Free</td></tr>
-          <tr><th scope="row"><a href="#preview">16.&nbsp;Preview &amp; Markup</a></th><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Free</td></tr>
-          <tr><th scope="row"><a href="#xournalpp">17.&nbsp;Xournal++</a></th><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-yes"><span aria-hidden="true">&#9679;</span><span class="vh">yes</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-no"><span aria-hidden="true">&ndash;</span><span class="vh">no</span></td><td class="g-price">Free</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+          <tr class="m-detail" id="bluebeam-d" data-group="sets">
+            <td colspan="11"><div class="d-body"><p>Tool chests of saved markups, a markups list you can sort and export, calibrated measurement and takeoff, sheet comparison, and Studio Sessions for live review with consultants.</p><p>The full app is Windows only. Revu for iPad was retired at the end of 2025, so Mac, iPad and Linux users get Bluebeam Cloud in the browser or the iOS app, which does less.</p><p class="d-meta">Price: About $260&ndash;440 per user per year &middot; Also on iPhone &middot; <a href="https://www.bluebeam.com/product/markups-and-data/" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="drawboard-pdf" data-group="sets" data-plat="win mac ipad web">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="drawboard-pdf-d"><span class="m-tool">Drawboard PDF</span><span class="m-maker">Drawboard</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></td><td class="m-part m-cap1"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Scaled measurement: partly, Pro Plus tiers</span><span class="m-txt">Pro Plus tiers</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Team review: yes, shared documents</span><span class="m-txt">shared documents</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Free tier, subscription</td>
+          </tr>
+          <tr class="m-detail" id="drawboard-pdf-d" data-group="sets">
+            <td colspan="11"><div class="d-body"><p>Drawboard&rsquo;s single-user app, designed around pen input on a tablet. The free tier covers ink, shapes, text and signatures. Pro syncs up to 50 documents. Measurement is in Pro Plus and Pro Unlimited.</p><p class="d-meta">Price: Free. Paid tiers $6.99&ndash;13.33 a month, billed annually &middot; Also on Android &middot; <a href="https://www.drawboard.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="ncored" data-group="sets" data-plat="win mac">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="ncored-d"><span class="m-tool">Ncored</span><span class="m-maker">Noir architects</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Scaled measurement: no, not listed</span><span class="m-txt">not listed</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Subscription or one-time</td>
+          </tr>
+          <tr class="m-detail" id="ncored-d" data-group="sets">
+            <td colspan="11"><div class="d-body"><p>A PDF editor made by an architecture studio for large CAD and BIM exports, the 50&ndash;200&nbsp;MB sets that make general PDF apps lag on zoom and pan. Redlines, notes, shapes and large-format printing, with files kept on your machine.</p><p class="d-meta">Price: Subscription or one-time license &middot; <a href="https://ncored.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="pdf-studio" data-group="sets" data-plat="win mac linux">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="pdf-studio-d"><span class="m-tool">PDF Studio Pro</span><span class="m-maker">Qoppa</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, document comparison</span><span class="m-txt">document comparison</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">One-time</td>
+          </tr>
+          <tr class="m-detail" id="pdf-studio-d" data-group="sets">
+            <td colspan="11"><div class="d-body"><p>Markup, calibrated measurement and document comparison on Windows, Mac and Linux, for a one-time license.</p><p class="d-meta">Price: One-time license &middot; <a href="https://www.qoppa.com/pdfstudio/" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="pdf-xchange" data-group="sets" data-plat="win">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="pdf-xchange-d"><span class="m-tool">PDF-XChange Editor</span><span class="m-maker">PDF-XChange</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, length, perimeter, area</span><span class="m-txt">length, perimeter, area</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">One-time</td>
+          </tr>
+          <tr class="m-detail" id="pdf-xchange-d" data-group="sets">
+            <td colspan="11"><div class="d-body"><p>A Windows editor for one person working alone. Clouds, callouts, stamps, and calibrated length, perimeter and area measurement. It has no shared review.</p><p class="d-meta">Price: One-time license &middot; <a href="https://www.pdf-xchange.com/product/pdf-xchange-editor" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="polypdf" data-group="sets" data-plat="ipad">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="polypdf-d"><span class="m-tool">PolyPDF</span><span class="m-maker">PolyPDF</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, snaps to lines</span><span class="m-txt">snaps to lines</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no, not yet</span><span class="m-txt">not yet</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="polypdf-d" data-group="sets">
+            <td colspan="11"><div class="d-body"><p>A new iPad app for drawings. Callouts, discipline colors, and measurement of lengths, areas and angles at a set scale, with line detection that snaps to the drawing. Sync and team review are not out yet.</p><p class="d-meta">Price: Free &middot; Also on iPhone &middot; <a href="https://polypdf.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-group" data-group="review"><th colspan="11" scope="colgroup" id="review"><span class="m-group-name">Built around a review process</span> <span class="m-group-sub">Review kept as a record: issues, checklists, versions.</span></th></tr>
+          <tr class="m-row" id="adequate" data-group="review" data-plat="win mac linux">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="adequate-d"><span class="m-tool">Adequate Design Review</span><span class="m-maker">Adequate Design &middot; in beta</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no, runs locally</span><span class="m-txt">runs locally</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, revision overlay</span><span class="m-txt">revision overlay</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Checklist review: yes</span></td><td class="m-price">One-time</td>
+          </tr>
+          <tr class="m-detail" id="adequate-d" data-group="review">
+            <td colspan="11"><div class="d-body"><p>For reviewing a set against a checklist rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.</p><p>Runs locally and offline on Windows, Mac and Linux, and nothing leaves your machine. It is for one reviewer, not live team sessions.</p><p class="d-disclosure">Disclosure: I make it, to replace my own Bluebeam, Excel and Affinity workflow.</p><p class="d-meta">Price: $400 one-time after the beta &middot; <a href="https://adequate.design" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="drawboard-projects" data-group="review" data-plat="win ipad web">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="drawboard-projects-d"><span class="m-tool">Drawboard Projects</span><span class="m-maker">Drawboard</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Team review: yes, issues, versions, free guests</span><span class="m-txt">issues, versions, free guests</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="drawboard-projects-d" data-group="review">
+            <td colspan="11"><div class="d-body"><p>Drawboard&rsquo;s team product for drawing review. Drawings live in one project with versions, markups sync live, and issues are pinned to a spot on a sheet with an owner and a status. Clients and consultants join as guests without a paid license.</p><p class="d-meta">Price: Subscription, per user &middot; <a href="https://www.drawboard.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-group" data-group="editors"><th colspan="11" scope="colgroup" id="editors"><span class="m-group-name">General PDF editors</span> <span class="m-group-sub">Full PDF editors that also handle drawings.</span></th></tr>
+          <tr class="m-row" id="acrobat" data-group="editors" data-plat="win mac ipad web">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="acrobat-d"><span class="m-tool">Adobe Acrobat Pro</span><span class="m-maker">Adobe</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Team review: yes, shared review</span><span class="m-txt">shared review</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, file comparison</span><span class="m-txt">file comparison</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="acrobat-d" data-group="editors">
+            <td colspan="11"><div class="d-body"><p>A general PDF editor that many firms already license. Comments, drawing markups, calibrated measurement, file comparison and shared review.</p><p>It has no tool chest or sortable markups list.</p><p class="d-meta">Price: Subscription &middot; Also on iPhone, Android &middot; <a href="https://www.adobe.com/acrobat/acrobat-pro.html" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="foxit" data-group="editors" data-plat="win mac ipad web">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="foxit-d"><span class="m-tool">Foxit PDF Editor</span><span class="m-maker">Foxit</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Team review: yes, shared review</span><span class="m-txt">shared review</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, file comparison</span><span class="m-txt">file comparison</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="foxit-d" data-group="editors">
+            <td colspan="11"><div class="d-body"><p>A general PDF editor with measurement, file comparison and shared review. Firms often license it for office documents.</p><p class="d-meta">Price: Subscription &middot; Also on iPhone, Android &middot; <a href="https://www.foxit.com/pdf-editor/" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="master-pdf" data-group="editors" data-plat="win mac linux">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="master-pdf-d"><span class="m-tool">Master PDF Editor</span><span class="m-maker">Code Industry</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, distance, perimeter, area</span><span class="m-txt">distance, perimeter, area</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">One-time</td>
+          </tr>
+          <tr class="m-detail" id="master-pdf-d" data-group="editors">
+            <td colspan="11"><div class="d-body"><p>A full PDF editor with a native Linux version. Annotations, page editing, OCR, and distance, perimeter and area tools.</p><p>Check how it sets a drawing scale before you rely on it for takeoff.</p><p class="d-meta">Price: One-time license &middot; <a href="https://code-industry.net/masterpdfeditor/" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="pdf-expert" data-group="editors" data-plat="mac ipad">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="pdf-expert-d"><span class="m-tool">PDF Expert</span><span class="m-maker">Readdle</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Scaled measurement: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="pdf-expert-d" data-group="editors">
+            <td colspan="11"><div class="d-body"><p>A PDF editor for Mac and iPad with Apple Pencil support. Highlights, shapes, ink, stamps and notes that sync across your devices.</p><p>It does not measure to scale.</p><p class="d-meta">Price: Subscription &middot; Also on iPhone &middot; <a href="https://pdfexpert.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-group" data-group="notes"><th colspan="11" scope="colgroup" id="notes"><span class="m-group-name">Reading, notes and sketching</span> <span class="m-group-sub">Light markup on a tablet or desktop.</span></th></tr>
+          <tr class="m-row" id="documents" data-group="notes" data-plat="ipad">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="documents-d"><span class="m-tool">Documents</span><span class="m-maker">Readdle</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Scaled measurement: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Free tier, subscription</td>
+          </tr>
+          <tr class="m-detail" id="documents-d" data-group="notes">
+            <td colspan="11"><div class="d-body"><p>A file manager that opens PDFs with annotation built in. For carrying a set to site, pulling files from cloud storage, and noting what you see on the sheet.</p><p class="d-meta">Price: Free, paid tier &middot; Also on iPhone &middot; <a href="https://documents.io/app" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="trace" data-group="notes" data-plat="mac ipad">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="trace-d"><span class="m-tool">Morpholio Trace</span><span class="m-maker">Morpholio</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-part m-cap1"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Scaled measurement: partly, scale-aware drawing</span><span class="m-txt">scale-aware drawing</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="trace-d" data-group="notes">
+            <td colspan="11"><div class="d-body"><p>Digital trace paper for sketching a design response over a plan or photo at scale. It does not track comments.</p><p class="d-meta">Price: Subscription &middot; Also on iPhone &middot; <a href="https://morpholio.com/trace" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="okular" data-group="notes" data-plat="win linux">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="okular-d"><span class="m-tool">Okular</span><span class="m-maker">KDE</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Scaled measurement: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="okular-d" data-group="notes">
+            <td colspan="11"><div class="d-body"><p>The default document viewer on KDE Linux desktops. Highlights, notes, lines, shapes and stamps, saved into the PDF. It does not measure.</p><p class="d-meta">Price: Free, open source &middot; <a href="https://okular.kde.org" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="preview" data-group="notes" data-plat="mac ipad">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="preview-d"><span class="m-tool">Preview &amp; Markup</span><span class="m-maker">Apple</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Scaled measurement: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="preview-d" data-group="notes">
+            <td colspan="11"><div class="d-body"><p>Built into Apple devices. Enough to circle something on one sheet and send it back, with nothing to install.</p><p class="d-meta">Price: Free, built in &middot; Also on iPhone &middot; <a href="https://support.apple.com/guide/preview/welcome/mac" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="xournalpp" data-group="notes" data-plat="win mac linux">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="xournalpp-d"><span class="m-tool">Xournal++</span><span class="m-maker">Open source</span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Scaled measurement: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Checklist review: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="xournalpp-d" data-group="notes">
+            <td colspan="11"><div class="d-body"><p>Handwriting and sketching over a PDF in layers, with pen pressure. Runs on Linux with a drawing tablet.</p><p class="d-meta">Price: Free, open source &middot; <a href="https://xournalpp.github.io" rel="noopener">Website</a></p></div></td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="m-none" id="noMatch" hidden>No tool here runs on every platform selected. Clear one to see more.</p>
 
   <div class="chooser-notes">
     <section id="platforms">
@@ -518,5 +299,67 @@
 </div>
 
 <script src="assets/js/ui.js"></script>
+<script>
+/* Feature matrix: open and close detail rows, and filter rows by platform.
+   A row stays when its data-plat holds EVERY selected platform; ?p= keeps
+   the choice. Without this script every row and detail row shows. */
+(function () {
+  'use strict';
+  document.documentElement.classList.add('js');
+  var rows = [].slice.call(document.querySelectorAll('.m-row'));
+  var groups = [].slice.call(document.querySelectorAll('.m-group'));
+  var toggles = [].slice.call(document.querySelectorAll('#controls [data-plat]'));
+  var count = document.getElementById('resultCount');
+  var clear = document.getElementById('clearPlat');
+  var none = document.getElementById('noMatch');
+  function detail(row) { return document.getElementById(row.id + '-d'); }
+  function isOpen(row) { return row.querySelector('.m-open').getAttribute('aria-expanded') === 'true'; }
+  function setOpen(row, open) {
+    row.querySelector('.m-open').setAttribute('aria-expanded', open ? 'true' : 'false');
+    detail(row).hidden = !open || row.hidden;
+  }
+
+  // detail rows close once the script runs; a #tool hash opens that one
+  rows.forEach(function (row) {
+    setOpen(row, false);
+    row.querySelector('.m-open').addEventListener('click', function () { setOpen(row, !isOpen(row)); });
+  });
+  var target = location.hash && document.getElementById(location.hash.slice(1));
+  if (target && target.classList.contains('m-row')) setOpen(target, true);
+
+  var sel = {};
+  try {
+    (new URLSearchParams(location.search).get('p') || '').split(',').forEach(function (k) {
+      if (toggles.some(function (t) { return t.dataset.plat === k; })) sel[k] = true;
+    });
+  } catch (e) {}
+
+  function apply() {
+    var keys = Object.keys(sel), shown = 0;
+    rows.forEach(function (row) {
+      var have = ' ' + row.dataset.plat + ' ';
+      row.hidden = !keys.every(function (k) { return have.indexOf(' ' + k + ' ') >= 0; });
+      setOpen(row, isOpen(row));
+      if (!row.hidden) shown++;
+    });
+    groups.forEach(function (g) {
+      g.hidden = !rows.some(function (r) { return r.dataset.group === g.dataset.group && !r.hidden; });
+    });
+    toggles.forEach(function (t) { UI.press(t, !!sel[t.dataset.plat]); });
+    count.textContent = keys.length ? shown + ' of ' + rows.length + ' tools' : rows.length + ' tools';
+    clear.hidden = !keys.length;
+    none.hidden = shown > 0;
+    try { history.replaceState(null, '', (keys.length ? '?p=' + keys.join(',') : location.pathname) + location.hash); } catch (e) {}
+  }
+  toggles.forEach(function (t) {
+    t.addEventListener('click', function () {
+      if (sel[t.dataset.plat]) delete sel[t.dataset.plat]; else sel[t.dataset.plat] = true;
+      apply();
+    });
+  });
+  clear.addEventListener('click', function () { sel = {}; apply(); });
+  apply();
+})();
+</script>
 </body>
 </html>
