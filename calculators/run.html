@@ -533,8 +533,8 @@
      { L: up,   name: 'Round up',   gloss: 'fewest pieces of drift the other way' }].forEach(function (r) {
       if (r.L !== near && r.L.spacing === near.spacing) return;   // coincident — one row speaks
       var over = r.L.spacing > p.a;
-      html += rowHtml(r.name, r.gloss + (over ? ' — exceeds the max spacing' : ''),
-                      escapeHtml(fmt(r.L.spacing)) + (over ? ' <span class="snap-gloss">over ' + escapeHtml(fmt(p.a)) + '</span>' : ''),
+      html += rowHtml(r.name, r.gloss,
+                      (over ? '<span class="is-void">' + escapeHtml(fmt(r.L.spacing)) + '</span> <span class="void-why">over ' + escapeHtml(fmt(p.a)) + '</span>' : escapeHtml(fmt(r.L.spacing))),
                       escapeHtml(NumberLine.formatResidual(r.L.drift, state.target)) + ' drift',
                       r.L === near);
     });

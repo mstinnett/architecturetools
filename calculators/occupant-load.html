@@ -342,7 +342,7 @@
     } else {
       html += rowHtml('Occupant load', '§1004.5 says "not less than" the quotient — fractions read up', '<span class="fact">' + up + '</span>', '+' + sig(up - exact, 2) + ' person of rounding', true);
       html += rowHtml('Exact quotient', areaBoth(result.area_mm2) + ' ÷ ' + fx.f + ' ft²', escapeHtml(sig(exact, 2)), '—', false);
-      html += rowHtml('Rounded down', 'below the "not less than" floor — the arithmetic, not a usable count', String(down), '−' + sig(exact - down, 2), false, 'is-ref');
+      html += rowHtml('Rounded down', 'the arithmetic, not a usable count', '<span class="is-void">' + down + '</span> <span class="void-why">under "not less than"</span>', '−' + sig(exact - down, 2), false, 'is-ref');
       html += rowHtml('Headroom', 'area you could add before the count reaches ' + (up + 1), escapeHtml(sig(up * fx.f - ft2, 1)) + ' ft²', '—', false, 'is-ref');
     }
     els.olRows.innerHTML = html;

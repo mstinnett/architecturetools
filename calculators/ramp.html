@@ -59,12 +59,11 @@
   .flags:empty { display: none; }
   .flags { margin: var(--space-md) 0 0; padding: 0; list-style: none; }
   .flags li { font-size: var(--text-sm); color: var(--ink); padding: 0.4rem 0.6rem; margin-bottom: 0.35rem;
-              border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: var(--radius); }
+              border-left: 3px solid var(--ink-2); background: transparent; border-radius: 0; }
   .flags li.quiet { border-left-color: var(--ink-3); background: transparent; color: var(--ink-2); }
 
   .cite { margin-top: var(--space-md); font-size: var(--text-xs); color: var(--ink-2); line-height: 1.7; }
   .cite b { color: var(--ink); font-weight: 400; }
-  .warn { color: var(--accent); }
 
   @media (max-width: 600px) {
     .snap-name { width: 118px; }
@@ -442,8 +441,8 @@
     rows += rowHtml('Built longer', 'to ' + grids[state.gridIx][1] + ', for a max: used above',
       escapeHtml(fmtLen(R.built.longer)), escapeHtml(oneTo(R.slope.longer)), false);
     rows += rowHtml('Built nearest', 'to ' + grids[state.gridIx][1],
-      escapeHtml(fmtLen(R.built.nearest)) + (nearShort ? ' <span class="snap-gloss warn">shorter than exact, so steeper</span>' : ''),
-      '<span' + (nearShort && R.slope.nearest > REF.max + 1e-12 ? ' class="warn"' : '') + '>' + escapeHtml(oneTo(R.slope.nearest)) + '</span>', false);
+      escapeHtml(fmtLen(R.built.nearest)) + (nearShort ? ' <span class="snap-gloss">shorter than exact, so steeper</span>' : ''),
+      (nearShort && R.slope.nearest > REF.max + 1e-12 ? '<span class="is-void">' + escapeHtml(oneTo(R.slope.nearest)) + '</span> <span class="void-why">over 1:12</span>' : escapeHtml(oneTo(R.slope.nearest))), false);
 
     if (landings > 0) {
       var landTxt = state.turn === 'l' ? fmtLen(Math.max(W, L)) + ' × ' + fmtLen(Math.max(W, L))

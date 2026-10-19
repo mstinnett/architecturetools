@@ -98,8 +98,8 @@
     <h1>Stairs</h1>
     <p>Type the floor-to-floor height. The answer is the fewest equal risers
        that stay at or under the code maximum you pick, with its treads and
-       total run. Every other workable count is listed below it. Pick one to
-       draw it instead.</p>
+       total run. The counts around it are listed below it. Pick one to draw
+       it instead.</p>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
@@ -461,7 +461,7 @@
       var runU = (r.n - 1) * treadUsed;
       rows += '<button type="button" class="cand-row' + (r.n === selN ? ' sel' : '') + '" data-n="' + r.n + '" aria-pressed="' + (r.n === selN) + '">'
         + '<span class="c-n">' + r.n + (r.n === anchor ? ' ·' : '') + '</span>'
-        + '<span class="c-riser">' + escapeHtml(fmtLen(r.riser)) + '</span>'
+        + '<span class="c-riser' + (within(r.riser, ref) ? '' : ' is-void') + '">' + escapeHtml(fmtLen(r.riser)) + '</span>'
         + '<span class="c-vs">' + vsLimit(r.riser, ref) + '</span>'
         + '<span class="c-run">' + escapeHtml(fmtLen(runU)) + '</span>'
         + '</button>';
@@ -492,7 +492,8 @@
     else if (sel.n === anchor && sel.riser <= ref.riserMax) basis = 'The fewest risers at or under the ' + ref.label + ' maximum of ' + fmtLen(ref.riserMax) + '.';
     else if (sel.riser > ref.riserMax) basis = 'Over the ' + ref.label + ' maximum of ' + fmtLen(ref.riserMax) + '.' + (anchor !== sel.n ? ' ' + anchor + ' risers is the fewest that stay under it.' : '');
     else basis = 'Under the ' + ref.label + ' maximum of ' + fmtLen(ref.riserMax) + '. ' + anchor + ' risers is the fewest that stay under it.';
-    els.answerLine.innerHTML = '<div class="sa-main"><b>' + sel.n + ' riser' + (sel.n === 1 ? '' : 's') + ' of ' + escapeHtml(fmtLen(sel.riser)) + '</b>, '
+    var riserFace = within(sel.riser, ref) ? escapeHtml(fmtLen(sel.riser)) : '<span class="is-void">' + escapeHtml(fmtLen(sel.riser)) + '</span>';
+    els.answerLine.innerHTML = '<div class="sa-main"><b>' + sel.n + ' riser' + (sel.n === 1 ? '' : 's') + ' of ' + riserFace + '</b>, '
       + treadsN + ' tread' + (treadsN === 1 ? '' : 's') + ' of ' + escapeHtml(fmtLen(treadUsed))
       + ', total run ' + escapeHtml(fmtLen(runAll)) + '</div>'
       + '<div class="sa-basis">' + escapeHtml(basis) + '</div>';

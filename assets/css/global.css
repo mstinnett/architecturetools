@@ -394,6 +394,15 @@ html[data-scheme="dark"] .scheme-toggle .icon-moon { display: none; }
 .mini-pill.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
                     box-shadow: var(--shadow-press); transform: translateY(1px); }
 
+/* void — a value outside a code or system limit, struck through like a
+   voided figure on a drawing. It stays legible (how far off it is matters)
+   and always sits beside its reason in words, which screen readers hear;
+   the strike adds no color, because the site locates values against
+   limits and never grades them. Advisory rules (comfort, rules of thumb)
+   are never voided. */
+.is-void { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: currentColor; color: var(--ink-3); }
+.void-why { font-size: var(--text-xs); color: var(--ink-2); }
+
 /* small key — the smallest raised key, for shortcuts that sit beside a field
    (a link or a button). .is-suggested marks the one that fits the reading. */
 .key-sm { display: inline-flex; align-items: baseline; gap: 0.3rem; padding: 0.15rem 0.5rem;

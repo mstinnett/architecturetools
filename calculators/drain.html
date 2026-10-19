@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Drain -- architecture.tools</title>
-<meta name="description" content="Minimum slope for drainage, both ways: the height a pipe or surface uses over its run, pipe and hangers included, or the length an available height allows. Drop rounded to how it is built, with the rounding that lands under the minimum flagged.">
+<meta name="description" content="Minimum slope for drainage, both ways: the height a pipe or surface uses over its run, pipe and hangers included, or the length an available height allows. Drop rounded to how it is built, with any rounding that lands under the minimum struck through.">
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
 <script>
     window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
@@ -75,9 +75,6 @@
 
   .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
                 color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
-  .flag { font-size: var(--text-xs); padding: 0.05rem 0.4rem; border-radius: var(--radius); white-space: nowrap; }
-  .flag.bad { background: var(--accent); color: var(--accent-ink); }
-  .flag.ok { color: var(--ink-2); border: var(--border-light); }
   .snap-resid { width: auto; min-width: 120px; }
   .lede-line { font-size: var(--text-base); margin: 0 0 var(--space-sm); }
   .lede-line b { font-weight: 500; color: var(--accent); }
@@ -474,13 +471,18 @@
       + '<div class="snap-value">' + value + '</div>'
       + '<div class="snap-resid">' + resid + '</div></div>';
   }
-  function flagFor(r, lim, hNeeded, hAvail) {
+  // why a value is outside a limit, in words, or null when it is within
+  function whyVoid(r, lim, hNeeded, hAvail) {
     var c = Drain.check(r, lim.min, lim.max);
-    if (c === 'under') return '<span class="flag bad">under the minimum</span>';
-    if (c === 'over') return '<span class="flag bad">over the maximum</span>';
-    if (hAvail != null && hNeeded > hAvail) return '<span class="flag bad">over the height by ' + esc(fmtDiff(hNeeded - hAvail)) + '</span>';
-    return '<span class="flag ok">meets the minimum</span>';
+    if (c === 'under') return 'under the ' + lim.minFace + ' minimum';
+    if (c === 'over') return 'over the ' + lim.maxFace + ' maximum';
+    if (hAvail != null && hNeeded > hAvail) return 'over the height by ' + fmtDiff(hNeeded - hAvail);
+    return null;
   }
+  // a value, struck when it is outside a limit; the reason goes in the row's
+  // right-hand column (global.css .is-void)
+  function voidIf(valueHtml, why) { return why ? '<span class="is-void">' + valueHtml + '</span>' : valueHtml; }
+  function whyCell(why) { return why ? '<span class="void-why">' + esc(why) + '</span>' : ''; }
 
   function renderAnswer(solved, answer, lim, odU, alU, hAvail) {
     var L = solved.run, d = solved.rise, s = d / L;
@@ -520,16 +522,19 @@
 
     var r = '';
     // the answer leads
-    if (answer === 'height') r += rowHtml('Height used', 'drop + pipe + allowance', esc(fmtV(hUsed)), flagFor(s, lim, hUsed, null), true);
+    var w0 = whyVoid(s, lim, hUsed, null);
+    if (answer === 'height') r += rowHtml('Height used', 'drop + pipe + allowance', voidIf(esc(fmtV(hUsed)), w0), whyCell(w0), true);
     if (answer === 'run') r += rowHtml('Longest run', 'at ' + esc(Slope.faceOf(s)), esc(fmtRunMax(L)), 'floored to the ' + (state.target === 'metric' ? 'mm' : '1/8"'), true);
-    if (answer === 'slope') r += rowHtml('Slope', 'over this length', esc(slopeText(s)), flagFor(s, lim, hUsed, null), true);
+    if (answer === 'slope') r += rowHtml('Slope', 'over this length', voidIf(esc(slopeText(s)), w0), whyCell(w0), true);
     r += rowHtml('Drop', 'exact', esc(fmtExact(d)), solved.leg === 'rise' && solved.quant ? esc(NumberLine.formatResidual(solved.quant, state.target)) : '', false);
     r += '<div class="rows-label">Drop as built, to ' + esc(inc.label) + '</div>';
     if (down === up) {
-      r += rowHtml('On a step', esc(slopeText(sDown)), esc(fmtV(down)), flagFor(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit), false);
+      var wS = whyVoid(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit);
+      r += rowHtml('On a step', esc(slopeText(sDown)), voidIf(esc(fmtV(down)), wS), whyCell(wS), false);
     } else {
-      r += rowHtml('Rounded down', esc(slopeText(sDown)), esc(fmtV(down)) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(down, odU, alU))) + '</span>', flagFor(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit), false);
-      r += rowHtml('Rounded up', esc(slopeText(sUp)), esc(fmtV(up)) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(up, odU, alU))) + '</span>', flagFor(sUp, lim, Drain.heightUsed(up, odU, alU), hLimit), false);
+      var wD = whyVoid(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit), wU = whyVoid(sUp, lim, Drain.heightUsed(up, odU, alU), hLimit);
+      r += rowHtml('Rounded down', esc(slopeText(sDown)), voidIf(esc(fmtV(down)), wD) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(down, odU, alU))) + '</span>', whyCell(wD), false);
+      r += rowHtml('Rounded up', esc(slopeText(sUp)), voidIf(esc(fmtV(up)), wU) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(up, odU, alU))) + '</span>', whyCell(wU), false);
     }
     if (answer === 'run' && down !== d && down > 0) {
       // with the drop set out in steps, the longest run at the minimum is a
