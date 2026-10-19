@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stairs -- architecture.tools</title>
-<meta name="description" content="Type a floor-to-floor height and get every workable riser count: each riser height, how it compares with the IRC or IBC limit, the run it needs, and a section drawn to scale.">
+<meta name="description" content="Type a floor-to-floor height and get every workable riser count: each riser height, how it compares with the IRC or IBC limit (2018, 2021 or 2024), the run it needs, and a section drawn to scale.">
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
 <script>
     window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
@@ -130,8 +130,14 @@
   <div class="opt-line">
     <div class="opt-cluster">
       <span class="section-label">Code</span>
-      <button type="button" class="mini-pill" aria-pressed="false" data-ref="irc">IRC 2021</button>
-      <button type="button" class="mini-pill" aria-pressed="false" data-ref="ibc">IBC 2021</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-ref="irc">IRC</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-ref="ibc">IBC</button>
+    </div>
+    <div class="opt-cluster">
+      <span class="section-label">Edition</span>
+      <button type="button" class="mini-pill" aria-pressed="false" data-ed="2018">2018</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-ed="2021">2021</button>
+      <button type="button" class="mini-pill" aria-pressed="false" data-ed="2024">2024</button>
     </div>
   </div>
 
@@ -209,20 +215,29 @@
   var SHOW_ROWS = 6;            // counts within the limits listed before "show all"
   var VARY = 3 * IN / 8;        // the most risers in a flight may differ, both codes
 
-  /* The references — facts with citations, selected by the edition pill.
-     Limits live as EXACT inch lattice values; the page locates each
-     candidate against them and never colors a verdict. */
-  var REFS = {
-    irc: {
-      label: 'IRC 2021', riserMax: 7 * IN + 3 * (IN / 4), riserMin: null, treadMin: 10 * IN,
-      cite: 'IRC 2021: riser 7 3/4" max (R311.7.5.1), tread 10" min (R311.7.5.2).'
-    },
-    ibc: {
-      label: 'IBC 2021', riserMax: 7 * IN, riserMin: 4 * IN, treadMin: 11 * IN,
-      cite: 'IBC 2021: riser 4" min and 7" max, tread 11" min (1011.5.2).'
-    }
+  /* The references — facts with citations, selected by the code and edition
+     pills. Read against the ICC full text, 2026-10: the values are the same
+     in the 2018, 2021 and 2024 editions of each code; the 2024 IRC moved the
+     stair sections from R311 to R318. Limits live as EXACT inch lattice
+     values; the page locates each candidate against them and never colors
+     a verdict. */
+  var CODES = {
+    irc: { riserMax: 7 * IN + 3 * (IN / 4), riserMin: null, treadMin: 10 * IN },
+    ibc: { riserMax: 7 * IN, riserMin: 4 * IN, treadMin: 11 * IN }
   };
-  var CITE_TAIL = ' Both codes allow at most 3/8" between the tallest and shortest riser in a flight (IRC R311.7.5.1, IBC 1011.5.4). Local amendments and exceptions for spiral stairs, dwelling units and existing buildings change these limits. Check the edition your project is under.';
+  var EDITIONS = ['2018', '2021', '2024'];
+  function refFor(code, ed) {
+    var c = CODES[code], r = { label: code.toUpperCase() + ' ' + ed, riserMax: c.riserMax, riserMin: c.riserMin, treadMin: c.treadMin };
+    if (code === 'irc') {
+      var sec = ed === '2024' ? 'R318.7.5' : 'R311.7.5';
+      r.cite = r.label + ': riser 7 3/4" max (' + sec + '.1), tread 10" min (' + sec + '.2). Risers in a flight may differ by 3/8" at most (' + sec + '.1).';
+    } else {
+      r.cite = r.label + ': riser 4" min and 7" max, tread 11" min (1011.5.2). Risers in a flight may differ by 3/8" at most (1011.5.4). Dwelling units in R-2 and R-3 may use 7 3/4" and 10" (1011.5.2, exception 3'
+        + (ed === '2024' ? ', 2024: dwelling units not required to be Accessible or Type A' : '') + ').';
+    }
+    return r;
+  }
+  var CITE_TAIL = ' The values are the same in the 2018, 2021 and 2024 editions. Local amendments and exceptions for spiral stairs and existing buildings change them, so check the edition your project is under.';
 
   // the band of risers worth listing at all (display bound, not a rule)
   var SHOW_MIN = 4 * IN, SHOW_MAX = 8 * IN + IN / 2;
@@ -231,6 +246,7 @@
     rise: '', tread: '',
     defaultUnit: 'in',
     ref: 'irc',
+    ed: '2024',
     selN: null,                 // selected riser count; null → the anchor row
     showAll: false,             // list every count within the limits
     target: 'imperial',
@@ -394,7 +410,8 @@
     els.treadNote.innerHTML = tread && tread.error ? escapeHtml(tread.error) : '';
     renderBareAsk(rise);
 
-    var ref = REFS[state.ref];
+    var ref = refFor(state.ref, state.ed);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ed]'), function (el) { UI.press(el, el.dataset.ed === state.ed); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-ref]'), function (el) {
       UI.press(el, el.dataset.ref === state.ref);
     });
@@ -545,6 +562,7 @@
       if (state.rise && state.rise !== "9'-1 1/8\"") params.set('d', state.rise);
       if (state.tread) params.set('t', state.tread);
       if (state.ref !== 'irc') params.set('c', state.ref);
+      if (state.ed !== '2024') params.set('e', state.ed);
       if (state.selN != null) params.set('n', String(state.selN));
       if (state.target === 'imperial' ? state.grid.imperial.denom !== 16 : state.grid.metric.mm !== 1) {
         params.set('g', state.target === 'imperial' ? String(state.grid.imperial.denom) : state.grid.metric.mm + 'mm');
@@ -556,6 +574,7 @@
   function initFromURL() {
     var params = new URLSearchParams(location.search);
     if (params.get('c') === 'ibc') state.ref = 'ibc';
+    if (EDITIONS.indexOf(params.get('e')) >= 0) state.ed = params.get('e');
     var n = parseInt(params.get('n') || '', 10);
     if (Number.isInteger(n) && n >= 1 && n <= 1000) state.selN = n;
     var g = params.get('g');
@@ -577,6 +596,9 @@
   els.treadInput.addEventListener('focus', function () { setTimeout(function () { els.treadInput.select(); }, 0); });
   Array.prototype.forEach.call(document.querySelectorAll('[data-ref]'), function (el) {
     el.addEventListener('click', function () { state.ref = el.dataset.ref; render(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ed]'), function (el) {
+    el.addEventListener('click', function () { state.ed = el.dataset.ed; render(); });
   });
 
   // initial state — URL params override the worked example (9'-1 1/8" rise)

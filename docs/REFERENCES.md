@@ -40,7 +40,7 @@ of standards behind the tools with editions, access, and source links — is
 | §1005.5 | losing one of multiple exits can't halve capacity | egress-width (citation line) | memory |
 | §1010.1.1 | door clear width 32″ min | egress-width | memory |
 | §1011.2 | stair width 44″ min; 36″ serving fewer than 50 | egress-width | memory |
-| §1011.5.2 | riser 4″ min / 7″ max; tread 11″ min | stairs (IBC pill) | memory |
+| §1011.5.2 / §1011.5.4 | riser 4″ min / 7″ max; tread 11″ min; 3/8″ max variation in a flight; exception 3 (dwelling units 7 3/4″ / 10″) | stairs (IBC pill, 2018/2021/2024) | **verified** 2026-10-19 — read in the ICC full text, 2018, 2021 and 2024 editions; values unchanged |
 | §1020 | corridor width minimums | egress-width (cited at section level deliberately — subsection numbering moved between editions) | memory |
 | §1006.2.1.1 / §1006.3 | 3 exits at 501–1,000 occupants, 4 above 1,000 | exits | **verified** 2026-06-10 — search returned the provision's wording ([codes.iccsafe.org](https://codes.iccsafe.org/content/IBC2024P1/chapter-10-means-of-egress) result set) |
 | Table 1006.2.1 | single-exit allowances (per-occupancy OL + common-path caps) | exits — **as a pointer only**, draft-tagged; no rows shipped | not shipped as data |
@@ -52,8 +52,8 @@ of standards behind the tools with editions, access, and source links — is
 
 | Provision | What the suite takes from it | Cited by | Status |
 |---|---|---|---|
-| R311.7.5.1 | riser height max 7 3/4″ | stairs (IRC pill, default) | memory — standard value, unchanged across recent editions |
-| R311.7.5.2 | tread depth min 10″ | stairs | memory |
+| R311.7.5.1 (2024: R318.7.5.1) | riser height max 7 3/4″; 3/8″ max variation in a flight | stairs (IRC pill, default) | **verified** 2026-10-19 — ICC full text, 2018, 2021 and 2024; the 2024 IRC renumbered R311 to R318 |
+| R311.7.5.2 (2024: R318.7.5.2) | tread depth min 10″ | stairs | **verified** 2026-10-19 — ICC full text, 2018, 2021 and 2024 |
 
 ## IPC 2021 — International Plumbing Code
 
