@@ -70,6 +70,7 @@
   .tp-edit { position: absolute; z-index: 2; transform: translate(-50%, -50%); width: 5.6em; padding: 0 0.25rem; height: 1.25rem;
              font-family: 'SF Mono', ui-monospace, 'Menlo', monospace; font-size: 0.75rem; font-weight: 500; text-align: center;
              color: var(--accent); background: var(--answer-surface); border: 1px solid var(--rule-2); border-radius: var(--radius); outline: none; }
+  .tp-edit.is-all { color: var(--ink); font-weight: 400; }
   .tp-edit.is-v { transform: translate(-50%, -50%) rotate(-90deg); }
   .tp-edit:hover, .tp-edit:focus { border-color: var(--accent); }
   .tp-edit:focus { box-shadow: 0 0 0 2px var(--accent-soft); }
@@ -291,7 +292,8 @@
     if (!L || L.error || !W || W.error || !sl || sl.error) { els.out.style.display = 'none'; els.echo.style.display = 'none'; els.mathNote.innerHTML = ''; return; }
     var Lu = L.units, Wu = W.units, s = sl.ratio;
     if (!state.drains) state.drains = [{ x: Lu / 2, y: Wu / 2 }];
-    state.drains = state.drains.filter(function (d) { return d.x >= 0 && d.x <= Lu && d.y >= 0 && d.y <= Wu; });
+    // a smaller roof pulls its drains inside rather than losing them
+    state.drains.forEach(function (d) { d.x = Math.max(0, Math.min(Lu, d.x)); d.y = Math.max(0, Math.min(Wu, d.y)); });
     els.out.style.display = '';
 
     // echo
@@ -337,28 +339,55 @@
 
   // each drain is dimensioned from its nearest corner: across to the corner's
   // vertical edge (on the corner's top or bottom side) and along to its
-  // horizontal edge (on its left or right side). On each side the dimensions
-  // stack outward, shortest nearest the plan; the overall length and width sit
-  // outermost on the top and left. Six drains at most, so six on a side.
-  var TIER = 24, GAP = 16;
+  // horizontal edge (on its left or right side). Each CORNER keeps its own
+  // stack on each of its two sides, shortest nearest the plan, so dimensions
+  // from different corners never offset each other. A dimension too short for
+  // its label puts the label just outside its line, and the next one out
+  // steps past it. The overall length and width sit outermost on the top and
+  // left. Six drains at most.
+  var TIER = 24, GAP = 16, LBL = 20, SHORT_PX = 78;
   function dimsFor(L, W) {
-    var sides = { top: [], bottom: [], left: [], right: [] };
+    var sides = { top: {}, bottom: {}, left: {}, right: {} };
     state.drains.forEach(function (d, i) {
       var west = d.x <= L / 2, north = d.y <= W / 2;
       var ax = west ? d.x : L - d.x, ay = north ? d.y : W - d.y;
-      if (ax > 0) sides[north ? 'top' : 'bottom'].push({ i: i, axis: 'x', from: west ? 0 : L, to: d.x, len: ax, west: west, north: north });
-      if (ay > 0) sides[west ? 'left' : 'right'].push({ i: i, axis: 'y', from: north ? 0 : W, to: d.y, len: ay, west: west, north: north });
+      var corner = (north ? 'n' : 's') + (west ? 'w' : 'e');
+      function add(side, item) { (sides[side][corner] = sides[side][corner] || []).push(item); }
+      if (ax > 0) add(north ? 'top' : 'bottom', { i: i, axis: 'x', from: west ? 0 : L, to: d.x, len: ax, west: west, north: north });
+      if (ay > 0) add(west ? 'left' : 'right', { i: i, axis: 'y', from: north ? 0 : W, to: d.y, len: ay, west: west, north: north });
     });
-    Object.keys(sides).forEach(function (k) { sides[k].sort(function (a, b) { return a.len - b.len; }); });
+    Object.keys(sides).forEach(function (sd) {
+      Object.keys(sides[sd]).forEach(function (c) { sides[sd][c].sort(function (a, b) { return a.len - b.len; }); });
+    });
     return sides;
+  }
+  // offsets for a scale k: each corner's stack in turn; returns each side's depth
+  function stackAt(sides, k) {
+    var depth = { top: 0, bottom: 0, left: 0, right: 0 };
+    Object.keys(sides).forEach(function (sd) {
+      Object.keys(sides[sd]).forEach(function (c) {
+        var cur = GAP;
+        sides[sd][c].forEach(function (d) {
+          d.short = d.len * k < SHORT_PX;
+          d.off = cur;
+          cur += TIER + (d.short ? LBL : 0);
+        });
+        depth[sd] = Math.max(depth[sd], cur);
+      });
+    });
+    return depth;
   }
   function drawPlan(L, W, s) {
     var avail = Math.min(els.plan.clientWidth || 640, 680);
-    var sides = dimsFor(L, W);
-    function margin(n) { return GAP + n * TIER + 8; }
-    var mT = margin(sides.top.length + 1), mL = margin(sides.left.length + 1);
-    var mB = sides.bottom.length ? margin(sides.bottom.length) : 16, mR = sides.right.length ? margin(sides.right.length) : 16;
-    var k = Math.min((avail - mL - mR) / L, 420 / W);
+    var sides = dimsFor(L, W), k = 1, depth, mT, mL, mB, mR;
+    // margins hang on which labels are short, which hangs on the scale: settle it twice
+    for (var pass = 0; pass < 2; pass++) {
+      depth = stackAt(sides, k);
+      mT = Math.max(depth.top, GAP) + TIER + 8; mL = Math.max(depth.left, GAP) + TIER + 8;
+      mB = depth.bottom ? depth.bottom + 8 : 16; mR = depth.right ? depth.right + 8 : 16;
+      k = Math.min((avail - mL - mR) / L, 420 / W);
+    }
+    depth = stackAt(sides, k);
     var w = Math.round(L * k + mL + mR), h = Math.round(W * k + mT + mB);
     fig = { k: k, mL: mL, mT: mT, w: w, h: h, L: L, W: W };
     function X(x) { return mL + x * k; }
@@ -388,8 +417,8 @@
     var edits = '';
     // one dimension: its line at a tier off a side, ticks, dashed extension
     // lines back to the corner's edge and to the drain, and its label
-    function dim(side, tier, d) {
-      var off = GAP + tier * TIER;
+    function dim(side, d) {
+      var off = d.off;
       if (side === 'top' || side === 'bottom') {
         var yl = side === 'top' ? Y(0) - off : Y(W) + off;
         var x1 = X(d.from), x2 = X(d.to), yEdge = side === 'top' ? Y(0) : Y(W), yDr = Y(state.drains[d.i].y);
@@ -398,9 +427,11 @@
         g += '<line class="tp-dl" x1="' + f(x1) + '" y1="' + f(yl) + '" x2="' + f(x2) + '" y2="' + f(yl) + '"/>';
         g += '<line class="tp-tk" x1="' + f(x1 - 3) + '" y1="' + f(yl + 3) + '" x2="' + f(x1 + 3) + '" y2="' + f(yl - 3) + '"/>';
         g += '<line class="tp-tk" x1="' + f(x2 - 3) + '" y1="' + f(yl + 3) + '" x2="' + f(x2 + 3) + '" y2="' + f(yl - 3) + '"/>';
-        var cx = (x1 + x2) / 2;
-        if (Math.abs(x2 - x1) < 74) cx = x2 + (x2 > x1 ? 40 : -40);    // too short: the label sits past the end
-        edits += label(d, cx, yl, false);
+        // too short for its label: the label sits just outside the line
+        var ly = d.short ? yl + (side === 'top' ? -LBL + 4 : LBL - 4) : yl;
+        // a short one also slides along, away from its corner, so it never meets the corner's other stack
+        var lxc = d.short ? x1 + (x2 > x1 ? 1 : -1) * 44 : (x1 + x2) / 2;
+        edits += label(d, Math.max(40, Math.min(w - 40, lxc)), ly, false);
       } else {
         var xl = side === 'left' ? X(0) - off : X(L) + off;
         var y1 = Y(d.from), y2 = Y(d.to), xEdge = side === 'left' ? X(0) : X(L), xDr = X(state.drains[d.i].x);
@@ -409,9 +440,9 @@
         g += '<line class="tp-dl" x1="' + f(xl) + '" y1="' + f(y1) + '" x2="' + f(xl) + '" y2="' + f(y2) + '"/>';
         g += '<line class="tp-tk" x1="' + f(xl - 3) + '" y1="' + f(y1 + 3) + '" x2="' + f(xl + 3) + '" y2="' + f(y1 - 3) + '"/>';
         g += '<line class="tp-tk" x1="' + f(xl - 3) + '" y1="' + f(y2 + 3) + '" x2="' + f(xl + 3) + '" y2="' + f(y2 - 3) + '"/>';
-        var cy = (y1 + y2) / 2;
-        if (Math.abs(y2 - y1) < 74) cy = y2 + (y2 > y1 ? 40 : -40);
-        edits += label(d, xl, cy, true);
+        var lx = d.short ? xl + (side === 'left' ? -LBL + 4 : LBL - 4) : xl;
+        var lyc = d.short ? y1 + (y2 > y1 ? 1 : -1) * 44 : (y1 + y2) / 2;
+        edits += label(d, lx, Math.max(40, Math.min(h - 40, lyc)), true);
       }
     }
     function label(d, x, y, vertical) {
@@ -420,13 +451,15 @@
         + ' aria-label="Drain ' + (d.i + 1) + ', ' + (d.axis === 'x' ? 'across from the ' + (d.west ? 'left' : 'right') : 'along from the ' + (d.north ? 'top' : 'bottom')) + ' edge"'
         + ' value="' + esc(fmtNear(d.len)) + '" style="left:' + f(x) + 'px;top:' + f(y) + 'px" spellcheck="false" autocomplete="off">';
     }
-    ['top', 'bottom', 'left', 'right'].forEach(function (side) { sides[side].forEach(function (d, t) { dim(side, t, d); }); });
+    Object.keys(sides).forEach(function (sd) { Object.keys(sides[sd]).forEach(function (c) { sides[sd][c].forEach(function (d) { dim(sd, d); }); }); });
     // the overall length and width, outermost on the top and left
-    var yo = Y(0) - (GAP + sides.top.length * TIER), xo = X(0) - (GAP + sides.left.length * TIER);
+    var yo = Y(0) - Math.max(depth.top, GAP), xo = X(0) - Math.max(depth.left, GAP);
     g += '<line class="tp-dl is-all" x1="' + f(X(0)) + '" y1="' + f(yo) + '" x2="' + f(X(L)) + '" y2="' + f(yo) + '"/>';
     g += '<line class="tp-dl is-all" x1="' + f(xo) + '" y1="' + f(Y(0)) + '" x2="' + f(xo) + '" y2="' + f(Y(W)) + '"/>';
-    g += '<text x="' + f(X(L / 2)) + '" y="' + f(yo - 5) + '" text-anchor="middle">' + esc(fmtNear(L)) + '</text>';
-    g += '<text x="' + f(xo - 5) + '" y="' + f(Y(W / 2)) + '" text-anchor="middle" transform="rotate(-90 ' + f(xo - 5) + ' ' + f(Y(W / 2)) + ')">' + esc(fmtNear(W)) + '</text>';
+    // the overall length and width are labels you can type into too; they
+    // write back to the length and width fields
+    edits += '<input class="tp-edit is-all" id="tpdL" data-overall="len" aria-label="Roof length" value="' + esc(fmtNear(L)) + '" style="left:' + f(X(L / 2)) + 'px;top:' + f(yo) + 'px" spellcheck="false" autocomplete="off">';
+    edits += '<input class="tp-edit is-all is-v" id="tpdW" data-overall="wid" aria-label="Roof width" value="' + esc(fmtNear(W)) + '" style="left:' + f(xo) + 'px;top:' + f(Y(W / 2)) + 'px" spellcheck="false" autocomplete="off">';
     if (state.drains.length) {
       var hp = highPoint(L, W, s);
       g += '<circle class="tp-high" cx="' + f(X(hp.x)) + '" cy="' + f(Y(hp.y)) + '" r="4"/>';
@@ -506,6 +539,15 @@
 
   // a typed dimension moves its drain: on Enter or when the label loses focus
   function commitDim(el) {
+    if (el.dataset.overall) {
+      var o = readDim(el.value), k = el.dataset.overall;
+      if (!o || o.error) { el.classList.add('is-bad'); el.title = o ? o.error : 'a length, e.g. 60\' or 18m'; return; }
+      var sys = statedSystem(el.value);
+      if (sys) setTarget(sys, k);
+      state.text[k] = el.value.trim(); field[k].value = state.text[k];
+      render();
+      return;
+    }
     var d = state.drains[+el.dataset.i]; if (!d) return;
     var v = readDim(el.value), from = +el.dataset.from, axis = el.dataset.axis, size = axis === 'x' ? fig.L : fig.W;
     if (!v || v.error || v.units > size) { el.classList.add('is-bad'); el.title = v && !v.error ? 'past the far edge' : 'a length, e.g. 12\'-6" or 3.8m'; return; }
