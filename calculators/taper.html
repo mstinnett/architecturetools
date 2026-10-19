@@ -54,7 +54,7 @@
   /* the plan: shaded bands of taper, drains you place and drag */
   .tp-wrap { position: relative; touch-action: none; user-select: none; -webkit-user-select: none; }
   .tp-wrap canvas { display: block; position: absolute; left: 0; top: 0; }
-  svg.tp { display: block; position: relative; max-width: 100%; height: auto; }
+  svg.tp { display: block; position: relative; max-width: 100%; height: auto; overflow: visible; }
   svg.tp text { font-family: var(--font-body); font-size: 12px; fill: var(--ink-2);
                 stroke: var(--answer-surface); stroke-width: 3px; paint-order: stroke; }
   svg.tp .tp-edge  { stroke: var(--nl-ink); stroke-width: 2; fill: none; }
@@ -387,9 +387,14 @@
       mB = depth.bottom ? depth.bottom + 8 : 16; mR = depth.right ? depth.right + 8 : 16;
       k = Math.min((avail - mL - mR) / L, 420 / W);
     }
+    // while a drain is dragged the layout holds still: a re-layout moves the
+    // plan under the pointer, which moves the drain, which re-lays it out. It
+    // settles once, on release. Stacks that outgrow the held margins draw past
+    // the edge of the drawing for that moment.
+    if (drag && drag.lock) { k = drag.lock.k; mL = drag.lock.mL; mT = drag.lock.mT; mR = drag.lock.mR; mB = drag.lock.mB; }
     depth = stackAt(sides, k);
     var w = Math.round(L * k + mL + mR), h = Math.round(W * k + mT + mB);
-    fig = { k: k, mL: mL, mT: mT, w: w, h: h, L: L, W: W };
+    fig = { k: k, mL: mL, mT: mT, mR: mR, mB: mB, w: w, h: h, L: L, W: W };
     function X(x) { return mL + x * k; }
     function Y(y) { return mT + y * k; }
     function f(n) { return n.toFixed(1); }
@@ -505,13 +510,14 @@
     if (!fig.L || (e.target.closest && e.target.closest('.tp-edit'))) return;
     var t = e.target.closest && e.target.closest('.tp-drain');
     var p = planAt(e);
+    var lock = { k: fig.k, mL: fig.mL, mT: fig.mT, mR: fig.mR, mB: fig.mB };
     if (t) {
-      drag = { i: +t.dataset.i, id: e.pointerId };
+      drag = { i: +t.dataset.i, id: e.pointerId, lock: lock };
     } else {
       if (p.raw.x < 0 || p.raw.x > fig.L || p.raw.y < 0 || p.raw.y > fig.W) return;
       if (state.drains.length >= MAX_DRAINS) { els.capNote.hidden = false; return; }
       state.drains.push({ x: p.x, y: p.y });
-      drag = { i: state.drains.length - 1, id: e.pointerId };
+      drag = { i: state.drains.length - 1, id: e.pointerId, lock: lock };
       render();
     }
     els.plan.setPointerCapture(e.pointerId);
