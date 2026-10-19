@@ -41,6 +41,7 @@ of standards behind the tools with editions, access, and source links — is
 | §1010.1.1 | door clear width 32″ min | egress-width | memory |
 | §1011.2 | stair width 44″ min; 36″ serving fewer than 50 | egress-width | memory |
 | §1011.5.2 / §1011.5.4 | riser 4″ min / 7″ max; tread 11″ min; 3/8″ max variation in a flight; exception 3 (dwelling units 7 3/4″ / 10″) | stairs (IBC pill, 2018/2021/2024) | **verified** 2026-10-19 — read in the ICC full text, 2018, 2021 and 2024 editions; values unchanged |
+| §1507.10.1 / §1507.11.1 / §1507.12.1 (2018: thermoplastic at §1507.13.1) | low-slope membranes 1/4″/ft min (built-up, modified bitumen, single-ply); coal-tar built-up 1/8″/ft | drain (low-slope roof membrane) | **verified** 2026-10-19 — read in the ICC full text, 2018, 2021 and 2024; values unchanged. 2021 merged thermoset and thermoplastic into §1507.12 Single-ply roofing, so §1507.13 became sprayed polyurethane foam |
 | §1020 | corridor width minimums | egress-width (cited at section level deliberately — subsection numbering moved between editions) | memory |
 | §1006.2.1.1 / §1006.3 | 3 exits at 501–1,000 occupants, 4 above 1,000 | exits | **verified** 2026-06-10 — search returned the provision's wording ([codes.iccsafe.org](https://codes.iccsafe.org/content/IBC2024P1/chapter-10-means-of-egress) result set) |
 | Table 1006.2.1 | single-exit allowances (per-occupancy OL + common-path caps) | exits — **as a pointer only**, draft-tagged; no rows shipped | not shipped as data |
@@ -54,6 +55,8 @@ of standards behind the tools with editions, access, and source links — is
 |---|---|---|---|
 | R311.7.5.1 (2024: R318.7.5.1) | riser height max 7 3/4″; 3/8″ max variation in a flight | stairs (IRC pill, default) | **verified** 2026-10-19 — ICC full text, 2018, 2021 and 2024; the 2024 IRC renumbered R311 to R318 |
 | R311.7.5.2 (2024: R318.7.5.2) | tread depth min 10″ | stairs | **verified** 2026-10-19 — ICC full text, 2018, 2021 and 2024 |
+| P2709.1 | shower floor slope 1/4″/ft min, 1/2″/ft max toward the drain | drain (shower floor) | **verified** 2026-10-19 — read in the ICC full text, 2018, 2021 and 2024; not renumbered |
+| R401.3 (+ exception) | grade falls 6″ min within the first 10′; drains or swales where barriers prevent it; impervious surfaces within 10′ at 2% min (in the exception) | drain (ground at a foundation; paving within 10′) | **verified** 2026-10-19 — read in the ICC full text, 2018, 2021 and 2024; not renumbered |
 
 ## IPC 2021 — International Plumbing Code
 
@@ -63,6 +66,7 @@ of standards behind the tools with editions, access, and source links — is
 | Table 403.1 — Business WC | 1 per 25 for the first 50, 1 per 50 for the remainder | fixture-calc | **verified** 2026-06-10 — ICC 2021 Significant Changes worked example ([iccsafe.org PDF](https://www.iccsafe.org/wp-content/uploads/2021_SigChanges_IPC_403.1.1.pdf) result) |
 | Table 403.1 — Business lavatories | 1 per 40 for the first 80, 1 per 80 for the remainder | fixture-calc | **verified** 2026-06-10 — same source |
 | Table 403.1 — A-1 water closets | male 1:125, female 1:65 | fixture-calc | **verified** 2026-06-10 — search returned the ratios with their 1,000-occupant worked example |
+| Table 704.1 (+ note a) | horizontal drainage pipe slope: 2 1/2″ and smaller 1/4″/ft, 3″–6″ 1/8″/ft, 8″ and larger 1/16″/ft; upstream of a grease interceptor 1/4″/ft | drain (DWV pipe) | **verified** 2026-10-19 — read in the ICC full text, 2018, 2021 and 2024; values unchanged |
 | Table 403.1 — all other ratios (A-2, A-3, E, F, M, S, R-2, drinking fountains, service sinks) | the page's remaining defaults | fixture-calc | **memory** — every one renders a `draft — check the table` tag until replaced from a checked copy (backlog records the procedure) |
 | §403.2 | separate facilities + small-occupancy exceptions | fixture-calc (citation line, named only) | memory |
 
@@ -85,6 +89,12 @@ of standards behind the tools with editions, access, and source links — is
 | ANSI/ASME Y14.1 sheet series | ANSI A–E sheet dimensions (8.5×11 … 34×44) | sheet-sizes | memory — standard published sizes; ARCH series is customary practice, no single standard cited |
 | ADA 2010 Standards §403.5.1 | 36″ minimum clear width of walking surfaces — the "36″ ADA floor" on the gondola aisle, checkout queue, and garment-rack info lines | l/furniture (catalog info lines) | **verified** 2026-07-19 — provision wording returned ([corada.com §403.5.1](https://www.corada.com/documents/2010ADAStandards/403-5-1), access-board.gov ch. 4) |
 | NKBA Kitchen Planning Guidelines | work aisle ≥42″ one cook / ≥48″ multi-cook; 36″ pass-only walkway — the kitchenette run's drawn 48″ aisle and note | l/furniture (kitchenette) | **verified** 2026-07-19 — guideline PDF ([media.nkba.org](https://media.nkba.org/uploads/2022/05/Kitchen-Planning-Guidelines.pdf)) |
+| IMC §307.2.1 / §307.2.2 | condensate line slope 1/8″/ft (1%) min; 3/4″ min with no decrease in size from the drain pan connection | drain (condensate line) | **verified** 2026-10-19 — read in the ICC full text, 2018, 2021 and 2024. The size reads "3/4-inch internal diameter" in 2018 and "3/4-inch pipe size" in 2021 and 2024 |
+| UPC §708.1 | horizontal drainage 1/4″/ft; 1/8″/ft for 4″ and larger only where 1/4″ is impractical and the AHJ approves (2024: building drain piping only) | drain (DWV note) | **verified** 2026-10-19 — IAPMO 2021 and 2024 UPC e-books (epubs.iapmo.org), read from the page images |
+| ADA 2010 Standards §305.2 / §403.3 | clear floor slope 1:48 max (305.2 exception); walking surface cross slope 1:48 max (403.3) | drain (shower and paving notes) | **verified** 2026-10-19 — ada.gov 2010 Standards text |
+| ASTM D1785 (PVC Sch. 40) / ASTM D2665 (DWV) | IPS outside diameters 3/4″ 1.050 … 8″ 8.625 | drain (pipe in the height) | **verified** 2026-10-19 against a published dimension table (engineeringtoolbox.com), spot-checked against Charlotte Pipe listings; ABS (D2661) assumed the same IPS diameters |
+| CISPI 301 (no-hub cast iron) | barrel outside diameters 1 1/2″ 1.90 … 8″ 8.38 | drain (pipe in the height) | **cross-checked** 2026-10-19 — manufacturer catalog values (Tyler Pipe, AB&I) seen through search summaries; the CISPI table itself not opened |
+| Gutter 1/16″/ft; paving elsewhere 1% | the usual minimums where the model codes set none | drain (gutter; paving elsewhere) | **trade practice** — labeled on the page as such, not a code value |
 
 The furniture catalog's remaining dimensions (mattress sizes, table sizing,
 cubicle footprints, Lozier gondola modules, clearance bands) are **trade
