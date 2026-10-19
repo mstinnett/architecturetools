@@ -63,6 +63,17 @@
   svg.tp .tp-high  { fill: var(--accent); }
   svg.tp .tp-val   { fill: var(--accent); font-weight: 500; font-size: 14px; }
   svg.tp .tp-dim   { stroke: var(--nl-axis); stroke-width: 1; }
+  svg.tp .tp-ext   { stroke: var(--nl-axis); stroke-width: 1; stroke-dasharray: 3 3; }
+  svg.tp .tp-dl    { stroke: var(--accent); stroke-width: 1.2; }
+  svg.tp .tp-dl.is-all { stroke: var(--nl-ink); }
+  svg.tp .tp-tk    { stroke: var(--accent); stroke-width: 1.4; }
+  .tp-edit { position: absolute; z-index: 2; transform: translate(-50%, -50%); width: 5.6em; padding: 0 0.25rem; height: 1.25rem;
+             font-family: 'SF Mono', ui-monospace, 'Menlo', monospace; font-size: 0.75rem; font-weight: 500; text-align: center;
+             color: var(--accent); background: var(--answer-surface); border: 1px solid var(--rule-2); border-radius: var(--radius); outline: none; }
+  .tp-edit.is-v { transform: translate(-50%, -50%) rotate(-90deg); }
+  .tp-edit:hover, .tp-edit:focus { border-color: var(--accent); }
+  .tp-edit:focus { box-shadow: 0 0 0 2px var(--accent-soft); }
+  .tp-edit.is-bad { border-color: var(--correction, #AF3D34); }
   .tp-hint { font-size: var(--text-xs); color: var(--ink-3); margin: 0.4rem 0 0; }
 
   .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
@@ -120,7 +131,8 @@
   <div id="out" style="display:none;">
     <div class="answer-card">
       <div class="tp-wrap" id="plan"></div>
-      <p class="tp-hint">Tap the plan to add a drain. Drag a drain to move it, or off the roof to remove it. Each band is <span id="bandStep">1&quot;</span> of taper.</p>
+      <p class="tp-hint">Tap the plan to add a drain, up to six. Drag a drain to move it, or off the roof to remove it, or type a dimension from its nearest corner. Each band is <span id="bandStep">1&quot;</span> of taper.</p>
+      <p class="tp-hint" id="capNote" hidden>Six drains is the most for one roof area here. Split a larger roof into drainage areas and lay out each one.</p>
       <div class="snap-rows" id="rows"></div>
       <p class="block-note">The curb or parapet stands above the high point, plus the flashing
          height your roofing system calls for. A cricket is the same taper turned across the
@@ -169,12 +181,15 @@
   var DEFAULT_GRID = { imperial: 3048, metric: 4800 };
   var STEP = { imperial: 6 * IN, metric: 100 * MM };     // drain placement
   var BAND = { imperial: IN, metric: 25 * MM };          // one shaded band of taper
+  // six drains on one roof area: more and the roof is better split into
+  // separate drainage areas, each with its own taper
+  var MAX_DRAINS = 6;
   var FIELDS = ['len', 'wid', 'slope'];
   var EXAMPLE = { len: "60'", wid: "40'", slope: '1/4"/ft' };
   var state = { text: {}, grid: DEFAULT_GRID.imperial, target: 'imperial', drains: null, sel: -1 };
 
   var els = {};
-  ['buildRow', 'echo', 'echoLine', 'echoAssume', 'out', 'plan', 'rows', 'mathNote', 'bandStep'].forEach(function (id) { els[id] = document.getElementById(id); });
+  ['buildRow', 'echo', 'echoLine', 'echoAssume', 'out', 'plan', 'rows', 'mathNote', 'bandStep', 'capNote'].forEach(function (id) { els[id] = document.getElementById(id); });
   var field = {}, note = {};
   FIELDS.forEach(function (k) { field[k] = document.getElementById(k + 'Input'); note[k] = document.getElementById(k + 'Note'); });
   var esc = UI.esc;
@@ -264,7 +279,7 @@
     return best;
   }
 
-  var fig = { k: 1, m: 28, w: 0, h: 0 };
+  var fig = { k: 1, mL: 28, mT: 28, w: 0, h: 0 };
   function render() {
     renderBuildRow();
     syncURL();
@@ -320,18 +335,40 @@
     return sum / (n * n);
   }
 
+  // each drain is dimensioned from its nearest corner: across to the corner's
+  // vertical edge (on the corner's top or bottom side) and along to its
+  // horizontal edge (on its left or right side). On each side the dimensions
+  // stack outward, shortest nearest the plan; the overall length and width sit
+  // outermost on the top and left. Six drains at most, so six on a side.
+  var TIER = 24, GAP = 16;
+  function dimsFor(L, W) {
+    var sides = { top: [], bottom: [], left: [], right: [] };
+    state.drains.forEach(function (d, i) {
+      var west = d.x <= L / 2, north = d.y <= W / 2;
+      var ax = west ? d.x : L - d.x, ay = north ? d.y : W - d.y;
+      if (ax > 0) sides[north ? 'top' : 'bottom'].push({ i: i, axis: 'x', from: west ? 0 : L, to: d.x, len: ax, west: west, north: north });
+      if (ay > 0) sides[west ? 'left' : 'right'].push({ i: i, axis: 'y', from: north ? 0 : W, to: d.y, len: ay, west: west, north: north });
+    });
+    Object.keys(sides).forEach(function (k) { sides[k].sort(function (a, b) { return a.len - b.len; }); });
+    return sides;
+  }
   function drawPlan(L, W, s) {
-    var avail = Math.min(els.plan.clientWidth || 640, 680), m = 28;
-    var k = Math.min((avail - 2 * m) / L, 420 / W);
-    var w = Math.round(L * k + 2 * m), h = Math.round(W * k + 2 * m);
-    fig = { k: k, m: m, w: w, h: h, L: L, W: W };
-    function X(x) { return m + x * k; }
-    function Y(y) { return m + y * k; }
+    var avail = Math.min(els.plan.clientWidth || 640, 680);
+    var sides = dimsFor(L, W);
+    function margin(n) { return GAP + n * TIER + 8; }
+    var mT = margin(sides.top.length + 1), mL = margin(sides.left.length + 1);
+    var mB = sides.bottom.length ? margin(sides.bottom.length) : 16, mR = sides.right.length ? margin(sides.right.length) : 16;
+    var k = Math.min((avail - mL - mR) / L, 420 / W);
+    var w = Math.round(L * k + mL + mR), h = Math.round(W * k + mT + mB);
+    fig = { k: k, mL: mL, mT: mT, w: w, h: h, L: L, W: W };
+    function X(x) { return mL + x * k; }
+    function Y(y) { return mT + y * k; }
+    function f(n) { return n.toFixed(1); }
     // the bands, on a canvas under the drawing
     var dpr = window.devicePixelRatio || 1;
     var cv = document.createElement('canvas');
     cv.width = Math.round(L * k * dpr); cv.height = Math.round(W * k * dpr);
-    cv.style.width = (L * k) + 'px'; cv.style.height = (W * k) + 'px'; cv.style.left = m + 'px'; cv.style.top = m + 'px';
+    cv.style.width = (L * k) + 'px'; cv.style.height = (W * k) + 'px'; cv.style.left = mL + 'px'; cv.style.top = mT + 'px';
     var ctx = cv.getContext('2d'), img = ctx.createImageData(cv.width, cv.height), px = img.data;
     var cs = getComputedStyle(document.documentElement);
     var acc = parseColor(cs.getPropertyValue('--accent')), band = BAND[state.target];
@@ -347,24 +384,66 @@
     }
     ctx.putImageData(img, 0, 0);
 
-    var g = '<rect class="tp-edge" x="' + X(0) + '" y="' + Y(0) + '" width="' + (L * k) + '" height="' + (W * k) + '"/>';
-    g += '<text x="' + X(L / 2) + '" y="' + (m - 9) + '" text-anchor="middle">' + esc(fmtNear(L)) + '</text>';
-    g += '<text x="' + (m - 9) + '" y="' + Y(W / 2) + '" text-anchor="middle" transform="rotate(-90 ' + (m - 9) + ' ' + Y(W / 2) + ')">' + esc(fmtNear(W)) + '</text>';
+    var g = '<rect class="tp-edge" x="' + f(X(0)) + '" y="' + f(Y(0)) + '" width="' + f(L * k) + '" height="' + f(W * k) + '"/>';
+    var edits = '';
+    // one dimension: its line at a tier off a side, ticks, dashed extension
+    // lines back to the corner's edge and to the drain, and its label
+    function dim(side, tier, d) {
+      var off = GAP + tier * TIER;
+      if (side === 'top' || side === 'bottom') {
+        var yl = side === 'top' ? Y(0) - off : Y(W) + off;
+        var x1 = X(d.from), x2 = X(d.to), yEdge = side === 'top' ? Y(0) : Y(W), yDr = Y(state.drains[d.i].y);
+        g += '<line class="tp-ext" x1="' + f(x2) + '" y1="' + f(yDr) + '" x2="' + f(x2) + '" y2="' + f(yl + (side === 'top' ? -4 : 4)) + '"/>';
+        g += '<line class="tp-ext" x1="' + f(x1) + '" y1="' + f(yEdge) + '" x2="' + f(x1) + '" y2="' + f(yl + (side === 'top' ? -4 : 4)) + '"/>';
+        g += '<line class="tp-dl" x1="' + f(x1) + '" y1="' + f(yl) + '" x2="' + f(x2) + '" y2="' + f(yl) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(x1 - 3) + '" y1="' + f(yl + 3) + '" x2="' + f(x1 + 3) + '" y2="' + f(yl - 3) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(x2 - 3) + '" y1="' + f(yl + 3) + '" x2="' + f(x2 + 3) + '" y2="' + f(yl - 3) + '"/>';
+        var cx = (x1 + x2) / 2;
+        if (Math.abs(x2 - x1) < 74) cx = x2 + (x2 > x1 ? 40 : -40);    // too short: the label sits past the end
+        edits += label(d, cx, yl, false);
+      } else {
+        var xl = side === 'left' ? X(0) - off : X(L) + off;
+        var y1 = Y(d.from), y2 = Y(d.to), xEdge = side === 'left' ? X(0) : X(L), xDr = X(state.drains[d.i].x);
+        g += '<line class="tp-ext" x1="' + f(xDr) + '" y1="' + f(y2) + '" x2="' + f(xl + (side === 'left' ? -4 : 4)) + '" y2="' + f(y2) + '"/>';
+        g += '<line class="tp-ext" x1="' + f(xEdge) + '" y1="' + f(y1) + '" x2="' + f(xl + (side === 'left' ? -4 : 4)) + '" y2="' + f(y1) + '"/>';
+        g += '<line class="tp-dl" x1="' + f(xl) + '" y1="' + f(y1) + '" x2="' + f(xl) + '" y2="' + f(y2) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(xl - 3) + '" y1="' + f(y1 + 3) + '" x2="' + f(xl + 3) + '" y2="' + f(y1 - 3) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(xl - 3) + '" y1="' + f(y2 + 3) + '" x2="' + f(xl + 3) + '" y2="' + f(y2 - 3) + '"/>';
+        var cy = (y1 + y2) / 2;
+        if (Math.abs(y2 - y1) < 74) cy = y2 + (y2 > y1 ? 40 : -40);
+        edits += label(d, xl, cy, true);
+      }
+    }
+    function label(d, x, y, vertical) {
+      var id = 'tpd' + d.i + d.axis;
+      return '<input class="tp-edit' + (vertical ? ' is-v' : '') + '" id="' + id + '" data-i="' + d.i + '" data-axis="' + d.axis + '" data-from="' + d.from + '"'
+        + ' aria-label="Drain ' + (d.i + 1) + ', ' + (d.axis === 'x' ? 'across from the ' + (d.west ? 'left' : 'right') : 'along from the ' + (d.north ? 'top' : 'bottom')) + ' edge"'
+        + ' value="' + esc(fmtNear(d.len)) + '" style="left:' + f(x) + 'px;top:' + f(y) + 'px" spellcheck="false" autocomplete="off">';
+    }
+    ['top', 'bottom', 'left', 'right'].forEach(function (side) { sides[side].forEach(function (d, t) { dim(side, t, d); }); });
+    // the overall length and width, outermost on the top and left
+    var yo = Y(0) - (GAP + sides.top.length * TIER), xo = X(0) - (GAP + sides.left.length * TIER);
+    g += '<line class="tp-dl is-all" x1="' + f(X(0)) + '" y1="' + f(yo) + '" x2="' + f(X(L)) + '" y2="' + f(yo) + '"/>';
+    g += '<line class="tp-dl is-all" x1="' + f(xo) + '" y1="' + f(Y(0)) + '" x2="' + f(xo) + '" y2="' + f(Y(W)) + '"/>';
+    g += '<text x="' + f(X(L / 2)) + '" y="' + f(yo - 5) + '" text-anchor="middle">' + esc(fmtNear(L)) + '</text>';
+    g += '<text x="' + f(xo - 5) + '" y="' + f(Y(W / 2)) + '" text-anchor="middle" transform="rotate(-90 ' + f(xo - 5) + ' ' + f(Y(W / 2)) + ')">' + esc(fmtNear(W)) + '</text>';
     if (state.drains.length) {
       var hp = highPoint(L, W, s);
-      g += '<circle class="tp-high" cx="' + X(hp.x) + '" cy="' + Y(hp.y) + '" r="4"/>';
-      var right = X(hp.x) < w * 0.7, below = Y(hp.y) < m + 18;
-      g += '<text class="tp-val" x="' + (X(hp.x) + (right ? 8 : -8)) + '" y="' + (Y(hp.y) + (below ? 16 : -7)) + '" text-anchor="' + (right ? 'start' : 'end') + '">'
+      g += '<circle class="tp-high" cx="' + f(X(hp.x)) + '" cy="' + f(Y(hp.y)) + '" r="4"/>';
+      var right = X(hp.x) < w * 0.7, below = Y(hp.y) < mT + 18;
+      g += '<text class="tp-val" x="' + f(X(hp.x) + (right ? 8 : -8)) + '" y="' + f(Y(hp.y) + (below ? 16 : -7)) + '" text-anchor="' + (right ? 'start' : 'end') + '">'
          + esc(fmtBuilt(Roof.build(hp.h, state.grid, 'ceil').built)) + '</text>';
     }
     state.drains.forEach(function (d, i) {
       var cx = X(d.x), cy = Y(d.y);
-      g += '<circle class="tp-drain" data-i="' + i + '" cx="' + cx + '" cy="' + cy + '" r="9"/>';
-      g += '<path class="tp-cross" d="M' + (cx - 5) + ' ' + cy + 'H' + (cx + 5) + 'M' + cx + ' ' + (cy - 5) + 'V' + (cy + 5) + '"/>';
+      g += '<circle class="tp-drain" data-i="' + i + '" cx="' + f(cx) + '" cy="' + f(cy) + '" r="9"/>';
+      g += '<path class="tp-cross" d="M' + f(cx - 5) + ' ' + f(cy) + 'H' + f(cx + 5) + 'M' + f(cx) + ' ' + f(cy - 5) + 'V' + f(cy + 5) + '"/>';
     });
+    var active = document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('tp-edit') ? document.activeElement.id : null;
     els.plan.innerHTML = '';
     els.plan.appendChild(cv);
-    els.plan.insertAdjacentHTML('beforeend', '<svg class="tp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" role="img" aria-label="Roof plan with drains and taper bands">' + g + '</svg>');
+    els.plan.insertAdjacentHTML('beforeend', '<svg class="tp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" role="img" aria-label="Roof plan with drains, their dimensions and taper bands">' + g + '</svg>' + edits);
+    if (active) { var el = document.getElementById(active); if (el) el.focus({ preventScroll: true }); }
   }
   function parseColor(c) {
     c = c.trim();
@@ -379,7 +458,7 @@
   // the center lines and the edges
   function planAt(e) {
     var svg = els.plan.querySelector('svg'), r = svg.getBoundingClientRect(), sc = r.width / fig.w;
-    var x = ((e.clientX - r.left) / sc - fig.m) / fig.k, y = ((e.clientY - r.top) / sc - fig.m) / fig.k;
+    var x = ((e.clientX - r.left) / sc - fig.mL) / fig.k, y = ((e.clientY - r.top) / sc - fig.mT) / fig.k;
     var hold = 8 / (fig.k * sc), st = STEP[state.target];
     function snap(v, size) {
       var marks = [0, size / 2, size];
@@ -390,13 +469,14 @@
   }
   var drag = null;
   els.plan.addEventListener('pointerdown', function (e) {
-    if (!fig.L) return;
+    if (!fig.L || (e.target.closest && e.target.closest('.tp-edit'))) return;
     var t = e.target.closest && e.target.closest('.tp-drain');
     var p = planAt(e);
     if (t) {
       drag = { i: +t.dataset.i, id: e.pointerId };
     } else {
       if (p.raw.x < 0 || p.raw.x > fig.L || p.raw.y < 0 || p.raw.y > fig.W) return;
+      if (state.drains.length >= MAX_DRAINS) { els.capNote.hidden = false; return; }
       state.drains.push({ x: p.x, y: p.y });
       drag = { i: state.drains.length - 1, id: e.pointerId };
       render();
@@ -408,7 +488,8 @@
     if (!drag || e.pointerId !== drag.id) return;
     var p = planAt(e), d = state.drains[drag.i];
     if (!d) return;
-    var off = p.raw.x < -fig.m / fig.k || p.raw.x > fig.L + fig.m / fig.k || p.raw.y < -fig.m / fig.k || p.raw.y > fig.W + fig.m / fig.k;
+    var pad = 24 / fig.k;
+    var off = p.raw.x < -pad || p.raw.x > fig.L + pad || p.raw.y < -pad || p.raw.y > fig.W + pad;
     d.off = off;
     d.x = Math.max(0, Math.min(fig.L, p.x)); d.y = Math.max(0, Math.min(fig.W, p.y));
     render();
@@ -416,12 +497,33 @@
   function end(e) {
     if (!drag || e.pointerId !== drag.id) return;
     var d = state.drains[drag.i];
-    if (d && d.off) state.drains.splice(drag.i, 1);
+    if (d && d.off) { state.drains.splice(drag.i, 1); els.capNote.hidden = true; }
     drag = null;
     render();
   }
   els.plan.addEventListener('pointerup', end);
   els.plan.addEventListener('pointercancel', end);
+
+  // a typed dimension moves its drain: on Enter or when the label loses focus
+  function commitDim(el) {
+    var d = state.drains[+el.dataset.i]; if (!d) return;
+    var v = readDim(el.value), from = +el.dataset.from, axis = el.dataset.axis, size = axis === 'x' ? fig.L : fig.W;
+    if (!v || v.error || v.units > size) { el.classList.add('is-bad'); el.title = v && !v.error ? 'past the far edge' : 'a length, e.g. 12\'-6" or 3.8m'; return; }
+    var p = from === 0 ? v.units : size - v.units;
+    if (axis === 'x') d.x = p; else d.y = p;
+    render();
+  }
+  els.plan.addEventListener('keydown', function (e) {
+    if (!e.target.classList.contains('tp-edit')) return;
+    if (e.key === 'Enter') { e.preventDefault(); commitDim(e.target); }
+    if (e.key === 'Escape') { e.target.blur(); render(); }
+  });
+  els.plan.addEventListener('focusout', function (e) {
+    if (e.target.classList && e.target.classList.contains('tp-edit')) setTimeout(function () { if (document.body.contains(e.target)) commitDim(e.target); }, 0);
+  });
+  els.plan.addEventListener('focusin', function (e) {
+    if (e.target.classList && e.target.classList.contains('tp-edit')) setTimeout(function () { e.target.select(); }, 0);
+  });
 
   /* ---- URL -------------------------------------------------------------------- */
   var urlTimer = null;
@@ -457,7 +559,7 @@
 
   var q = new URLSearchParams(location.search), any = FIELDS.some(function (k) { return q.get(k) != null; });
   FIELDS.forEach(function (k) { state.text[k] = any ? (q.get(k) || '').slice(0, 80) : EXAMPLE[k]; field[k].value = state.text[k]; });
-  if (q.get('dr') != null) state.drains = q.get('dr') ? q.get('dr').split('~').map(function (p) { var a = p.split('_'); return { x: +a[0], y: +a[1] }; }).filter(function (d) { return isFinite(d.x) && isFinite(d.y); }) : [];
+  if (q.get('dr') != null) state.drains = q.get('dr') ? q.get('dr').split('~').map(function (p) { var a = p.split('_'); return { x: +a[0], y: +a[1] }; }).filter(function (d) { return isFinite(d.x) && isFinite(d.y); }).slice(0, MAX_DRAINS) : [];
   // the handoff from Roof or Slope: ?slope=
   if (q.get('slope') && !any) { state.text.slope = q.get('slope').slice(0, 40); field.slope.value = state.text.slope; }
   state.target = q.get('u') === 'mm' ? 'metric' : (statedSystem(state.text.len) || 'imperial');
