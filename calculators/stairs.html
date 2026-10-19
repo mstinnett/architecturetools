@@ -58,25 +58,21 @@
   .cand-head .c-n { width: 5.2em; } .cand-head .c-riser { width: 8.5em; }
   .cand-head .c-vs { flex: 1; } .cand-head .c-run { width: 8em; text-align: right; }
   .cite { margin-top: var(--space-sm); font-size: var(--text-xs); color: var(--ink-3); line-height: 1.7; }
-  /* the design inverse: what floor-to-floor closes clean */
-  .ftf-note { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.6; margin: 0.2rem 0 0; max-width: 44em; }
-  .ftf-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin-top: var(--space-sm); }
-  .ftf-table th, .ftf-table td { text-align: right; padding: 0.4rem 0.55rem;
-    border-bottom: var(--border-light); font-variant-numeric: tabular-nums; }
-  .ftf-table th { color: var(--ink-3); font-weight: 400; font-size: var(--text-xs);
-    text-transform: uppercase; letter-spacing: 0.06em; }
-  .ftf-table td:first-child, .ftf-table th:first-child { text-align: left; }
-  .ftf-table tr.sel td { box-shadow: inset 2px 0 0 var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
   /* the answer line: the selected count in words, above the section */
   .stair-answer { margin: 0 0 var(--space-md); }
   .stair-answer .sa-main { font-size: var(--text-lg); line-height: 1.35; color: var(--ink); }
   .stair-answer .sa-main b { font-weight: 500; color: var(--accent); }
   .stair-answer .sa-basis { font-size: var(--text-sm); color: var(--ink-2); margin-top: 0.2rem; }
+  .duo label .opt { text-transform: none; letter-spacing: 0; color: var(--ink-3); }
+  .comfort-line { font-size: var(--text-sm); color: var(--ink-2); margin: calc(-1 * var(--space-sm)) 0 var(--space-md); line-height: 1.6; }
+  .comfort-line:empty { display: none; }
+  .comfort-line b { font-weight: 500; color: var(--ink); }
+  .comfort-line .off { color: var(--ink); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+  .cand-more { margin-top: var(--space-sm); }
   .grid-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.9rem; margin-top: var(--space-md); }
   .grid-line .section-label { margin: 0; }
   .grid-line .grid-presets { margin: 0; }
   .grid-hint { font-size: var(--text-xs); color: var(--ink-3); line-height: 1.6; margin: 0.4rem 0 0; max-width: 40em; }
-  .ftf-table .sub { display: block; font-size: var(--text-xs); color: var(--ink-3); }
   /* phones: the comparison drops to its own line under count, riser and run */
   @media (max-width: 540px) {
     .cand-row, .cand-head { display: grid; grid-template-columns: 3.2em 1fr auto; column-gap: 0.6rem; }
@@ -87,9 +83,7 @@
     .cand-row .c-run { grid-column: 3; grid-row: 1; }
     .cand-row .c-vs { grid-column: 2 / 4; grid-row: 2; margin-top: 0.1rem; }
     .cand-head .c-vs { display: none; }
-    .ftf-table th, .ftf-table td { padding: 0.4rem 0.3rem; }
     #detailRows .snap-name { width: 118px; }
-    .ftf-table td:nth-child(2) { white-space: nowrap; }
   }
 </style>
 </head>
@@ -124,9 +118,9 @@
       <div class="duo-note" id="riseNote"></div>
     </div>
     <div class="duo">
-      <label for="treadInput">tread depth (optional)</label>
+      <label for="treadInput">tread depth <span class="opt">blank = code minimum</span></label>
       <input type="text" id="treadInput" class="duo-input" spellcheck="false" maxlength="40"
-             autocomplete="off" autocapitalize="off" placeholder="code minimum if blank">
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 11&quot;">
       <div class="duo-note" id="treadNote"></div>
     </div>
   </div>
@@ -140,6 +134,9 @@
       <button type="button" class="mini-pill" aria-pressed="false" data-ref="ibc">IBC 2021</button>
     </div>
   </div>
+
+  <!-- the comfort rules for the drawn count: rules of thumb, kept by the inputs -->
+  <p class="comfort-line" id="comfortLine"></p>
 
   <div id="results">
     <!-- slot 3 · ECHO -->
@@ -161,24 +158,18 @@
           <span class="section-label">Round risers to</span>
           <div class="grid-presets" id="gridPresets"></div>
         </div>
-        <p class="grid-hint">Equal risers rarely land on a tape mark. Each riser is rounded to this fraction, and what is left over across the flight is the drift.</p>
+        <p class="grid-hint" id="gridHint"></p>
       </div>
 
       <!-- slot 6 · every candidate count, yours to pick -->
       <div class="ratio-box">
-        <div class="section-label" id="candLabel">Other riser counts</div>
-        <div class="cand-head"><span class="c-n">risers</span><span class="c-riser">riser</span><span class="c-vs">against the code</span><span class="c-run">total run</span></div>
+        <div class="section-label" id="candLabel">Riser counts</div>
+        <div class="cand-head"><span class="c-n">risers</span><span class="c-riser">riser</span><span class="c-vs" id="candVsHead">under the max</span><span class="c-run">total run</span></div>
         <div class="cand-rows" id="candRows"></div>
+        <div class="key-row cand-more" id="candMore"></div>
         <div class="cite" id="citeLine"></div>
       </div>
 
-      <!-- the design inverse: while the floor-to-floor is still yours to set,
-           what each count allows and where the risers close with no drift -->
-      <div class="ratio-box">
-        <div class="section-label">If the floor-to-floor can still change</div>
-        <p class="ftf-note" id="ftfNote"></p>
-        <table class="ftf-table" id="ftfTable"></table>
-      </div>
     </div>
 
   </div>
@@ -215,6 +206,8 @@
   var MAX_UNITS = 96000000000;
   function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
   var MAX_ROWS = 30;
+  var SHOW_ROWS = 6;            // counts within the limits listed before "show all"
+  var VARY = 3 * IN / 8;        // the most risers in a flight may differ, both codes
 
   /* The references — facts with citations, selected by the edition pill.
      Limits live as EXACT inch lattice values; the page locates each
@@ -239,6 +232,7 @@
     defaultUnit: 'in',
     ref: 'irc',
     selN: null,                 // selected riser count; null → the anchor row
+    showAll: false,             // list every count within the limits
     target: 'imperial',
     gridUiSystem: null,
     grid: { imperial: { denom: 16 }, metric: { mm: 1 } }
@@ -246,7 +240,7 @@
 
   var els = {};
   ['riseInput','treadInput','riseNote','treadNote','bareAsk','echo','echoLine','echoAssume',
-   'stairOut','answerLine','gridPresets','figLabel','figure','detailRows','candLabel','candRows','ftfNote','ftfTable','citeLine','mathNote']
+   'stairOut','answerLine','gridPresets','gridHint','figLabel','figure','detailRows','candLabel','candRows','candVsHead','candMore','comfortLine','citeLine','mathNote']
     .forEach(function (id) { els[id] = document.getElementById(id); });
 
   var escapeHtml = UI.esc;
@@ -367,15 +361,14 @@
     return list.length ? list[list.length - 1].n : null;
   }
 
+  function within(riser, ref) { return riser <= ref.riserMax && (ref.riserMin == null || riser >= ref.riserMin); }
+  // the room under the max riser, as a bare amount; the column head names the max
   function vsLimit(riser, ref) {
     var d = riser - ref.riserMax;
-    var s;
-    var amt = escapeHtml(NumberLine.formatResidual(d, state.target).replace(/^[+\u2212-]/, ''));
-    if (d === 0) s = 'at the max';
-    else if (d < 0) s = amt + ' under the max';
-    else s = amt + ' over the max';
-    if (ref.riserMin != null && riser < ref.riserMin) s = 'under the 4" minimum';
-    return s;
+    var amt = escapeHtml(fmtLen(Math.abs(d)));
+    if (ref.riserMin != null && riser < ref.riserMin) return 'under the ' + escapeHtml(fmtLen(ref.riserMin)) + ' minimum';
+    if (d === 0) return 'at the max';
+    return d < 0 ? amt : amt + ' over';
   }
 
   function rowHtml(name, gloss, value, resid, primary, cls) {
@@ -427,8 +420,7 @@
     if (!list.length) {
       els.answerLine.innerHTML = '<div class="sa-main">No riser count gives a riser between 4" and 8 1/2".</div>'
         + '<div class="sa-basis">A rise this size needs a ramp, a ladder or a single step, not a stair.</div>';
-      els.candRows.innerHTML = ''; els.candLabel.textContent = 'Other riser counts';
-      els.ftfNote.textContent = ''; els.ftfTable.innerHTML = '';
+      els.candRows.innerHTML = ''; els.candMore.innerHTML = ''; els.comfortLine.innerHTML = '';
       els.figure.innerHTML = ''; els.detailRows.innerHTML = ''; els.figLabel.textContent = '';
       els.citeLine.innerHTML = escapeHtml(ref.cite + CITE_TAIL);
       els.mathNote.innerHTML = '';
@@ -440,9 +432,15 @@
     if (!list.some(function (r) { return r.n === selN; })) selN = anchor;
     var sel = list.filter(function (r) { return r.n === selN; })[0];
 
-    // the candidate table
+    // the counts: the last one over the max (what one fewer riser costs),
+    // then those within the limits, the first few unless all are asked for
+    var over = list.filter(function (r) { return r.riser > ref.riserMax; });
+    var ok = list.filter(function (r) { return within(r.riser, ref); });
+    var shown = (over.length ? [over[over.length - 1]] : []).concat(state.showAll ? ok : ok.slice(0, SHOW_ROWS));
+    if (!shown.some(function (r) { return r.n === selN; })) shown.push(sel);
+    shown.sort(function (a, b) { return a.n - b.n; });
     var rows = '';
-    list.forEach(function (r) {
+    shown.forEach(function (r) {
       var runU = (r.n - 1) * treadUsed;
       rows += '<button type="button" class="cand-row' + (r.n === selN ? ' sel' : '') + '" data-n="' + r.n + '" aria-pressed="' + (r.n === selN) + '">'
         + '<span class="c-n">' + r.n + (r.n === anchor ? ' ·' : '') + '</span>'
@@ -452,35 +450,18 @@
         + '</button>';
     });
     els.candRows.innerHTML = rows;
-    els.candLabel.innerHTML = 'Every count with a riser from 4&Prime; to 8 1/2&Prime;'
-      + (c.capped ? ', first ' + MAX_ROWS + ' shown' : '')
-      + ' <span style="text-transform:none;letter-spacing:0;">(· marks the fewest under the max)</span>';
+    els.candVsHead.textContent = 'under the ' + fmtLen(ref.riserMax) + ' max';
+    els.candLabel.innerHTML = 'Riser counts <span style="text-transform:none;letter-spacing:0;">· marks the fewest within ' + escapeHtml(ref.label) + '</span>';
+    var more = ok.length - SHOW_ROWS;
+    els.candMore.innerHTML = more > 0
+      ? '<button type="button" class="key-sm" id="candToggle">' + (state.showAll ? 'Show fewer' : 'Show ' + more + ' more, down to ' + escapeHtml(fmtLen(ok[ok.length - 1].riser)) + ' risers') + '</button>'
+      : '';
+    var tg = document.getElementById('candToggle');
+    if (tg) tg.addEventListener('click', function () { state.showAll = !state.showAll; render(); });
     els.citeLine.innerHTML = escapeHtml(ref.cite + CITE_TAIL);
     Array.prototype.forEach.call(els.candRows.querySelectorAll('[data-n]'), function (b) {
       b.addEventListener('click', function () { state.selN = +b.dataset.n; render(); });
     });
-
-    // ---- the design inverse: what floor-to-floor closes clean --------------
-    // For each count: the floor-to-floor the reference allows, and the nearest
-    // floor-to-floor where its risers land exactly on the layout grid — no
-    // drift for the section to absorb. Dimensions to set, not to audit.
-    els.ftfNote.innerHTML = 'For each count: the floor-to-floor ' + escapeHtml(ref.label)
-      + ' allows, and the nearest floor-to-floor to yours where every riser lands on the rounding fraction, so there is no drift.';
-    var ftf = '<tr><th>Risers</th><th>' + escapeHtml(ref.label) + ' allows</th><th>No drift at</th></tr>';
-    list.forEach(function (r) {
-      var winCell = ref.riserMin != null
-        ? escapeHtml(fmtLen(r.n * ref.riserMin)) + ' – ' + escapeHtml(fmtLen(r.n * ref.riserMax))
-        : 'up to ' + escapeHtml(fmtLen(r.n * ref.riserMax));
-      var rStar = Math.round(riseU / r.n / grid) * grid;
-      if (rStar > ref.riserMax) rStar = Math.floor(ref.riserMax / grid) * grid;
-      if (ref.riserMin != null && rStar < ref.riserMin) rStar = Math.ceil(ref.riserMin / grid) * grid;
-      var Fp = r.n * rStar, dF = Fp - riseU;
-      ftf += '<tr' + (r.n === selN ? ' class="sel"' : '') + '><td>' + r.n + '</td><td>' + winCell + '</td>'
-           + '<td>' + escapeHtml(fmtLen(Fp))
-           + '<span class="sub">' + r.n + ' × ' + escapeHtml(fmtLen(rStar))
-           + (dF === 0 ? ', yours exactly' : ', ' + (dF > 0 ? '+' : '−') + escapeHtml(fmtLen(Math.abs(dF))) + ' from yours') + '</span></td></tr>';
-    });
-    els.ftfTable.innerHTML = ftf;
 
     // the section + detail for the selected count
     var width = els.figure.clientWidth;
@@ -510,24 +491,41 @@
     var html = '';
     html += rowHtml('Riser', sel.n + ' equal, rounded', '<span class="fact">' + escapeHtml(fmtLen(sel.riser)) + '</span>',
                     resid === 0 ? 'no drift' : escapeHtml(NumberLine.formatResidual(resid, state.target)) + ' drift', true);
-    if (resid !== 0) html += rowHtml('Drift', 'put it in one riser or spread it',
-                    escapeHtml(fmtLen(Math.abs(resid))) + ' across the flight', '', false, 'is-ref');
+    if (resid !== 0) {
+      // the drift's legal bounds: risers in a flight may differ by 3/8" at
+      // most, and none may pass the max. In one riser it shows whole; spread,
+      // the risers differ by one rounding step.
+      var one = sel.riser + resid, inOne;
+      if (Math.abs(resid) > VARY) inOne = 'Too much for one riser: it would differ from the rest by more than the ' + fmtLen(VARY) + ' the code allows. Spread it.';
+      else if (one > ref.riserMax) inOne = 'In one riser it would be ' + fmtLen(one) + ', over the ' + fmtLen(ref.riserMax) + ' max. Spread it, or use ' + (sel.n + 1) + ' risers.';
+      else if (ref.riserMin != null && one < ref.riserMin) inOne = 'In one riser it would be ' + fmtLen(one) + ', under the ' + fmtLen(ref.riserMin) + ' min. Spread it.';
+      else inOne = 'In one riser: that riser is ' + fmtLen(one) + ', ' + fmtLen(Math.abs(resid)) + (resid > 0 ? ' taller' : ' shorter') + ' than the rest, within the ' + fmtLen(VARY) + ' the code allows between risers.';
+      html += rowHtml('Drift', fmtLen(Math.abs(resid)) + ' across the flight',
+        '<span style="font-size:var(--text-sm);">' + escapeHtml(inOne) + '<br>Spread across the flight, the risers differ by one rounding step, ' + escapeHtml(fmtLen(grid)) + '.</span>', '', false, 'is-ref');
+    }
     html += rowHtml('Exact riser', 'floor to floor ÷ ' + sel.n + ', unrounded', escapeHtml(NumberLine.formatTrue(Math.round(exact), state.target)), '', false, 'is-ref');
+    // the floor-to-floor where this count closes with no drift, while that
+    // height can still move
+    var rStar = Math.round(riseU / sel.n / grid) * grid;
+    if (rStar > ref.riserMax) rStar = Math.floor(ref.riserMax / grid) * grid;
+    if (ref.riserMin != null && rStar < ref.riserMin) rStar = Math.ceil(ref.riserMin / grid) * grid;
+    var Fp = sel.n * rStar, dF = Fp - riseU;
+    if (dF !== 0) html += rowHtml('No drift at', 'if the floor-to-floor can move', escapeHtml(fmtLen(Fp)),
+      escapeHtml(sel.n + ' × ' + fmtLen(rStar) + ', ' + (dF > 0 ? '+' : '−') + fmtLen(Math.abs(dF))), false, 'is-ref');
     html += rowHtml('Tread', treadU != null ? 'as typed' : ref.label + ' minimum', escapeHtml(fmtLen(treadUsed)), '', false);
     html += rowHtml('Total run', treadsN + ' treads, nosing not included', escapeHtml(fmtLen(runAll)), '', false);
-    // the classic comfort rules — located, labelled as rules of thumb
-    var rIn = sel.riser / IN, tIn = treadUsed / IN;
-    var c1 = 2 * rIn + tIn, c2 = rIn + tIn, c3 = rIn * tIn;
-    function locate(v, lo, hi, unit) {
-      var s = v.toFixed(1) + (unit || '') + ' (' + lo + ' to ' + hi + ')';
-      if (v < lo) return s + ', under';
-      if (v > hi) return s + ', over';
-      return s + ', inside';
-    }
-    html += rowHtml('Comfort rules', 'rules of thumb, not code. R is riser, T is tread, in inches',
-      '<span style="font-size:var(--text-sm);">2R+T ' + escapeHtml(locate(c1, 24, 26, '"')) + '<br>R+T ' + escapeHtml(locate(c2, 17, 18, '"'))
-      + '<br>R×T ' + escapeHtml(locate(c3, 70, 75, '')) + '</span>', '', false, 'is-ref');
     els.detailRows.innerHTML = html;
+    els.gridHint.innerHTML = 'Equal risers rarely land on a tape mark. Each riser is rounded to this fraction, and what is left over across the flight is the drift. '
+      + 'Both codes let the risers in a flight differ by up to ' + escapeHtml(fmtLen(VARY)) + ', so a small drift can go in one riser.';
+
+    // the comfort rules for the drawn count — located, labelled as rules of thumb
+    var rIn = sel.riser / IN, tIn = treadUsed / IN;
+    function locate(name, v, lo, hi, unit) {
+      var where = v < lo ? 'under' : v > hi ? 'over' : null;
+      return '<span' + (where ? ' class="off"' : '') + '>' + name + ' <b>' + v.toFixed(1) + (unit || '') + '</b> (' + lo + '–' + hi + (where ? ', ' + where : '') + ')</span>';
+    }
+    els.comfortLine.innerHTML = 'Comfort for ' + sel.n + ' risers, rules of thumb, not code: '
+      + locate('2R+T', 2 * rIn + tIn, 24, 26, '"') + ' · ' + locate('R+T', rIn + tIn, 17, 18, '"') + ' · ' + locate('R×T', rIn * tIn, 70, 75, '');
 
     els.mathNote.innerHTML = '<b>engine</b> — exact integers, 1 unit = 1/960 mm:<br>'
       + 'rise = <b>' + riseU + '</b> units · ' + sel.n + ' risers → ' + riseU + ' / ' + sel.n + ' = ' + (riseU / sel.n).toFixed(2) + ' units'
