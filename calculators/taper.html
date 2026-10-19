@@ -195,10 +195,22 @@
     var stated = (r.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
     return stated && (r.unitSystem === 'imperial' || r.unitSystem === 'metric') ? r.unitSystem : null;
   }
-  function setTarget(sys) {
+  // switching units rewrites the length fields in the new units, exactly.
+  // skip: the field being typed in.
+  function setTarget(sys, skip) {
     if (sys === state.target) return;
+    var lens = {};
+    ['len', 'wid'].forEach(function (k) {
+      var d = k === skip ? null : readDim(state.text[k]);
+      if (d && !d.error) lens[k] = d.units;
+    });
     state.target = sys;
     if (!GRIDS[sys].some(function (g) { return g[1] === state.grid; })) state.grid = DEFAULT_GRID[sys];
+    Object.keys(lens).forEach(function (k) {
+      state.text[k] = NumberLine.formatTrue(lens[k], sys);
+      field[k].value = state.text[k];
+    });
+    // drains are stored in engine units, so they stay where they are
   }
   function fmtBuilt(u) { return state.target === 'metric' ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatSnapped(u, 'imperial', 64); }
   function fmtTrue(u) { return NumberLine.formatTrue(Math.round(u), state.target); }
@@ -429,7 +441,7 @@
     field[k].addEventListener('input', function () {
       state.text[k] = field[k].value;
       var sys = k === 'slope' ? null : statedSystem(field[k].value);
-      if (sys) setTarget(sys);
+      if (sys) setTarget(sys, k);
       render();
     });
     field[k].addEventListener('focus', function () { setTimeout(function () { field[k].select(); }, 0); });

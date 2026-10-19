@@ -318,12 +318,22 @@
     return Math.round(mm2 / SF_MM2).toLocaleString('en-US') + ' sf';
   }
 
-  function setTarget(sys) {
+  // switching units rewrites the length fields in the new units, exactly, so
+  // the whole page reads in one system. skip: the field being typed in.
+  function setTarget(sys, skip) {
     if (sys === state.target) return;
+    var lens = {}, area = skip === 'area' ? null : readArea(state.text.area);
+    ['span', 'oh'].forEach(function (k) {
+      var d = k === skip ? null : readDim(state.text[k], true);
+      if (d && !d.error) lens[k] = d.units;
+    });
     state.target = sys;
     if (!GRIDS[sys].some(function (g) { return g[1] === state.grid; })) state.grid = DEFAULT_GRID[sys];
     if (!SNAPS[sys].some(function (o) { return o[1] === state.snap; })) state.snap = STEP[sys];
+    Object.keys(lens).forEach(function (k) { setField(k, NumberLine.formatTrue(lens[k], sys)); });
+    if (area && !area.error) setField('area', sys === 'metric' ? sig(area.mm2 / 1e6, 2) + ' m2' : sig(area.mm2 / SF_MM2, 1) + ' sf');
   }
+  function setField(k, v) { state.text[k] = v; field[k].value = v; }
 
   function row(name, gloss, value, sub, resid, cls) {
     return '<div class="snap-row' + (cls ? ' ' + cls : '') + '">'
@@ -738,7 +748,7 @@
     el.addEventListener('input', function () {
       state.text[k] = el.value;
       var sys = k === 'pitch' || k === 'pitch2' ? null : statedSystem(el.value);
-      if (sys) setTarget(sys);
+      if (sys) setTarget(sys, k);
       render();
     });
     el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
