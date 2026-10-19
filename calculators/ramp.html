@@ -66,8 +66,6 @@
   .cite b { color: var(--ink); font-weight: 400; }
   .warn { color: var(--accent); }
 
-  .engine-note { margin-top: var(--space-xl); padding-top: var(--space-md);
-    border-top: var(--border-light); }
   @media (max-width: 600px) {
     .snap-name { width: 118px; }
     .snap-resid { width: auto; max-width: 7.5em; }
@@ -164,16 +162,23 @@
     <div class="cite" id="citeLine" style="display:none;"></div>
   </div>
 
-  <!-- slot 7 · the engine's auditable footnote — bottom of page, never mixed -->
-  <div class="engine-note">
-    <div class="mathnote" id="mathNote"></div>
-  </div>
 
   <div class="page-footer">
     <a class="back-link" href="../index.html">← architecture.tools</a>
     <span class="crumb-sep">&middot;</span> <a class="back-link" href="slope.html">Slope</a>
     <span class="crumb-sep">&middot;</span> <a class="back-link" href="../privacy.html">Privacy &amp; analytics</a>
     <span class="crumb-sep">&middot;</span> <a class="back-link" href="../feedback.html">Feedback</a>
+    <span class="crumb-sep">&middot;</span> <button type="button" class="back-link footer-disclose" aria-expanded="false" aria-controls="enginePanel">How it&rsquo;s calculated</button>
+    <div class="footer-panel" id="enginePanel" hidden>
+      <p class="engine-intro">Every length on this page is held as a whole number of
+        engine units. One unit is 1/960 of a millimeter, so a millimeter is 960 units and an
+        inch is 24,384. Whole millimeters and sixteenths, thirty-seconds and sixty-fourths of an
+        inch are all whole numbers of units, so metric and imperial inputs are both exact, and no
+        step rounds in decimals along the way. When a result falls between units, such as the
+        sloped length of most roofs, it is snapped to the nearest unit and the note says by how
+        much. The lines below are the arithmetic for the reading above.</p>
+      <div class="mathnote" id="mathNote"></div>
+    </div>
   </div>
 </div>
 

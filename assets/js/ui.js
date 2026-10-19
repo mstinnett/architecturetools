@@ -63,6 +63,24 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireScheme);
   else wireScheme();
 
+  // ---- footer disclosures --------------------------------------------------
+  // A .footer-disclose button opens the panel its aria-controls names (the
+  // calculators' "How it's calculated"). Without this script the panel stays
+  // hidden; the reading itself never depends on it.
+  function wireDisclose() {
+    Array.prototype.forEach.call(document.querySelectorAll('.footer-disclose'), function (btn) {
+      var panel = document.getElementById(btn.getAttribute('aria-controls'));
+      if (!panel) return;
+      btn.addEventListener('click', function () {
+        var open = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        panel.hidden = !open;
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireDisclose);
+  else wireDisclose();
+
   // ---- Recents — per-tool history of saved readings ------------------------
   // A recent IS the page URL's query string: every engine tool serializes its
   // whole state there, so restoring one restores the full reading, figure and

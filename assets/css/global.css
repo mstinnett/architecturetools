@@ -547,7 +547,17 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
 .fit-badge, .rec-badge { font-size: 0.55rem; background: var(--accent); color: var(--accent-ink); padding: 1px 5px; letter-spacing: 0.1em; text-transform: uppercase; border-radius: var(--radius); }
 
 /* ---- FOOTER ---- */
-.page-footer { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--rule-2); font-size: var(--text-xs); color: var(--ink-3); font-weight: 300; line-height: 1.7; }
+.page-footer { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--rule-2); font-size: var(--text-xs); color: var(--ink-3); font-weight: 300; line-height: 1.7; text-align: center; }
+/* a footer link that opens a panel under the footer line (the calculators'
+   "How it's calculated"); wired in ui.js */
+.footer-disclose { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.footer-disclose::after { content: " +"; }
+.footer-disclose[aria-expanded="true"]::after { content: " \2212"; }
+.footer-panel { max-width: 40rem; margin: var(--space-md) auto 0; text-align: left; }
+.footer-panel .engine-intro { font-size: var(--text-xs); color: var(--ink-2); line-height: 1.65; margin-bottom: var(--space-sm); }
+.footer-panel .mathnote { margin-top: 0; padding-top: var(--space-sm); }
+.footer-panel .mathnote:empty { display: block; }
+.footer-panel .mathnote:empty::before { content: "Enter a value above to see its arithmetic here."; font-family: var(--font-body); color: var(--ink-3); }
 
 /* ---- CHOOSER — the software choosers (pdf-markup; bim.html is
    information, not a chooser, and styles itself): the picker's control columns over a grid of tool cards.
