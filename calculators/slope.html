@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slope -- architecture.tools</title>
-<meta name="description" content="Enter any two of rise, run and slope: the third comes back calculated, the slope — percent, ratio, roof pitch, degrees — with what rounding each to a whole number costs in rise across your run, and common slopes drawn for comparison.">
+<meta name="description" content="Enter any two of rise, run and slope and get the third: the slope — percent, ratio, roof pitch, degrees — with what rounding each to a whole number costs in rise across your run, and common slopes drawn for comparison.">
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
 <script>
     window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
@@ -60,17 +60,8 @@
   .tri.is-answer .tri-input::placeholder { color: var(--ink-3); font-weight: 400; font-size: 1rem; }
   .tri-hint { font-size: var(--text-xs); color: var(--ink-2); margin: 0 0 var(--space-md); max-width: 40em; }
 
-  /* the onward tools */
-  .next-box { margin-top: var(--space-lg); }
-  .next-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.6rem; }
-  .next-link { display: block; padding: 0.65rem 0.8rem; border: var(--border-light); border-radius: var(--radius);
-               color: var(--ink); text-decoration: none; background: var(--card); }
-  .next-link:hover { border-color: var(--accent); }
-  .next-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .next-link b { display: block; font-weight: 500; }
-  .next-link span { display: block; font-size: var(--text-xs); color: var(--ink-2); margin-top: 0.2rem; }
-  .next-link.is-suggested { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
-  .next-link em { font-style: normal; font-size: var(--text-xs); color: var(--accent); margin-left: 0.4em; font-weight: 400; }
+  /* the onward tools: small keys under the fields, the one that fits marked */
+  .next-keys { margin: calc(-1 * var(--space-xs)) 0 var(--space-md); }
 
   /* subgroup labels inside the answer card */
   .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
@@ -120,9 +111,9 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Slope</span>
     </nav>
     <h1>Slope</h1>
-    <p>Enter any two of rise, run and slope. The third comes back calculated,
-       with the slope in every form and what rounding it to a whole number
-       costs in rise across your run.</p>
+    <p>Enter any two of rise, run and slope to get the third, the slope in
+       every form, and how much rise rounding it to a whole number adds or
+       drops across your run.</p>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
@@ -155,7 +146,8 @@
       <div class="tri-note" id="slopeNote"></div>
     </div>
   </div>
-  <p class="tri-hint">The third field is calculated. Type in it and the oldest of the other two is calculated instead.</p>
+  <p class="tri-hint">The third field shows the answer. Type in it and the oldest of the other two becomes the answer instead.</p>
+  <div class="key-row next-keys" id="nextRow" hidden></div>
 
   <div id="results">
     <!-- slot 3 · ECHO -->
@@ -170,13 +162,6 @@
       <div class="answer-card">
         <div class="figure-wrap" id="figure"></div>
         <div class="snap-rows" id="snapRows"></div>
-      </div>
-
-      <!-- the onward tools: this slope, carried into Roof / Ramp / Drain
-           (hrefs are built in script, with the values in the URL) -->
-      <div class="next-box">
-        <div class="section-label">Take this slope to</div>
-        <div class="next-row" id="nextRow"></div>
       </div>
 
       <!-- slot 6 · common slopes, grouped — each selectable as a comparison
@@ -319,6 +304,7 @@
     renderEcho(rise, run, slope, solved, derivedNote);
     if (!solved || solved.rise <= 0 || solved.run <= 0) {
       els.slopeOut.style.display = 'none';
+      els.nextRow.hidden = true;
       els.mathNote.innerHTML = '';
       return;
     }
@@ -552,10 +538,11 @@
     // onward tools, the regime's own one marked
     var sug = suggestFor(s), qs = handoffQuery(), nx = '';
     NEXT.forEach(function (n) {
-      nx += '<a class="next-link' + (n.key === sug ? ' is-suggested' : '') + '" href="' + n.href + escapeHtml(qs) + '">'
-          + '<b>' + n.name + (n.key === sug ? '<em>fits this slope</em>' : '') + '</b><span>' + n.line + '</span></a>';
+      nx += '<a class="key-sm' + (n.key === sug ? ' is-suggested' : '') + '" href="' + n.href + escapeHtml(qs) + '" title="' + n.line + '">'
+          + n.name + ' &rarr;</a>';
     });
-    els.nextRow.innerHTML = nx;
+    els.nextRow.innerHTML = '<span class="key-label">Use this slope in</span>' + nx;
+    els.nextRow.hidden = false;
 
     // common slopes — grouped, located, selectable into the figure
     var refs = '';
