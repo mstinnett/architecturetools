@@ -11,8 +11,9 @@
 
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join, dirname, resolve, relative, extname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const REPO_ROOT = resolve(dirname(new URL(import.meta.url).pathname), "..", "..");
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SKIP_DIRS = new Set([".git", "node_modules", ".claude", "scratch"]);
 
 function walk(dir, out = []) {
