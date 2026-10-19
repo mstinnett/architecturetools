@@ -69,6 +69,22 @@ remaining exemplar passes and the operator's promotions.
 - **Promotion model:** build on `dev` → preview on a neutral host (§4) → when a
   tool is done, move that single page (and any new `lib/` module) to `main` in a
   small commit. Live the moment it's on `main`.
+- **Links to tools still on dev:** on `dev`, anything that links to a tool not
+  yet promoted carries `data-stage="dev"`: a cover card, a sentence, a key. A
+  script list does the same with `stage: 'dev'` on the entry and leaves it out
+  when `<html data-stage="live">` (Slope's onward keys). Promoting runs
+  `tools/stage-live.mjs` over the copied pages on `main`:
+  ```
+  git checkout main
+  git checkout dev -- index.html calculators/slope.html calculators/lib/slope.js …
+  node tools/stage-live.mjs index.html calculators/slope.html …
+  ```
+  It removes the `data-stage="dev"` elements, sets `data-stage="live"`, drops
+  the noindex, and fails if any relative link or script left points at a file
+  `main` doesn't have, which also catches a `lib/` module left behind. When a
+  tool is promoted, take `data-stage="dev"` off the links to it on `dev`.
+  First set ready (2026-10-19): the cover, Slope, Drain, Roof Taper (with
+  `lib/roof.js`), PDF markup and the architecture software page.
 
 > **Stale-branch note:** the local `claude/build-this-L58m6` was deleted; the
 > **remote** copy plus several other `claude/*` branches could **not** be deleted

@@ -141,7 +141,7 @@
     </div>
   </div>
 
-  <p class="back-to">A pitched roof? <a href="roof.html">Roof</a> reads heights off a section.
+  <p class="back-to"><span data-stage="dev">A pitched roof? <a href="roof.html">Roof</a> reads heights off a section.</span>
      A pipe or a gutter run? <a href="drain.html">Drain</a> takes it from its minimum slope.</p>
 
   <div class="page-footer">
@@ -605,11 +605,17 @@
   window.addEventListener('resize', function () { clearTimeout(window.__tp); window.__tp = setTimeout(render, 120); });
   document.addEventListener('schemechange', render);
 
-  var q = new URLSearchParams(location.search), any = FIELDS.some(function (k) { return q.get(k) != null; });
-  FIELDS.forEach(function (k) { state.text[k] = any ? (q.get(k) || '').slice(0, 80) : EXAMPLE[k]; field[k].value = state.text[k]; });
+  // a saved plan carries its length or width; a handoff from Slope carries
+  // only ?slope= (with rise and run), so it opens the example plan at that slope
+  var q = new URLSearchParams(location.search), any = q.get('len') != null || q.get('wid') != null;
+  FIELDS.forEach(function (k) { state.text[k] = any ? (q.get(k) || '').slice(0, 80) : EXAMPLE[k]; });
+  if (!any && q.get('slope')) state.text.slope = q.get('slope').slice(0, 40);
+  else if (!any && q.get('rise') && q.get('run')) {
+    var hr = readDim(q.get('rise').slice(0, 80)), hn = readDim(q.get('run').slice(0, 80));
+    if (hr && hr.units && hn && hn.units) state.text.slope = Slope.faceOf(hr.units / hn.units);
+  }
+  FIELDS.forEach(function (k) { field[k].value = state.text[k]; });
   if (q.get('dr') != null) state.drains = q.get('dr') ? q.get('dr').split('~').map(function (p) { var a = p.split('_'); return { x: +a[0], y: +a[1] }; }).filter(function (d) { return isFinite(d.x) && isFinite(d.y); }).slice(0, MAX_DRAINS) : [];
-  // the handoff from Roof or Slope: ?slope=
-  if (q.get('slope') && !any) { state.text.slope = q.get('slope').slice(0, 40); field.slope.value = state.text.slope; }
   state.target = q.get('u') === 'mm' ? 'metric' : (statedSystem(state.text.len) || 'imperial');
   var g = +q.get('g'); state.grid = GRIDS[state.target].some(function (x) { return x[1] === g; }) ? g : DEFAULT_GRID[state.target];
   render();

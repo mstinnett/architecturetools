@@ -439,10 +439,14 @@
 
   /* ---- the onward tools ------------------------------------------------------ */
   var NEXT = [
-    { key: 'roof', href: 'roof.html', name: 'Roof', line: 'Heights read off a plan, roof area, low-slope taper.' },
-    { key: 'ramp', href: 'ramp.html', name: 'Ramp', line: 'Run length, landings and the floor the ramp takes.' },
-    { key: 'drain', href: 'drain.html', name: 'Drain', line: 'The height a run uses at its minimum slope, or the length a height allows.' }
-  ];
+    { key: 'roof', href: 'roof.html', name: 'Roof', line: 'Heights off a roof section, from the wall line, drip edge or ridge.', stage: 'dev' },
+    { key: 'ramp', href: 'ramp.html', name: 'Ramp', line: 'Run length, landings and the floor the ramp takes.', stage: 'dev' },
+    { key: 'drain', href: 'drain.html', name: 'Drain', line: 'The height a run uses at its minimum slope, or the length a height allows.' },
+    { key: 'taper', href: 'taper.html', name: 'Roof Taper', line: 'A flat roof sloped to its drains: how high the taper builds.' }
+  ].filter(function (n) {
+    // a tool still on dev is left out where the page runs as live (html[data-stage=live], set by tools/stage-live.mjs)
+    return !(n.stage === 'dev' && document.documentElement.dataset.stage === 'live');
+  });
   function suggestFor(s) {
     var eps = 1e-6;
     if (s <= 1 / 48 + eps) return 'drain';
