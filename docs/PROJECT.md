@@ -140,6 +140,8 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── occupant-load.html          # Occupant Load — takeoff ÷ Table 1004.5 (dev, noindexed)
 │   ├── egress-width.html           # Egress Width — load×factor ↔ capacity (dev, noindexed)
 │   ├── ramp.html                   # Ramp — rise → runs + landings, §405 (dev, noindexed)
+│   ├── roof.html                   # Roof — drag a true-scale section for heights from wall line, drip edge or ridge (dev)
+│   ├── taper.html                  # Roof Taper — flat plan, drains placed, four-way taper heights (dev, noindexed)
 │   ├── exits.html                  # Exits — count thresholds + half-diagonal (dev, noindexed)
 │   ├── fixture-calc.html           # Plumbing Fixtures — banded ratios, draft-tagged data (dev)
 │   ├── sheet-sizes.html            # Sheet Sizes — ARCH/ANSI fit reference, on the theme (dev)
