@@ -51,13 +51,14 @@
   /* the section: true scale, drag the point along the roof; the distance and
      height labels are inputs sitting on the drawing */
   .rf-wrap { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-  .rf-from { position: absolute; left: 0; top: 0; z-index: 2; }
+  .rf-tools { position: absolute; left: 0; right: 0; top: 0; z-index: 2; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem 1rem; }
   svg.rf { display: block; max-width: 100%; height: auto; }
   svg.rf text { font-family: var(--font-body); font-size: 13px; fill: var(--ink-2);
                 stroke: var(--answer-surface); stroke-width: 3px; paint-order: stroke; }
   svg.rf .rf-roof  { stroke: var(--nl-ink); stroke-width: 2.5; fill: none; stroke-linejoin: round; }
   svg.rf .rf-plate { stroke: var(--nl-axis); stroke-width: 1; }
   svg.rf .rf-wall  { stroke: var(--nl-axis); stroke-width: 1; stroke-dasharray: 2 3; }
+  svg.rf .rf-ext   { stroke: var(--nl-axis); stroke-width: 1; stroke-dasharray: 3 3; }
   svg.rf .rf-datum { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 3; opacity: 0.7; }
   svg.rf .rf-dim   { stroke: var(--accent); stroke-width: 1.5; }
   svg.rf .rf-tick  { stroke: var(--accent); stroke-width: 1.5; }
@@ -149,7 +150,7 @@
            heights, each built to the grid with its rounding -->
       <div class="answer-card">
         <div class="rf-wrap" id="figure"></div>
-        <p class="rf-hint" id="figHint">Drag along the roof, or type in a label on the drawing. Arrow keys move the point by an inch, with Shift by a foot.</p>
+        <p class="rf-hint" id="figHint">Drag along the roof, or type in a label on the drawing. Arrow keys move the point one snap step, with Shift a foot (a meter).</p>
         <div class="snap-rows" id="heightRows"></div>
       </div>
 
@@ -203,8 +204,9 @@
         step rounds in decimals along the way. A height is the plan distance times the slope,
         which usually falls between units: it is rounded to the nearest unit, then to the
         fraction you build to, and each row shows what that rounding adds or drops. Dragging
-        moves the point in whole inches, or 10 mm in metric, and holds it at the wall line,
-        the drip edge, the ridge and whole feet or meters as it passes them. The lines below are
+        moves the point by the snap step you choose, and with any step it holds at the wall line,
+        the drip edge, the ridge and whole feet or meters as it passes them. With snap off it
+        moves to the nearest engine unit. The lines below are
         the arithmetic for the reading above.</p>
       <div class="mathnote" id="mathNote"></div>
     </div>
@@ -233,7 +235,13 @@
   };
   var DEFAULT_GRID = { imperial: 3048, metric: 4800 };
   // the drag step and the round numbers it holds at, per system
-  var STEP = { imperial: IN, metric: 10 * MM };
+  // the snap choices: what a drag moves in. Off drags freely; any step also
+  // holds at the wall line, drip edge, ridge and round numbers it passes
+  var SNAPS = {
+    imperial: [['off', 0], ['1/2"', IN / 2], ['1"', IN], ['6"', 6 * IN], ["1'", FT]],
+    metric:   [['off', 0], ['5 mm', 5 * MM], ['10 mm', 10 * MM], ['50 mm', 50 * MM], ['100 mm', 100 * MM]]
+  };
+  var STEP = { imperial: IN, metric: 10 * MM };   // the default snap
   var ROUND = { imperial: FT, metric: M };
   // with no span, the section runs this far: long enough for most roofs,
   // shorter on a phone so the eave end stays readable
@@ -249,7 +257,7 @@
 
   // x: the point, in plan, from the left wall line (engine units). ref: what
   // distances and heights are measured from.
-  var state = { text: {}, grid: null, target: 'imperial', x: 9 * FT, ref: 'wall' };
+  var state = { text: {}, grid: null, target: 'imperial', x: 9 * FT, ref: 'wall', snap: IN };
 
   var els = {};
   ['buildRow','echo','echoLine','echoAssume','roofOut','figure','figHint','heightRows','areaRows','hipRows','hipBox','mathNote','slopeLink']
@@ -314,6 +322,7 @@
     if (sys === state.target) return;
     state.target = sys;
     if (!GRIDS[sys].some(function (g) { return g[1] === state.grid; })) state.grid = DEFAULT_GRID[sys];
+    if (!SNAPS[sys].some(function (o) { return o[1] === state.snap; })) state.snap = STEP[sys];
   }
 
   function row(name, gloss, value, sub, resid, cls) {
@@ -477,7 +486,7 @@
     var yBot = Math.min(0, -O * s);
     var width = els.figure.clientWidth || Math.min(680, (document.documentElement.clientWidth || 360) - 40);
     width = Math.min(width, 680);
-    var mL = 14, mR = 14, mT = 40, mB = 62;
+    var mL = 14, mR = 14, mT = width < 560 ? 76 : 40, mB = 62;
     var k = Math.min((width - mL - mR) / (x2 - x0), 300 / Math.max(yTop - yBot, 1));
     var H = Math.round((yTop - yBot) * k + mT + mB);
     fig = { k: k, x0: x0, yTop: yTop, mL: mL, mT: mT, width: width };
@@ -507,6 +516,9 @@
     o += '<line class="rf-dim" x1="' + f(px) + '" y1="' + f(ry) + '" x2="' + f(px) + '" y2="' + f(py) + '"/>';
     // the plan distance: a dimension line under the drawing
     var dy = H - 40;
+    // extension lines, dashed, from the reference and the point down to it
+    o += '<line class="rf-ext" x1="' + f(rx) + '" y1="' + f(ry + 5) + '" x2="' + f(rx) + '" y2="' + (dy + 7) + '"/>';
+    o += '<line class="rf-ext" x1="' + f(px) + '" y1="' + f(Math.max(py, ry) + 5) + '" x2="' + f(px) + '" y2="' + (dy + 7) + '"/>';
     o += '<line class="rf-dim" x1="' + f(rx) + '" y1="' + dy + '" x2="' + f(px) + '" y2="' + dy + '"/>';
     o += '<line class="rf-tick" x1="' + f(rx) + '" y1="' + (dy - 5) + '" x2="' + f(rx) + '" y2="' + (dy + 5) + '"/>';
     o += '<line class="rf-tick" x1="' + f(px) + '" y1="' + (dy - 5) + '" x2="' + f(px) + '" y2="' + (dy + 5) + '"/>';
@@ -518,12 +530,16 @@
     var svg = '<svg class="rf" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + H + '" width="' + width + '" height="' + H + '" aria-label="Roof section to true scale">' + o + '</svg>';
 
     // on the drawing: what to measure from, and the two editable labels
-    var from = '<div class="rf-from key-row" role="group" aria-label="Measure from"><span class="key-label">from</span>';
+    var from = '<div class="rf-tools"><div class="rf-from key-row" role="group" aria-label="Measure from"><span class="key-label">from</span>';
     REFS.forEach(function (r) {
       if ((r[0] === 'ridge' && g.S == null) || (r[0] === 'drip' && !(g.O > 0))) return;
       from += '<button type="button" class="key-sm" data-ref="' + r[0] + '" aria-pressed="' + (state.ref === r[0]) + '">' + r[1] + '</button>';
     });
-    from += '</div>';
+    from += '</div><div class="rf-snap key-row" role="group" aria-label="Snap"><span class="key-label">snap</span>';
+    SNAPS[state.target].forEach(function (o) {
+      from += '<button type="button" class="key-sm" data-snap="' + o[1] + '" aria-pressed="' + (state.snap === o[1]) + '">' + esc(o[0]) + '</button>';
+    });
+    from += '</div></div>';
     // the height label sits beside its dimension, on the open side
     var hx = px + (px < width * 0.55 ? 62 : -62), hy = Math.max(mT + 12, Math.min(H - 50, (py + ry) / 2));
     // a short dimension: the label goes above the point instead of beside it
@@ -546,20 +562,21 @@
     var rect = els.figure.querySelector('svg').getBoundingClientRect();
     var scale = rect.width / fig.width;
     var raw = fig.x0 + ((e.clientX - rect.left) / scale - fig.mL) / fig.k;
+    if (!state.snap) return Math.round(raw);
     var magnets = [-g.O, 0];
     if (g.S != null) magnets.push(g.S / 2, g.S, g.S + g.O);
     var best = null, bd = 10 / (fig.k * scale);       // 10 px
     magnets.forEach(function (m) { var d = Math.abs(raw - m); if (d < bd) { bd = d; best = m; } });
     if (best != null) return best;
     var R = ROUND[state.target], r = Math.round(raw / R) * R;
-    if (Math.abs(raw - r) < 5 / (fig.k * scale)) return r;
-    var st = STEP[state.target];
+    if (state.snap < R && Math.abs(raw - r) < 5 / (fig.k * scale)) return r;
+    var st = state.snap;
     return Math.round(raw / st) * st;
   }
 
   var drag = null;
   els.figure.addEventListener('pointerdown', function (e) {
-    if (e.target.closest('.rf-edit') || e.target.closest('.rf-from')) return;
+    if (e.target.closest('.rf-edit') || e.target.closest('.rf-tools')) return;
     var g = geom(); if (g.s == null) return;
     var onHit = e.target.classList && (e.target.classList.contains('rf-hit') || e.target.id === 'rfHandle' || e.target.classList.contains('rf-halo'));
     if (!onHit) return;
@@ -586,6 +603,8 @@
 
   // the measure-from keys
   els.figure.addEventListener('click', function (e) {
+    var sn = e.target.closest && e.target.closest('[data-snap]');
+    if (sn) { state.snap = +sn.dataset.snap; render(); return; }
     var b = e.target.closest && e.target.closest('[data-ref]');
     if (!b) return;
     state.ref = b.dataset.ref;
@@ -594,7 +613,7 @@
   // arrow keys on the handle
   els.figure.addEventListener('keydown', function (e) {
     if (e.target.id === 'rfHandle') {
-      var st = e.shiftKey ? ROUND[state.target] : STEP[state.target];
+      var st = e.shiftKey ? ROUND[state.target] : (state.snap || STEP[state.target]);
       var dir = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 0;
       if (!dir) return;
       e.preventDefault();
@@ -686,6 +705,7 @@
       });
       if (Math.round(state.x) !== 9 * FT) { any = true; q.set('x', String(Math.round(state.x))); }
       if (state.ref !== 'wall') { any = true; q.set('ref', state.ref); }
+      if (state.snap !== STEP[state.target]) { any = true; q.set('sn', String(state.snap)); }
       if (state.target !== 'imperial') { any = true; q.set('u', 'mm'); }
       if (state.grid !== DEFAULT_GRID[state.target]) { any = true; q.set('g', String(state.grid)); }
       try { history.replaceState(null, '', any ? '?' + q.toString() : location.pathname); } catch (e) { /* sandboxed view */ }
@@ -707,9 +727,9 @@
       var r2 = readDim(hr), sp = Slope.parseSlope(hs);
       if (r2 && r2.units && sp && !sp.error) { X = Math.round(r2.units / sp.ratio); any = true; }
     }
-    var ref = q.get('ref'), g = +q.get('g');
+    var ref = q.get('ref'), g = +q.get('g'), sn = q.get('sn');
     return { text: out, any: any || X != null, x: X, ref: ref === 'drip' || ref === 'ridge' ? ref : null,
-             metric: q.get('u') === 'mm', grid: Number.isSafeInteger(g) && g > 0 ? g : null };
+             metric: q.get('u') === 'mm', snap: sn != null && /^d+$/.test(sn) ? +sn : null, grid: Number.isSafeInteger(g) && g > 0 ? g : null };
   }
 
   /* ---- wiring ------------------------------------------------------------------ */
@@ -742,6 +762,7 @@
   if (u.x != null) state.x = u.x;
   if (u.ref) state.ref = u.ref;
   state.target = u.metric ? 'metric' : (['span', 'oh'].map(function (k) { return statedSystem(state.text[k]); }).filter(Boolean)[0] || 'imperial');
+  state.snap = u.snap != null && SNAPS[state.target].some(function (o) { return o[1] === u.snap; }) ? u.snap : STEP[state.target];
   state.grid = u.grid && GRIDS[state.target].some(function (g) { return g[1] === u.grid; }) ? u.grid : DEFAULT_GRID[state.target];
   render();
 })();
