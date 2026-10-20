@@ -3,7 +3,7 @@
    pdf-markup.html (between the matrix:start / matrix:end comments).
    =========================================================================
    The JSON is the source of truth for every tool: its group, whether it is
-   its tier ("leader" for a current market leader, "new" for a newcomer, "" for neither), one cell per column, price, notes.
+   its tier ("leader" for an editorial shortlist pick, "new" for a newcomer, "" for neither), one cell per column, price, notes.
 
    A cell is [value, label, evidence]:
      value     yes | part | no
@@ -28,7 +28,7 @@ const PAGE = join(ROOT, 'pdf-markup.html');
 
 const COLS = [
   ['win', 'Windows'], ['mac', 'Mac'], ['linux', 'Linux'], ['ipad', 'iPad'], ['web', 'Web'],
-  ['measure', 'Scaled measurement'], ['team', 'Team review'], ['compare', 'Compare revisions'], ['checklist', 'Checklist review'],
+  ['measure', 'Scaled measurement'], ['team', 'Team review'], ['compare', 'Compare revisions'],
 ];
 const PLATS = COLS.slice(0, 5).map(c => c[0]);
 const CAPS = COLS.slice(5).map(c => c[0]);
@@ -59,13 +59,13 @@ let out = '';
 for (const g of groups) {
   const rows = tools.filter(t => t.group === g.key);
   if (!rows.length) continue;
-  out += `          <tr class="m-group" data-group="${g.key}"><th colspan="${NCOL}" scope="colgroup" id="${g.key}"><span class="m-group-name">${g.name}</span> <span class="m-group-sub">${g.sub}</span></th></tr>\n`;
+  out += `          <tr class="m-group" data-group="${g.key}"><th colspan="${NCOL}" scope="colgroup" id="${g.key}"><span class="m-group-label"><span class="m-group-name">${g.name}</span> <span class="m-group-sub">${g.sub}</span></span></th></tr>\n`;
   for (const t of rows.sort((a, b) => a.name.localeCompare(b.name))) {
     if (ids.has(t.id)) fail('duplicate id ' + t.id);
     ids.add(t.id);
     const plat = PLATS.filter(k => t.cells[k][0] !== 'no').join(' ');
     const caps = CAPS.filter(k => t.cells[k][0] !== 'no').join(' ');
-    const TIER = { leader: 'market leader', new: 'newcomer' };
+    const TIER = { leader: 'shortlist', new: 'newcomer' };
     if (t.tier && !TIER[t.tier]) fail(t.id + ': unknown tier ' + t.tier);
     const maker = t.maker + (t.tier ? ` &middot; <span class="m-tier m-tier-${t.tier}">${TIER[t.tier]}</span>` : '');
     out += `          <tr class="m-row" id="${t.id}" data-group="${g.key}" data-plat="${plat}" data-cap="${caps}"${t.tier ? ` data-tier="${t.tier}"` : ''}>\n`;

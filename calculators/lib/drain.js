@@ -55,7 +55,7 @@
   var Q = 1 / 48, E = 1 / 96, S = 1 / 192;   // 1/4, 1/8, 1/16 inch per foot
 
   var ITEMS = [
-    { id: 'dwv', label: 'Drain, waste and vent pipe', group: 'Pipe', min: null, piped: true,
+    { id: 'dwv', label: 'Horizontal drainage pipe', group: 'Pipe', min: null, piped: true,
       pipes: ['1-1/2', '2', '3', '4', '6', '8'],
       cite: 'IPC Table 704.1',
       note: 'Pipe upstream of a grease interceptor takes 1/4"/ft at any size (Table 704.1, note a). The UPC (708.1) asks 1/4"/ft for every size, and allows 1/8"/ft for 4" and larger only where 1/4"/ft is impractical and the authority having jurisdiction approves it. The 2024 UPC limits that to the building drain.' },
@@ -65,13 +65,13 @@
       note: 'The IMC sets the line at 3/4" pipe size or larger (3/4" inside diameter in the 2018 edition), with no decrease in size from the drain pan connection.' },
     { id: 'shower', label: 'Shower floor', group: 'Surface', min: Q, max: 1 / 24, minFace: '1/4"/ft', maxFace: '1/2"/ft',
       cite: 'IRC P2709.1',
-      note: 'An accessible shower\'s clear floor is held to 1:48 (ADA 2010 305.2), so a roll-in shower lands at 1/4"/ft with almost no room either way.' },
+      note: 'For accessible showers, coordinate drainage with the applicable accessibility requirements. A 1:48 maximum is 1/4"/ft; do not apply the general shower maximum to an accessible shower.' },
     { id: 'roof', label: 'Low-slope roof membrane', group: 'Surface', min: Q, minFace: '1/4"/ft',
       cite: 'IBC 1507.10.1, 1507.11.1, 1507.12.1',
       note: 'Built-up, modified bitumen and single-ply membranes. Coal-tar built-up roofing is allowed at 1/8"/ft. The 2018 IBC lists thermoplastic single-ply separately, at 1507.13.1.' },
     { id: 'gutter', label: 'Gutter', group: 'Surface', min: S, minFace: '1/16"/ft',
       cite: 'Trade practice',
-      note: 'The model codes set no gutter slope. 1/16"/ft is the usual minimum, and steeper drains faster.' },
+      note: 'The model codes set no gutter slope. 1/16"/ft is a planning reference here. Confirm the gutter manufacturer\'s slope and outlet requirements.' },
     { id: 'grade', label: 'Ground at a foundation', group: 'Site', min: 1 / 20, minFace: '6" in 10\' (5%)',
       cite: 'IRC R401.3',
       note: 'Where lot lines or walls prevent the full fall, the IRC allows drains or swales instead.' },
@@ -79,7 +79,7 @@
       cite: 'IRC R401.3, exception', note: 'Impervious surfaces sloped away from the building.' },
     { id: 'pave', label: 'Paving, elsewhere', group: 'Site', min: 0.01, minFace: '1%',
       cite: 'Trade practice',
-      note: 'An accessible route\'s cross slope may not exceed 1:48 (ADA 2010 403.3), so it drains between 1% and 2.08%.' }
+      note: 'An accessible route\'s cross slope may not exceed 1:48 (ADA 2010 403.3), The 1% value here is a drainage planning reference, not an ADA minimum.' }
   ];
 
   // IPC Table 704.1: 2-1/2" and smaller 1/4"/ft, 3"–6" 1/8"/ft, 8" and larger 1/16"/ft

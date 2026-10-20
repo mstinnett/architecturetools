@@ -108,9 +108,8 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Slope</span>
     </nav>
     <h1>Slope</h1>
-    <p>Enter any two of rise, run and slope to get the third, the slope in
-       every form, and how much rise rounding it to a whole number adds or
-       drops across your run.</p>
+    <p>What rise, run or slope do you need? Enter any two to find the third,
+       convert between slope formats, and see how rounding changes the rise.</p>
     <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
@@ -166,6 +165,13 @@
       <div class="ratio-box" id="refBox">
         <div class="section-label">Common Slopes</div>
         <div class="ref-groups" id="refRows"></div>
+        <details class="engine-intro"><summary>Reference scope and sources</summary>
+          <p>Accessibility: <a href="https://www.access-board.gov/ada/chapter/ch04/">2010 ADA 403.3 and 405.2–3</a>, including the stated exceptions.
+          Roofing: <a href="https://codes.iccsafe.org/content/IRC2024V1.0/chapter-9-roof-assemblies">2024 IRC R905</a>; underlayment requirements also depend on material and wind conditions.
+          Drainage: IPC Table 704.1; upstream of a grease interceptor, use at least 1/4&quot;/ft regardless of size.</p>
+          <p>Excavations: <a href="https://www.osha.gov/laws-regs/regulations/standardnumber/1926/1926SubpartPAppB">OSHA Subpart P, Appendix B</a> applies the listed simple slopes to classified soils at depths of 20 ft (6.1 m) or less. Site conditions may require flatter slopes.
+          Repose, landscape and stair angles are illustrative comparisons, not design limits. Check the adopted code and project conditions.</p>
+        </details>
       </div>
     </div>
   </div>
@@ -406,9 +412,9 @@
       { label: 'Repose, dry sand', ratio: tanD(30), ratioHi: tanD(35), face: '30–35°', type: 'range' },
       { label: 'Repose, gravel', ratio: tanD(35), ratioHi: tanD(40), face: '35–40°', type: 'range' },
       { label: 'Repose, loose earth', ratio: tanD(30), ratioHi: tanD(45), face: '30–45°', type: 'range' } ] },
-    { name: 'Landscape', refs: [
-      { label: 'Mowable lawn', ratio: 1 / 3, face: '3H:1V (33%)', type: 'max' },
-      { label: 'Planted slope', ratio: 1 / 2, face: '2H:1V (50%)', type: 'max' } ] },
+    { name: 'Landscape examples', refs: [
+      { label: 'Mowable lawn', ratio: 1 / 3, face: '3H:1V (33%)', type: 'reference' },
+      { label: 'Planted slope', ratio: 1 / 2, face: '2H:1V (50%)', type: 'reference' } ] },
     { name: 'Stairs and ladders', refs: [
       { label: 'Stairs', ratio: tanD(30), ratioHi: tanD(38), face: 'about 30–38°', type: 'range' },
       { label: "Ship's ladder", ratio: tanD(50), ratioHi: tanD(70), face: '50–70°', type: 'range' },
@@ -439,7 +445,7 @@
 
   /* ---- the onward tools ------------------------------------------------------ */
   var NEXT = [
-    { key: 'roof', href: 'roof.html', name: 'Roof', line: 'Heights off a roof section, from the wall line, drip edge or ridge.', stage: 'dev' },
+    { key: 'roof', href: 'roof.html', name: 'Roof', line: 'Heights off a roof section, from the wall line, drip edge or ridge.' },
     { key: 'ramp', href: 'ramp.html', name: 'Ramp', line: 'Run length, landings and the floor the ramp takes.', stage: 'dev' },
     { key: 'drain', href: 'drain.html', name: 'Drain', line: 'The height a run uses at its minimum slope, or the length a height allows.' },
     { key: 'taper', href: 'taper.html', name: 'Roof Taper', line: 'A flat roof sloped to its drains: how high the taper builds.' }
@@ -516,7 +522,7 @@
       refLoLabel: wedge ? ss.lo.face : null, refHiLabel: wedge ? ss.hi.face : null,
       hatchTo: wedge ? hatchTo : null,
       compare: compare,
-      width: width, height: 360
+      width: width, height: Math.min(360, Math.max(220, width * 0.6))
     });
 
     function cost(stepRatio) {

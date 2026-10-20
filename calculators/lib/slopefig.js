@@ -129,7 +129,7 @@
     rays.forEach(function (ray) {
       var e = rayEnd(ray.r);
       var stroke = ray.cmp ? 'var(--accent,#004C80)' : 'var(--nl-axis,#999)';
-      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:' + stroke + '" stroke-width="' + (ray.cmp ? 1.3 : 1) + '" stroke-dasharray="' + (ray.cmp ? '1 3' : '4 3') + '"/>';
+      svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + e.x + '" y2="' + e.y + '" style="stroke:' + stroke + '" stroke-width="' + 1 + '" stroke-dasharray="' + (ray.cmp ? '1 3' : '4 3') + '"/>';
       if (!ray.label) return;
       if (Math.abs(e.y - mT) < 1.5) stack.push({ ex: e.x, label: ray.label });   // clipped to top edge
       else svg += txt(Math.min(e.x + 4, W - 4), Math.max(10, e.y + 3), 'nl-src-val', e.x > x0 + boxW - 8 ? 'end' : 'start', ray.label);
@@ -142,14 +142,14 @@
     }
 
     // ground + rise legs (light), the slope itself (heavy)
-    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
-    svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + y0 + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
+    svg += '<line x1="' + xT + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
     // right-angle marker at the toe corner — reads as a diagram
     if (px > 22 && py > 22) {
       var sq = 10;
-      svg += '<path d="M ' + (xT - sq) + ' ' + y0 + ' L ' + (xT - sq) + ' ' + (y0 - sq) + ' L ' + xT + ' ' + (y0 - sq) + '" fill="none" style="stroke:var(--nl-axis,#999)" stroke-width="1.2"/>';
+      svg += '<path d="M ' + (xT - sq) + ' ' + y0 + ' L ' + (xT - sq) + ' ' + (y0 - sq) + ' L ' + xT + ' ' + (y0 - sq) + '" fill="none" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>';
     }
-    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="2.5"/>';
+    svg += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + xT + '" y2="' + yT + '" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="1.5"/>';
 
     // the slope length (the projected/true length, e.g. a rafter) — labelled
     // at the hypotenuse midpoint, offset perpendicular to sit above the line

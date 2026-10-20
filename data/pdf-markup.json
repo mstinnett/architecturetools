@@ -36,16 +36,15 @@
         "web": ["yes", "Bluebeam Cloud", "https://www.bluebeam.com/bluebeam-on-mac/#:~:text=open%20PDFs%2C%20place%20markups%2C%20take%20measurements"],
         "measure": ["yes", "with takeoff", "https://support.bluebeam.com/revu/how-to/set-the-page-scale-on-drawing.html#:~:text=Locate%20a%20known%20length%20on%20the%20drawing"],
         "team": ["yes", "Studio Sessions", "https://support.bluebeam.com/studio/how-to/tips-and-tricks/five-things-you-may-not-know-about-sessions.html#:~:text=Studio%20Sessions%20allow%20multiple%20attendees%20to%20access%20a%20PDF"],
-        "compare": ["yes", "compare, overlay", "https://support.bluebeam.com/revu/features/compare-documents-vs-overlay-pages.html#:~:text=Compare%20Documents%20highlights%20differences%20between%20two%20PDFs"],
-        "checklist": ["no", "", ""]
+        "compare": ["yes", "compare, overlay", "https://support.bluebeam.com/revu/features/compare-documents-vs-overlay-pages.html#:~:text=Compare%20Documents%20highlights%20differences%20between%20two%20PDFs"]
       },
       "price": "Subscription",
       "notes": [
         "Tool chests of saved markups, a markups list you can sort and export, calibrated measurement and takeoff, sheet comparison and overlay, and Studio Sessions for live review with consultants.",
-        "The full app is Windows only. Revu for Mac ended in 2023, and Revu for iPad left the App Store at the end of 2025. Mac users get Bluebeam Cloud in the browser. On iPad, the Bluebeam Cloud app does not yet calibrate a sheet, and it is rated 1.5 out of 5 on the App Store, with reviewers reporting an unresponsive Apple Pencil."
+        "The full desktop app is Windows only. Support for Revu for Mac ended in June 2023; Revu for iPad was withdrawn from sale in December 2025. Mac users can use the web app. Check the mobile feature list before relying on it for site measurement."
       ],
       "disclosure": "",
-      "meta": "Price: About $260&ndash;440 per user per year &middot; Also on iPhone &middot; <a href=\"https://www.bluebeam.com/product/markups-and-data/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Subscription; price and features depend on plan &middot; Also on iPhone &middot; <a href=\"https://www.bluebeam.com/product/markups-and-data/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "drawboard-pdf",
@@ -61,12 +60,12 @@
         "web": ["yes", "", "https://www.drawboard.com/pdf#:~:text=Available%20on%20Windows%2C%20iOS%2C%20macOS%2C%20Android%20and%20in%20your%20web%20browser"],
         "measure": ["part", "Pro Plus tiers", "https://www.drawboard.com/blog/add-measurement-and-angles-to-your-markups-using-drawboard-pdf#:~:text=Drawboard%20PDF%20PRO%20includes%20the%20ability%20to%20calibrate"],
         "team": ["yes", "shared documents", "https://www.drawboard.com/pdf#:~:text=mark%20up%20with%20others%20in%20real-time"],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Free tier, subscription",
       "notes": [
-        "Drawboard&rsquo;s single-user app, designed around pen input on a tablet. The free tier covers ink, shapes, text and signatures. Pro syncs up to 50 documents. Measurement is in Pro Plus and Pro Unlimited."
+        "Annotate PDFs with pen, shapes, text and signatures. Paid plans add scaled measurement, cloud storage and shared documents for real-time review.",
+        "For commercial work, Drawboard specifies Pro Plus or Pro Unlimited. Check the plan terms before using the free tier for project deliverables."
       ],
       "disclosure": "",
       "meta": "Price: Free. Paid tiers $6.99&ndash;13.33 a month, billed annually &middot; Also on Android &middot; <a href=\"https://www.drawboard.com\" rel=\"noopener\">Website</a>"
@@ -85,12 +84,11 @@
         "web": ["no", "", ""],
         "measure": ["yes", "length, area", "https://ncored.com/#:~:text=Set%20the%20scale%20by%20ratio%20or%20calibrate%20on%20a%20known%20length"],
         "team": ["no", "", ""],
-        "compare": ["yes", "revision overlay", "https://ncored.com/#:~:text=Drag%20an%20older%20revision%20onto%20the%20drawing"],
-        "checklist": ["no", "", ""]
+        "compare": ["yes", "revision overlay", "https://ncored.com/#:~:text=Drag%20an%20older%20revision%20onto%20the%20drawing"]
       },
       "price": "Subscription or one-time",
       "notes": [
-        "A PDF editor made by an architecture studio for large CAD and BIM exports, the 50&ndash;200&nbsp;MB sets that make general PDF apps lag on zoom and pan. Redlines, notes, shapes and large-format printing, with files kept on your machine.",
+        "A PDF editor for large CAD and BIM drawing sets. Redlines, notes, shapes and large-format printing, with local files.",
         "Set the scale by ratio or by calibrating a known length, then measure lengths and areas. Drag an older revision onto a sheet to overlay it, with additions and removals in color. The Mac version needs Apple Silicon."
       ],
       "disclosure": "",
@@ -110,8 +108,7 @@
         "web": ["no", "", ""],
         "measure": ["yes", "", "https://www.qoppa.com/pdfstudio/features/#:~:text=Precision%20measuring%20tools%20for%20distances"],
         "team": ["no", "", ""],
-        "compare": ["yes", "overlay", "https://www.qoppa.com/files/pdfstudio/guide/overlay-comparison.htm#:~:text=especially%20useful%20for%20architects%20and%20engineers"],
-        "checklist": ["no", "", ""]
+        "compare": ["yes", "overlay", "https://www.qoppa.com/files/pdfstudio/guide/overlay-comparison.htm#:~:text=especially%20useful%20for%20architects%20and%20engineers"]
       },
       "price": "One-time",
       "notes": [
@@ -134,8 +131,7 @@
         "web": ["no", "", ""],
         "measure": ["yes", "length, perimeter, area", "https://help.pdf-xchange.com/pdfxe11/the-measuring-tools.html#:~:text=The%20Area%20Tool%20is%20used%20to%20measure"],
         "team": ["no", "", ""],
-        "compare": ["part", "Plus edition", "https://help.pdf-xchange.com/pdfxe11/compare-documents.html#:~:text=a%20license%20for%20PDF%2DXChange%20Editor%20Plus%20is%20required"],
-        "checklist": ["no", "", ""]
+        "compare": ["part", "Plus edition", "https://help.pdf-xchange.com/pdfxe11/compare-documents.html#:~:text=a%20license%20for%20PDF%2DXChange%20Editor%20Plus%20is%20required"]
       },
       "price": "One-time",
       "notes": [
@@ -157,14 +153,13 @@
         "ipad": ["yes", "", "https://apps.apple.com/us/app/polypdf/id6751167250"],
         "web": ["no", "", ""],
         "measure": ["yes", "length, area", "https://apps.apple.com/us/app/polypdf/id6751167250#:~:text=Measure%20lengths%20and%20areas%20using%20a%20calibrated%20scale"],
-        "team": ["no", "", ""],
-        "compare": ["part", "desktop", "https://polypdf.com/compare-pdf-drawings/#:~:text=Compare%20Documents%20is%20available%20in%20Free%20and%20Pro%20on%20Mac%20and%20Windows"],
-        "checklist": ["no", "", ""]
+        "team": ["no", "in beta", "https://polypdf.com/versions/#:~:text=Collaboration%20Beta%20lets%20approved%20Mac%20and%20Windows%20users"],
+        "compare": ["part", "desktop", "https://polypdf.com/compare-pdf-drawings/#:~:text=Compare%20Documents%20is%20available%20in%20Free%20and%20Pro%20on%20Mac%20and%20Windows"]
       },
       "price": "Free tier, one-time",
       "notes": [
         "A drawing app for Mac, Windows and iPad from one developer. Callouts, discipline colors, and measurement of lengths, areas, perimeters and angles at a calibrated scale. The desktop apps compare two documents, with a colored overlay in Pro.",
-        "The free tier allows three measurements per document. It has no shared team review."
+        "The free tier allows three measurements per document. Shared live markup between Mac and Windows users is in beta, through a collaboration server the firm hosts itself."
       ],
       "disclosure": "",
       "meta": "Price: Free. Desktop Pro $74.95 one-time, iPad Pro $99 one-time &middot; Also on iPhone &middot; <a href=\"https://polypdf.com\" rel=\"noopener\">Website</a>"
@@ -182,16 +177,15 @@
         "ipad": ["no", "", ""],
         "web": ["no", "", ""],
         "measure": ["yes", "", ""],
-        "team": ["no", "runs locally", ""],
-        "compare": ["yes", "revision overlay", ""],
-        "checklist": ["yes", "", ""]
+        "team": ["no", "", ""],
+        "compare": ["yes", "revision overlay", ""]
       },
       "price": "One-time",
       "notes": [
         "For reviewing a set against a checklist rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.",
-        "Runs locally and offline on Windows, Mac and Linux, and nothing leaves your machine. It is for one reviewer, not live team sessions."
+        "Runs locally and offline on Windows, Mac and Linux. It is for one reviewer, without live team sessions."
       ],
-      "disclosure": "Disclosure: I make it, to replace my own Bluebeam, Excel and Affinity workflow.",
+      "disclosure": "Public documentation could not be verified on 19 October 2026. Platform and feature entries are provisional; confirm them before choosing this beta.",
       "meta": "Price: $400 one-time after the beta &middot; <a href=\"https://adequate.design\" rel=\"noopener\">Website</a>"
     },
     {
@@ -208,8 +202,7 @@
         "web": ["yes", "", "https://www.drawboard.com/pricing"],
         "measure": ["yes", "", "https://www.drawboard.com/pricing#:~:text=Calibrated%20measurements%20including%20length"],
         "team": ["yes", "task lists, free guests", "https://www.drawboard.com/projects#:~:text=limited-access%20guests"],
-        "compare": ["yes", "overlay", "https://www.drawboard.com/blog/overlay-pdf#:~:text=you%20can%20layer%20revisions%20or%20related%20drawings%20together%20and%20compare%20them%20visually%20in%20one%20place"],
-        "checklist": ["no", "", ""]
+        "compare": ["yes", "overlay", "https://www.drawboard.com/blog/overlay-pdf#:~:text=you%20can%20layer%20revisions%20or%20related%20drawings%20together%20and%20compare%20them%20visually%20in%20one%20place"]
       },
       "price": "Subscription",
       "notes": [
@@ -233,13 +226,12 @@
         "web": ["yes", "", "https://helpx.adobe.com/acrobat/web/share-review-and-export/share-documents/share-pdfs-for-review.html"],
         "measure": ["yes", "desktop", "https://helpx.adobe.com/acrobat/using/grids-guides-measurements-pdfs.html"],
         "team": ["yes", "shared review", "https://www.adobe.com/acrobat/features/share-and-review-pdfs.html#:~:text=Multiple%20people%20can%20comment%20on%20a%20PDF%20at%20the%20same%20time"],
-        "compare": ["yes", "desktop", "https://www.adobe.com/acrobat/how-to/compare-two-pdf-files.html#:~:text=Quickly%20spot%20differences%20between%20different%20file%20versions"],
-        "checklist": ["no", "", ""]
+        "compare": ["yes", "desktop", "https://www.adobe.com/acrobat/how-to/compare-two-pdf-files.html#:~:text=Quickly%20spot%20differences%20between%20different%20file%20versions"]
       },
       "price": "Subscription",
       "notes": [
         "A general PDF editor that many firms already license. Comments, drawing markups, calibrated measurement, file comparison and shared review. Measurement and comparison are in the Windows and Mac apps, not the web or iPad apps.",
-        "It has no tool chest or sortable markups list."
+        "Sort and filter the Comments list by author, page, type or status."
       ],
       "disclosure": "",
       "meta": "Price: Subscription &middot; Also on iPhone, Android &middot; <a href=\"https://www.adobe.com/acrobat/acrobat-pro.html\" rel=\"noopener\">Website</a>"
@@ -258,8 +250,7 @@
         "web": ["yes", "", "https://www.foxit.com/pdf-editor/pricing/#:~:text=Windows%2C%20macOS%20%26%20Web%20apps"],
         "measure": ["yes", "", "https://resource-cms.foxit.com/foxit-pdf-editor-for-windows/about-measure-tools#:~:text=There%20are%20ten%20measurement%20tools%20in%20Foxit%20PDF%20Editor"],
         "team": ["yes", "shared review", "https://www.foxit.com/blog/collaborate-with-shared-review/"],
-        "compare": ["yes", "file comparison", "https://www.foxit.com/blog/seeing-double-how-to-compare-pdfs-in-foxit-reader-and-foxit-phantompdf/#:~:text=To%20compare%20two%20versions%20of%20the%20same%20PDF%20document"],
-        "checklist": ["no", "", ""]
+        "compare": ["yes", "file comparison", "https://www.foxit.com/blog/seeing-double-how-to-compare-pdfs-in-foxit-reader-and-foxit-phantompdf/#:~:text=To%20compare%20two%20versions%20of%20the%20same%20PDF%20document"]
       },
       "price": "Subscription",
       "notes": [
@@ -282,8 +273,7 @@
         "web": ["no", "", ""],
         "measure": ["yes", "scale ratio", "https://code-industry.net/masterpdfeditor-help/comments-measurements/#:~:text=The%20Scale%20Ratio%20parameter%20allows%20you%20to%20set"],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "One-time",
       "notes": [
@@ -307,13 +297,12 @@
         "web": ["no", "", ""],
         "measure": ["part", "paid tier", "https://support.readdle.com/pdfexpert/en_US/construction-tools/scale-and-measure-drawings#:~:text=The%20construction%20toolset%20is%20a%20part%20of%20the%20paid%20subscription"],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Subscription",
       "notes": [
         "A PDF editor for Mac and iPad with Apple Pencil support. Highlights, shapes, ink, stamps and notes that sync across your devices.",
-        "The paid tier calibrates a sheet and measures distance, area and perimeter, on iPad since 2021 and on Mac since 2024. Readdle has no plans for a Windows version."
+        "The paid tier calibrates a sheet and measures distance, area and perimeter on Mac and iPad."
       ],
       "disclosure": "",
       "meta": "Price: Subscription &middot; Also on iPhone &middot; <a href=\"https://pdfexpert.com\" rel=\"noopener\">Website</a>"
@@ -332,8 +321,7 @@
         "web": ["no", "", ""],
         "measure": ["no", "", ""],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Free tier, subscription",
       "notes": [
@@ -356,13 +344,12 @@
         "web": ["no", "", ""],
         "measure": ["yes", "scale, area", "https://morpholioapps.com/trace/#:~:text=set%20any%20drawing%20to%20scale%20in%20seconds"],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Subscription",
       "notes": [
-        "Digital trace paper for sketching a design response over a plan or photo. Set a drawing to scale, then dimension it and fill rooms to get their areas. AI Scale, added in March 2026, reads the scale for you.",
-        "It is an iPad and iPhone app, with no Mac or Windows version. It does not track comments. Vectorworks bought Morpholio in February 2026."
+        "Sketch a design response over a plan or photo. Set the drawing scale, then dimension it and measure room areas.",
+        "Available on iPad and iPhone. It does not provide a shared comment log."
       ],
       "disclosure": "",
       "meta": "Price: Subscription &middot; Also on iPhone &middot; <a href=\"https://morpholio.com/trace\" rel=\"noopener\">Website</a>"
@@ -375,18 +362,17 @@
       "tier": "",
       "cells": {
         "win": ["yes", "", "https://okular.kde.org/download/#:~:text=The%20Microsoft%20Store%20is%20the%20recommended%20place"],
-        "mac": ["no", "", ""],
+        "mac": ["part", "nightly builds", "https://okular.kde.org/download/"],
         "linux": ["yes", "", "https://okular.kde.org/download/#:~:text=already%20available%20on%20majority%20of%20Linux%20distributions"],
         "ipad": ["no", "", ""],
         "web": ["no", "", ""],
         "measure": ["no", "", ""],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Free",
       "notes": [
-        "The default document viewer on KDE Linux desktops. Highlights, notes, lines, shapes and stamps, saved into the PDF. It does not measure."
+        "A document viewer with highlights, notes, lines, shapes and stamps. Stable downloads are offered for Windows and Linux; Mac builds are untested nightlies. No scaled takeoff tools."
       ],
       "disclosure": "",
       "meta": "Price: Free, open source &middot; <a href=\"https://okular.kde.org\" rel=\"noopener\">Website</a>"
@@ -405,8 +391,7 @@
         "web": ["no", "", ""],
         "measure": ["no", "", ""],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Free",
       "notes": [
@@ -429,8 +414,7 @@
         "web": ["no", "", ""],
         "measure": ["no", "", ""],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Free",
       "notes": [
@@ -453,8 +437,7 @@
         "web": ["no", "", ""],
         "measure": ["yes", "scale, calibrate", "https://concepts.app/en/tutorials/how-create-floor-plan/#:~:text=Tap%20the%20ratio%20beside%20Measure%20in%20the%20Precision%20menu"],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""],
-        "checklist": ["no", "", ""]
+        "compare": ["no", "", ""]
       },
       "price": "Free tier, subscription",
       "notes": [
@@ -462,7 +445,7 @@
         "It has no shared review."
       ],
       "disclosure": "",
-      "meta": "Price: Free. PDF import is in the Everything plan, $4.99 a month or $29.99 a year &middot; Also on Android &middot; <a href=\"https://concepts.app/en/architects/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free tier; PDF workflows require a paid plan &middot; Also on Android &middot; <a href=\"https://concepts.app/en/architects/\" rel=\"noopener\">Website</a>"
     }
   ]
 }

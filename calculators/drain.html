@@ -67,8 +67,8 @@
   svg.dr .dr-ans { fill: var(--accent); font-size: 15px; font-weight: 500; }
   svg.dr .dr-note { font-size: 12px; font-style: italic; }
   svg.dr .dr-limit { stroke: var(--nl-axis); stroke-width: 1; }
-  svg.dr .dr-pipe { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
-  svg.dr .dr-surf { stroke: var(--accent); stroke-width: 3; fill: none; }
+  svg.dr .dr-pipe { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1; }
+  svg.dr .dr-surf { stroke: var(--accent); stroke-width: 1.5; fill: none; }
   svg.dr .dr-dim { stroke: var(--ink-3); stroke-width: 1; fill: none; }
   svg.dr .dr-allow { fill: url(#drHatch); stroke: none; }
   svg.dr .dr-hatch { stroke: var(--nl-hatch); stroke-width: 0.8; opacity: 0.45; }
@@ -90,6 +90,15 @@
   .ref-foot { font-size: var(--text-xs); color: var(--ink-2); margin-top: var(--space-sm); max-width: 44em; }
   @media (max-width: 600px) { .ref-list .r-cite { flex-basis: auto; text-align: left; margin-left: 0; } }
 
+
+  /* Keep dimensions intact on phones; rounding notes sit below the value. */
+  @media (max-width: 480px) {
+    .snap-row { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 0.2rem 0.5rem; }
+    .snap-name { width: auto; }
+    .snap-value { min-width: 0; }
+    .snap-resid { grid-column: 2; width: auto; min-width: 0; text-align: left; }
+    .snap-resid:empty { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -100,9 +109,9 @@
       <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Drain</span>
     </nav>
     <h1>Drain</h1>
-    <p>Pick what drains and it sets the minimum slope. Enter a length to see the
-       height the run uses, pipe and hangers included, or enter the height you
-       have to see how far it reaches.</p>
+    <p>How much height does the drainage run need? Choose a pipe or surface
+       and enter its length, or start with the available height to find the run.
+       For pipes, add an allowance for hangers, insulation and fittings.</p>
     <button type="button" class="scheme-toggle">
       <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
       <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -183,10 +192,9 @@
 
     <!-- slot 6 · the minimums, cited — the selected one marked -->
     <div class="ratio-box">
-      <div class="section-label">Minimum slopes</div>
+      <div class="section-label">Drainage slope references</div>
       <div class="ref-list" id="refList"></div>
-      <p class="ref-foot">Model-code values, the same in the 2018, 2021 and 2024 editions of the
-         IPC, IMC, IRC and IBC; section numbers are the 2024 ones. Your jurisdiction adopts an
+      <p class="ref-foot">Model-code references are identified by section. Gutter and general paving slopes are planning examples, not code minimums. Your jurisdiction adopts an
          edition with its own amendments, so check the adopted text. Outside diameters are the pipe
          barrel; hubs and no-hub couplings are larger, so add them to the allowance
          where they sit in the tight spot.</p>
@@ -379,7 +387,7 @@
     syncURL();
 
     var lim = limits(), it = item(), odU = od(), alU = allow && !allow.error ? allow.units : 0;
-    els.whatCite.innerHTML = esc('Minimum ' + lim.minFace + (lim.maxFace ? ', maximum ' + lim.maxFace : '') + ' (' + lim.cite + '). ' + it.note)
+    els.whatCite.innerHTML = esc((it.cite === 'Trade practice' ? 'Planning slope ' : 'Reference minimum ') + lim.minFace + (lim.maxFace ? ', maximum ' + lim.maxFace : '') + ' (' + lim.cite + '). ' + it.note)
       + (it.piped ? ' ' + esc('Outside diameter ' + fmtV(odU) + ' (' + Drain.MATERIALS[state.mat].cite + ').') : '');
 
     note.run.innerHTML = run && run.error ? esc(run.error) : '';

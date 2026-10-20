@@ -82,12 +82,54 @@
 
   function build(exact, grid, dir) {
     if (!(typeof exact === 'number' && isFinite(exact))) throw new TypeError('roof: exact must be a finite number, got ' + exact);
-    var u = Math.round(exact);                  // the lattice is far finer than any build grid
+    // Preserve directed rounding even within one lattice unit of a grid line.
+    var u = dir === 'ceil' ? Math.ceil(exact) : dir === 'floor' ? Math.floor(exact) : Math.round(exact);
     var built = snapLib().snap(u, grid, dir);
     return { built: built, resid: built - exact };
   }
 
-  return { heightAt: heightAt, planAt: planAt, ridge: ridge, areaFactor: areaFactor, hip: hip, build: build };
+  // The four-way taper is slope * distance to the nearest drain in the
+  // max(|dx|, |dy|) metric. At radius r, each drain covers an axis-aligned
+  // square. Sweep every square boundary to detect any uncovered roof area.
+  // Bisect the covering radius, retaining an upper bound (never a sampled
+  // underestimate). This also finds narrow maxima between clustered drains.
+  function taperHighPoint(L, W, s, drains) {
+    okL(L, 'length'); okL(W, 'width'); okS(s);
+    if (!drains.length) throw new TypeError('roof: at least one drain is required');
+    drains.forEach(function (d) {
+      okL(d.x, 'drain x'); okL(d.y, 'drain y');
+      if (d.x > L || d.y > W) throw new RangeError('roof: drain outside roof');
+    });
+    function gap(r) {
+      var xs = [0, L];
+      drains.forEach(function (d) { xs.push(Math.max(0, d.x - r), Math.min(L, d.x + r)); });
+      xs.sort(function (a, b) { return a - b; });
+      var probes = xs.slice();
+      for (var i = 1; i < xs.length; i++) probes.push((xs[i - 1] + xs[i]) / 2);
+      for (var x of probes) {
+        var intervals = drains.filter(function (d) { return Math.abs(x - d.x) <= r; })
+          .map(function (d) { return [Math.max(0, d.y - r), Math.min(W, d.y + r)]; })
+          .sort(function (a, b) { return a[0] - b[0]; });
+        var end = 0;
+        for (var interval of intervals) {
+          if (interval[0] > end) return { x: x, y: (end + interval[0]) / 2 };
+          end = Math.max(end, interval[1]);
+        }
+        if (!intervals.length || end < W) return { x: x, y: (end + W) / 2 };
+      }
+      return null;
+    }
+    var lo = 0, hi = Math.max(L, W), witness = gap(0) || { x: 0, y: 0 };
+    for (var n = 0; n < 54; n++) {
+      var mid = (lo + hi) / 2;
+      if (mid === lo || mid === hi) break;
+      var uncovered = gap(mid);
+      if (uncovered) { lo = mid; witness = uncovered; } else hi = mid;
+    }
+    return { h: hi * s, x: witness.x, y: witness.y, error: (hi - lo) * s };
+  }
+
+  return { heightAt: heightAt, planAt: planAt, ridge: ridge, areaFactor: areaFactor, hip: hip, build: build, taperHighPoint: taperHighPoint };
 });
 
 /* ---- tests: node calculators/lib/roof.js -------------------------------- */
@@ -125,6 +167,14 @@ if (typeof module !== 'undefined' && require.main === module) {
   near('build ceil', R.build(6 * FT + 100, 3048, 'ceil').built, 6 * FT + 3048, 0);
   near('build floor', R.build(6 * FT + 3000, 3048, 'floor').built, 6 * FT, 0);
   near('build on grid', R.build(5 * 3048, 3048, 'ceil').resid, 0, 0);
+  near('ceil just above grid', R.build(3048.1, 3048, 'ceil').built, 6096, 0);
+  near('floor just below grid', R.build(3047.9, 3048, 'floor').built, 0, 0);
+  near('center drain', R.taperHighPoint(100, 80, 0.25, [{x:50,y:40}]).h, 12.5);
+  near('corner drain', R.taperHighPoint(100, 80, 0.25, [{x:0,y:0}]).h, 25);
+  near('two drains interior maximum', R.taperHighPoint(100, 20, 1, [{x:10,y:10},{x:90,y:10}]).h, 40);
+  near('asymmetric drains', R.taperHighPoint(100, 20, 1, [{x:2,y:10},{x:83,y:10}]).h, 40.5);
+  near('coincident drains', R.taperHighPoint(100, 80, 1, [{x:50,y:40},{x:50,y:40}]).h, 50);
+  threw('empty drains', function () { R.taperHighPoint(100, 80, 1, []); });
   threw('zero slope throws', function () { R.heightAt(0, 10); });
   threw('negative plan throws', function () { R.heightAt(0.5, -1); });
   threw('NaN slope throws', function () { R.hip(NaN, 1); });
