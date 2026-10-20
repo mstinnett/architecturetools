@@ -2,17 +2,17 @@
 <!-- AT-0 — the master cover sheet (docs/SITE_FRAMEWORK.md "AT-series").
      data-family: the cover takes drafting, the site's blueprint anchor, rather
      than any one set's accent — it belongs to the whole site, not to a tool. -->
-<html lang="en" data-family="drafting">
+<html lang="en" data-family="drafting" data-stage="live">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>architecture.tools</title>
-<meta name="description" content="Tools for architects: a hardware picker for CPU, GPU, RAM, monitor and laptop choices, and a precise unit converter.">
+<meta name="description" content="Tools for architects: a precise unit converter, slope, drainage and roof-taper calculators, a hardware picker for CPU, GPU, RAM, monitor and laptop choices, and guides to PDF markup and architecture software.">
 <link rel="canonical" href="https://architecture.tools/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://architecture.tools/">
 <meta property="og:title" content="architecture.tools">
-<meta property="og:description" content="Tools for architects: a hardware picker for CPU, GPU, RAM, monitor and laptop choices, and a precise unit converter.">
+<meta property="og:description" content="Tools for architects: a precise unit converter, slope, drainage and roof-taper calculators, a hardware picker for CPU, GPU, RAM, monitor and laptop choices, and guides to PDF markup and architecture software.">
 <meta name="twitter:card" content="summary">
 
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
@@ -36,14 +36,17 @@
   /* ---- page-specific only ----
      The sheet, the crumb, the scheme toggle and the palette are shared
      (assets/css/global.css + tokens.css). What's local is the title block and
-     the card band.
+     the lists.
 
-     The band is the picker's software selector at cover scale: a scrolling
-     strip of category groups, chevrons at the edges, and a nav below that
-     doubles as the scrollbar — same parts, same names (sw-* there, cover-*
-     here), larger cards in place of chips. Below 820px the field turns
-     vertical and that nav becomes a rail down the left edge; it is the same
-     scrubber either way, reading its axis from the layout. */
+     The cover is a STACK OF LISTS, one per set: each list is a titled row of
+     plates with its own sideways shelf, rather than one strip divided into
+     sections. A list can open on a FEATURED plate — one tool drawn at full
+     width with its real figure — ahead of its shelf. The calculators lead,
+     opening on the Precise Unit Converter.
+
+     On a phone nothing scrolls sideways: each shelf becomes a two-column
+     grid read top to bottom, and a category bar stuck under the title moves
+     between the lists (see NARROW below). */
 
   /* ONE SURFACE. The cover had three grounds stacked — paper, sheet, card —
      and counted as its own rhythm. There is now a single content surface
@@ -61,7 +64,7 @@
      under it on the shadow, which is the whole point of the shadow.
 
      It behaves the way a native large title does: full size while you are at
-     the top, shrinking as the field moves under it and then STAYING — it is
+     the top, shrinking as the lists move under it and then STAYING — it is
      never not there, at either size. The box shrink-wraps at both, so the
      morph is the box doing its one job at two scales.
 
@@ -69,12 +72,12 @@
      place. That is not a detail: an in-flow bar that shrinks shortens the
      document, which on a short page hands back the very scroll that collapsed
      it — so it uncollapses, grows, and flickers. Overlaid, the document height
-     never moves, the field never lurches when the title lands, and the state
+     never moves, the lists never lurch when the title lands, and the state
      can only settle. */
   :root { --mark-h: 8rem; --mark-h-mini: 3.25rem; }
   .cover-mark-space { height: var(--mark-h); }
   /* The bar itself is nothing: no fill, no rule. Only the box floats, and the
-     field passes behind it rather than being masked by a band the width of the
+     lists pass behind it rather than being masked by a band the width of the
      window. The bar is only a positioner, so it lets pointer events through —
      the box and the key take them back. */
   .cover-mark { position: fixed; top: 0; left: 0; right: 0; z-index: 20;
@@ -112,36 +115,45 @@
     .cover-mark, .cover-mark-box { transition: none; }
   }
 
-  /* FIELD — band + nav. Wide: nav under the band. Narrow: nav down the left
-     edge, band beside it (grid areas swap; nothing is duplicated). */
-  .cover-field { display: grid; grid-template-areas: "band" "nav"; }
-  .cover-band { grid-area: band; display: flex; align-items: stretch; gap: 0.5rem; min-width: 0; }
-  .cover-nav { grid-area: nav; }
+  /* LISTS — stacked down the page, each opened by its title on a rule: the
+     name of the set, then a hairline running to the margin, the way a sheet
+     titles a zone of the drawing. Where a list's shelf overflows, its two
+     keys sit at the end of that rule. */
+  .cover-lists { display: flex; flex-direction: column; gap: var(--space-2xl); }
+  .cover-list-head { display: flex; align-items: center; gap: var(--space-md);
+                     margin-bottom: var(--space-md); min-height: 1.9rem; }
+  .cover-list-label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+                      text-transform: uppercase; color: var(--ink); }
+  .cover-list-rule { flex: 1; min-width: 2rem; border-top: 1px solid var(--rule-2); }
+  /* a shelf that follows a feature has a head of its own: the same rule and
+     keys, no title (the list already has one), so the keys sit beside the
+     plates they move rather than above the feature */
+  .cover-feature + .cover-list-head { margin-top: var(--space-lg); }
 
-  .cover-chev { flex-shrink: 0; width: 2.25rem; border: 1px solid var(--rule-2); background: var(--card);
+  .cover-chev { flex-shrink: 0; width: 1.9rem; height: 1.9rem; border: 1px solid var(--rule-2); background: var(--card);
                 box-shadow: var(--shadow-key); border-radius: var(--radius); cursor: pointer;
                 display: flex; align-items: center; justify-content: center;
                 font-size: 1.1rem; line-height: 1; color: var(--ink-2); padding: 0;
-                transition: border-color 0.15s, color 0.15s, box-shadow 0.15s; }
-  .cover-chev:hover { border-color: var(--ink-3); color: var(--ink); box-shadow: var(--shadow-key-hover); }
+                transition: border-color 0.15s, color 0.15s, box-shadow 0.15s, opacity 0.15s; }
+  .cover-chev:hover:not(:disabled) { border-color: var(--ink-3); color: var(--ink); box-shadow: var(--shadow-key-hover); }
+  .cover-chev:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
   .cover-chev[hidden] { display: none; }
 
-  /* the scroller — its scrollbar is hidden because the nav below IS the bar */
-  .cover-scroll { flex: 1; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
-                  padding-bottom: 0.5rem; scrollbar-width: none; }
-  .cover-scroll::-webkit-scrollbar { display: none; }
-  .cover-strip { display: flex; gap: 2.5rem; min-width: max-content; padding: 0.25rem 0; }
-  .cover-group { display: flex; flex-direction: column; gap: 0.5rem; }
-  .cover-group-label { font-size: 0.55rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase;
-                       color: var(--gray-400); white-space: nowrap; }
-  /* flex:1 so every group fills the strip's height and all card bottoms line
-     up, however long a description runs */
-  .cover-cards { display: flex; gap: 0.75rem; flex: 1; }
+  /* THE SHELF — one list's plates in a row, scrolling sideways when they
+     outrun the page. Its scrollbar is hidden (the keys and a swipe move it).
+     The scroller clips whatever crosses its edges, so it is widened past the
+     column by the plate's hover shadow and padded back in: the plates still
+     line up with the title, and a lifted plate keeps its shadow. */
+  .cover-shelf { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+                 margin: 0 -0.5rem; padding: 0.25rem 0.5rem 0.75rem; scroll-padding: 0 0.5rem;
+                 scroll-snap-type: x proximity; }
+  .cover-shelf::-webkit-scrollbar { display: none; }
+  .cover-cards { display: flex; gap: var(--space-md); }
 
   /* CARD — drawn ON the surface, not lifted off it: a hairline outline, no
      fill of its own and no resting shadow. The lift is kept for hover, where
      it means something (this is a link) instead of being a permanent layer. */
-  .cover-card { display: flex; flex-direction: column; width: 16rem; flex-shrink: 0;
+  .cover-card { display: flex; flex-direction: column; flex: 0 0 16rem; scroll-snap-align: start;
                 border: 1px solid var(--rule); border-radius: var(--radius);
                 background: none; color: inherit; text-decoration: none; overflow: hidden;
                 transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s; }
@@ -160,33 +172,73 @@
   .cover-card .card-desc { margin-top: 0.15rem; font-size: var(--text-sm); font-weight: 300;
                            color: var(--ink-2); line-height: 1.5; }
 
-  /* NAV — the category index, and the scrollbar. Thin track line above, heavy
-     rule below; the indicator overhangs both, as it does on the picker. */
-  .cover-nav { position: relative; display: flex; justify-content: space-between; gap: 1rem;
-               margin-top: 0.5rem; padding: 0.5rem 0;
-               border-top: 1px solid var(--gray-700); border-bottom: 2px solid var(--black);
-               cursor: pointer; touch-action: none; user-select: none; }
-  .cover-nav-item { background: none; border: 0; padding: 0; position: relative; z-index: 1;
-                    font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase;
-                    color: var(--gray-400); white-space: nowrap; cursor: pointer; transition: color 0.15s; }
-  .cover-nav-item:hover, .cover-nav-item.is-active { color: var(--black); }
-  .cover-nav-indicator { position: absolute; top: -1px; bottom: -2px;
-                         border: 1px solid var(--accent); background: var(--accent-soft);
-                         pointer-events: none; cursor: grab; }
-  .cover-nav.is-scrubbing, .cover-nav.is-scrubbing .cover-nav-indicator { cursor: grabbing; }
+  /* THE FEATURE — a plate at the full width of its list: the drawing takes
+     the larger side and the name, the line and a few worked inputs the other.
+     It is a plate with more room, not a banner, so the same hairline, the
+     same hover lift and the same name-turns-accent apply.
 
-  .cover-foot { margin-top: var(--space-xl); text-align: center;
+     The plate holds more than one link (the tool, and each worked input opens
+     the tool on that input), and links can't nest, so it is a box rather than
+     an <a>: the name's link stretches over the whole plate, and the inputs
+     sit above that stretch. */
+  .cover-feature { position: relative; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(15rem, 1fr);
+                   overflow: visible; }   /* or the stretched link's focus ring is clipped */
+  .cover-feature .feature-link { color: inherit; text-decoration: none; }
+  .cover-feature .feature-link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+  .cover-feature .feature-link:focus-visible { outline: none; }
+  .cover-feature .feature-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .cover-feature .card-art { aspect-ratio: auto; min-height: 17rem; padding: 1.75rem 1.25rem;
+                             border-bottom: none;
+                             border-right: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); }
+  /* the figure keeps its own proportions here: drawn once at 560 wide by the
+     engine and shown near that size, never stretched to fill the box */
+  .cover-feature .card-art svg { width: 100%; max-width: 620px; height: auto; }
+  .cover-feature .card-body { display: flex; flex-direction: column; padding: 1.4rem 1.6rem 1.5rem; }
+  .cover-feature .card-name { font-size: var(--text-xl); line-height: 1.2; }
+  .cover-feature .card-desc { margin-top: var(--space-sm); font-size: var(--text-base); }
+
+  /* worked inputs: typed the way the field takes them, in the field's mono */
+  .feature-try { margin-top: auto; padding-top: var(--space-lg); }
+  .feature-try-label { display: block; margin-bottom: var(--space-sm); font-size: var(--text-xs); font-weight: 400;
+                       letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+  .feature-try-list { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+  .feature-try a { position: relative; z-index: 2;
+                   font-family: 'SF Mono', ui-monospace, 'Menlo', monospace; font-size: var(--text-sm);
+                   color: var(--ink); text-decoration: none; white-space: nowrap;
+                   padding: 0.2rem 0.55rem; border: 1px solid var(--rule-2); border-radius: var(--radius);
+                   transition: border-color 0.15s, color 0.15s; }
+  .feature-try a:hover { border-color: var(--accent); color: var(--accent); }
+  .feature-try a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* the narrow figure stands in once the full one would shrink its labels
+     past reading (see below) */
+  .cover-feature .card-art .feature-fig-narrow { display: none; }
+
+  /* the category bar is the phone's way between lists (NARROW below) */
+  .cover-cats { display: none; }
+
+  .cover-foot { margin-top: var(--space-2xl); text-align: center;
                 font-size: var(--text-xs); font-weight: 300; color: var(--ink-3); }
   .cover-foot a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--rule-2);
                   transition: color 0.15s, border-color 0.15s; }
   .cover-foot a:hover { color: var(--ink); border-bottom-color: var(--ink); }
 
-  /* NARROW — the field turns vertical: cards stack, and the nav becomes the
-     rail down the left edge that says where you are in the field. */
+  /* MEDIUM — the feature stacks: drawing above, words below, both at the
+     list's full width. Side by side below this width the drawing would shrink
+     its labels past reading. */
+  @media (max-width: 960px) {
+    .cover-feature { grid-template-columns: minmax(0, 1fr); }
+    .cover-feature .card-art { min-height: 0; border-right: none;
+                               border-bottom: 1px solid color-mix(in srgb, var(--rule) 58%, transparent); }
+    .feature-try { margin-top: 0; }
+  }
+
+  /* NARROW — nothing scrolls sideways. A row that scrolls sideways on a phone
+     shows one plate and a sliver of the next, so most of a list waits behind
+     a swipe many readers never make. Here each shelf becomes a two-column
+     grid read top to bottom, and the lists are reached from the category bar
+     instead (below). */
   @media (max-width: 820px) {
-    /* the key moves above the mark rather than beside it: at phone widths the
-       box, its padding and a key don't share a line, and shrinking the mark to
-       make room costs more than stacking does */
     /* the key takes the top of the bar and the mark sits under it, rather than
        beside it: at phone widths a centred box this wide reaches the key, and
        stacking beats shrinking the mark to make room */
@@ -197,46 +249,71 @@
     .cover-mark.is-mini .cover-mark-inner { align-items: center; padding-bottom: 0; }
     .cover-mark.is-mini .scheme-toggle { top: 50%; transform: translateY(-50%); }
     .cover-mark.is-mini .cover-mark-box { font-size: var(--text-base); }
-    .cover-field { grid-template-areas: "nav band"; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-md); }
+    .cover-lists { gap: var(--space-xl); }
     .cover-chev { display: none; }
-    /* THE PAGE scrolls here, not a box inside it. That is what makes the title
-       shrink as you go — and it is why the rail can no longer be cut off by
-       whatever sits below the field, because there is no longer a box for the
-       field to end inside of. */
-    .cover-scroll { overflow: visible; max-height: none; padding-bottom: 0; }
-    .cover-strip { flex-direction: column; gap: var(--space-lg); min-width: 0; }
-    /* one column, so a long category can wrap instead of running off the edge
-       (across, it stays on one line and simply widens its group) */
-    .cover-group-label { white-space: normal; }
-    .cover-cards { flex-direction: column; }
-    .cover-card { width: auto; }
-    /* THE RAIL is placed, not laid out: a fixed top-layer element positioned
-       by hand below the floating title, running down to the matching inset at
-       the foot. Nothing about the box model decides where it ends, which is
-       what kept clipping it — sticky could only travel inside its containing
-       block, and a flow item ended wherever the field ended.
-       It is drawn as a CLOSED rectangle: the earlier version had only left and
-       right edges, so the ends read as unfinished open lines. Padding keeps
-       the labels off those ends. */
-    .cover-field { display: block; }
-    .cover-band { padding-left: 2.9rem; }
-    .cover-nav { position: fixed; z-index: 19;
-                 left: var(--space-lg); width: 1.8rem;
-                 top: calc(var(--mark-h) + 0.4rem);
-                 bottom: calc(var(--mark-h-mini) + 0.4rem);
-                 height: auto; margin: 0; padding: 0.6rem 0.3rem;
-                 flex-direction: column;
-                 border: 1px solid var(--gray-700); border-right-width: 2px;
-                 border-right-color: var(--black);
-                 transition: top 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
-    /* it follows the title down and back up, always sitting just under it */
-    .cover-mark.is-mini ~ .cover .cover-nav { top: calc(var(--mark-h-mini) + 0.4rem); }
-    .cover-nav-item { font-size: 0.55rem; min-height: 0;
-                      overflow: hidden; text-overflow: ellipsis; }
-    /* the thumb overhangs the two long edges only — the closed ends stay closed */
-    .cover-nav-indicator { left: -1px; right: -2px; }
-    .cover-nav-item { writing-mode: vertical-rl; text-orientation: mixed; }
-    .cover-nav-indicator { top: auto; bottom: auto; left: -1px; right: -2px; }
+
+    /* the shelf, unrolled: no scroller, no bleed, a two-column grid. A plate
+       alone on its shelf takes both columns. The untitled rule between the
+       feature and its shelf goes too: in a grid the plates simply follow. */
+    .cover-shelf { overflow: visible; margin: 0; padding: 0; scroll-snap-type: none; }
+    .cover-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cover-card:only-child { grid-column: 1 / -1; }
+    .cover-feature { margin-bottom: var(--space-md); }
+    .cover-feature + .cover-list-head { display: none; }
+
+    /* THE CATEGORY BAR — one tab per list. A tap jumps to that list; the list
+       you are reading is marked as you scroll. Tap, not swipe: on a web page a
+       sideways swipe competes with the browser's own back gesture and is hard
+       to tell from a scroll, and a control nobody can see is one nobody finds.
+       It sticks to the top of the screen, and its padding runs up under the
+       settled title, so cards pass behind the tabs rather than showing in a
+       strip above them. Its fill is the page's own surface, so until it
+       sticks it is invisible but for its tabs; the negative margin gives the
+       padding back, so in the flow the tabs sit where they would anyway. The
+       mark still floats above it (z-index 20 over 19). */
+    .cover-cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+                  position: sticky; top: 0; z-index: 19;
+                  margin: calc(-1 * var(--mark-h-mini)) calc(-1 * var(--space-lg)) var(--space-lg);
+                  padding: var(--mark-h-mini) var(--space-lg) 0;
+                  background: var(--card); border-bottom: 1px solid var(--rule-2); }
+    .cover-cat { display: flex; align-items: center; justify-content: center; text-align: center;
+                 min-height: 2.75rem; padding: 0.35rem 0.5rem; margin-bottom: -1px;
+                 font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+                 text-transform: uppercase; line-height: 1.35;
+                 color: var(--ink-3); text-decoration: none;
+                 border-bottom: 2px solid transparent;
+                 transition: color 0.15s, border-color 0.15s; }
+    .cover-cat:hover { color: var(--ink); }
+    .cover-cat.is-active { color: var(--ink); border-bottom-color: var(--accent); }
+    .cover-cat:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    /* a jump lands the list's title just under the bar, not behind it */
+    .cover-list { scroll-margin-top: calc(var(--mark-h-mini) + 3.75rem); }
+    /* the first list opens right under the bar, whose first tab already names
+       it; a title there would say it twice. Later lists keep theirs, which is
+       what marks where one list ends and the next begins. */
+    .cover-list:first-child > .cover-list-head:first-child { display: none; }
+  }
+  @media (max-width: 820px) and (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  /* PHONE — the full figure would print its labels at a few pixels here, so
+     the feature swaps to the reduced figure the plate was first drawn with.
+     The grid's plates turn compact: at half a phone's width a description
+     runs five or six lines, so a plate is its drawing and its name, and the
+     drawing takes more of the plate. The feature keeps its line. */
+  @media (max-width: 600px) {
+    .cover-cards .card-desc { display: none; }
+    .cover-cards .card-art { padding: 0.35rem; }
+    .cover-cards .card-body { padding: 0.55rem 0.65rem 0.7rem; }
+    .cover-cards .card-name { font-size: var(--text-base); line-height: 1.3; }
+    .cover-feature .card-art .feature-fig-wide { display: none; }
+    .cover-feature .card-art .feature-fig-narrow { display: block; }
+    .cover-feature .card-art { aspect-ratio: 5 / 4; padding: 0.6rem; }
+    .cover-feature .card-art svg.feature-fig-narrow { max-width: none; height: 100%; }
+    .cover-feature .card-body { padding: 0.85rem 0.85rem 1rem; }
+    .cover-feature .card-name { font-size: var(--text-lg); }
+    .cover-feature .card-desc { font-size: var(--text-sm); }
   }
 </style>
 </head>
@@ -260,107 +337,305 @@
 
 <div class="page-wide cover">
 
-  <div class="cover-field">
-    <div class="cover-band">
-      <button type="button" class="cover-chev" id="coverPrev" hidden aria-label="Scroll back">&#8249;</button>
+  <!-- phones only (CSS): one tab per list below, by its id -->
+  <nav class="cover-cats" id="coverCats" aria-label="Lists">
+    <a class="cover-cat" href="#list-calc">Calculators</a>
+    <a class="cover-cat" href="#list-tools">What tool to buy or use</a>
+  </nav>
 
-      <div class="cover-scroll" id="coverScroll">
-        <div class="cover-strip">
+  <div class="cover-lists">
 
-          <div class="cover-group" id="grp-live">
-            <div class="cover-group-label">What computer should I buy for architecture</div>
-            <div class="cover-cards">
-              <a class="cover-card" href="picker.html">
-                <!-- the picker's own desk drawing; deskArt() below swaps the
-                     light/dark export, the way the picker does -->
-                <div class="card-art" id="artPicker"></div>
-                <div class="card-body">
-                  <div class="card-name">Computer Chooser</div>
-                  <div class="card-desc">CPU, GPU, RAM, monitor and laptop picks from your software, project scale and budget.</div>
-                </div>
-              </a>
+    <section class="cover-list" id="list-calc" aria-labelledby="list-calc-title">
+      <div class="cover-list-head">
+        <h2 class="cover-list-label" id="list-calc-title">Calculators</h2>
+        <span class="cover-list-rule"></span>
+      </div>
+
+      <div class="cover-card cover-feature">
+        <div class="card-art">
+          <!-- The converter's own figure for the page's worked example, 1 m to
+               imperial at 1/8": drawn by calculators/lib/numberline.js at 560
+               wide and kept as it came out (coordinates rounded, the ticks
+               gathered into one path), so the feature shows exactly what the
+               tool shows. One change: the nearest mark and its value take the
+               accent, as on the plate below — the accent is the answer.
+               Redraw from the engine if the figure's anatomy changes. -->
+          <svg class="nl feature-fig-wide" viewBox="0 0 560 160" role="img"
+               aria-label="One metre on a metric scale over an imperial scale: it falls between 3'-3 1/4&quot; and 3'-3 3/8&quot;, and 3'-3 3/8&quot; is nearest">
+            <defs>
+              <pattern id="featurehatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/>
+              </pattern>
+            </defs>
+            <path d="M24 46H536" fill="none" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>
+            <path d="M24 108H536" fill="none" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="1"/>
+            <path fill="none" style="stroke:var(--nl-tick,#bbb)" stroke-width="1"
+                  d="M108.48 108V121 M409.28 108V119 M24 108V117 M192.96 108V117 M493.76 108V117 M66.24 108V115 M150.72 108V115 M367.04 108V115 M451.52 108V115 M536 108V115
+                     M360.19 46V33 M100.5 46V41 M498.42 46V41 M33.98 46V43 M167.02 46V43 M431.9 46V43 M47.28 46V43 M60.59 46V43 M73.89 46V43 M87.19 46V43 M113.8 46V43 M127.11 46V43 M140.41 46V43 M153.71 46V43 M180.32 46V43 M195.7 46V43 M250.53 46V43 M305.36 46V43 M378.68 46V43 M391.98 46V43 M405.29 46V43 M418.59 46V43 M445.2 46V43 M458.5 46V43 M471.81 46V43 M485.11 46V43 M511.72 46V43 M525.02 46V43"/>
+            <text x="24" y="124" class="nl-axis-label" text-anchor="start" stroke-width="3" style="paint-order:stroke">3'-2 3/4"</text>
+            <text x="536" y="124" class="nl-axis-label" text-anchor="end" stroke-width="3" style="paint-order:stroke">3'-3 7/8"</text>
+            <text x="24" y="28" class="nl-axis-label" text-anchor="start" stroke-width="3" style="paint-order:stroke">984.25 mm</text>
+            <text x="536" y="28" class="nl-axis-label" text-anchor="end" stroke-width="3" style="paint-order:stroke">1012.83 mm</text>
+            <rect x="192.96" y="46" width="174.08" height="62" fill="url(#featurehatch)" stroke="none"/>
+            <path d="M192.96 46V108" fill="none" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="1"/>
+            <path d="M367.04 46V108" fill="none" style="stroke:var(--accent)" stroke-width="1.5"/>
+            <text x="184.96" y="62" class="nl-snap-role" text-anchor="end" stroke-width="3" style="paint-order:stroke">round down</text>
+            <text x="184.96" y="78" class="nl-snap-val" text-anchor="end" stroke-width="3" style="paint-order:stroke">3'-3 1/4"</text>
+            <text x="184.96" y="92" class="nl-src-val" text-anchor="end" stroke-width="3" style="paint-order:stroke">3'-3.25"</text>
+            <text x="184.96" y="105" class="nl-residual" text-anchor="end" stroke-width="3" style="paint-order:stroke">−0.12008"</text>
+            <text x="375.04" y="62" class="nl-snap-role" text-anchor="start" stroke-width="3" style="paint-order:stroke">round up · nearest</text>
+            <!-- inline fill, not the attribute: .nl-snap-val sets one -->
+            <text x="375.04" y="78" class="nl-snap-val nl-nearest" text-anchor="start" stroke-width="3" style="paint-order:stroke;fill:var(--accent)">3'-3 3/8"</text>
+            <text x="375.04" y="92" class="nl-src-val" text-anchor="start" stroke-width="3" style="paint-order:stroke">3'-3.375"</text>
+            <text x="375.04" y="105" class="nl-residual" text-anchor="start" stroke-width="3" style="paint-order:stroke">+0.00492"</text>
+            <path d="M360.19 46V132" fill="none" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="1.5"/>
+            <text x="360.19" y="140" class="nl-true-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">3'-3.3701"</text>
+            <text x="360.19" y="152" class="nl-src-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">1000 mm</text>
+          </svg>
+
+          <!-- The same example reduced, for phones: drawn to the anatomy the
+               engine draws — metric scale above, imperial below, and the one
+               grid cell the value falls inside magnified and hatched between
+               them. Text carries the shared .nl-* classes and the strokes read
+               the number-line tokens, so it matches the real figure and
+               inverts with the scheme.
+               Simplified twice over: the end and bound labels are dropped,
+               and the value is drawn further off the mark than 1 m truly
+               falls (+0.005") — at this size the real gap is under a pixel,
+               and falling between marks is the point. -->
+          <svg class="nl feature-fig-narrow" viewBox="0 0 260 208" role="img"
+               aria-label="One metre on a metric scale, reading three feet three and three-eighths inches on an imperial scale, with the eighth-inch it falls inside magnified and hatched">
+            <defs>
+              <pattern id="coverhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/>
+              </pattern>
+            </defs>
+
+            <!-- the magnified cell: the single 1/8" the value sits in -->
+            <rect x="102" y="78" width="78" height="50" fill="url(#coverhatch)" stroke="none"/>
+
+            <g fill="none" stroke="var(--nl-tick)" stroke-width="1">
+              <!-- metric ticks: fine outside the cell, opened up inside it -->
+              <path d="M18 78 V70 M26 78 V72 M34 78 V72 M42 78 V72 M50 78 V72 M58 78 V72 M66 78 V72 M74 78 V72 M82 78 V72 M90 78 V72 M98 78 V72"/>
+              <path d="M124 78 V72 M146 78 V72 M168 78 V72"/>
+              <path d="M188 78 V72 M196 78 V72 M204 78 V72 M212 78 V72 M220 78 V72 M228 78 V72 M236 78 V72 M242 78 V70"/>
+              <!-- imperial ticks: one eighth apart, the cell one eighth wide -->
+              <path d="M18 128 V138 M46 128 V137 M74 128 V137 M208 128 V137 M236 128 V138"/>
+            </g>
+
+            <!-- the two scales -->
+            <path d="M18 78 H242 M18 128 H242" fill="none" stroke="var(--nl-axis)" stroke-width="1"/>
+
+            <!-- the marks it falls between: round down, then the one it
+                 takes (the accent is the answer, per global.css) -->
+            <path d="M102 78 V128" fill="none" stroke="var(--nl-ink)" stroke-width="1"/>
+            <path d="M180 78 V140" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+
+            <!-- the value itself, crossing both scales -->
+            <path d="M150 66 V78" fill="none" stroke="var(--nl-ink)" stroke-width="1"/>
+            <path d="M150 78 V134" fill="none" stroke="var(--nl-ink)" stroke-width="1.5"/>
+
+            <text x="150" y="60" class="nl-src-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">1 m</text>
+            <!-- inline fill, not the attribute: .nl-snap-val sets one -->
+            <text x="180" y="158" class="nl-snap-val nl-nearest" text-anchor="middle" stroke-width="3" style="paint-order:stroke;fill:var(--accent)">3'-3 3/8"</text>
+          </svg>
+        </div>
+        <div class="card-body">
+          <div class="card-name"><a class="feature-link" href="calculators/convert.html">Precise Unit Converter</a></div>
+          <div class="card-desc">Exact conversions and mixed unit calculations that visually show the precision of rounding.</div>
+          <!-- each opens the converter on that input (its ?d= link state) -->
+          <div class="feature-try">
+            <span class="feature-try-label">Try</span>
+            <div class="feature-try-list">
+              <a href="calculators/convert.html?d=3%27-4%201%2F2%22">3'-4 1/2"</a>
+              <a href="calculators/convert.html?d=(10%27%20-%202%201%2F2%22)%20%2F%203">(10' - 2 1/2") / 3</a>
+              <a href="calculators/convert.html?d=1500%20mm%20-%202%27">1500 mm - 2'</a>
             </div>
           </div>
-
-          <div class="cover-group" id="grp-calc">
-            <div class="cover-group-label">Calculators</div>
-            <div class="cover-cards">
-              <a class="cover-card" href="calculators/convert.html">
-                <!-- The tool's own figure, reduced: the page's worked example
-                     (1 m → imperial at 1/8") drawn to the anatomy the engine
-                     draws — metric scale above, imperial below, and the one
-                     grid cell the value falls inside magnified and hatched
-                     between them. Text carries the shared .nl-* classes and
-                     the strokes read the number-line tokens, so it matches the
-                     real figure and inverts with the scheme.
-                     Simplified twice over: the end and bound labels are
-                     dropped, and the value is drawn further off the mark than
-                     1 m truly falls (+0.005") — at this size the real gap is
-                     under a pixel, and falling between marks is the point. -->
-                <div class="card-art">
-                  <svg class="nl" viewBox="0 0 260 208" role="img"
-                       aria-label="One metre on a metric scale, reading three feet three and three-eighths inches on an imperial scale, with the eighth-inch it falls inside magnified and hatched">
-                    <defs>
-                      <pattern id="coverhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                        <line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/>
-                      </pattern>
-                    </defs>
-
-                    <!-- the magnified cell: the single 1/8" the value sits in -->
-                    <rect x="102" y="78" width="78" height="50" fill="url(#coverhatch)" stroke="none"/>
-
-                    <g fill="none" stroke="var(--nl-tick)" stroke-width="1">
-                      <!-- metric ticks: fine outside the cell, opened up inside it -->
-                      <path d="M18 78 V70 M26 78 V72 M34 78 V72 M42 78 V72 M50 78 V72 M58 78 V72 M66 78 V72 M74 78 V72 M82 78 V72 M90 78 V72 M98 78 V72"/>
-                      <path d="M124 78 V72 M146 78 V72 M168 78 V72"/>
-                      <path d="M188 78 V72 M196 78 V72 M204 78 V72 M212 78 V72 M220 78 V72 M228 78 V72 M236 78 V72 M242 78 V70"/>
-                      <!-- imperial ticks: one eighth apart, the cell one eighth wide -->
-                      <path d="M18 128 V138 M46 128 V137 M74 128 V137 M208 128 V137 M236 128 V138"/>
-                    </g>
-
-                    <!-- the two scales -->
-                    <path d="M18 78 H242 M18 128 H242" fill="none" stroke="var(--nl-axis)" stroke-width="1"/>
-
-                    <!-- the marks it falls between: round down, then the one it
-                         takes (the accent is the answer, per global.css) -->
-                    <path d="M102 78 V128" fill="none" stroke="var(--nl-ink)" stroke-width="1.4"/>
-                    <path d="M180 78 V140" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
-
-                    <!-- the value itself, crossing both scales -->
-                    <path d="M150 66 V78" fill="none" stroke="var(--nl-ink)" stroke-width="1"/>
-                    <path d="M150 78 V134" fill="none" stroke="var(--nl-ink)" stroke-width="2"/>
-
-                    <text x="150" y="60" class="nl-src-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">1 m</text>
-                    <!-- inline fill, not the attribute: .nl-snap-val sets one -->
-                    <text x="180" y="158" class="nl-snap-val nl-nearest" text-anchor="middle" stroke-width="3" style="paint-order:stroke;fill:var(--accent)">3'-3 3/8"</text>
-                  </svg>
-                </div>
-                <div class="card-body">
-                  <div class="card-name">Precise Unit Converter</div>
-                  <div class="card-desc">Exact conversions and mixed unit calculations that visually show the precision of rounding.</div>
-                </div>
-              </a>
-            </div>
-          </div>
-
-          <!-- Next calculator goes here: copy one .cover-card into the group's
-               .cover-cards. A new category is a .cover-group with an id, plus
-               one .cover-nav-item below pointing at that id. -->
-
         </div>
       </div>
 
-      <button type="button" class="cover-chev" id="coverNext" hidden aria-label="Scroll on">&#8250;</button>
-    </div>
+      <div class="cover-list-head">
+        <span class="cover-list-rule"></span>
+        <button type="button" class="cover-chev" data-step="-1" hidden aria-label="Scroll back">&#8249;</button>
+        <button type="button" class="cover-chev" data-step="1" hidden aria-label="Scroll on">&#8250;</button>
+      </div>
+      <div class="cover-shelf">
+        <div class="cover-cards">
+          <a class="cover-card" href="calculators/slope.html">
+            <!-- the page's own figure for its worked example, a 9' run at 8:12,
+                 as the page draws it at phone width and cropped to the plate -->
+            <div class="card-art">
+              <svg viewBox="-24 188 220 176" class="nl sf" role="img"
+                   aria-label="A slope triangle with a 9-foot run and a 6-foot rise at 33.69 degrees">
+                <defs>
+                  <pattern id="sfhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--nl-hatch,#0a0a0a)" stroke-width="0.6"/>
+                  </pattern>
+                </defs>
+                <line x1="18" y1="304" x2="134" y2="304" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>
+                <line x1="134" y1="304" x2="134" y2="226.67" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>
+                <path d="M 124 304 L 124 294 L 134 294" fill="none" style="stroke:var(--nl-axis,#999)" stroke-width="1"/>
+                <line x1="18" y1="304" x2="134" y2="226.67" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="1.5"/>
+                <text x="69.9" y="256.18" class="nl-snap-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">10'-9.8"</text>
+                <path d="M 64 304 A 46 46 0 0 0 56.27 278.48" fill="none" style="stroke:var(--nl-ink,#0a0a0a)" stroke-width="1"/>
+                <text x="70" y="298" class="nl-snap-val" text-anchor="start" stroke-width="3" style="paint-order:stroke">33.69°</text>
+                <text x="76" y="320" class="nl-true-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">9'</text>
+                <text x="140" y="269.33" class="nl-true-val" text-anchor="start" stroke-width="3" style="paint-order:stroke">6'</text>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-name">Slope</div>
+              <div class="card-desc">Any two of rise, run and slope give the rest, as percent, ratio, pitch and degrees, with what rounding it costs across the run.</div>
+            </div>
+          </a>
+          <a class="cover-card" href="calculators/roof.html">
+            <!-- A gable in section at 8:12: the plate line, the roof, and the height at one point read off its plan distance from the eave. Strokes read the number-line tokens; the reading is the accent. -->
+            <div class="card-art">
+              <svg class="nl" viewBox="0 0 260 208" role="img"
+                   aria-label="A gable roof in section with the height at a point 9 feet from the eave marked as 6 feet above the plate">
+                <path d="M30 150 H230" fill="none" stroke="var(--nl-axis)" stroke-width="1"/>
+                <path d="M30 150 L130 83.3 L230 150" fill="none" stroke="var(--nl-ink)" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M30 150 V170 M230 150 V170" fill="none" stroke="var(--nl-tick)" stroke-width="1"/>
+                <path d="M30 164 H105" fill="none" stroke="var(--nl-tick)" stroke-width="1"/>
+                <path d="M105 150 V100" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+                <circle cx="105" cy="100" r="3" fill="var(--accent)"/>
+                <text x="67" y="182" class="nl-snap-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">9'</text>
+                <text x="119" y="130" class="nl-true-val" text-anchor="start" stroke-width="3" style="paint-order:stroke;fill:var(--accent)">6'</text>
+                <text x="196" y="112" class="nl-snap-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">8:12</text>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-name">Roof</div>
+              <div class="card-desc">Drag along a true-scale section for the height at any point, from the wall line, drip edge or ridge, with roof area in squares.</div>
+            </div>
+          </a>
+          <a class="cover-card" href="calculators/taper.html">
+            <!-- A flat roof in plan with one drain: four-way taper with diagonal valleys and the high corner marked. -->
+            <div class="card-art">
+              <svg class="nl" viewBox="0 0 260 208" role="img"
+                   aria-label="A roof plan with a center drain and diagonal valleys running to the corners, the corner height marked">
+                <rect x="40" y="40" width="180" height="120" fill="none" stroke="var(--nl-ink)" stroke-width="1.5"/>
+                <rect x="70" y="70" width="120" height="60" fill="var(--accent-soft)" stroke="none"/>
+                <path d="M40 40 L130 100 L220 40 M40 160 L130 100 L220 160" fill="none" stroke="var(--nl-tick)" stroke-width="1" stroke-dasharray="3 3"/>
+                <circle cx="130" cy="100" r="7" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+                <path d="M126 100 H134 M130 96 V104" stroke="var(--accent)" stroke-width="1"/>
+                <circle cx="220" cy="40" r="3.5" fill="var(--accent)"/>
+                <text x="218" y="30" class="nl-true-val" text-anchor="end" stroke-width="3" style="paint-order:stroke;fill:var(--accent)">7 1/2&quot;</text>
+                <text x="130" y="186" class="nl-snap-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">1/4&quot; per foot across each plane</text>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-name">Roof Taper</div>
+              <div class="card-desc">Start from a flat roof plan, place the drains, and read how high the taper builds at the high points.</div>
+            </div>
+          </a>
+          <a class="cover-card" href="calculators/drain.html">
+            <!-- A pipe falling at its minimum slope through a ceiling space: the depth it has, the depth it uses. The pipe is the accent. -->
+            <div class="card-art">
+              <svg class="nl" viewBox="0 0 260 208" role="img"
+                   aria-label="A drain pipe sloping down through a ceiling space, with the drop it takes marked">
+                <path d="M20 50 H240 M20 160 H240" fill="none" stroke="var(--nl-axis)" stroke-width="1"/>
+                <path d="M30 80 L230 120" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="butt" stroke-opacity="0.85"/>
+                <path d="M30 70 V130 M230 70 V130" fill="none" stroke="var(--nl-tick)" stroke-width="1"/>
+                <path d="M238 80 V120 M233 80 H243 M233 120 H243" fill="none" stroke="var(--nl-ink)" stroke-width="1"/>
+                <text x="130" y="186" class="nl-snap-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">1/4" per foot · 38' run</text>
+                <text x="130" y="38" class="nl-snap-val" text-anchor="middle" stroke-width="3" style="paint-order:stroke">depth available</text>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-name">Drain</div>
+              <div class="card-desc">Drainage slopes, vertical clearance and the run that fits your available height.</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
 
-    <div class="cover-nav" id="coverNav">
-      <span class="cover-nav-indicator" id="coverNavThumb" hidden></span>
-      <button type="button" class="cover-nav-item" data-target="grp-live">What computer should I buy for architecture</button>
-      <button type="button" class="cover-nav-item" data-target="grp-calc">Calculators</button>
-    </div>
+    <section class="cover-list" id="list-tools" aria-labelledby="list-tools-title">
+      <div class="cover-list-head">
+        <h2 class="cover-list-label" id="list-tools-title">What tool to buy or use</h2>
+        <span class="cover-list-rule"></span>
+        <button type="button" class="cover-chev" data-step="-1" hidden aria-label="Scroll back">&#8249;</button>
+        <button type="button" class="cover-chev" data-step="1" hidden aria-label="Scroll on">&#8250;</button>
+      </div>
+      <div class="cover-shelf">
+        <div class="cover-cards">
+          <a class="cover-card" href="picker.html">
+            <!-- the picker's own desk drawing; deskArt() below swaps the
+                 light/dark export, the way the picker does -->
+            <div class="card-art" id="artPicker"></div>
+            <div class="card-body">
+              <div class="card-name">Computer Chooser</div>
+              <div class="card-desc">CPU, GPU, RAM, monitor and laptop picks from your software, project scale and budget.</div>
+            </div>
+          </a>
+          <a class="cover-card" href="pdf-markup.html">
+            <!-- A sheet with its title block, a revision cloud around one
+                 room and a tagged leader: the thing every tool on the page
+                 does. Strokes read the number-line tokens so it inverts
+                 with the scheme; the markup is the accent. -->
+            <div class="card-art">
+              <svg class="nl" viewBox="0 0 260 208" role="img"
+                   aria-label="A drawing sheet with a revision cloud drawn around one room and a numbered tag on a leader">
+                <!-- sheet + title block -->
+                <rect x="30" y="20" width="200" height="168" fill="none" stroke="var(--nl-axis)" stroke-width="1"/>
+                <path d="M196 20 V188" fill="none" stroke="var(--nl-axis)" stroke-width="1"/>
+                <path d="M201 150 H225 M201 158 H225 M201 166 H218" fill="none" stroke="var(--nl-tick)" stroke-width="1"/>
+                <!-- plan: walls -->
+                <g fill="none" stroke="var(--nl-ink)" stroke-width="1.5">
+                  <path d="M46 40 H166 V168 H46 Z"/>
+                  <path d="M108 40 V96 M46 108 H90 M114 108 H166"/>
+                </g>
+                <!-- revision cloud around the upper-right room -->
+                <path d="M118 48 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 q8 2 6 10 q8 4 2 12 q8 4 2 12 q6 6 -2 12 q-2 8 -10 6 q-6 8 -12 0 q-6 8 -12 0 q-6 8 -12 0 q-8 2 -8 -6 q-8 -4 -2 -12 q-8 -4 -2 -12 q-8 -4 -2 -12 q0 -8 10 -10 Z"
+                      fill="none" stroke="var(--accent)" stroke-width="1.5" transform="matrix(0.85 0 0 0.85 18.5 8)"/>
+                <!-- leader + delta tag -->
+                <path d="M164 96 L180 118" fill="none" stroke="var(--accent)" stroke-width="1"/>
+                <path d="M182 116 L190 130 H174 Z" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+                <text x="182" y="128" class="nl-snap-val" text-anchor="middle" style="font-size:8px;fill:var(--accent);stroke:none">2</text>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-name">PDF Markup &amp; Review</div>
+              <div class="card-desc">Eighteen markup tools, grouped by what each is built for, with platforms, measurement and price.</div>
+            </div>
+          </a>
+          <a class="cover-card" href="bim.html">
+            <!-- The standard tools' subject: a building drawn as an
+                 axonometric of stacked floor plates on a column grid,
+                 with one plate picked out in the accent. -->
+            <div class="card-art">
+              <svg class="nl" viewBox="0 0 260 208" role="img"
+                   aria-label="An axonometric drawing of a four-storey building as stacked floor plates on columns, one floor highlighted">
+                <g fill="none" stroke="var(--nl-axis)" stroke-width="1">
+                  <path d="M70 160 V64 M130 190 V94 M190 160 V64 M130 130 V34"/>
+                </g>
+                <g fill="none" stroke="var(--nl-ink)" stroke-width="1.5" stroke-linejoin="round">
+                  <path d="M70 160 L130 130 L190 160 L130 190 Z"/>
+                  <path d="M70 96 L130 66 L190 96 L130 126 Z"/>
+                  <path d="M70 64 L130 34 L190 64 L130 94 Z"/>
+                </g>
+                <path d="M70 128 L130 98 L190 128 L130 158 Z" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-name">Architecture Software, Then and Now</div>
+              <div class="card-desc">CAD, BIM, modeling, rendering and browser tools: when each arrived, what it does today, and what to watch.</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- A new list is a .cover-list section like the one above: a head (label,
+         rule, the two keys) over a shelf of plates, plus one tab in
+         #coverCats pointing at its id. A tool joins a list as one
+         <a class="cover-card"> on its shelf. Lists stack in source order. -->
+
   </div>
 
-  <div class="cover-foot">Updated August 2026 <span class="crumb-sep">&middot;</span> <a href="privacy.html">Privacy &amp; analytics</a> <span class="crumb-sep">&middot;</span> <a href="feedback.html">Feedback</a></div>
+  <div class="cover-foot">Updated October 2026 <span class="crumb-sep">&middot;</span> <a href="privacy.html">Privacy &amp; analytics</a> <span class="crumb-sep">&middot;</span> <a href="feedback.html">Feedback</a></div>
 </div>
 
 <script src="assets/js/ui.js"></script>
@@ -382,7 +657,7 @@
 })();
 
 // ---- large title → mini title ----
-// The mark settles into the bar once the field has genuinely moved. Two
+// The mark settles into the bar once the lists have genuinely moved. Two
 // thresholds, not one: a single threshold sitting where the page can only just
 // reach it lets the state chatter on every stray pixel of scroll, so entering
 // and leaving are held apart. On a page too short to scroll past ENTER the
@@ -407,153 +682,81 @@
   read();
 })();
 
-// ---- the field scrubber ----
-// One scrubber, two axes. Across (wide), the strip has its own overflow and
-// the nav under it is the bar. Down (narrow), the thing that scrolls is THE
-// PAGE — a phone should scroll the page, so the title shrinks as you go and
-// the rail can never end up inside a box that clips it — and that same nav is
-// the rail along the left edge, stuck under the settled title.
-// Both scrollers are described the same way below, so there is one
-// implementation rather than two to keep in step.
+// ---- the shelves ----
+// Each shelf scrolls on its own, moved by the two keys in the head directly
+// above it (a list's title head, or the untitled head under a feature). The
+// keys show only while the shelf overflows, and the one at an end it has
+// reached is disabled rather than hidden, so neither key jumps along the
+// rule. A press moves one plate.
 (function () {
   'use strict';
-  var scroll = document.getElementById('coverScroll');
-  var nav    = document.getElementById('coverNav');
-  var thumb  = document.getElementById('coverNavThumb');
-  var prev   = document.getElementById('coverPrev');
-  var next   = document.getElementById('coverNext');
-  var mark   = document.getElementById('coverMark');
-  var items  = Array.prototype.slice.call(nav.querySelectorAll('.cover-nav-item'));
-  var STEP   = 280;                              // one card + gap, for a chevron press
+  var smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  Array.prototype.forEach.call(document.querySelectorAll('.cover-shelf'), function (shelf) {
+    var head = shelf.previousElementSibling;
+    if (!head || !head.classList.contains('cover-list-head')) return;
+    var prev = head.querySelector('.cover-chev[data-step="-1"]');
+    var next = head.querySelector('.cover-chev[data-step="1"]');
+    if (!prev || !next) return;
 
-  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-  function docTop(el) { return el.getBoundingClientRect().top + window.pageYOffset; }
-  function vertical() { return matchMedia('(max-width: 820px)').matches; }
-
-  function axis() {
-    if (vertical()) return {
-      vertical: true,
-      total: function () { return scroll.offsetHeight; },
-      view:  function () { var f = this.frame(); return f.far - f.near; },
-      max:   function () { return Math.max(this.total() - this.view(), 0); },
-      get:   function () { return clamp(window.pageYOffset - docTop(scroll), 0, this.max()); },
-      to:    function (v, smooth) { window.scrollTo({ top: docTop(scroll) + v, behavior: smooth ? 'smooth' : 'auto' }); },
-      by:    function (d) { window.scrollBy({ top: d, behavior: 'smooth' }); },
-      // the usable frame starts BELOW the title bar, so a group hidden behind
-      // it is not reported as the one you are looking at
-      frame: function () { return { near: mark ? mark.getBoundingClientRect().bottom : 0, far: window.innerHeight }; },
-      navSize: function () { return nav.offsetHeight; },
-      thumbSize: function () { return thumb.offsetHeight; },
-      near: 'top', far: 'bottom', client: 'clientY',
-      edge: 'top', span: 'height', clear: ['left', 'width']
-    };
-    return {
-      vertical: false,
-      total: function () { return scroll.scrollWidth; },
-      view:  function () { return scroll.clientWidth; },
-      max:   function () { return Math.max(this.total() - this.view(), 0); },
-      get:   function () { return scroll.scrollLeft; },
-      to:    function (v, smooth) { scroll.scrollTo({ left: v, behavior: smooth ? 'smooth' : 'auto' }); },
-      by:    function (d) { scroll.scrollBy({ left: d, behavior: 'smooth' }); },
-      frame: function () { var r = scroll.getBoundingClientRect(); return { near: r.left, far: r.right }; },
-      navSize: function () { return nav.offsetWidth; },
-      thumbSize: function () { return thumb.offsetWidth; },
-      near: 'left', far: 'right', client: 'clientX',
-      edge: 'left', span: 'width', clear: ['top', 'height']
-    };
-  }
-
-  function update() {
-    var a = axis();
-    var total = a.total(), view = a.view(), at = a.get(), max = a.max();
-
-    prev.hidden = at <= 0;
-    next.hidden = at >= max - 1;
-
-    // a category is current while any part of it is inside the usable frame
-    var f = a.frame();
-    items.forEach(function (item) {
-      var group = document.getElementById(item.dataset.target);
-      if (!group) return;
-      var gr = group.getBoundingClientRect();
-      item.classList.toggle('is-active', gr[a.far] > f.near + 1 && gr[a.near] < f.far - 1);
-    });
-
-    // the thumb is the frame, drawn to scale across the whole nav
-    if (total <= view) { thumb.hidden = true; return; }
-    var navSize = a.navSize();
-    thumb.hidden = false;
-    a.clear.forEach(function (p) { thumb.style[p] = ''; });
-    thumb.style[a.edge] = Math.round((at / total) * navSize) + 'px';
-    thumb.style[a.span] = Math.round((view / total) * navSize) + 'px';
-  }
-
-  prev.addEventListener('click', function () { axis().by(-STEP); });
-  next.addEventListener('click', function () { axis().by(STEP); });
-  scroll.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-
-  // a label brings its category to the top of the frame
-  items.forEach(function (item) {
-    item.addEventListener('click', function () {
-      var group = document.getElementById(item.dataset.target);
-      if (!group) return;
-      var a = axis();
-      a.to(a.get() + (group.getBoundingClientRect()[a.near] - a.frame().near), true);
-    });
-  });
-
-  // The nav doubles as the scrollbar: grab it and the field follows your
-  // pointer proportionally. Pressing down moves nothing — motion drives the
-  // scroll, in the direction you drag. A press inside the thumb always
-  // scrubs, even over a label (the thumb is pointer-events:none, so the label
-  // beneath is the target); an exposed label keeps its jump.
-  var scrubbing = false, startAt = 0, startScroll = 0, perPixel = 1, suppressClick = false;
-
-  nav.addEventListener('pointerdown', function (e) {
-    if (e.button !== undefined && e.button !== 0) return;
-    var a = axis();
-    var overThumb = false;
-    if (!thumb.hidden) {
-      var t = thumb.getBoundingClientRect();
-      overThumb = e.clientX >= t.left && e.clientX <= t.right && e.clientY >= t.top && e.clientY <= t.bottom;
+    function step() {
+      var card = shelf.querySelector('.cover-card');
+      var gap = parseFloat(getComputedStyle(card.parentNode).columnGap) || 0;
+      return card.offsetWidth + gap;
     }
-    if (!overThumb && e.target.closest('.cover-nav-item')) return;
-    var max = a.max();
-    if (max <= 0) return;
-    var track = Math.max(a.navSize() - (a.thumbSize() || 0), 1);
-    scrubbing = true;
-    startAt = e[a.client];
-    startScroll = a.get();
-    perPixel = max / track;
-    nav.classList.add('is-scrubbing');
-    try { nav.setPointerCapture(e.pointerId); } catch (err) {}
-    e.preventDefault();
-  });
+    function update() {
+      var max = shelf.scrollWidth - shelf.clientWidth;
+      prev.hidden = next.hidden = max <= 1;
+      prev.disabled = shelf.scrollLeft <= 0;
+      next.disabled = shelf.scrollLeft >= max - 1;
+    }
 
-  nav.addEventListener('pointermove', function (e) {
-    if (!scrubbing) return;
-    var a = axis();
-    a.to(clamp(startScroll + (e[a.client] - startAt) * perPixel, 0, a.max()), false);
+    [prev, next].forEach(function (key) {
+      key.addEventListener('click', function () {
+        shelf.scrollBy({ left: +key.dataset.step * step(), behavior: smooth ? 'smooth' : 'auto' });
+      });
+    });
+    shelf.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    // the desk plate loads after first paint and can change a shelf's extent
+    window.addEventListener('load', update);
+    update();
   });
+})();
 
-  function endScrub(e) {
-    if (!scrubbing) return;
-    scrubbing = false;
-    suppressClick = true;            // a scrub that releases over a label isn't a click
-    nav.classList.remove('is-scrubbing');
-    try { nav.releasePointerCapture(e.pointerId); } catch (err) {}
+// ---- the category bar (phones) ----
+// The tabs are plain links to each list's id, so a tap jumps with or without
+// this script (CSS sets the smooth scroll and the landing offset). This only
+// marks the list being read: the last one whose top has passed under the
+// bar, or the last list outright once the page can scroll no further.
+(function () {
+  'use strict';
+  var bar = document.getElementById('coverCats');
+  if (!bar) return;
+  var tabs = Array.prototype.slice.call(bar.querySelectorAll('.cover-cat'));
+  var queued = false;
+  function mark() {
+    queued = false;
+    if (getComputedStyle(bar).display === 'none') return;   // desktop: no bar
+    var line = bar.getBoundingClientRect().bottom + 24;
+    var current = tabs[0];
+    tabs.forEach(function (tab) {
+      var list = document.getElementById(tab.hash.slice(1));
+      if (list && list.getBoundingClientRect().top <= line) current = tab;
+    });
+    var doc = document.documentElement;
+    if (window.innerHeight + window.pageYOffset >= doc.scrollHeight - 2) current = tabs[tabs.length - 1];
+    tabs.forEach(function (tab) {
+      var on = tab === current;
+      tab.classList.toggle('is-active', on);
+      if (on) tab.setAttribute('aria-current', 'location');
+      else tab.removeAttribute('aria-current');
+    });
   }
-  nav.addEventListener('pointerup', endScrub);
-  nav.addEventListener('pointercancel', endScrub);
-  nav.addEventListener('click', function (e) {
-    if (suppressClick) { suppressClick = false; e.stopPropagation(); e.preventDefault(); }
-  }, true);
-
-  // the desk plate loads after first paint and changes the field's extent
-  window.addEventListener('load', update);
-  update();
+  function queue() { if (!queued) { queued = true; requestAnimationFrame(mark); } }
+  window.addEventListener('scroll', queue, { passive: true });
+  window.addEventListener('resize', queue);
+  window.addEventListener('load', queue);
+  mark();
 })();
 </script>
 </body>

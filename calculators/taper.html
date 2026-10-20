@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting" data-stage="live">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roof Taper -- architecture.tools</title>
+<meta name="description" content="Low-slope roof taper: start from a flat roof plan, place the drains, and see how high the taper builds at the high points for a chosen plane slope, in feet and inches or millimeters.">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     Roof Taper: a flat roof plan, drains placed on it, and the height the
+     taper reaches everywhere for a chosen plane slope. Four-way taper: each drain
+     sits in a square sump of planes meeting at diagonal valleys, so the
+     taper at a point is slope × the larger of its x and y distances to the
+     nearest drain. Slope parsing is lib/slope.js; rounding is lib/roof.js. */
+  html, body { overflow-x: hidden; }
+
+  .in-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-start; margin-bottom: var(--space-sm); }
+  .in { display: flex; flex-direction: column; }
+  .in label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+              text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .in label .opt { text-transform: none; letter-spacing: 0; color: var(--ink-3); }
+  .in-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+              font-size: 1.05rem; font-weight: 400; width: 9rem; max-width: 100%;
+              color: var(--ink); background: var(--card);
+              padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+              box-shadow: var(--shadow-well); border-radius: var(--radius);
+              outline: none; -webkit-appearance: none; appearance: none; }
+  .in-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .in-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 12em; }
+  @media (max-width: 480px) { .in { flex: 1 1 8rem; } .in-input { width: 100%; box-sizing: border-box; } }
+
+  .build-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0 0 var(--space-md); }
+  .build-row .section-label { margin: 0 0.4rem 0 0; }
+  .build-row .units { margin-left: auto; display: flex; gap: 0.3rem; align-items: center; }
+  .key-sm[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: var(--shadow-press); }
+
+  /* the plan: shaded bands of taper, drains you place and drag */
+  .tp-wrap { position: relative; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .tp-wrap canvas { display: block; position: absolute; left: 0; top: 0; }
+  svg.tp { display: block; position: relative; max-width: 100%; height: auto; overflow: visible; }
+  svg.tp text { font-family: var(--font-body); font-size: 12px; fill: var(--ink-2);
+                stroke: var(--answer-surface); stroke-width: 3px; paint-order: stroke; }
+  svg.tp .tp-edge  { stroke: var(--nl-ink); stroke-width: 1.5; fill: none; }
+  svg.tp .tp-drain { fill: var(--answer-surface); stroke: var(--accent); stroke-width: 1.5; cursor: grab; }
+  svg.tp .tp-cross { stroke: var(--accent); stroke-width: 1; pointer-events: none; }
+  svg.tp .tp-high  { fill: var(--accent); }
+  svg.tp .tp-val   { fill: var(--accent); font-weight: 500; font-size: 14px; }
+  svg.tp .tp-dim   { stroke: var(--nl-axis); stroke-width: 1; }
+  svg.tp .tp-ext   { stroke: var(--nl-axis); stroke-width: 1; stroke-dasharray: 3 3; }
+  svg.tp .tp-dl    { stroke: var(--accent); stroke-width: 1; }
+  svg.tp .tp-dl.is-all { stroke: var(--nl-ink); }
+  svg.tp .tp-tk    { stroke: var(--accent); stroke-width: 1; }
+  .tp-edit { position: absolute; z-index: 2; transform: translate(-50%, -50%); width: 5.6em; padding: 0 0.25rem; height: 1.25rem;
+             font-family: 'SF Mono', ui-monospace, 'Menlo', monospace; font-size: 0.75rem; font-weight: 500; text-align: center;
+             color: var(--accent); background: var(--answer-surface); border: 1px solid var(--rule-2); border-radius: var(--radius); outline: none; }
+  .tp-edit.is-all { color: var(--ink); font-weight: 400; }
+  .tp-edit.is-v { transform: translate(-50%, -50%) rotate(-90deg); }
+  .tp-edit:hover, .tp-edit:focus { border-color: var(--accent); }
+  .tp-edit:focus { box-shadow: 0 0 0 2px var(--accent-soft); }
+  .tp-edit.is-bad { border-color: var(--correction, #AF3D34); }
+  .tp-hint { font-size: var(--text-xs); color: var(--ink-3); margin: 0.4rem 0 0; }
+
+  .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
+                color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
+  .rows-label:first-child { margin-top: 0.2rem; }
+  .block-note { font-size: var(--text-sm); color: var(--ink-2); margin: 0.5rem 0 0; max-width: 42em; }
+  .back-to { font-size: var(--text-sm); color: var(--ink-2); margin-top: var(--space-md); }
+
+  /* Keep dimensions intact on phones; rounding notes sit below the value. */
+  @media (max-width: 480px) {
+    .snap-row { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 0.2rem 0.5rem; }
+    .snap-name { width: auto; }
+    .snap-value { min-width: 0; }
+    .snap-resid { grid-column: 2; width: auto; min-width: 0; text-align: left; }
+    .snap-resid:empty { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Roof Taper</span>
+    </nav>
+    <h1>Roof Taper</h1>
+    <p>How high does the taper build on a low-slope roof? Start with the flat
+       roof in plan, place the drains, and read the height at the high points
+       for the slope you need.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <div class="in-row">
+    <div class="in">
+      <label for="lenInput">length</label>
+      <input type="text" id="lenInput" class="in-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 60'  ·  18m">
+      <div class="in-note" id="lenNote"></div>
+    </div>
+    <div class="in">
+      <label for="widInput">width</label>
+      <input type="text" id="widInput" class="in-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 40'  ·  12m">
+      <div class="in-note" id="widNote"></div>
+    </div>
+    <div class="in">
+      <label for="slopeInput">slope <span class="opt">across each plane</span></label>
+      <input type="text" id="slopeInput" class="in-input" spellcheck="false" maxlength="40"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 1/4&quot;/ft  ·  2%">
+      <div class="in-note" id="slopeNote"></div>
+    </div>
+  </div>
+  <div class="build-row" id="buildRow"></div>
+
+  <div class="echo" id="echo" style="display:none;">
+    <div class="echo-line" id="echoLine"></div>
+    <div class="echo-assumptions" id="echoAssume"></div>
+  </div>
+
+  <div id="out" style="display:none;">
+    <div class="answer-card">
+      <div class="tp-wrap" id="plan"></div>
+      <p class="tp-hint">Tap the plan to add a drain, up to six. Drag a drain to move it, or off the roof to remove it, or type a dimension from its nearest corner. Each band is <span id="bandStep">1&quot;</span> of taper.</p>
+      <p class="tp-hint" id="capNote" hidden>Six drains is the most for one roof area here. Split a larger roof into drainage areas and lay out each one.</p>
+      <div class="snap-rows" id="rows"></div>
+      <p class="block-note">Add the base insulation thickness to these taper heights before setting curb or
+         parapet heights. Allow for the flashing height your roofing system requires.
+         Crickets behind curbs need their own geometry and drainage check.</p>
+    </div>
+  </div>
+
+  <p class="back-to"><span>A pitched roof? <a href="roof.html">Roof</a> reads heights off a section.</span>
+     A pipe or a gutter run? <a href="drain.html">Drain</a> takes it from its minimum slope.</p>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../privacy.html">Privacy &amp; analytics</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../feedback.html">Feedback</a>
+    <span class="crumb-sep">&middot;</span> <button type="button" class="back-link footer-disclose" aria-expanded="false" aria-controls="enginePanel">How it&rsquo;s calculated</button>
+    <div class="footer-panel" id="enginePanel" hidden>
+      <p class="engine-intro">Every length on this page is held as a whole number of
+        engine units. One unit is 1/960 of a millimeter, so a millimeter is 960 units and an
+        inch is 24,384. The taper is four-way: each drain sits at the low point of four planes
+        that meet along diagonal valleys. This is an idealized four-plane layout. The taper at any
+        point is the slope times the larger of its two plan distances, across and along, to the
+        drain that gives the lowest height. Drainage-area boundaries occur where those heights are equal. The high
+        point is the largest of those heights over the whole plan; it is rounded up to the
+        selected increment. A square-coverage search bounds the high point; the average
+        and volume are sampled estimates. Along a diagonal valley the slope is the
+        entered plane slope divided by the square root of two.
+        Drains move in 6&quot; steps, or 100 mm in metric, and snap to the center lines and the
+        edges. The lines below are the arithmetic for the plan above.</p>
+      <div class="mathnote" id="mathNote"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/slope.js"></script>
+<script src="lib/roof.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960, FT = 12 * IN, M = 1000 * MM;
+  var GRIDS = {
+    imperial: [['1/16"', 1524], ['1/8"', 3048], ['1/4"', 6096], ['1/2"', 12192]],
+    metric:   [['1 mm', 960], ['5 mm', 4800], ['10 mm', 9600]]
+  };
+  var DEFAULT_GRID = { imperial: 3048, metric: 4800 };
+  var STEP = { imperial: 6 * IN, metric: 100 * MM };     // drain placement
+  var BAND = { imperial: IN, metric: 25 * MM };          // one shaded band of taper
+  // six drains on one roof area: more and the roof is better split into
+  // separate drainage areas, each with its own taper
+  var MAX_DRAINS = 6;
+  var FIELDS = ['len', 'wid', 'slope'];
+  var EXAMPLE = { len: "60'", wid: "40'", slope: '1/4"/ft' };
+  var state = { text: {}, grid: DEFAULT_GRID.imperial, target: 'imperial', drains: null, sel: -1 };
+
+  var els = {};
+  ['buildRow', 'echo', 'echoLine', 'echoAssume', 'out', 'plan', 'rows', 'mathNote', 'bandStep', 'capNote'].forEach(function (id) { els[id] = document.getElementById(id); });
+  var field = {}, note = {};
+  FIELDS.forEach(function (k) { field[k] = document.getElementById(k + 'Input'); note[k] = document.getElementById(k + 'Note'); });
+  var esc = UI.esc;
+
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
+  function defaultUnit() { return state.target === 'metric' ? 'mm' : 'in'; }
+  function readDim(text) {
+    if (!text || !text.trim()) return null;
+    var r = parseLength(text, { defaultUnit: defaultUnit() });
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length' };
+    if (!Number.isSafeInteger(r.units) || r.units <= 0) return { error: 'must be more than zero' };
+    return { units: r.units, result: r };
+  }
+  function statedSystem(text) {
+    if (!text || !text.trim()) return null;
+    var r = parseLength(text, { defaultUnit: defaultUnit() });
+    if (!r || !r.interpretation) return null;
+    var stated = (r.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+    return stated && (r.unitSystem === 'imperial' || r.unitSystem === 'metric') ? r.unitSystem : null;
+  }
+  // switching units rewrites the length fields in the new units, exactly.
+  // skip: the field being typed in.
+  function setTarget(sys, skip) {
+    if (sys === state.target) return;
+    var lens = {};
+    ['len', 'wid'].forEach(function (k) {
+      var d = k === skip ? null : readDim(state.text[k]);
+      if (d && !d.error) lens[k] = d.units;
+    });
+    state.target = sys;
+    if (!GRIDS[sys].some(function (g) { return g[1] === state.grid; })) state.grid = DEFAULT_GRID[sys];
+    Object.keys(lens).forEach(function (k) {
+      state.text[k] = NumberLine.formatTrue(lens[k], sys);
+      field[k].value = state.text[k];
+    });
+    // drains are stored in engine units, so they stay where they are
+  }
+  function fmtBuilt(u) { return state.target === 'metric' ? NumberLine.formatSnapped(u, 'metric') : NumberLine.formatSnapped(u, 'imperial', 64); }
+  function fmtTrue(u) { return NumberLine.formatTrue(Math.round(u), state.target); }
+  function fmtNear(u) { return fmtBuilt(Roof.build(u, state.grid, 'nearest').built); }
+  function fmtResid(u) { return Math.abs(u) < 0.5 ? 'exact' : NumberLine.formatResidual(Math.round(u), state.target); }
+  function row(name, gloss, value, sub, resid, cls) {
+    return '<div class="snap-row' + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + (sub ? '<span class="snap-dec">' + sub + '</span>' : '') + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+  // a taper height: a minimum slope rounds UP
+  function upRow(name, gloss, exact, cls) {
+    var b = Roof.build(exact, state.grid, 'ceil');
+    return row(name, gloss, esc(fmtBuilt(b.built)), Math.abs(b.resid) < 0.5 ? '' : 'exactly ' + esc(fmtTrue(exact)), esc(fmtResid(b.resid)), cls);
+  }
+
+  function renderBuildRow() {
+    var html = '<span class="section-label">Build the taper to</span>';
+    GRIDS[state.target].forEach(function (g) {
+      var on = g[1] === state.grid;
+      html += '<button type="button" class="grid-box' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-grid="' + g[1] + '">' + esc(g[0]) + '</button>';
+    });
+    html += '<span class="units" role="group" aria-label="Units">'
+         + '<button type="button" class="key-sm" data-units="imperial" aria-pressed="' + (state.target === 'imperial') + '">ft-in</button>'
+         + '<button type="button" class="key-sm" data-units="metric" aria-pressed="' + (state.target === 'metric') + '">mm</button></span>';
+    els.buildRow.innerHTML = html;
+  }
+
+  /* ---- the taper field ------------------------------------------------------- */
+  function taperAt(x, y, s) {
+    var best = Infinity;
+    state.drains.forEach(function (d) { var v = Math.max(Math.abs(x - d.x), Math.abs(y - d.y)); if (v < best) best = v; });
+    return best * s;
+  }
+  function highPoint(L, W, s) {
+    return Roof.taperHighPoint(L, W, s, state.drains);
+  }
+
+  var fig = { k: 1, mL: 28, mT: 28, w: 0, h: 0 };
+  function render() {
+    renderBuildRow();
+    syncURL();
+    var L = readDim(state.text.len), W = readDim(state.text.wid), sl = Slope.parseSlope(state.text.slope);
+    note.len.innerHTML = L && L.error ? esc(L.error) : '';
+    note.wid.innerHTML = W && W.error ? esc(W.error) : '';
+    note.slope.innerHTML = sl && sl.error ? esc(sl.error) : '';
+    els.bandStep.textContent = fmtBuilt(BAND[state.target]);
+    if (!L || L.error || !W || W.error || !sl || sl.error) { els.out.style.display = 'none'; els.echo.style.display = 'none'; els.mathNote.innerHTML = ''; return; }
+    var Lu = L.units, Wu = W.units, s = sl.ratio;
+    if (!state.drains) state.drains = [{ x: Lu / 2, y: Wu / 2 }];
+    // a smaller roof pulls its drains inside rather than losing them
+    state.drains.forEach(function (d) { d.x = Math.max(0, Math.min(Lu, d.x)); d.y = Math.max(0, Math.min(Wu, d.y)); });
+    els.out.style.display = '';
+
+    // echo
+    els.echoLine.innerHTML = '<span class="op">slope </span><span class="tok stated">' + esc(state.text.slope.trim()) + '</span><span class="eq">=</span><span class="result">'
+      + esc(Slope.faceOf(s) + ' · ' + sig(100 * s, 2) + '% · ' + (state.target === 'metric' ? sig(s * 1000, 1) + ' mm per m' : sig(s * 12, 3) + '" per ft')) + '</span>';
+    els.echoAssume.innerHTML = ['four-way taper: four planes meet at each drain; valleys follow the diagonals',
+      'the deck starts flat. Heights are taper added above it',
+      'base insulation thickness is not included', 'slope is measured across each plane; diagonal valley slope is lower'].concat(state.drains.length ? [] : ['add a drain to calculate taper']).map(function (a) { return '<div>' + esc(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+
+    drawPlan(Lu, Wu, s);
+    if (!state.drains.length) { els.rows.innerHTML = row('No drains', 'tap the plan to add one', '—', '', ''); els.mathNote.innerHTML = ''; return; }
+    var hp = highPoint(Lu, Wu, s);
+    var corners = [[0, 0], [Lu, 0], [0, Wu], [Lu, Wu]].map(function (c) { return taperAt(c[0], c[1], s); });
+    var html = '<div class="rows-label">' + state.drains.length + ' drain' + (state.drains.length > 1 ? 's' : '') + '</div>';
+    html += upRow('High point', 'taper above the flat deck, built up', hp.h, 'is-primary');
+    html += row('Where', 'from the left and top edges', esc(fmtNear(hp.x) + ' · ' + fmtNear(hp.y)), '', '');
+    html += upRow('Corners', 'the highest of the four', Math.max.apply(null, corners));
+    html += upRow('Edges', 'lowest point along the perimeter', perimeterMin(Lu, Wu, s));
+    var avg = averageTaper(Lu, Wu, s);
+    html += row('Average', 'sampled estimate over the whole roof', esc(fmtNear(avg)), state.target === 'metric'
+      ? sig(avg / MM / 1000 * Lu / MM / 1000 * Wu / MM / 1000, 2) + ' m³ of taper fill'
+      : sig(avg / IN * Lu / FT * Wu / FT, 0) + ' board feet of taper fill', '');
+    els.rows.innerHTML = html;
+    els.mathNote.innerHTML = '<b>engine</b> — 1 unit = 1/960 mm:<br>'
+      + 'plan ' + Lu + ' × ' + Wu + ' units · slope ' + sig(s, 8) + '<br>'
+      + 'taper(x, y) = slope × min over drains of max(|x − dx|, |y − dy|)<br>'
+      + 'drains: ' + state.drains.map(function (d) { return '(' + Math.round(d.x) + ', ' + Math.round(d.y) + ')'; }).join(' ') + '<br>'
+      + 'high point ' + sig(hp.h, 2) + ' units at (' + Math.round(hp.x) + ', ' + Math.round(hp.y) + '), bounded square-coverage search; rounded up to ' + state.grid + ' units';
+  }
+  function perimeterMin(L, W, s) {
+    // Nearest boundary distance over all drains, exactly for this taper model.
+    return s * Math.min.apply(null, state.drains.map(function (d) {
+      return Math.min(d.x, L - d.x, d.y, W - d.y);
+    }));
+  }
+  function averageTaper(L, W, s) {
+    var sum = 0, n = 60;
+    for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) sum += taperAt(L * (i + 0.5) / n, W * (j + 0.5) / n, s);
+    return sum / (n * n);
+  }
+
+  // each drain is dimensioned from its nearest corner: across to the corner's
+  // vertical edge (on the corner's top or bottom side) and along to its
+  // horizontal edge (on its left or right side). Each CORNER keeps its own
+  // stack on each of its two sides, shortest nearest the plan, so dimensions
+  // from different corners never offset each other. A dimension too short for
+  // its label puts the label just outside its line, and the next one out
+  // steps past it. The overall length and width sit outermost on the top and
+  // left. Six drains at most.
+  var TIER = 24, GAP = 16, LBL = 20, SHORT_PX = 78;
+  function dimsFor(L, W) {
+    var sides = { top: {}, bottom: {}, left: {}, right: {} };
+    state.drains.forEach(function (d, i) {
+      var west = d.x <= L / 2, north = d.y <= W / 2;
+      var ax = west ? d.x : L - d.x, ay = north ? d.y : W - d.y;
+      var corner = (north ? 'n' : 's') + (west ? 'w' : 'e');
+      function add(side, item) { (sides[side][corner] = sides[side][corner] || []).push(item); }
+      if (ax > 0) add(north ? 'top' : 'bottom', { i: i, axis: 'x', from: west ? 0 : L, to: d.x, len: ax, west: west, north: north });
+      if (ay > 0) add(west ? 'left' : 'right', { i: i, axis: 'y', from: north ? 0 : W, to: d.y, len: ay, west: west, north: north });
+    });
+    Object.keys(sides).forEach(function (sd) {
+      Object.keys(sides[sd]).forEach(function (c) { sides[sd][c].sort(function (a, b) { return a.len - b.len; }); });
+    });
+    return sides;
+  }
+  // offsets for a scale k: each corner's stack in turn; returns each side's depth
+  function stackAt(sides, k) {
+    var depth = { top: 0, bottom: 0, left: 0, right: 0 };
+    Object.keys(sides).forEach(function (sd) {
+      Object.keys(sides[sd]).forEach(function (c) {
+        var cur = GAP;
+        sides[sd][c].forEach(function (d) {
+          d.short = d.len * k < SHORT_PX;
+          d.off = cur;
+          cur += TIER + (d.short ? LBL : 0);
+        });
+        depth[sd] = Math.max(depth[sd], cur);
+      });
+    });
+    return depth;
+  }
+  function drawPlan(L, W, s) {
+    var avail = Math.min(els.plan.clientWidth || 640, 680);
+    var sides = dimsFor(L, W), k = 1, depth, mT, mL, mB, mR;
+    // margins hang on which labels are short, which hangs on the scale: settle it twice
+    for (var pass = 0; pass < 2; pass++) {
+      depth = stackAt(sides, k);
+      mT = Math.max(depth.top, GAP) + TIER + 8; mL = Math.max(depth.left, GAP) + TIER + 8;
+      mB = depth.bottom ? depth.bottom + 8 : 16; mR = depth.right ? depth.right + 8 : 16;
+      k = Math.min((avail - mL - mR) / L, 420 / W);
+    }
+    // while a drain is dragged the layout holds still: a re-layout moves the
+    // plan under the pointer, which moves the drain, which re-lays it out. It
+    // settles once, on release. Stacks that outgrow the held margins draw past
+    // the edge of the drawing for that moment.
+    if (drag && drag.lock) { k = drag.lock.k; mL = drag.lock.mL; mT = drag.lock.mT; mR = drag.lock.mR; mB = drag.lock.mB; }
+    depth = stackAt(sides, k);
+    var w = Math.round(L * k + mL + mR), h = Math.round(W * k + mT + mB);
+    fig = { k: k, mL: mL, mT: mT, mR: mR, mB: mB, w: w, h: h, L: L, W: W };
+    function X(x) { return mL + x * k; }
+    function Y(y) { return mT + y * k; }
+    function f(n) { return n.toFixed(1); }
+    // the bands, on a canvas under the drawing
+    var dpr = window.devicePixelRatio || 1;
+    var cv = document.createElement('canvas');
+    cv.width = Math.round(L * k * dpr); cv.height = Math.round(W * k * dpr);
+    cv.style.width = (L * k) + 'px'; cv.style.height = (W * k) + 'px'; cv.style.left = mL + 'px'; cv.style.top = mT + 'px';
+    var ctx = cv.getContext('2d'), img = ctx.createImageData(cv.width, cv.height), px = img.data;
+    var cs = getComputedStyle(document.documentElement);
+    var acc = parseColor(cs.getPropertyValue('--accent')), band = BAND[state.target];
+    var hiH = state.drains.length ? highPoint(L, W, s).h : 0;
+    for (var j = 0; j < cv.height; j++) {
+      for (var i = 0; i < cv.width; i++) {
+        var x = (i + 0.5) / dpr / k, y = (j + 0.5) / dpr / k;
+        var t = state.drains.length ? taperAt(x, y, s) : 0, b = Math.floor(t / band);
+        var a = state.drains.length ? (0.05 + 0.32 * (hiH ? t / hiH : 0)) * (b % 2 ? 1 : 0.72) : 0;
+        var o = (j * cv.width + i) * 4;
+        px[o] = acc[0]; px[o + 1] = acc[1]; px[o + 2] = acc[2]; px[o + 3] = Math.round(a * 255);
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+
+    var g = '<rect class="tp-edge" x="' + f(X(0)) + '" y="' + f(Y(0)) + '" width="' + f(L * k) + '" height="' + f(W * k) + '"/>';
+    var edits = '';
+    // one dimension: its line at a tier off a side, ticks, dashed extension
+    // lines back to the corner's edge and to the drain, and its label
+    function dim(side, d) {
+      var off = d.off;
+      if (side === 'top' || side === 'bottom') {
+        var yl = side === 'top' ? Y(0) - off : Y(W) + off;
+        var x1 = X(d.from), x2 = X(d.to), yEdge = side === 'top' ? Y(0) : Y(W), yDr = Y(state.drains[d.i].y);
+        g += '<line class="tp-ext" x1="' + f(x2) + '" y1="' + f(yDr) + '" x2="' + f(x2) + '" y2="' + f(yl + (side === 'top' ? -4 : 4)) + '"/>';
+        g += '<line class="tp-ext" x1="' + f(x1) + '" y1="' + f(yEdge) + '" x2="' + f(x1) + '" y2="' + f(yl + (side === 'top' ? -4 : 4)) + '"/>';
+        g += '<line class="tp-dl" x1="' + f(x1) + '" y1="' + f(yl) + '" x2="' + f(x2) + '" y2="' + f(yl) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(x1 - 3) + '" y1="' + f(yl + 3) + '" x2="' + f(x1 + 3) + '" y2="' + f(yl - 3) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(x2 - 3) + '" y1="' + f(yl + 3) + '" x2="' + f(x2 + 3) + '" y2="' + f(yl - 3) + '"/>';
+        // too short for its label: the label sits just outside the line
+        var ly = d.short ? yl + (side === 'top' ? -LBL + 4 : LBL - 4) : yl;
+        // a short one also slides along, away from its corner, so it never meets the corner's other stack
+        var lxc = d.short ? x1 + (x2 > x1 ? 1 : -1) * 44 : (x1 + x2) / 2;
+        edits += label(d, Math.max(40, Math.min(w - 40, lxc)), ly, false);
+      } else {
+        var xl = side === 'left' ? X(0) - off : X(L) + off;
+        var y1 = Y(d.from), y2 = Y(d.to), xEdge = side === 'left' ? X(0) : X(L), xDr = X(state.drains[d.i].x);
+        g += '<line class="tp-ext" x1="' + f(xDr) + '" y1="' + f(y2) + '" x2="' + f(xl + (side === 'left' ? -4 : 4)) + '" y2="' + f(y2) + '"/>';
+        g += '<line class="tp-ext" x1="' + f(xEdge) + '" y1="' + f(y1) + '" x2="' + f(xl + (side === 'left' ? -4 : 4)) + '" y2="' + f(y1) + '"/>';
+        g += '<line class="tp-dl" x1="' + f(xl) + '" y1="' + f(y1) + '" x2="' + f(xl) + '" y2="' + f(y2) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(xl - 3) + '" y1="' + f(y1 + 3) + '" x2="' + f(xl + 3) + '" y2="' + f(y1 - 3) + '"/>';
+        g += '<line class="tp-tk" x1="' + f(xl - 3) + '" y1="' + f(y2 + 3) + '" x2="' + f(xl + 3) + '" y2="' + f(y2 - 3) + '"/>';
+        var lx = d.short ? xl + (side === 'left' ? -LBL + 4 : LBL - 4) : xl;
+        var lyc = d.short ? y1 + (y2 > y1 ? 1 : -1) * 44 : (y1 + y2) / 2;
+        edits += label(d, lx, Math.max(40, Math.min(h - 40, lyc)), true);
+      }
+    }
+    function label(d, x, y, vertical) {
+      var id = 'tpd' + d.i + d.axis;
+      return '<input class="tp-edit' + (vertical ? ' is-v' : '') + '" id="' + id + '" data-i="' + d.i + '" data-axis="' + d.axis + '" data-from="' + d.from + '"'
+        + ' aria-label="Drain ' + (d.i + 1) + ', ' + (d.axis === 'x' ? 'across from the ' + (d.west ? 'left' : 'right') : 'along from the ' + (d.north ? 'top' : 'bottom')) + ' edge"'
+        + ' value="' + esc(fmtNear(d.len)) + '" style="left:' + f(x) + 'px;top:' + f(y) + 'px" spellcheck="false" autocomplete="off">';
+    }
+    Object.keys(sides).forEach(function (sd) { Object.keys(sides[sd]).forEach(function (c) { sides[sd][c].forEach(function (d) { dim(sd, d); }); }); });
+    // the overall length and width, outermost on the top and left
+    var yo = Y(0) - Math.max(depth.top, GAP), xo = X(0) - Math.max(depth.left, GAP);
+    g += '<line class="tp-dl is-all" x1="' + f(X(0)) + '" y1="' + f(yo) + '" x2="' + f(X(L)) + '" y2="' + f(yo) + '"/>';
+    g += '<line class="tp-dl is-all" x1="' + f(xo) + '" y1="' + f(Y(0)) + '" x2="' + f(xo) + '" y2="' + f(Y(W)) + '"/>';
+    // the overall length and width are labels you can type into too; they
+    // write back to the length and width fields
+    edits += '<input class="tp-edit is-all" id="tpdL" data-overall="len" aria-label="Roof length" value="' + esc(fmtNear(L)) + '" style="left:' + f(X(L / 2)) + 'px;top:' + f(yo) + 'px" spellcheck="false" autocomplete="off">';
+    edits += '<input class="tp-edit is-all is-v" id="tpdW" data-overall="wid" aria-label="Roof width" value="' + esc(fmtNear(W)) + '" style="left:' + f(xo) + 'px;top:' + f(Y(W / 2)) + 'px" spellcheck="false" autocomplete="off">';
+    if (state.drains.length) {
+      var hp = highPoint(L, W, s);
+      g += '<circle class="tp-high" cx="' + f(X(hp.x)) + '" cy="' + f(Y(hp.y)) + '" r="4"/>';
+      var right = X(hp.x) < w * 0.7, below = Y(hp.y) < mT + 18;
+      g += '<text class="tp-val" x="' + f(X(hp.x) + (right ? 8 : -8)) + '" y="' + f(Y(hp.y) + (below ? 16 : -7)) + '" text-anchor="' + (right ? 'start' : 'end') + '">'
+         + esc(fmtBuilt(Roof.build(hp.h, state.grid, 'ceil').built)) + '</text>';
+    }
+    state.drains.forEach(function (d, i) {
+      var cx = X(d.x), cy = Y(d.y);
+      g += '<circle class="tp-drain" data-i="' + i + '" cx="' + f(cx) + '" cy="' + f(cy) + '" r="9"/>';
+      g += '<path class="tp-cross" d="M' + f(cx - 5) + ' ' + f(cy) + 'H' + f(cx + 5) + 'M' + f(cx) + ' ' + f(cy - 5) + 'V' + f(cy + 5) + '"/>';
+    });
+    var active = document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('tp-edit') ? document.activeElement.id : null;
+    els.plan.innerHTML = '';
+    els.plan.appendChild(cv);
+    els.plan.insertAdjacentHTML('beforeend', '<svg class="tp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" role="img" aria-label="Roof plan with drains, their dimensions and taper bands">' + g + '</svg>' + edits);
+    if (active) { var el = document.getElementById(active); if (el) el.focus({ preventScroll: true }); }
+  }
+  function parseColor(c) {
+    c = c.trim();
+    var m = /^#([0-9a-f]{6})$/i.exec(c);
+    if (m) return [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4, 6), 16)];
+    var probe = document.createElement('span'); probe.style.color = c; document.body.appendChild(probe);
+    var rgb = getComputedStyle(probe).color.match(/\d+/g) || [0, 76, 128]; probe.remove();
+    return rgb.slice(0, 3).map(Number);
+  }
+
+  // a plan point under the pointer, snapped to the placement step, held at
+  // the center lines and the edges
+  function planAt(e) {
+    var svg = els.plan.querySelector('svg'), r = svg.getBoundingClientRect(), sc = r.width / fig.w;
+    var x = ((e.clientX - r.left) / sc - fig.mL) / fig.k, y = ((e.clientY - r.top) / sc - fig.mT) / fig.k;
+    var hold = 8 / (fig.k * sc), st = STEP[state.target];
+    function snap(v, size) {
+      var marks = [0, size / 2, size];
+      for (var i = 0; i < marks.length; i++) if (Math.abs(v - marks[i]) < hold) return marks[i];
+      return Math.round(v / st) * st;
+    }
+    return { x: snap(x, fig.L), y: snap(y, fig.W), raw: { x: x, y: y } };
+  }
+  var drag = null;
+  els.plan.addEventListener('pointerdown', function (e) {
+    if (!fig.L || (e.target.closest && e.target.closest('.tp-edit'))) return;
+    var t = e.target.closest && e.target.closest('.tp-drain');
+    var p = planAt(e);
+    var lock = { k: fig.k, mL: fig.mL, mT: fig.mT, mR: fig.mR, mB: fig.mB };
+    if (t) {
+      drag = { i: +t.dataset.i, id: e.pointerId, lock: lock };
+    } else {
+      if (p.raw.x < 0 || p.raw.x > fig.L || p.raw.y < 0 || p.raw.y > fig.W) return;
+      if (state.drains.length >= MAX_DRAINS) { els.capNote.hidden = false; return; }
+      state.drains.push({ x: p.x, y: p.y });
+      drag = { i: state.drains.length - 1, id: e.pointerId, lock: lock };
+      render();
+    }
+    els.plan.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  els.plan.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var p = planAt(e), d = state.drains[drag.i];
+    if (!d) return;
+    var pad = 24 / fig.k;
+    var off = p.raw.x < -pad || p.raw.x > fig.L + pad || p.raw.y < -pad || p.raw.y > fig.W + pad;
+    d.off = off;
+    d.x = Math.max(0, Math.min(fig.L, p.x)); d.y = Math.max(0, Math.min(fig.W, p.y));
+    render();
+  });
+  function end(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var d = state.drains[drag.i];
+    if (d && d.off) { state.drains.splice(drag.i, 1); els.capNote.hidden = true; }
+    drag = null;
+    render();
+  }
+  els.plan.addEventListener('pointerup', end);
+  els.plan.addEventListener('pointercancel', end);
+
+  // a typed dimension moves its drain: on Enter or when the label loses focus
+  function commitDim(el) {
+    if (el.dataset.overall) {
+      var o = readDim(el.value), k = el.dataset.overall;
+      if (!o || o.error) { el.classList.add('is-bad'); el.title = o ? o.error : 'a length, e.g. 60\' or 18m'; return; }
+      var sys = statedSystem(el.value);
+      if (sys) setTarget(sys, k);
+      state.text[k] = el.value.trim(); field[k].value = state.text[k];
+      render();
+      return;
+    }
+    var d = state.drains[+el.dataset.i]; if (!d) return;
+    var v = readDim(el.value), from = +el.dataset.from, axis = el.dataset.axis, size = axis === 'x' ? fig.L : fig.W;
+    if (!v || v.error || v.units > size) { el.classList.add('is-bad'); el.title = v && !v.error ? 'past the far edge' : 'a length, e.g. 12\'-6" or 3.8m'; return; }
+    var p = from === 0 ? v.units : size - v.units;
+    if (axis === 'x') d.x = p; else d.y = p;
+    render();
+  }
+  els.plan.addEventListener('keydown', function (e) {
+    if (!e.target.classList.contains('tp-edit')) return;
+    if (e.key === 'Enter') { e.preventDefault(); commitDim(e.target); }
+    if (e.key === 'Escape') { e.target.blur(); render(); }
+  });
+  els.plan.addEventListener('focusout', function (e) {
+    if (e.target.classList && e.target.classList.contains('tp-edit')) setTimeout(function () { if (document.body.contains(e.target)) commitDim(e.target); }, 0);
+  });
+  els.plan.addEventListener('focusin', function (e) {
+    if (e.target.classList && e.target.classList.contains('tp-edit')) setTimeout(function () { e.target.select(); }, 0);
+  });
+
+  /* ---- URL -------------------------------------------------------------------- */
+  var urlTimer = null;
+  function syncURL() {
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var q = new URLSearchParams();
+      FIELDS.forEach(function (k) { if (state.text[k]) q.set(k, state.text[k]); });
+      if (state.drains) q.set('dr', state.drains.map(function (d) { return Math.round(d.x) + '_' + Math.round(d.y); }).join('~'));
+      if (state.target === 'metric') q.set('u', 'mm');
+      if (state.grid !== DEFAULT_GRID[state.target]) q.set('g', String(state.grid));
+      try { history.replaceState(null, '', '?' + q.toString()); } catch (e) {}
+    }, 250);
+  }
+
+  FIELDS.forEach(function (k) {
+    field[k].addEventListener('input', function () {
+      state.text[k] = field[k].value;
+      var sys = k === 'slope' ? null : statedSystem(field[k].value);
+      if (sys) setTarget(sys, k);
+      render();
+    });
+    field[k].addEventListener('focus', function () { setTimeout(function () { field[k].select(); }, 0); });
+  });
+  els.buildRow.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.grid-box, [data-units]') : null;
+    if (!b) return;
+    if (b.dataset.units) setTarget(b.dataset.units); else state.grid = +b.dataset.grid;
+    render();
+  });
+  window.addEventListener('resize', function () { clearTimeout(window.__tp); window.__tp = setTimeout(render, 120); });
+  document.addEventListener('schemechange', render);
+
+  // a saved plan carries its length or width; a handoff from Slope carries
+  // only ?slope= (with rise and run), so it opens the example plan at that slope
+  var q = new URLSearchParams(location.search), any = q.get('len') != null || q.get('wid') != null;
+  FIELDS.forEach(function (k) { state.text[k] = any ? (q.get(k) || '').slice(0, 80) : EXAMPLE[k]; });
+  if (!any && q.get('slope')) state.text.slope = q.get('slope').slice(0, 40);
+  else if (!any && q.get('rise') && q.get('run')) {
+    var hr = readDim(q.get('rise').slice(0, 80)), hn = readDim(q.get('run').slice(0, 80));
+    if (hr && hr.units && hn && hn.units) state.text.slope = Slope.faceOf(hr.units / hn.units);
+  }
+  FIELDS.forEach(function (k) { field[k].value = state.text[k]; });
+  if (q.get('dr') != null) state.drains = q.get('dr') ? q.get('dr').split('~').map(function (p) { var a = p.split('_'); return { x: +a[0], y: +a[1] }; }).filter(function (d) { return isFinite(d.x) && isFinite(d.y); }).slice(0, MAX_DRAINS) : [];
+  state.target = q.get('u') === 'mm' ? 'metric' : (statedSystem(state.text.len) || 'imperial');
+  var g = +q.get('g'); state.grid = GRIDS[state.target].some(function (x) { return x[1] === g; }) ? g : DEFAULT_GRID[state.target];
+  render();
+})();
+</script>
+</body>
+</html>

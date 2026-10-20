@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" data-family="drafting" data-stage="live">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roof -- architecture.tools</title>
+<meta name="description" content="Roof heights from a pitch: drag a point along a true-scale roof section, or type a distance or a height on the drawing, measured from the wall line, the drip edge or the ridge, in feet and inches or millimeters. With roof area in squares and hip slopes.">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="../assets/css/global.css">
+<style>
+  /* ---- page-specific only ----
+     The calculator shell is shared via global.css; the slope parsing lives
+     in lib/slope.js and the roof geometry in lib/roof.js. Local rules cover
+     the input row, the interactive section and the answer blocks. */
+  html, body { overflow-x: hidden; }            /* keep L/R margins symmetric */
+
+  .in-row { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; align-items: flex-start; margin-bottom: var(--space-sm); }
+  .in { display: flex; flex-direction: column; }
+  .in label { font-size: var(--text-xs); font-weight: 400; letter-spacing: 0.1em;
+              text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--space-xs); }
+  .in label .opt { text-transform: none; letter-spacing: 0; color: var(--ink-3); }
+  .in-input { font-family: 'SF Mono', ui-monospace, 'Menlo', monospace;
+              font-size: 1.05rem; font-weight: 400; width: 9rem; max-width: 100%;
+              color: var(--ink); background: var(--card);
+              padding: 0.4rem 0.55rem; border: 1px solid var(--rule-2);
+              box-shadow: var(--shadow-well); border-radius: var(--radius);
+              outline: none; -webkit-appearance: none; appearance: none; }
+  .in-input:focus { border-color: var(--accent); box-shadow: var(--shadow-well), 0 0 0 2px var(--accent-soft); }
+  .in-note { font-size: var(--text-xs); color: var(--ink-2); min-height: 1.2em; margin-top: 0.25rem; max-width: 12em; }
+  @media (max-width: 480px) { .in { flex: 1 1 8rem; } .in-input { width: 100%; box-sizing: border-box; } }
+
+  .build-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0 0 var(--space-md); }
+  .build-row .section-label { margin: 0 0.4rem 0 0; }
+  .build-row .units { margin-left: auto; display: flex; gap: 0.3rem; align-items: center; }
+  .key-sm[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: var(--shadow-press); }
+
+  /* the section: true scale, drag the point along the roof; the distance and
+     height labels are inputs sitting on the drawing */
+  .rf-wrap { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .rf-tools { position: absolute; left: 0; right: 0; top: 0; z-index: 2; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem 1rem; }
+  svg.rf { display: block; max-width: 100%; height: auto; }
+  svg.rf text { font-family: var(--font-body); font-size: 13px; fill: var(--ink-2);
+                stroke: var(--answer-surface); stroke-width: 3px; paint-order: stroke; }
+  svg.rf .rf-roof  { stroke: var(--nl-ink); stroke-width: 1.5; fill: none; stroke-linejoin: round; }
+  svg.rf .rf-plate { stroke: var(--nl-axis); stroke-width: 1; }
+  svg.rf .rf-wall  { stroke: var(--nl-axis); stroke-width: 1; stroke-dasharray: 2 3; }
+  svg.rf .rf-ext   { stroke: var(--nl-axis); stroke-width: 1; stroke-dasharray: 3 3; }
+  svg.rf .rf-datum { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 3; opacity: 0.7; }
+  svg.rf .rf-dim   { stroke: var(--accent); stroke-width: 1; }
+  svg.rf .rf-tick  { stroke: var(--accent); stroke-width: 1; }
+  svg.rf .rf-pt    { fill: var(--accent); }
+  svg.rf .rf-halo  { fill: var(--accent); opacity: 0.14; }
+  svg.rf .rf-hit   { stroke: transparent; stroke-width: 36; fill: none; cursor: ew-resize; }
+  svg.rf .rf-ref   { fill: var(--accent); }
+  svg.rf.is-dragging .rf-halo { opacity: 0.28; }
+  .rf-edit { position: absolute; z-index: 2; transform: translate(-50%, -50%);
+             font-family: 'SF Mono', ui-monospace, 'Menlo', monospace; font-size: 0.95rem; font-weight: 500;
+             width: 7.2em; padding: 0.15rem 0.3rem; text-align: center; color: var(--accent);
+             background: var(--answer-surface); border: 1px solid var(--rule-2); border-radius: var(--radius); outline: none; }
+  .rf-edit:hover { border-color: var(--accent); }
+  .rf-edit:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .rf-edit.is-bad { border-color: var(--correction, #AF3D34); }
+  .rf-hint { font-size: var(--text-xs); color: var(--ink-3); margin: 0.4rem 0 0; }
+
+  /* subgroup labels inside the answer blocks */
+  .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
+                color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
+  .rows-label:first-child { margin-top: 0.2rem; }
+  .block-note { font-size: var(--text-sm); color: var(--ink-2); margin: 0.5rem 0 0; max-width: 42em; }
+
+  .ratio-box .in-row { margin-top: var(--space-sm); }
+  .ratio-box .snap-rows { border-top: 1px solid var(--rule); }
+
+  /* hips and valleys: a detail you open, not a headline */
+  .hip-box summary { cursor: pointer; font-size: var(--text-sm); color: var(--ink); padding: 0.2rem 0; }
+  .hip-box summary .section-label { display: inline; margin: 0; }
+  .hip-box summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .back-to { font-size: var(--text-sm); color: var(--ink-2); margin-top: var(--space-md); }
+
+  /* Keep dimensions intact on phones; rounding notes sit below the value. */
+  @media (max-width: 480px) {
+    .snap-row { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 0.2rem 0.5rem; }
+    .snap-name { width: auto; }
+    .snap-value { min-width: 0; }
+    .snap-resid { grid-column: 2; width: auto; min-width: 0; text-align: left; }
+    .snap-resid:empty { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <!-- the set trail is a label until a C-0 index earns its page on main -->
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="../index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Calculators</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">Roof</span>
+    </nav>
+    <h1>Roof</h1>
+    <p>How high is the roof at this point? Set the pitch, then drag along the
+       section or type a distance or a height on the drawing, from the wall
+       line, the drip edge or the ridge.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <!-- CALC SHELL (global.css "CALCULATOR SHELL" + docs/HANDOFF.md §3) -->
+
+  <!-- slot 1 · INPUT: the pitch, and the span and overhang if known. The
+       point itself is set on the drawing. -->
+  <div class="in-row">
+    <div class="in">
+      <label for="pitchInput">pitch</label>
+      <input type="text" id="pitchInput" class="in-input" spellcheck="false" maxlength="40"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 8:12  ·  30°" autofocus>
+      <div class="in-note" id="pitchNote"></div>
+    </div>
+    <div class="in">
+      <label for="spanInput">span <span class="opt">wall to wall, optional</span></label>
+      <input type="text" id="spanInput" class="in-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 24'  ·  7.3m">
+      <div class="in-note" id="spanNote"></div>
+    </div>
+    <div class="in">
+      <label for="ohInput">overhang <span class="opt">wall to drip edge</span></label>
+      <input type="text" id="ohInput" class="in-input" spellcheck="false" maxlength="80"
+             autocomplete="off" autocapitalize="off" placeholder="e.g. 12&quot;  ·  300mm">
+      <div class="in-note" id="ohNote"></div>
+    </div>
+  </div>
+  <div class="build-row" id="buildRow"></div>
+
+  <div id="results">
+    <!-- slot 3 · ECHO -->
+    <div class="echo" id="echo" style="display:none;">
+      <div class="echo-line" id="echoLine"></div>
+      <div class="echo-assumptions" id="echoAssume"></div>
+    </div>
+
+    <div id="roofOut" style="display:none;">
+      <!-- slot 5 · ANSWER CARD: the interactive true-scale section + the
+           heights, each built to the grid with its rounding -->
+      <div class="answer-card">
+        <div class="rf-wrap" id="figure"></div>
+        <p class="rf-hint" id="figHint">Drag along the roof, or type in a label on the drawing. Arrow keys move the point one snap step, with Shift a foot (a meter).</p>
+        <div class="snap-rows" id="heightRows"></div>
+      </div>
+
+      <!-- roof area: plan area × the pitch factor → area on the slope, squares -->
+      <div class="ratio-box">
+        <div class="section-label">Roof area</div>
+        <div class="in-row">
+          <div class="in">
+            <label for="areaInput">plan area <span class="opt">to the drip edge</span></label>
+            <input type="text" id="areaInput" class="in-input" spellcheck="false" maxlength="80"
+                   autocomplete="off" autocapitalize="off" placeholder="e.g. 40' x 28'  ·  1120 sf">
+            <div class="in-note" id="areaNote"></div>
+          </div>
+        </div>
+        <div class="snap-rows" id="areaRows"></div>
+        <p class="block-note">Every plane at one pitch has the same factor, so a hip roof and a
+           gable at that pitch over the same plan have the same roof area. No waste is included.</p>
+      </div>
+
+      <!-- hips and valleys: opened only when the roof plan needs them -->
+      <div class="ratio-box hip-box">
+        <details id="hipBox">
+          <summary><span class="section-label">Hips and valleys</span></summary>
+          <div class="in-row">
+            <div class="in">
+              <label for="pitch2Input">other plane&rsquo;s pitch <span class="opt">blank = the same</span></label>
+              <input type="text" id="pitch2Input" class="in-input" spellcheck="false" maxlength="40"
+                     autocomplete="off" autocapitalize="off" placeholder="same pitch">
+              <div class="in-note" id="pitch2Note"></div>
+            </div>
+          </div>
+          <div class="snap-rows" id="hipRows"></div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <p class="back-to">A low-slope roof? <a href="taper.html">Roof Taper</a> starts flat and slopes it to the drains.
+     Only need a rise, a run or a slope? <a href="slope.html" id="slopeLink">Slope</a> solves any two of the three.</p>
+
+  <div class="page-footer">
+    <a class="back-link" href="../index.html">← architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../privacy.html">Privacy &amp; analytics</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="../feedback.html">Feedback</a>
+    <span class="crumb-sep">&middot;</span> <button type="button" class="back-link footer-disclose" aria-expanded="false" aria-controls="enginePanel">How it&rsquo;s calculated</button>
+    <div class="footer-panel" id="enginePanel" hidden>
+      <p class="engine-intro">Every length on this page is held as a whole number of
+        engine units. One unit is 1/960 of a millimeter, so a millimeter is 960 units and an
+        inch is 24,384. Whole millimeters and sixteenths, thirty-seconds and sixty-fourths of an
+        inch are all whole numbers of units, so metric and imperial inputs are both exact, and no
+        step rounds in decimals along the way. A height is the plan distance times the slope,
+        which usually falls between units: it is rounded to the nearest unit, then to the
+        fraction you build to, and each row shows what that rounding adds or drops. Dragging
+        moves the point by the snap step you choose, and with any step it holds at the wall line,
+        the drip edge, the ridge and whole feet or meters as it passes them. With snap off it
+        moves to the nearest engine unit. The lines below are
+        the arithmetic for the reading above.</p>
+      <div class="mathnote" id="mathNote"></div>
+    </div>
+  </div>
+</div>
+
+<!-- pure modules (UMD: attach to window); page below is wiring only -->
+<script src="../assets/js/ui.js"></script>
+<script src="lib/parse-length.js"></script>
+<script src="lib/snap.js"></script>
+<script src="lib/numberline.js"></script>
+<script src="lib/slope.js"></script>
+<script src="lib/roof.js"></script>
+<script>
+(function () {
+  'use strict';
+  var IN = 24384, MM = 960, FT = 12 * IN, M = 1000 * MM;
+  var MAX_UNITS = 96000000000;
+  var SF_MM2 = 92903.04;                       // one square foot in mm²
+  function outOfRange(units) { return !Number.isSafeInteger(units) || Math.abs(units) > MAX_UNITS; }
+
+  // build grids — the fraction a height is built to (snap.js grid counts)
+  var GRIDS = {
+    imperial: [['1/16"', 1524], ['1/8"', 3048], ['1/4"', 6096], ['1/2"', 12192]],
+    metric:   [['1 mm', 960], ['5 mm', 4800], ['10 mm', 9600]]
+  };
+  var DEFAULT_GRID = { imperial: 3048, metric: 4800 };
+  // the drag step and the round numbers it holds at, per system
+  // the snap choices: what a drag moves in. Off drags freely; any step also
+  // holds at the wall line, drip edge, ridge and round numbers it passes
+  var SNAPS = {
+    imperial: [['off', 0], ['1/2"', IN / 2], ['1"', IN], ['6"', 6 * IN], ["1'", FT]],
+    metric:   [['off', 0], ['5 mm', 5 * MM], ['10 mm', 10 * MM], ['50 mm', 50 * MM], ['100 mm', 100 * MM]]
+  };
+  var STEP = { imperial: IN, metric: 10 * MM };   // the default snap
+  var ROUND = { imperial: FT, metric: M };
+  // with no span, the section runs this far: long enough for most roofs,
+  // shorter on a phone so the eave end stays readable
+  function openRun() {
+    var narrow = (els.figure.clientWidth || document.documentElement.clientWidth || 800) < 500;
+    return state.target === 'metric' ? (narrow ? 8 : 15) * M : (narrow ? 25 : 50) * FT;
+  }
+  var REFS = [['wall', 'wall line'], ['drip', 'drip edge'], ['ridge', 'ridge']];
+
+  var FIELDS = ['pitch', 'span', 'oh', 'area', 'pitch2'];
+  var EXAMPLE = { pitch: '8:12', span: "24'", oh: '12"', area: "40' x 28'", pitch2: '' };
+  var URLKEY = { pitch: 'p', span: 'span', oh: 'oh', area: 'area', pitch2: 'p2' };
+
+  // x: the point, in plan, from the left wall line (engine units). ref: what
+  // distances and heights are measured from.
+  var state = { text: {}, grid: null, target: 'imperial', x: 9 * FT, ref: 'wall', snap: IN };
+
+  var els = {};
+  ['buildRow','echo','echoLine','echoAssume','roofOut','figure','figHint','heightRows','areaRows','hipRows','hipBox','mathNote','slopeLink']
+    .forEach(function (id) { els[id] = document.getElementById(id); });
+  var field = {}, note = {};
+  FIELDS.forEach(function (k) { field[k] = document.getElementById(k + 'Input'); note[k] = document.getElementById(k + 'Note'); });
+
+  var esc = UI.esc;
+  function defaultUnit() { return state.target === 'metric' ? 'mm' : 'in'; }
+
+  /* ---- reading the fields ---------------------------------------------------- */
+  function readDim(text, allowZero) {
+    if (!text || !text.trim()) return null;
+    var r = parseLength(text, { defaultUnit: defaultUnit() });
+    if (!r || r.dimension !== 1 || r.units == null) return { error: 'needs a single length', result: r };
+    if (outOfRange(r.units) || r.units < 0 || (!allowZero && r.units === 0)) return { error: r.units <= 0 ? 'must be more than zero' : 'out of range', result: r };
+    return { units: r.units, result: r };
+  }
+  function readSlope(text) {
+    var p = Slope.parseSlope(text);
+    if (p && !p.error && p.flipRead) p.note = 'read as rise:run, ' + sig(degOf(p.ratio), 1) + '°';
+    return p;
+  }
+  // a plan area: "1120 sf", "104 m2", or a length × length expression
+  function readArea(text) {
+    if (!text || !text.trim()) return null;
+    var t = text.trim().toLowerCase().replace(/,/g, '');
+    var m = /^(\d+(?:\.\d+)?)\s*(sf|sq\.?\s*ft|ft2|ft²|square feet)$/.exec(t);
+    if (m) return +m[1] > 0 ? { mm2: +m[1] * SF_MM2, system: 'imperial' } : { error: 'must be more than zero' };
+    m = /^(\d+(?:\.\d+)?)\s*(m2|m²|sq\.?\s*m|sqm)$/.exec(t);
+    if (m) return +m[1] > 0 ? { mm2: +m[1] * 1e6, system: 'metric' } : { error: 'must be more than zero' };
+    var r = parseLength(text, { defaultUnit: defaultUnit() });
+    if (r && r.dimension === 2 && r.area_mm2 > 0) return { mm2: r.area_mm2, system: r.unitSystem, result: r };
+    return { error: "an area: 40' x 28' or 1120 sf" };
+  }
+  // the system a typed length states, if it states one ("2.4m", "8'"), else null
+  function statedSystem(text) {
+    if (!text || !text.trim()) return null;
+    var r = parseLength(text, { defaultUnit: defaultUnit() });
+    if (!r || !r.interpretation) return null;
+    var stated = (r.interpretation.terms || []).some(function (t) { return t.role === 'length' && !t.inferred; });
+    return stated && (r.unitSystem === 'imperial' || r.unitSystem === 'metric') ? r.unitSystem : null;
+  }
+
+  /* ---- formatting ---------------------------------------------------------- */
+  function sig(n, d) { return String(parseFloat(n.toFixed(d == null ? 3 : d))); }
+  function degOf(r) { return Math.atan(r) * 180 / Math.PI; }
+  function fmtBuilt(u) {
+    if (state.target === 'metric') return NumberLine.formatSnapped(u, 'metric');
+    return NumberLine.formatSnapped(u, 'imperial', 64);
+  }
+  function fmtTrue(u) { return NumberLine.formatTrue(Math.round(u), state.target); }
+  // a derived length that is not a build height: nearest on the build grid
+  function fmtNear(u) { return fmtBuilt(Roof.build(u, state.grid, 'nearest').built); }
+  function fmtResid(u) { return Math.abs(u) < 0.5 ? 'exact' : NumberLine.formatResidual(Math.round(u), state.target); }
+  function fmtArea(mm2) {
+    if (state.target === 'metric') return sig(mm2 / 1e6, 1) + ' m²';
+    return Math.round(mm2 / SF_MM2).toLocaleString('en-US') + ' sf';
+  }
+
+  // switching units rewrites the length fields in the new units, exactly, so
+  // the whole page reads in one system. skip: the field being typed in.
+  function setTarget(sys, skip) {
+    if (sys === state.target) return;
+    var lens = {}, area = skip === 'area' ? null : readArea(state.text.area);
+    ['span', 'oh'].forEach(function (k) {
+      var d = k === skip ? null : readDim(state.text[k], true);
+      if (d && !d.error) lens[k] = d.units;
+    });
+    state.target = sys;
+    if (!GRIDS[sys].some(function (g) { return g[1] === state.grid; })) state.grid = DEFAULT_GRID[sys];
+    if (!SNAPS[sys].some(function (o) { return o[1] === state.snap; })) state.snap = STEP[sys];
+    Object.keys(lens).forEach(function (k) { setField(k, NumberLine.formatTrue(lens[k], sys)); });
+    if (area && !area.error) setField('area', sys === 'metric' ? sig(area.mm2 / 1e6, 2) + ' m2' : sig(area.mm2 / SF_MM2, 1) + ' sf');
+  }
+  function setField(k, v) { state.text[k] = v; field[k].value = v; }
+
+  function row(name, gloss, value, sub, resid, cls) {
+    return '<div class="snap-row' + (cls ? ' ' + cls : '') + '">'
+      + '<div class="snap-name">' + name + (gloss ? '<span class="snap-gloss">' + gloss + '</span>' : '') + '</div>'
+      + '<div class="snap-value">' + value + (sub ? '<span class="snap-dec">' + sub + '</span>' : '') + '</div>'
+      + '<div class="snap-resid">' + resid + '</div></div>';
+  }
+  // a length row: built to the grid (nearest), the exact value under it, the cost
+  function lenRow(name, gloss, exact, cls) {
+    var b = Roof.build(exact, state.grid, 'nearest');
+    var on = Math.abs(b.resid) < 0.5;
+    return row(name, gloss, esc(fmtBuilt(b.built)), on ? '' : 'exactly ' + esc(fmtTrue(exact)), esc(fmtResid(b.resid)), cls);
+  }
+
+  function renderBuildRow() {
+    var html = '<span class="section-label">Build heights to</span>';
+    GRIDS[state.target].forEach(function (g) {
+      var on = g[1] === state.grid;
+      html += '<button type="button" class="grid-box' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-grid="' + g[1] + '">' + esc(g[0]) + '</button>';
+    });
+    html += '<span class="units" role="group" aria-label="Units">'
+         + '<button type="button" class="key-sm" data-units="imperial" aria-pressed="' + (state.target === 'imperial') + '">ft-in</button>'
+         + '<button type="button" class="key-sm" data-units="metric" aria-pressed="' + (state.target === 'metric') + '">mm</button></span>';
+    els.buildRow.innerHTML = html;
+  }
+
+  /* ---- the roof as geometry ---------------------------------------------------
+     x is plan distance from the left wall line; y is height above the wall
+     line (where the roof plane crosses it). With a span the roof is a gable,
+     ridge at S/2; without, one plane rising to the end of the drawing. */
+  function geom() {
+    var pitch = readSlope(state.text.pitch);
+    var span = readDim(state.text.span), oh = readDim(state.text.oh, true);
+    var s = pitch && !pitch.error ? pitch.ratio : null;
+    var S = span && !span.error ? span.units : null;
+    var O = oh && !oh.error ? oh.units : 0;
+    return { pitch: pitch, span: span, oh: oh, s: s, S: S, O: O };
+  }
+  function yAt(g, x) {
+    if (g.S != null && x > g.S / 2) return (g.S - x) * g.s;
+    return x * g.s;
+  }
+  function xMin(g) { return -g.O; }
+  function xMax(g) { return g.S != null ? g.S + g.O : Math.max(openRun(), state.x + 10 * FT); }
+  // which side of the ridge the point is on, and its eave's wall-line x
+  function onRight(g, x) { return g.S != null && x > g.S / 2; }
+  // the reference's plan x and height, on the point's side
+  function refAt(g, x, ref) {
+    var right = onRight(g, x);
+    if (ref === 'ridge' && g.S != null) return { x: g.S / 2, y: g.S / 2 * g.s };
+    if (ref === 'drip') return { x: right ? g.S + g.O : -g.O, y: -g.O * g.s };
+    return { x: right ? g.S : 0, y: 0 };
+  }
+  // the reading: distance and height from the reference
+  function reading(g, x, ref) {
+    var r = refAt(g, x, ref), y = yAt(g, x);
+    return { dist: Math.abs(x - r.x), rise: ref === 'ridge' ? r.y - y : y - r.y, ref: r, y: y };
+  }
+  // the inverse: put the point at a distance, or a height, from the reference,
+  // on the side it is on now
+  function xFromDist(g, v, ref) {
+    var r = refAt(g, state.x, ref), right = onRight(g, state.x);
+    if (ref === 'ridge') return state.x >= r.x ? r.x + v : r.x - v;
+    return right ? r.x - v : r.x + v;
+  }
+  function xFromRise(g, h, ref) {
+    var r = refAt(g, state.x, ref), right = onRight(g, state.x);
+    var y = ref === 'ridge' ? r.y - h : r.y + h;      // height above the wall line
+    var e = y / g.s;                                   // plan distance from the wall line
+    return right ? g.S - e : e;
+  }
+  function clampX(g, x) { return Math.max(xMin(g), Math.min(xMax(g), x)); }
+
+  /* ---- main render ----------------------------------------------------------- */
+  function render() {
+    renderBuildRow();
+    syncURL();
+    var g = geom();
+    note.pitch.innerHTML = g.pitch ? esc(g.pitch.error || g.pitch.note || '') : '';
+    note.span.innerHTML = g.span && g.span.error ? esc(g.span.error) : '';
+    note.oh.innerHTML = g.oh && g.oh.error ? esc(g.oh.error) : '';
+    if ((g.S == null && state.ref === 'ridge') || (!(g.O > 0) && state.ref === 'drip')) state.ref = 'wall';
+
+    renderEcho(g);
+    if (g.s == null) {
+      els.roofOut.style.display = 'none';
+      els.mathNote.innerHTML = '';
+      return;
+    }
+    els.roofOut.style.display = '';
+    state.x = clampX(g, state.x);
+    drawFigure(g);
+    renderRows(g);
+    renderArea(g.s);
+    renderHip(g.s, g.S);
+    renderMath(g);
+    els.slopeLink.setAttribute('href', 'slope.html?run=' + encodeURIComponent(fmtTrue(Math.abs(reading(g, state.x, 'wall').dist))) + '&slope=' + encodeURIComponent(state.text.pitch));
+  }
+
+  function renderRows(g) {
+    var rd = reading(g, state.x, state.ref), html = '';
+    var refName = { wall: 'the wall line', drip: 'the drip edge', ridge: 'the ridge' }[state.ref];
+    html += '<div class="rows-label">At the point, from ' + refName + '</div>';
+    html += lenRow(state.ref === 'ridge' ? 'Below the ridge' : 'Height', state.ref === 'ridge' ? 'drop to the roof' : 'above ' + refName, rd.rise, 'is-primary');
+    html += lenRow('In plan', 'from ' + refName, rd.dist);
+    // the other datums, so one reading answers all three
+    var others = REFS.filter(function (r) { return r[0] !== state.ref && (r[0] !== 'ridge' || g.S != null) && (r[0] !== 'drip' || g.O > 0); });
+    if (others.length) {
+      html += '<div class="rows-label">The same point</div>';
+      others.forEach(function (r) {
+        var o = reading(g, state.x, r[0]);
+        html += lenRow(r[0] === 'ridge' ? 'Below the ridge' : 'Height', r[0] === 'ridge' ? o.dist ? fmtNear(o.dist) + ' in plan from it' : 'at the ridge' : 'above the ' + r[1] + ', ' + fmtNear(o.dist) + ' in plan', o.rise);
+      });
+    }
+    html += lenRow('Along the slope', 'from the wall line', Math.abs(reading(g, state.x, 'wall').dist) * Roof.areaFactor(g.s));
+    if (g.S != null) {
+      html += '<div class="rows-label">Ridge</div>';
+      html += lenRow('Ridge', 'above the wall line', Roof.ridge(g.s, g.S));
+      if (g.O > 0) html += lenRow('Ridge', 'above the drip edge', Roof.ridge(g.s, g.S) + g.O * g.s);
+      html += lenRow('Rafter', 'wall line to ridge, on the slope', g.S / 2 * Roof.areaFactor(g.s));
+    }
+    if (g.O > 0) {
+      html += '<div class="rows-label">Overhang</div>';
+      html += lenRow('Drip edge', 'below the wall line', g.O * g.s);
+    }
+    els.heightRows.innerHTML = html;
+  }
+
+  function renderEcho(g) {
+    if (!g.pitch) { els.echo.style.display = 'none'; return; }
+    var html = '<span class="op">pitch </span><span class="tok stated">' + esc(state.text.pitch.trim()) + '</span>';
+    if (g.s != null) {
+      var parts = [sig(12 * g.s, 2) + ':12', sig(degOf(g.s), 2) + '°', sig(100 * g.s, 2) + '%'];
+      if (g.pitch.kind === 'pitch') parts.shift();    // already typed as x:12
+      html += '<span class="eq">=</span><span class="result">' + esc(parts.join(' · ')) + '</span>'
+            + '<span class="op"> · area factor ' + esc(sig(Roof.areaFactor(g.s), 4)) + '</span>';
+    } else {
+      html += '<span class="eq">—</span><span class="op">' + esc(g.pitch.error || '') + '</span>';
+    }
+    els.echoLine.innerHTML = html;
+    var asm = [];
+    ['span', 'oh'].forEach(function (k) {
+      var r = readDim(state.text[k], true);
+      if (r && r.result && r.result.interpretation) asm = asm.concat(r.result.interpretation.assumptions || []);
+    });
+    if (g.S == null) asm.push('no span: one plane, drawn ' + fmtNear(openRun()) + ' long');
+    if (!(g.O > 0)) asm.push('no overhang: the drip edge is at the wall line');
+    asm.push('heights are to the roof plane, measured where it crosses the wall line. A raised heel or a deeper rafter raises every height by the same amount');
+    var seen = {};
+    asm = asm.filter(function (a) { if (seen[a]) return false; seen[a] = true; return true; });
+    els.echoAssume.innerHTML = asm.map(function (a) { return '<div>' + esc(a) + '</div>'; }).join('');
+    els.echo.style.display = '';
+  }
+
+  /* ---- the section figure: true scale, interactive ---------------------------- */
+  var fig = { k: 1, x0: 0, yTop: 0, mL: 12, mT: 40 };
+  function drawFigure(g) {
+    var s = g.s, O = g.O, x0 = xMin(g), x2 = xMax(g);
+    var yTop = g.S != null ? g.S / 2 * s : yAt(g, x2);
+    var yBot = Math.min(0, -O * s);
+    var width = els.figure.clientWidth || Math.min(680, (document.documentElement.clientWidth || 360) - 40);
+    width = Math.min(width, 680);
+    var mL = 14, mR = 14, mT = width < 560 ? 76 : 40, mB = 62;
+    var k = Math.min((width - mL - mR) / (x2 - x0), 300 / Math.max(yTop - yBot, 1));
+    var H = Math.round((yTop - yBot) * k + mT + mB);
+    fig = { k: k, x0: x0, yTop: yTop, mL: mL, mT: mT, width: width };
+    function X(x) { return mL + (x - x0) * k; }
+    function Y(y) { return mT + (yTop - y) * k; }
+    function f(n) { return n.toFixed(1); }
+    var rd = reading(g, state.x, state.ref);
+    var px = X(state.x), py = Y(rd.y), rx = X(rd.ref.x), ry = Y(rd.ref.y);
+
+    var o = '';
+    // wall lines, dashed down from the wall line height
+    var walls = g.S != null ? [0, g.S] : [0];
+    walls.forEach(function (w) { o += '<line class="rf-wall" x1="' + f(X(w)) + '" y1="' + f(Y(0)) + '" x2="' + f(X(w)) + '" y2="' + f(H - 6) + '"/>'; });
+    o += '<line class="rf-plate" x1="' + f(X(x0)) + '" y1="' + f(Y(0)) + '" x2="' + f(X(x2)) + '" y2="' + f(Y(0)) + '"/>';
+    o += '<text x="' + f(X(0) + 5) + '" y="' + f(Y(0) + 15) + '">wall line</text>';
+    // the roof
+    var pts = [[x0, yAt(g, x0)]];
+    if (g.S != null) pts.push([g.S / 2, yAt(g, g.S / 2)]);
+    pts.push([x2, yAt(g, x2)]);
+    var poly = pts.map(function (p) { return f(X(p[0])) + ',' + f(Y(p[1])); }).join(' ');
+    o += '<polyline class="rf-roof" points="' + poly + '"/>';
+    o += '<polyline class="rf-hit" points="' + poly + '"/>';
+    // the reference: a datum line at its height, from it to the point
+    o += '<line class="rf-datum" x1="' + f(rx) + '" y1="' + f(ry) + '" x2="' + f(px) + '" y2="' + f(ry) + '"/>';
+    o += '<circle class="rf-ref" cx="' + f(rx) + '" cy="' + f(ry) + '" r="3"/>';
+    // the height: a vertical dimension at the point
+    o += '<line class="rf-dim" x1="' + f(px) + '" y1="' + f(ry) + '" x2="' + f(px) + '" y2="' + f(py) + '"/>';
+    // the plan distance: a dimension line under the drawing
+    var dy = H - 40;
+    // extension lines, dashed, from the reference and the point down to it
+    o += '<line class="rf-ext" x1="' + f(rx) + '" y1="' + f(ry + 5) + '" x2="' + f(rx) + '" y2="' + (dy + 7) + '"/>';
+    o += '<line class="rf-ext" x1="' + f(px) + '" y1="' + f(Math.max(py, ry) + 5) + '" x2="' + f(px) + '" y2="' + (dy + 7) + '"/>';
+    o += '<line class="rf-dim" x1="' + f(rx) + '" y1="' + dy + '" x2="' + f(px) + '" y2="' + dy + '"/>';
+    o += '<line class="rf-tick" x1="' + f(rx) + '" y1="' + (dy - 5) + '" x2="' + f(rx) + '" y2="' + (dy + 5) + '"/>';
+    o += '<line class="rf-tick" x1="' + f(px) + '" y1="' + (dy - 5) + '" x2="' + f(px) + '" y2="' + (dy + 5) + '"/>';
+    // the point and its handle
+    o += '<circle class="rf-halo" cx="' + f(px) + '" cy="' + f(py) + '" r="16"/>';
+    o += '<circle class="rf-pt" id="rfHandle" cx="' + f(px) + '" cy="' + f(py) + '" r="5" tabindex="0" role="slider" aria-label="Point on the roof, plan distance from the ' + esc(state.ref === 'drip' ? 'drip edge' : state.ref === 'ridge' ? 'ridge' : 'wall line') + '" aria-valuetext="' + esc(fmtNear(rd.dist) + ' in plan, ' + fmtNear(rd.rise) + (state.ref === 'ridge' ? ' below' : ' high')) + '"/>';
+    if (g.S != null) o += '<text x="' + f(X(g.S / 2)) + '" y="' + f(Y(yTop) - 8) + '" text-anchor="middle">ridge</text>';
+
+    var svg = '<svg class="rf" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + H + '" width="' + width + '" height="' + H + '" aria-label="Roof section to true scale">' + o + '</svg>';
+
+    // on the drawing: what to measure from, and the two editable labels
+    var from = '<div class="rf-tools"><div class="rf-from key-row" role="group" aria-label="Measure from"><span class="key-label">from</span>';
+    REFS.forEach(function (r) {
+      if ((r[0] === 'ridge' && g.S == null) || (r[0] === 'drip' && !(g.O > 0))) return;
+      from += '<button type="button" class="key-sm" data-ref="' + r[0] + '" aria-pressed="' + (state.ref === r[0]) + '">' + r[1] + '</button>';
+    });
+    from += '</div><div class="rf-snap key-row" role="group" aria-label="Snap"><span class="key-label">snap</span>';
+    SNAPS[state.target].forEach(function (o) {
+      from += '<button type="button" class="key-sm" data-snap="' + o[1] + '" aria-pressed="' + (state.snap === o[1]) + '">' + esc(o[0]) + '</button>';
+    });
+    from += '</div></div>';
+    // the height label sits beside its dimension, on the open side
+    var hx = px + (px < width * 0.55 ? 62 : -62), hy = Math.max(mT + 12, Math.min(H - 50, (py + ry) / 2));
+    // a short dimension: the label goes above the point instead of beside it
+    if (Math.abs(ry - py) < 44) { hx = Math.max(56, Math.min(width - 56, px)); hy = Math.max(14, py - 30); }
+    var dx = Math.max(56, Math.min(width - 56, (rx + px) / 2));
+    var edits = '<input class="rf-edit" id="rfRise" aria-label="' + (state.ref === 'ridge' ? 'Drop below the ridge' : 'Height') + '" value="' + esc(fmtNear(rd.rise)) + '" style="left:' + f(hx) + 'px;top:' + f(hy) + 'px" spellcheck="false" autocomplete="off" inputmode="text">'
+              + '<input class="rf-edit" id="rfDist" aria-label="Plan distance" value="' + esc(fmtNear(rd.dist)) + '" style="left:' + f(dx) + 'px;top:' + (dy + 20) + 'px" spellcheck="false" autocomplete="off" inputmode="text">';
+    // keep focus in a label while the figure redraws under it
+    var active = document.activeElement && document.activeElement.id;
+    els.figure.innerHTML = from + svg + edits;
+    if (active === 'rfHandle' || active === 'rfRise' || active === 'rfDist') {
+      var el = document.getElementById(active);
+      if (el) el.focus({ preventScroll: true });
+    }
+  }
+
+  // the plan x under a pointer, snapped: whole inches (10 mm), held at the
+  // wall line, drip edge, ridge and round numbers as it passes them
+  function xAtPointer(e, g) {
+    var rect = els.figure.querySelector('svg').getBoundingClientRect();
+    var scale = rect.width / fig.width;
+    var raw = fig.x0 + ((e.clientX - rect.left) / scale - fig.mL) / fig.k;
+    if (!state.snap) return Math.round(raw);
+    var magnets = [-g.O, 0];
+    if (g.S != null) magnets.push(g.S / 2, g.S, g.S + g.O);
+    var best = null, bd = 10 / (fig.k * scale);       // 10 px
+    magnets.forEach(function (m) { var d = Math.abs(raw - m); if (d < bd) { bd = d; best = m; } });
+    if (best != null) return best;
+    var R = ROUND[state.target], r = Math.round(raw / R) * R;
+    if (state.snap < R && Math.abs(raw - r) < 5 / (fig.k * scale)) return r;
+    var st = state.snap;
+    return Math.round(raw / st) * st;
+  }
+
+  var drag = null;
+  els.figure.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('.rf-edit') || e.target.closest('.rf-tools')) return;
+    var g = geom(); if (g.s == null) return;
+    var onHit = e.target.classList && (e.target.classList.contains('rf-hit') || e.target.id === 'rfHandle' || e.target.classList.contains('rf-halo'));
+    if (!onHit) return;
+    drag = { id: e.pointerId };
+    els.figure.setPointerCapture(e.pointerId);
+    state.x = clampX(g, xAtPointer(e, g));
+    render();
+    var svg = els.figure.querySelector('svg'); if (svg) svg.classList.add('is-dragging');
+    e.preventDefault();
+  });
+  els.figure.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var g = geom();
+    var nx = clampX(g, xAtPointer(e, g));
+    if (nx !== state.x) { state.x = nx; render(); var svg = els.figure.querySelector('svg'); if (svg) svg.classList.add('is-dragging'); }
+  });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag = null;
+    var svg = els.figure.querySelector('svg'); if (svg) svg.classList.remove('is-dragging');
+  }
+  els.figure.addEventListener('pointerup', endDrag);
+  els.figure.addEventListener('pointercancel', endDrag);
+
+  // the measure-from keys
+  els.figure.addEventListener('click', function (e) {
+    var sn = e.target.closest && e.target.closest('[data-snap]');
+    if (sn) { state.snap = +sn.dataset.snap; render(); return; }
+    var b = e.target.closest && e.target.closest('[data-ref]');
+    if (!b) return;
+    state.ref = b.dataset.ref;
+    render();
+  });
+  // arrow keys on the handle
+  els.figure.addEventListener('keydown', function (e) {
+    if (e.target.id === 'rfHandle') {
+      var st = e.shiftKey ? ROUND[state.target] : (state.snap || STEP[state.target]);
+      var dir = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 0;
+      if (!dir) return;
+      e.preventDefault();
+      var g = geom();
+      state.x = clampX(g, Math.round(state.x / st) * st + dir * st);
+      render();
+      return;
+    }
+    if ((e.target.id === 'rfRise' || e.target.id === 'rfDist') && e.key === 'Enter') { e.preventDefault(); commitEdit(e.target); }
+    if ((e.target.id === 'rfRise' || e.target.id === 'rfDist') && e.key === 'Escape') { e.target.blur(); render(); }
+  });
+  // a typed label sets the point: on Enter or when it loses focus
+  els.figure.addEventListener('focusout', function (e) {
+    if (e.target.id === 'rfRise' || e.target.id === 'rfDist') commitEdit(e.target, true);
+  });
+  els.figure.addEventListener('input', function (e) {
+    if (e.target.id !== 'rfRise' && e.target.id !== 'rfDist') return;
+    var sys = statedSystem(e.target.value);
+    if (sys && sys !== state.target) { setTarget(sys); renderBuildRow(); }
+  });
+  function commitEdit(el, leaving) {
+    var g = geom(); if (g.s == null) return;
+    var v = readDim(el.value, true);
+    if (!v || v.error) { el.classList.add('is-bad'); el.title = v ? v.error : 'a length, e.g. 9\' or 2.7m'; return; }
+    var nx = el.id === 'rfDist' ? xFromDist(g, v.units, state.ref) : xFromRise(g, v.units, state.ref);
+    if (!isFinite(nx) || nx < xMin(g) - 0.5 || nx > xMax(g) + 0.5) { el.classList.add('is-bad'); el.title = 'off this roof'; return; }
+    state.x = clampX(g, nx);
+    if (leaving) setTimeout(render, 0); else render();
+  }
+
+  /* ---- roof area ------------------------------------------------------------ */
+  function renderArea(s) {
+    var a = readArea(state.text.area);
+    note.area.innerHTML = a && a.error ? esc(a.error) : '';
+    if (!a || a.error) { els.areaRows.innerHTML = ''; return; }
+    var f = Roof.areaFactor(s), true2 = a.mm2 * f, sq = true2 / SF_MM2 / 100;
+    // shingles sell in bundles, three to a square: round up to a third
+    var bundles = Math.ceil(sq * 3 - 1e-9), sqUp = bundles / 3;
+    var whole = Math.floor(sqUp), third = Math.round((sqUp - whole) * 3);
+    var sqFace = (whole ? whole : '') + (third ? (whole ? ' ' : '') + third + '/3' : '') || '0';
+    var html = row('Factor', 'for this pitch', esc(sig(f, 4)), '√(1 + slope²)', '');
+    html += row('Plan area', 'as entered', esc(fmtArea(a.mm2)), '', '');
+    html += row('On the slope', 'plan area × factor', esc(fmtArea(true2)), state.target === 'metric' ? '' : sig(sq, 2) + ' squares of 100 sf', '', 'is-primary');
+    html += row('To order', 'bundles, 3 to a square', esc(sqFace + ' squares'), bundles + ' bundles', '+' + esc(sig(sqUp - sq, 2)) + ' sq');
+    els.areaRows.innerHTML = html;
+  }
+
+  /* ---- hips and valleys ---------------------------------------------------- */
+  function renderHip(s, S) {
+    var p2 = readSlope(state.text.pitch2);
+    note.pitch2.innerHTML = p2 ? esc(p2.error || p2.note || '') : '';
+    var s2 = p2 && !p2.error ? p2.ratio : s;
+    var h = Roof.hip(s, s2), same = Math.abs(s2 - s) < 1e-12;
+    var html = row('Hip slope', 'rise over the hip\'s plan run', esc(sig(12 * s, 3) + ' : ' + sig(h.runPer12, 2)),
+                   esc(Slope.faceOf(h.slope) + ' · ' + sig(degOf(h.slope), 2) + '°'), '', 'is-primary');
+    html += row('In plan', 'from this plane\'s wall line', esc(sig(h.planDeg, 2) + '°'), same ? 'equal pitches meet at 45°' : 'unequal pitches: draw it at this angle', '');
+    html += row('Length', 'per foot of hip plan run', esc(sig(h.lengthFactor, 4)), '', '');
+    if (S != null && same) {
+      var plan = S / 2 * Math.SQRT2;
+      html += row('Hip length', 'corner to ridge, square corner', esc(fmtNear(plan * h.lengthFactor)), 'plan run ' + esc(fmtNear(plan)), '');
+    }
+    els.hipRows.innerHTML = html;
+  }
+
+  /* ---- engine footnote ------------------------------------------------------- */
+  function renderMath(g) {
+    var rd = reading(g, state.x, state.ref), w = reading(g, state.x, 'wall');
+    var lines = ['slope = ' + sig(g.s, 8) + ' (rise ÷ run) · area factor = √(1 + s²) = ' + sig(Roof.areaFactor(g.s), 8)];
+    lines.push('point = ' + Math.round(state.x) + ' units in plan from the left wall line' + (g.S != null ? ' · span = ' + g.S + ' units' : '') + (g.O ? ' · overhang = ' + g.O + ' units' : ''));
+    lines.push('height above the wall line = ' + Math.round(w.dist) + ' × ' + sig(g.s, 8) + ' = <b>' + sig(w.rise, 2) + '</b> units, floating point');
+    if (state.ref !== 'wall') lines.push('from the ' + (state.ref === 'drip' ? 'drip edge' : 'ridge') + ': plan ' + Math.round(rd.dist) + ' units, ' + (state.ref === 'ridge' ? 'drop ' : 'height ') + '<b>' + sig(rd.rise, 2) + '</b> units');
+    lines.push('each length rounded to the lattice, then snapped to the build grid (' + state.grid + ' units, nearest)');
+    els.mathNote.innerHTML = '<b>engine</b> — 1 unit = 1/960 mm:<br>' + lines.join('<br>');
+  }
+
+  /* ---- shareable URL ----------------------------------------------------------
+     Own keys (p, span, oh, area, p2, x, ref, u, g), plus the slope.js handoff
+     contract: ?rise=&run=&slope= — slope reads as the pitch, run as the
+     point's plan distance from the wall line, and rise + run give the pitch. */
+  var urlTimer = null;
+  function syncURL() {
+    if (!window.history || !history.replaceState) return;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      var q = new URLSearchParams(), any = false;
+      FIELDS.forEach(function (k) {
+        if (state.text[k] !== EXAMPLE[k]) any = true;
+        if (state.text[k]) q.set(URLKEY[k], state.text[k]);
+      });
+      if (Math.round(state.x) !== 9 * FT) { any = true; q.set('x', String(Math.round(state.x))); }
+      if (state.ref !== 'wall') { any = true; q.set('ref', state.ref); }
+      if (state.snap !== STEP[state.target]) { any = true; q.set('sn', String(state.snap)); }
+      if (state.target !== 'imperial') { any = true; q.set('u', 'mm'); }
+      if (state.grid !== DEFAULT_GRID[state.target]) { any = true; q.set('g', String(state.grid)); }
+      try { history.replaceState(null, '', any ? '?' + q.toString() : location.pathname); } catch (e) { /* sandboxed view */ }
+    }, 250);
+  }
+  function initFromURL() {
+    var q = new URLSearchParams(location.search), out = {}, any = false;
+    FIELDS.forEach(function (k) { var v = q.get(URLKEY[k]); if (v != null) { out[k] = v.slice(0, 80); any = true; } });
+    var x = +q.get('x'); var X = Number.isSafeInteger(x) && q.get('x') != null ? x : null;
+    // the handoff from Slope
+    var hr = q.get('rise'), hn = q.get('run'), hs = q.get('slope');
+    if (hs != null && out.pitch == null) { out.pitch = hs.slice(0, 40); any = true; }
+    if (hn != null && X == null) { var n = readDim(hn, true); if (n && n.units != null) { X = n.units; any = true; } }
+    if (hr != null && out.pitch == null && hn != null) {
+      var r = readDim(hr), n2 = readDim(hn);
+      if (r && r.units && n2 && n2.units) { out.pitch = Slope.faceOf(r.units / n2.units); any = true; }
+    }
+    if (hr != null && hs != null && X == null) {
+      var r2 = readDim(hr), sp = Slope.parseSlope(hs);
+      if (r2 && r2.units && sp && !sp.error) { X = Math.round(r2.units / sp.ratio); any = true; }
+    }
+    var ref = q.get('ref'), g = +q.get('g'), sn = q.get('sn');
+    return { text: out, any: any || X != null, x: X, ref: ref === 'drip' || ref === 'ridge' ? ref : null,
+             metric: q.get('u') === 'mm', snap: sn != null && /^d+$/.test(sn) ? +sn : null, grid: Number.isSafeInteger(g) && g > 0 ? g : null };
+  }
+
+  /* ---- wiring ------------------------------------------------------------------ */
+  FIELDS.forEach(function (k) {
+    var el = field[k];
+    el.addEventListener('input', function () {
+      state.text[k] = el.value;
+      var sys = k === 'pitch' || k === 'pitch2' ? null : statedSystem(el.value);
+      if (sys) setTarget(sys, k);
+      render();
+    });
+    el.addEventListener('focus', function () { setTimeout(function () { el.select(); }, 0); });
+  });
+  els.buildRow.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.grid-box, [data-units]') : null;
+    if (!b) return;
+    if (b.dataset.units) setTarget(b.dataset.units);
+    else state.grid = +b.dataset.grid;
+    render();
+  });
+  window.addEventListener('resize', function () { clearTimeout(window.__rf); window.__rf = setTimeout(render, 120); });
+
+  // initial state — URL params (or a handoff from Slope) override the example:
+  // 8:12, a 24' span, a 12" overhang, the point 9' in from the wall line
+  var u = initFromURL();
+  FIELDS.forEach(function (k) {
+    state.text[k] = u.any ? (u.text[k] != null ? u.text[k] : '') : EXAMPLE[k];
+    field[k].value = state.text[k];
+  });
+  if (u.x != null) state.x = u.x;
+  if (u.ref) state.ref = u.ref;
+  state.target = u.metric ? 'metric' : (['span', 'oh'].map(function (k) { return statedSystem(state.text[k]); }).filter(Boolean)[0] || 'imperial');
+  state.snap = u.snap != null && SNAPS[state.target].some(function (o) { return o[1] === u.snap; }) ? u.snap : STEP[state.target];
+  state.grid = u.grid && GRIDS[state.target].some(function (g) { return g[1] === u.grid; }) ? u.grid : DEFAULT_GRID[state.target];
+  render();
+})();
+</script>
+</body>
+</html>
