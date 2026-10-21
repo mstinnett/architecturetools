@@ -101,11 +101,11 @@
   --ink-2:  #5b5346;             /* secondary text */
   --ink-3:  #8a8170;             /* micro-labels */
   /* Small text that has to read at 10-13px: subheadings, explainers, meta
-     (--ink-muted, about 9.5:1 on the sheet), and short notes a step under
-     the ink (--ink-note, about 13:1). --ink-2 / --ink-3 stay for larger or
+     (--ink-muted, about 8:1 on the sheet), and short notes a step under
+     the ink (--ink-note, about 11.5:1). --ink-2 / --ink-3 stay for larger or
      deliberately faint text. */
-  --ink-muted: #4a4338;
-  --ink-note:  #332d24;
+  --ink-muted: #554d41;
+  --ink-note:  #3d372e;
 
   /* Legacy names, re-valued warm (existing rules keep working) */
   --black: var(--ink);
@@ -657,7 +657,7 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
   --card: #181B21; --white: #181B21; --card-2: #20242B;
   /* text — palette text-on-dark */
   --ink: var(--text-on-dark); --black: var(--text-on-dark); --ink-2: #ADA89F; --ink-3: #7E7A72;
-  --ink-muted: #C4BFB5; --ink-note: #CFCBC2;
+  --ink-muted: #B7B2A8; --ink-note: #C9C5BC;
   --gray-700: #B8B4AB; --gray-900: #D8D4CB; --gray-400: #6A665F;
   /* lines */
   --rule: #2E323A; --rule-2: #3C414B; --gray-200: #2A2E36; --gray-300: #383D46;
