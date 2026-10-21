@@ -530,8 +530,7 @@
       "workloadProfiles": [ "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "drafting": { "best": true },
-        "modeling": { "best": true },
-        "modeling_viz": { "value": true }
+        "modeling": { "best": true }
       }
     },
     {
@@ -586,6 +585,7 @@
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "value": true },
+        "modeling_viz": { "value": true },
         "production": { "value": true }
       }
     },
