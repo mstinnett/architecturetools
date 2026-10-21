@@ -156,9 +156,9 @@
     },
     {
       "type": "mini",
-      "name": "ASUS NUC 16 Pro",
-      "price": "$600--$1,000",
-      "note": "Compact, with Thunderbolt 4 and a good dock ecosystem. Drives four 4K displays.",
+      "name": "ASUS NUC 16 Pro / NUC 15 Pro+",
+      "price": "$1,100--$1,500",
+      "note": "Drives four 4K displays, and Thunderbolt 4 runs a dock from one cable. Get the 15 Pro+, which ASUS sells assembled. The 16 Pro is newer, but ASUS sells it only as a kit, without memory, storage, or Windows.",
       "workloadProfiles": [
         "review",
         "drafting"
