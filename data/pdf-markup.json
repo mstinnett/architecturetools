@@ -11,6 +11,11 @@
       "sub": "Review kept as a record: issues, checklists, versions."
     },
     {
+      "key": "indie",
+      "name": "Small independent tools",
+      "sub": "Markup, measurement and review from one developer or a small studio."
+    },
+    {
       "key": "editors",
       "name": "General PDF editors",
       "sub": "Full PDF editors that also handle drawings."
@@ -72,7 +77,7 @@
     },
     {
       "id": "caliper",
-      "group": "sets",
+      "group": "indie",
       "name": "Caliper",
       "maker": "Caliper App LLC",
       "tier": "new",
@@ -95,8 +100,32 @@
       "meta": "Price: $149.99 one-time for each platform, with Mac and Windows licensed separately &middot; Also on the Mac App Store &middot; <a href=\"https://caliperapp.co\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "redcolumn",
+      "group": "indie",
+      "name": "redcolumn",
+      "maker": "Open source",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://github.com/ColbyGallagher/redcolumn#:~:text=The%20installer%20does%20not%20need%20administrator%20rights"],
+        "mac": ["yes", "", "https://github.com/ColbyGallagher/redcolumn#:~:text=drag%20redcolumn%20into%20Applications"],
+        "linux": ["yes", "", "https://github.com/ColbyGallagher/redcolumn#:~:text=The%20Linux%20build%20is%20an%20AppImage"],
+        "ipad": ["no", "", ""],
+        "web": ["yes", "", "https://github.com/ColbyGallagher/redcolumn#:~:text=Use%20it%20in%20the%20browser%20at"],
+        "measure": ["yes", "with takeoff", "https://github.com/ColbyGallagher/redcolumn#:~:text=turns%20one%20measurement%20into%20the%20materials%20it%20needs"],
+        "team": ["no", "experimental", "https://github.com/ColbyGallagher/redcolumn#:~:text=let%20several%20people%20mark%20up%20the%20same%20drawings%20at%20the%20same%20time"],
+        "compare": ["yes", "compare, overlay", "https://github.com/ColbyGallagher/redcolumn#:~:text=finds%20every%20difference%20between%20an%20old%20and%20a%20new%20revision"]
+      },
+      "price": "Free",
+      "notes": [
+        "A PDF markup and takeoff app from one developer that runs in the browser or as a desktop app. CAD commands such as Offset, Fillet and Trim work on markups, and an assembly turns one measurement into the materials it needs. Markups save as standard PDF annotations that open in Bluebeam Revu.",
+        "Compare clouds every difference between two revisions, and Overlay stacks them in color. Shared live markup through your own OneDrive is experimental. It is at version 0.1, and the installers are not signed, so Windows and macOS warn the first time it opens."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source &middot; <a href=\"https://github.com/ColbyGallagher/redcolumn\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "ncored",
-      "group": "sets",
+      "group": "indie",
       "name": "Ncored",
       "maker": "Noir architects",
       "tier": "new",
@@ -166,7 +195,7 @@
     },
     {
       "id": "polypdf",
-      "group": "sets",
+      "group": "indie",
       "name": "PolyPDF",
       "maker": "PolyPDF",
       "tier": "new",
@@ -190,7 +219,7 @@
     },
     {
       "id": "adequate",
-      "group": "review",
+      "group": "indie",
       "name": "Adequate Design Review",
       "maker": "Adequate Design &middot; in beta",
       "tier": "new",
