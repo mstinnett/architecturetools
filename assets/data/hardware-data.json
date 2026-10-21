@@ -216,6 +216,72 @@
       "priority": "Final rendering is the Mac's weakest workload. V-Ray runs on Metal, but a Windows PC goes further, with a Threadripper's CPU cores or a second NVIDIA GPU, and it can be upgraded later. Choose Mac here for the ecosystem, display, and silence."
     }
   },
+  "LaptopSpecs": {
+    "win": {
+      "review": {
+        "cheapest": { "cpu": "Intel Core Ultra 5 or AMD Ryzen 5", "cpuNote": "Any current laptop chip handles documents. Pick on price.", "gpu": "Integrated", "gpuNote": "Integrated graphics are all document work needs.", "ram": "16 GB", "ramNote": "Keeps a stack of PDFs and browser tabs open. Laptop memory is often soldered, so choose it when you buy.", "storage": "1 TB SSD" },
+        "value": { "cpu": "Intel Core Ultra 7", "cpuNote": "Intel's newest laptop chips run all day on battery.", "gpu": "Integrated", "gpuNote": "Integrated graphics are all document work needs.", "ram": "32 GB", "ramNote": "For keeping a lot open at once. Laptop memory is often soldered, so choose it when you buy.", "storage": "1 TB SSD" },
+        "best": { "cpu": "Intel Core Ultra 7 or 9 (Panther Lake)", "cpuNote": "Faster than documents need, with all-day battery.", "gpu": "Integrated", "gpuNote": "Integrated graphics are all document work needs.", "ram": "32 GB", "ramNote": "More than documents need. Laptop memory is often soldered, so choose it when you buy.", "storage": "1 TB SSD" }
+      },
+      "drafting": {
+        "cheapest": { "cpu": "Intel Core i7 or Core Ultra 7 (H or HX)", "cpuNote": "Skip the budget AMD Ryzen 7 250", "gpu": "whose older cores slow down in CAD.", "gpuNote": "NVIDIA RTX 5050 or 5060 Laptop GPU (8 GB)", "ram": "AutoCAD's viewport is light, so either is plenty.", "ramNote": "32 GB", "storage": "Plenty for typical drawings." },
+        "value": { "cpu": "Intel Core Ultra 7", "cpuNote": "A quick core for CAD, in a light laptop with all-day battery.", "gpu": "Integrated", "gpuNote": "Enough for AutoCAD in 2D. Get a dedicated GPU if you also model in 3D.", "ram": "32 GB", "ramNote": "Plenty for typical drawings. Laptop memory is often soldered, so choose it when you buy.", "storage": "1 TB SSD" },
+        "best": { "cpu": "Intel Core Ultra X9 or 9 (Panther Lake)", "cpuNote": "More than drafting uses, with room for 3D work.", "gpu": "NVIDIA RTX PRO 2000 or RTX 5060 Laptop GPU (8 GB)", "gpuNote": "More than AutoCAD needs, and useful if you work in 3D too.", "ram": "64 GB", "ramNote": "For large drawing sets and multitasking.", "storage": "2 TB SSD" }
+      },
+      "modeling": {
+        "cheapest": { "cpu": "Intel Core Ultra 7 or AMD Ryzen 7 (H or HX)", "cpuNote": "Revit runs one operation at a time, so shop for a fast core, not a high core count.", "gpu": "NVIDIA RTX 5060 Laptop GPU (8 GB)", "gpuNote": "Get a dedicated GPU. Rhino and SketchUp use it for the viewport, and integrated drivers have known issues.", "ram": "32 GB", "ramNote": "Enough for a single building. Buy a laptop with two memory slots so you can add more later.", "storage": "1 TB SSD" },
+        "value": { "cpu": "Intel Core Ultra 9 (Panther Lake) or AMD Ryzen AI 9", "cpuNote": "A fast core for regeneration, in a laptop thin enough to carry every day.", "gpu": "NVIDIA RTX 5070 Laptop GPU (8 GB)", "gpuNote": "More than Revit needs, and enough for Enscape on smaller scenes.", "ram": "64 GB", "ramNote": "Enough to run Revit with linked models and other programs at the same time.", "storage": "2 TB SSD" },
+        "best": { "cpu": "Intel Core Ultra X9 (Panther Lake)", "cpuNote": "A fast core in a workstation light enough to carry.", "gpu": "NVIDIA RTX PRO 2000 Laptop GPU (8 GB)", "gpuNote": "A pro GPU with certified drivers for the modeling apps.", "ram": "64 GB", "ramNote": "Plenty for a large building with everything else open.", "storage": "2 TB SSD" }
+      },
+      "viz": {
+        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "Plenty for loading scenes. Pick on price.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "12 GB of VRAM holds typical scenes. Check the GPU's wattage, since thin laptops run it slower.", "ram": "32 GB", "ramNote": "32 GB to load typical scenes.", "storage": "1 TB SSD" },
+        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "Loads scenes fast. Either brand is fine.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for larger scenes and assets.", "ram": "64 GB", "ramNote": "For larger scenes with other programs open.", "storage": "2 TB SSD" },
+        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "Loads and processes scenes fast.", "gpu": "NVIDIA RTX 5090 or RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM, the most a laptop offers, for large scenes.", "ram": "64 GB", "ramNote": "64 GB for large scenes.", "storage": "2 TB SSD" }
+      },
+      "modeling_viz": {
+        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "12 GB of VRAM covers the modeling viewport and typical Enscape scenes.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD" },
+        "value": { "cpu": "Intel Core Ultra X9 or Core Ultra 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5070 Ti (12 GB) or RTX PRO 2000 (8 GB) Laptop GPU", "gpuNote": "Get the 5070 Ti for larger scenes, or the PRO 2000 for a lighter workstation with certified drivers.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD" },
+        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "A fast core for modeling, and 24 cores for loading and rendering.", "gpu": "NVIDIA RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM and certified drivers, for large models and scenes together.", "ram": "128 GB", "ramNote": "For large linked models and scenes at once. Workstation laptops take this much.", "storage": "2 TB SSD" }
+      },
+      "production": {
+        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 9955HX", "cpuNote": "V-Ray and Corona use every core, and HX chips have the most cores a laptop offers.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "Enough for hybrid GPU rendering without overspending.", "ram": "64 GB", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB SSD" },
+        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 9955HX", "cpuNote": "Rendering keeps every core busy for hours, so buy a laptop whose cooling holds its speed through long renders.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for hybrid rendering and visualization.", "ram": "64 GB", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB SSD" },
+        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "Workstation cooling keeps all 24 cores fast through long renders.", "gpu": "NVIDIA RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM, the most a laptop offers, with certified drivers.", "ram": "128 GB", "ramNote": "128 GB so large scenes load fully before rendering.", "storage": "4 TB SSD" }
+      }
+    },
+    "mac": {
+      "review": {
+        "cheapest": { "chip": "MacBook Air 13-inch, M5", "cpuNote": "Plenty for documents, and silent with no fan.", "memory": "16 GB unified", "memoryNote": "Enough for documents and a stack of tabs.", "storage": "512 GB SSD" },
+        "value": { "chip": "MacBook Air 15-inch, M5", "cpuNote": "More screen for reading drawings, with all-day battery.", "memory": "24 GB unified", "memoryNote": "More than documents need.", "storage": "512 GB SSD" },
+        "best": { "chip": "MacBook Air 15-inch, M5", "cpuNote": "Silent, with all-day battery.", "memory": "32 GB unified", "memoryNote": "The most the Air takes.", "storage": "1 TB SSD" }
+      },
+      "drafting": {
+        "cheapest": { "chip": "MacBook Pro 14-inch, M5", "cpuNote": "Its fan keeps it at full speed through long sessions.", "memory": "24 GB unified", "memoryNote": "Enough for typical drawings.", "storage": "1 TB SSD" },
+        "value": { "chip": "MacBook Pro 14-inch, M5 Pro", "cpuNote": "More than drafting needs, with room for 3D work.", "memory": "24 GB unified", "memoryNote": "Enough for typical drawings.", "storage": "1 TB SSD" },
+        "best": { "chip": "MacBook Pro 14-inch, M5 Pro", "cpuNote": "More than drafting needs, with room for 3D work.", "memory": "48 GB unified", "memoryNote": "For large drawing sets and multitasking.", "storage": "1 TB SSD" }
+      },
+      "modeling": {
+        "cheapest": { "chip": "MacBook Pro 14-inch, M5", "cpuNote": "Handles ArchiCAD, Rhino, and SketchUp while models stay moderate. Its fan holds the speed on long sessions.", "memory": "24 GB unified", "memoryNote": "Holds a single building, GPU included.", "storage": "1 TB SSD" },
+        "value": { "chip": "MacBook Pro 14-inch, M5 Pro", "cpuNote": "The everyday Mac for ArchiCAD, Rhino, and SketchUp.", "memory": "48 GB unified", "memoryNote": "Comfortable with larger, linked models.", "storage": "1 TB SSD" },
+        "best": { "chip": "MacBook Pro 16-inch, M5 Pro", "cpuNote": "More screen, and cooling that holds its speed on long sessions.", "memory": "64 GB unified", "memoryNote": "The most the M5 Pro takes, for large models.", "storage": "2 TB SSD" }
+      },
+      "viz": {
+        "cheapest": { "chip": "MacBook Pro 14-inch, M5 Pro", "cpuNote": "The cheapest MacBook I'd use for Enscape and Twinmotion.", "memory": "48 GB unified", "memoryNote": "Holds typical scenes, GPU included.", "storage": "1 TB SSD" },
+        "value": { "chip": "MacBook Pro 16-inch, M5 Max", "cpuNote": "The most GPU cores in a Mac laptop, for Enscape and Twinmotion.", "memory": "48 GB unified", "memoryNote": "Room for larger Enscape and Twinmotion scenes.", "storage": "2 TB SSD" },
+        "best": { "chip": "MacBook Pro 16-inch, M5 Max", "cpuNote": "The most GPU cores in a Mac laptop, for Enscape and Twinmotion.", "memory": "128 GB unified", "memoryNote": "The most a MacBook takes, for large scenes and their assets.", "storage": "2 TB SSD" }
+      },
+      "modeling_viz": {
+        "cheapest": { "chip": "MacBook Pro 14-inch, M5 Pro", "cpuNote": "A fast core for modeling, with enough GPU cores for smaller Enscape and Twinmotion scenes.", "memory": "48 GB unified", "memoryNote": "Holds a model and its scene, GPU included.", "storage": "1 TB SSD" },
+        "value": { "chip": "MacBook Pro 16-inch, M5 Pro", "cpuNote": "A fast core for modeling, with cooling that holds its speed on long sessions.", "memory": "64 GB unified", "memoryNote": "Unified memory is both RAM and VRAM, so buy enough of it.", "storage": "2 TB SSD" },
+        "best": { "chip": "MacBook Pro 16-inch, M5 Max", "cpuNote": "A fast core for modeling and the most GPU cores in a Mac laptop.", "memory": "128 GB unified", "memoryNote": "Holds large models and scenes together.", "storage": "2 TB SSD" }
+      },
+      "production": {
+        "cheapest": { "chip": "MacBook Pro 16-inch, M5 Max", "cpuNote": "The entry point if you're set on rendering on a Mac laptop, though a Windows laptop offers better value for this work.", "memory": "48 GB unified", "memoryNote": "Holds small render scenes.", "storage": "2 TB SSD" },
+        "value": { "chip": "MacBook Pro 16-inch, M5 Max", "cpuNote": "The most CPU cores in a Mac laptop, plus Metal GPU rendering in V-Ray.", "memory": "64 GB unified", "memoryNote": "Room for larger render scenes.", "storage": "2 TB SSD" },
+        "best": { "chip": "MacBook Pro 16-inch, M5 Max", "cpuNote": "The most CPU cores in a Mac laptop. The 16-inch holds its speed through long renders.", "memory": "128 GB unified", "memoryNote": "The most a MacBook takes, for large render scenes.", "storage": "4 TB SSD" }
+      }
+    }
+  },
   "Prebuilts": [
     {
       "type": "builder",
