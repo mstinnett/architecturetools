@@ -15,9 +15,9 @@ Edit the files here instead.
 | `chips.csv` | Each Mac chip — `key`, `name` — defined **once**. |
 | `specs-win.csv` | Windows spec matrix: one row per `profile / scale / tier` cell. |
 | `specs-mac.csv` | Mac spec matrix: one row per cell. |
-| `specs-laptop.csv` | The spec shown when Setup is Laptop: one row per `platform / profile / tier`, no scale. Parts are named in full, since laptop parts aren't in the catalogs. Mac rows put the MacBook and chip in `cpu` and unified memory in `ram`, and leave `gpu` blank. |
+| `specs-laptop.csv` | The spec shown when Setup is Laptop: one row per `platform / profile / tier`, no scale. Parts are named in full, since laptop parts aren't in the catalogs. Mac rows put the MacBook and chip in `cpu` and unified memory in `ram`, and leave `gpu` blank. `minVram` (GB, Windows rows only) is the floor for that cell: the laptop list hides any laptop whose `maxVram` in `extras.json` is lower. Blank means no floor. |
 | `priorities.csv` | The per-profile "where the money matters" note. |
-| `extras.json` | Everything that isn't a table (apps, prebuilts, monitors, laptops, labels). |
+| `extras.json` | Everything that isn't a table (apps, prebuilts, monitors, laptops, labels). A laptop listed for a workload whose laptop spec sets `minVram` names `maxVram`, the most VRAM it can be configured with. The build fails if it's missing, if it never reaches the floor, or if a rec badge sits below that tier's floor. |
 
 A Windows cell's `cpu` column references a `cpus.csv` key; the picker shows it as
 "*intel* or *amd*". Its `gpu` column references a `gpus.csv` key.

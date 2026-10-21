@@ -234,19 +234,19 @@
         "best": { "cpu": "Intel Core Ultra X9 (Panther Lake)", "cpuNote": "A fast core in a workstation light enough to carry.", "gpu": "NVIDIA RTX PRO 2000 Laptop GPU (8 GB)", "gpuNote": "A pro GPU with certified drivers for the modeling apps.", "ram": "64 GB", "ramNote": "Plenty for a large building with everything else open.", "storage": "2 TB SSD" }
       },
       "viz": {
-        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "Plenty for loading scenes. Pick on price.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "12 GB of VRAM holds typical scenes. Check the GPU's wattage, since thin laptops run it slower.", "ram": "32 GB", "ramNote": "32 GB to load typical scenes.", "storage": "1 TB SSD" },
-        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "Loads scenes fast. Either brand is fine.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for larger scenes and assets.", "ram": "64 GB", "ramNote": "For larger scenes with other programs open.", "storage": "2 TB SSD" },
-        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "Loads and processes scenes fast.", "gpu": "NVIDIA RTX 5090 or RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM, the most a laptop offers, for large scenes.", "ram": "64 GB", "ramNote": "64 GB for large scenes.", "storage": "2 TB SSD" }
+        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "Plenty for loading scenes. Pick on price.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "12 GB of VRAM holds typical scenes. Check the GPU's wattage, since thin laptops run it slower.", "ram": "32 GB", "ramNote": "32 GB to load typical scenes.", "storage": "1 TB SSD", "minVram": 12 },
+        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "Loads scenes fast. Either brand is fine.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for larger scenes and assets.", "ram": "64 GB", "ramNote": "For larger scenes with other programs open.", "storage": "2 TB SSD", "minVram": 16 },
+        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "Loads and processes scenes fast.", "gpu": "NVIDIA RTX 5090 or RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM, the most a laptop offers, for large scenes.", "ram": "64 GB", "ramNote": "64 GB for large scenes.", "storage": "2 TB SSD", "minVram": 24 }
       },
       "modeling_viz": {
-        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "12 GB of VRAM covers the modeling viewport and typical Enscape scenes.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD" },
-        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for larger Enscape and Lumion scenes.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD" },
-        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "A fast core for modeling, and 24 cores for loading and rendering.", "gpu": "NVIDIA RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM and certified drivers, for large models and scenes together.", "ram": "128 GB", "ramNote": "For large linked models and scenes at once. Workstation laptops take this much.", "storage": "2 TB SSD" }
+        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "12 GB of VRAM covers the modeling viewport and typical Enscape scenes.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD", "minVram": 12 },
+        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for larger Enscape and Lumion scenes.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD", "minVram": 16 },
+        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "A fast core for modeling, and 24 cores for loading and rendering.", "gpu": "NVIDIA RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM and certified drivers, for large models and scenes together.", "ram": "128 GB", "ramNote": "For large linked models and scenes at once. Workstation laptops take this much.", "storage": "2 TB SSD", "minVram": 24 }
       },
       "production": {
-        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 9955HX", "cpuNote": "V-Ray and Corona use every core, and HX chips have the most cores a laptop offers.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "Enough for hybrid GPU rendering without overspending.", "ram": "64 GB", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB SSD" },
-        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 9955HX", "cpuNote": "Rendering keeps every core busy for hours, so buy a laptop whose cooling holds its speed through long renders.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for hybrid rendering and visualization.", "ram": "64 GB", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB SSD" },
-        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "Workstation cooling keeps all 24 cores fast through long renders.", "gpu": "NVIDIA RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM, the most a laptop offers, with certified drivers.", "ram": "128 GB", "ramNote": "128 GB so large scenes load fully before rendering.", "storage": "4 TB SSD" }
+        "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 9955HX", "cpuNote": "V-Ray and Corona use every core, and HX chips have the most cores a laptop offers.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "Enough for hybrid GPU rendering without overspending.", "ram": "64 GB", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB SSD", "minVram": 12 },
+        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 9955HX", "cpuNote": "Rendering keeps every core busy for hours, so buy a laptop whose cooling holds its speed through long renders.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for hybrid rendering and visualization.", "ram": "64 GB", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB SSD", "minVram": 16 },
+        "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "Workstation cooling keeps all 24 cores fast through long renders.", "gpu": "NVIDIA RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM, the most a laptop offers, with certified drivers.", "ram": "128 GB", "ramNote": "128 GB so large scenes load fully before rendering.", "storage": "4 TB SSD", "minVram": 24 }
       }
     },
     "mac": {
@@ -527,7 +527,7 @@
       "price": "$2,800--$3,400",
       "weight": "3.9 lbs",
       "note": "Core Ultra X9 (Panther Lake), RTX PRO 2000 (8 GB), up to 64 GB, tandem OLED. A true workstation at this weight, with the best keyboard here.",
-      "workloadProfiles": [ "drafting", "modeling", "modeling_viz" ],
+      "workloadProfiles": [ "drafting", "modeling" ],
       "recommendedFor": {
         "drafting": { "best": true },
         "modeling": { "best": true }
@@ -540,7 +540,7 @@
       "price": "$2,200--$2,600",
       "weight": "4.2 lbs",
       "note": "Ryzen AI 9 HX 370, RTX 5070, up to 64 GB, 16-inch 4K OLED. A polished creator laptop. Memory is soldered, so configure it up front.",
-      "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
+      "workloadProfiles": [ "review", "drafting", "modeling" ],
       "recommendedFor": {
         "modeling": { "value": true }
       }
@@ -552,6 +552,7 @@
       "price": "$2,000--$2,500",
       "weight": "4.1 lbs",
       "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. Lighter than a workstation, with an excellent screen.",
+      "maxVram": 24,
       "workloadProfiles": [ "drafting", "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {}
     },
@@ -572,6 +573,7 @@
       "price": "$2,500--$3,200",
       "weight": "4.7 lbs",
       "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. The thinnest way to carry a 5090. Premium build, but Razer's support is inconsistent.",
+      "maxVram": 24,
       "workloadProfiles": [ "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {}
     },
@@ -582,6 +584,7 @@
       "price": "$2,200--$2,800",
       "weight": "5.5 lbs",
       "note": "Core Ultra 9 275HX, up to RTX 5090, 16-inch OLED. Gaming-desktop power for the price. Loud, and desk-bound.",
+      "maxVram": 24,
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "value": true },
@@ -596,7 +599,8 @@
       "price": "$3,800--$4,500",
       "weight": "5.8 lbs",
       "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB), up to 192 GB ECC. A flagship mobile workstation, certified for pro apps.",
-      "workloadProfiles": [ "modeling_viz", "production" ],
+      "maxVram": 24,
+      "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "modeling_viz": { "best": true }
       }
@@ -608,6 +612,7 @@
       "price": "$4,000--$4,800",
       "weight": "6.0 lbs",
       "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB), up to 192 GB. A 280W adapter and three-fan vapor chamber give it the best sustained-rendering thermals here.",
+      "maxVram": 24,
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "best": true },
@@ -621,6 +626,7 @@
       "price": "$3,500--$4,200",
       "weight": "6.3 lbs",
       "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB ECC), 128 GB, 4K OLED. Replaceable memory makes it the serviceable pick. AEC Magazine rates it highly.",
+      "maxVram": 24,
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {}
     },
@@ -656,7 +662,7 @@
       "price": "$1,000--$1,400",
       "weight": "4.8 lbs",
       "note": "Ryzen 7, RTX 5060 (8 GB), upgradeable to 64 GB, 16-inch. Durable to MIL-STD and affordable, with long battery life for a gaming laptop.",
-      "workloadProfiles": [ "modeling", "viz", "modeling_viz", "drafting", "review" ],
+      "workloadProfiles": [ "modeling", "drafting", "review" ],
       "recommendedFor": {
         "modeling": { "cheapest": true }
       }
@@ -680,7 +686,8 @@
       "name": "Acer Predator Helios Neo 16",
       "price": "$1,400--$1,800",
       "weight": "5.5 lbs",
-      "note": "Core Ultra 9 275HX, up to RTX 5070 Ti, 16-inch 2.5K OLED. A high-wattage GPU for studios that need real-time visualization without a workstation price.",
+      "note": "Core Ultra 9 275HX, up to RTX 5070 Ti (12 GB), 16-inch 2.5K OLED. A high-wattage GPU for studios that need real-time visualization without a workstation price.",
+      "maxVram": 12,
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "cheapest": true },
