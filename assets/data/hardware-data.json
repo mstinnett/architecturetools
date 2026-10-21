@@ -707,10 +707,11 @@
       "price": "$2,200--$2,800",
       "weight": "3.5 lbs",
       "note": "M5 Pro, up to 64 GB unified, 14-inch XDR. The everyday Mac for ArchiCAD, Rhino, and SketchUp.",
-      "workloadProfiles": [ "drafting", "modeling", "modeling_viz" ],
+      "workloadProfiles": [ "drafting", "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {
         "drafting": { "value": true, "best": true },
-        "modeling": { "value": true }
+        "modeling": { "value": true },
+        "viz": { "cheapest": true }
       }
     },
     {
@@ -759,11 +760,10 @@
       "price": "$1,600--$1,800",
       "weight": "3.4 lbs",
       "note": "Base M5 with a fan, 14-inch XDR. Better sustained performance than the Air, for modeling on the move.",
-      "workloadProfiles": [ "modeling", "drafting", "viz" ],
+      "workloadProfiles": [ "modeling", "drafting" ],
       "recommendedFor": {
         "drafting": { "cheapest": true },
-        "modeling": { "cheapest": true },
-        "viz": { "cheapest": true }
+        "modeling": { "cheapest": true }
       }
     }
   ],
