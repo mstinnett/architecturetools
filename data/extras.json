@@ -722,6 +722,7 @@
       "workloadProfiles": [
         "drafting",
         "modeling",
+        "viz",
         "modeling_viz"
       ],
       "recommendedFor": {
@@ -731,6 +732,9 @@
         },
         "modeling": {
           "value": true
+        },
+        "viz": {
+          "cheapest": true
         }
       }
     },
@@ -808,17 +812,13 @@
       "note": "Base M5 with a fan, 14-inch XDR. Better sustained performance than the Air, for modeling on the move.",
       "workloadProfiles": [
         "modeling",
-        "drafting",
-        "viz"
+        "drafting"
       ],
       "recommendedFor": {
         "drafting": {
           "cheapest": true
         },
         "modeling": {
-          "cheapest": true
-        },
-        "viz": {
           "cheapest": true
         }
       }
