@@ -92,11 +92,11 @@
      end of this file sets color-scheme: dark under html[data-scheme="dark"] */
   color-scheme: light;
 
-  /* Warm neutral foundation. Text, hairlines and --paper come from the
-     canonical palette (tokens.css); the page field behind the sheet is
-     --gray-100 (see body). */
-  --card:   #fbfaf6;             /* the sheet / input / control surface */
-  --card-2: #f2efe7;             /* inset boxes (priority / note) */
+  /* Neutral white/gray surfaces under warm inks. Text, hairlines and --paper
+     come from the canonical palette (tokens.css); the page field behind the
+     sheet is --gray-100 (see body). */
+  --card:   #FDFDFC;             /* the sheet / input / control surface */
+  --card-2: #F2F2F1;             /* inset boxes (priority / note) */
   --ink:    var(--ink-text);     /* primary text + heavy rules */
   --ink-2:  #5b5346;             /* secondary text */
   --ink-3:  #8a8170;             /* micro-labels */
@@ -111,8 +111,8 @@
   --gray-400: #a89e8a;
   --gray-300: #c6bdac;
   --gray-200: #d8d1c1;
-  --gray-100: #e7e0d1;
-  --gray-50:  #f1ece0;
+  --gray-100: #E6E6E4;
+  --gray-50:  #F1F1F0;
   --white:   var(--card);
 
   /* Family accent — selection + the answer (see FAMILY SELECTION above) */
