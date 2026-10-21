@@ -60,6 +60,7 @@
   svg.tp .tp-drain { fill: var(--answer-surface); stroke: var(--accent); stroke-width: 1.5; cursor: grab; }
   svg.tp .tp-cross { stroke: var(--accent); stroke-width: 1; pointer-events: none; }
   svg.tp .tp-high  { fill: var(--accent); }
+  svg.tp .tp-high-run { stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
   svg.tp .tp-val   { fill: var(--accent); font-weight: 500; font-size: 14px; }
   svg.tp .tp-dim   { stroke: var(--nl-axis); stroke-width: 1; }
   svg.tp .tp-ext   { stroke: var(--nl-axis); stroke-width: 1; stroke-dasharray: 3 3; }
@@ -75,6 +76,8 @@
   .tp-edit:focus { box-shadow: 0 0 0 2px var(--accent-soft); }
   .tp-edit.is-bad { border-color: var(--correction, #AF3D34); }
   .tp-hint { font-size: var(--text-xs); color: var(--ink-3); margin: 0.4rem 0 0; }
+  .tp-where { display: block; }
+  .tp-where + .tp-where { margin-top: 0.3rem; }
 
   .rows-label { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
                 color: var(--ink-3); margin: var(--space-md) 0 0.15rem; }
@@ -164,9 +167,10 @@
         that meet along diagonal valleys. This is an idealized four-plane layout. The taper at any
         point is the slope times the larger of its two plan distances, across and along, to the
         drain that gives the lowest height. Drainage-area boundaries occur where those heights are equal. The high
-        point is the largest of those heights over the whole plan; it is rounded up to the
-        selected increment. A square-coverage search bounds the high point; the average
-        and volume are sampled estimates. Along a diagonal valley the slope is the
+        is the largest of those heights over the whole plan, and the plan marks every place
+        that reaches it: a point, a whole edge, or a ridge between drains. It is exact, found
+        at the crossings of the lines where the taper changes direction, and rounded up to the
+        selected increment. The average and volume are sampled estimates. Along a diagonal valley the slope is the
         entered plane slope divided by the square root of two.
         Drains move in 6&quot; steps, or 100 mm in metric, and snap to the center lines and the
         edges. The lines below are the arithmetic for the plan above.</p>
@@ -272,8 +276,45 @@
     state.drains.forEach(function (d) { var v = Math.max(Math.abs(x - d.x), Math.abs(y - d.y)); if (v < best) best = v; });
     return best * s;
   }
-  function highPoint(L, W, s) {
-    return Roof.taperHighPoint(L, W, s, state.drains);
+  // every equally high place: high edges, ridges between drains, points
+  function highs(L, W, s) {
+    return state.drains.length ? Roof.taperHighs(L, W, s, state.drains) : null;
+  }
+  function isEdgeRun(r, L, W) {
+    return (r.x1 === r.x2 && (r.x1 === 0 || r.x1 === L)) || (r.y1 === r.y2 && (r.y1 === 0 || r.y1 === W));
+  }
+  // "High edges and ridge", "High point", ...
+  function highName(hi, L, W) {
+    var e = hi.runs.filter(function (r) { return isEdgeRun(r, L, W); }).length, r = hi.runs.length - e, p = hi.points.length;
+    var parts = [[e, 'edge'], [r, 'ridge'], [p, 'point']].filter(function (c) { return c[0]; })
+      .map(function (c) { return c[1] + (c[0] > 1 ? 's' : ''); });
+    return 'High ' + (parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0]);
+  }
+  // one line per high place, edges first: "Left edge", "Bottom edge, 0" to
+  // 10' from the left", "Ridge 30' from the left, top to bottom", "12' · 8'"
+  function highWhere(hi, L, W) {
+    var lines = [];
+    // the stretch a run covers along its own direction
+    function along(r) {
+      var v = r.x1 === r.x2, a = v ? Math.min(r.y1, r.y2) : Math.min(r.x1, r.x2), b = v ? Math.max(r.y1, r.y2) : Math.max(r.x1, r.x2);
+      if (a === 0 && b === (v ? W : L)) return v ? 'top to bottom' : 'left to right';
+      return fmtNear(a) + ' to ' + fmtNear(b) + (v ? ' from the top' : ' from the left');
+    }
+    hi.runs.filter(function (r) { return isEdgeRun(r, L, W); }).forEach(function (r) {
+      var v = r.x1 === r.x2, name = v ? (r.x1 === 0 ? 'Left edge' : 'Right edge') : (r.y1 === 0 ? 'Top edge' : 'Bottom edge');
+      var a = along(r);
+      lines.push(a === 'top to bottom' || a === 'left to right' ? name : name + ', ' + a);
+    });
+    hi.runs.filter(function (r) { return !isEdgeRun(r, L, W); }).forEach(function (r) {
+      // runs are level, so they lie across or along the plan, never on a diagonal
+      lines.push(r.x1 === r.x2 ? 'Ridge ' + fmtNear(r.x1) + ' from the left, ' + along(r)
+        : 'Ridge ' + fmtNear(r.y1) + ' from the top, ' + along(r));
+    });
+    hi.points.forEach(function (p) {
+      var cx = p.x === 0 ? 'left' : p.x === L ? 'right' : '', cy = p.y === 0 ? 'Top' : p.y === W ? 'Bottom' : '';
+      lines.push(cx && cy ? cy + ' ' + cx + ' corner' : fmtNear(p.x) + ' · ' + fmtNear(p.y));
+    });
+    return lines.map(function (t) { return '<span class="tp-where">' + esc(t) + '</span>'; }).join('');
   }
 
   var fig = { k: 1, mL: 28, mT: 28, w: 0, h: 0 };
@@ -300,13 +341,13 @@
       'base insulation thickness is not included', 'slope is measured across each plane; diagonal valley slope is lower'].concat(state.drains.length ? [] : ['add a drain to calculate taper']).map(function (a) { return '<div>' + esc(a) + '</div>'; }).join('');
     els.echo.style.display = '';
 
-    drawPlan(Lu, Wu, s);
-    if (!state.drains.length) { els.rows.innerHTML = row('No drains', 'tap the plan to add one', '—', '', ''); els.mathNote.innerHTML = ''; return; }
-    var hp = highPoint(Lu, Wu, s);
+    var hi = highs(Lu, Wu, s);
+    drawPlan(Lu, Wu, s, hi);
+    if (!hi) { els.rows.innerHTML = row('No drains', 'tap the plan to add one', '—', '', ''); els.mathNote.innerHTML = ''; return; }
     var corners = [[0, 0], [Lu, 0], [0, Wu], [Lu, Wu]].map(function (c) { return taperAt(c[0], c[1], s); });
     var html = '<div class="rows-label">' + state.drains.length + ' drain' + (state.drains.length > 1 ? 's' : '') + '</div>';
-    html += upRow('High point', 'taper above the flat deck, built up', hp.h, 'is-primary');
-    html += row('Where', 'from the left and top edges', esc(fmtNear(hp.x) + ' · ' + fmtNear(hp.y)), '', '');
+    html += upRow(highName(hi, Lu, Wu), 'taper above the flat deck, built up', hi.h, 'is-primary');
+    html += row('Where', 'from the left and top edges', highWhere(hi, Lu, Wu), '', '');
     html += upRow('Corners', 'the highest of the four', Math.max.apply(null, corners));
     html += upRow('Edges', 'lowest point along the perimeter', perimeterMin(Lu, Wu, s));
     var avg = averageTaper(Lu, Wu, s);
@@ -318,7 +359,11 @@
       + 'plan ' + Lu + ' × ' + Wu + ' units · slope ' + sig(s, 8) + '<br>'
       + 'taper(x, y) = slope × min over drains of max(|x − dx|, |y − dy|)<br>'
       + 'drains: ' + state.drains.map(function (d) { return '(' + Math.round(d.x) + ', ' + Math.round(d.y) + ')'; }).join(' ') + '<br>'
-      + 'high point ' + sig(hp.h, 2) + ' units at (' + Math.round(hp.x) + ', ' + Math.round(hp.y) + '), bounded square-coverage search; rounded up to ' + state.grid + ' units';
+      + 'high ' + sig(hi.h, 2) + ' units, reached along ' + hi.runs.length + ' run' + (hi.runs.length === 1 ? '' : 's')
+      + hi.runs.map(function (r) { return ' (' + Math.round(r.x1) + ', ' + Math.round(r.y1) + ')–(' + Math.round(r.x2) + ', ' + Math.round(r.y2) + ')'; }).join('')
+      + ' and at ' + hi.points.length + ' point' + (hi.points.length === 1 ? '' : 's')
+      + hi.points.map(function (p) { return ' (' + Math.round(p.x) + ', ' + Math.round(p.y) + ')'; }).join('')
+      + '; exact, checked at every crossing of the lines where the taper changes; rounded up to ' + state.grid + ' units';
   }
   function perimeterMin(L, W, s) {
     // Nearest boundary distance over all drains, exactly for this taper model.
@@ -372,7 +417,7 @@
     });
     return depth;
   }
-  function drawPlan(L, W, s) {
+  function drawPlan(L, W, s, hi) {
     var avail = Math.min(els.plan.clientWidth || 640, 680);
     var sides = dimsFor(L, W), k = 1, depth, mT, mL, mB, mR;
     // margins hang on which labels are short, which hangs on the scale: settle it twice
@@ -401,7 +446,7 @@
     var ctx = cv.getContext('2d'), img = ctx.createImageData(cv.width, cv.height), px = img.data;
     var cs = getComputedStyle(document.documentElement);
     var acc = parseColor(cs.getPropertyValue('--accent')), band = BAND[state.target];
-    var hiH = state.drains.length ? highPoint(L, W, s).h : 0;
+    var hiH = hi ? hi.h : 0;
     for (var j = 0; j < cv.height; j++) {
       for (var i = 0; i < cv.width; i++) {
         var x = (i + 0.5) / dpr / k, y = (j + 0.5) / dpr / k;
@@ -460,12 +505,19 @@
     // write back to the length and width fields
     edits += '<input class="tp-edit is-all" id="tpdL" data-overall="len" aria-label="Roof length" value="' + esc(fmtNear(L)) + '" style="left:' + f(X(L / 2)) + 'px;top:' + f(yo) + 'px" spellcheck="false" autocomplete="off">';
     edits += '<input class="tp-edit is-all is-v" id="tpdW" data-overall="wid" aria-label="Roof width" value="' + esc(fmtNear(W)) + '" style="left:' + f(xo) + 'px;top:' + f(Y(W / 2)) + 'px" spellcheck="false" autocomplete="off">';
-    if (state.drains.length) {
-      var hp = highPoint(L, W, s);
-      g += '<circle class="tp-high" cx="' + f(X(hp.x)) + '" cy="' + f(Y(hp.y)) + '" r="4"/>';
+    if (hi) {
+      // every equally high place: runs as heavy lines, points as dots. One
+      // label carries the height, on the longest run or else the first point.
+      var hp = hi.points[0], longest = 0;
+      hi.runs.forEach(function (r) {
+        g += '<line class="tp-high-run" x1="' + f(X(r.x1)) + '" y1="' + f(Y(r.y1)) + '" x2="' + f(X(r.x2)) + '" y2="' + f(Y(r.y2)) + '"/>';
+        var len = Math.abs(r.x2 - r.x1) + Math.abs(r.y2 - r.y1);
+        if (len > longest) { longest = len; hp = { x: (r.x1 + r.x2) / 2, y: (r.y1 + r.y2) / 2 }; }
+      });
+      hi.points.forEach(function (p) { g += '<circle class="tp-high" cx="' + f(X(p.x)) + '" cy="' + f(Y(p.y)) + '" r="4"/>'; });
       var right = X(hp.x) < w * 0.7, below = Y(hp.y) < mT + 18;
       g += '<text class="tp-val" x="' + f(X(hp.x) + (right ? 8 : -8)) + '" y="' + f(Y(hp.y) + (below ? 16 : -7)) + '" text-anchor="' + (right ? 'start' : 'end') + '">'
-         + esc(fmtBuilt(Roof.build(hp.h, state.grid, 'ceil').built)) + '</text>';
+         + esc(fmtBuilt(Roof.build(hi.h, state.grid, 'ceil').built)) + '</text>';
     }
     state.drains.forEach(function (d, i) {
       var cx = X(d.x), cy = Y(d.y);
