@@ -29,10 +29,11 @@
 <link rel="stylesheet" href="assets/css/global.css">
 <style>
   /* Small text (subheadings, explainers, small notes) takes a darker
-     secondary than the shared --ink-2: at 10-13px its 7:1 warm gray still
-     read as faint. About 11:1 on the sheet in both schemes. */
-  :root{--picker-muted:#3f392f;}
-  :root[data-scheme="dark"]{--picker-muted:#CFCAC1;}
+     secondary than the shared --ink-2: at 10-13px its 7:1 warm gray read
+     as faint. Muted is about 9.5:1 on the sheet in both schemes; notes sit
+     a step under the ink, about 13:1 light and 11:1 dark. */
+  :root{--picker-muted:#4a4338;--picker-note:#332d24;}
+  :root[data-scheme="dark"]{--picker-muted:#C4BFB5;--picker-note:#CFCBC2;}
   .page-crumb, .page-crumb a{color:var(--picker-muted);}
   /* Page-specific layout + controls only. The canonical palette
      (assets/css/tokens.css), the family accent (picker = "Ink", selected by
@@ -165,11 +166,11 @@
   .spec-block{display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:1.5rem;}
   .spec-item-label{font-size:0.64rem;font-family:var(--font-body);font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:var(--picker-muted);margin-bottom:0.25rem;}
   .spec-item-value{font-size:0.88rem;font-weight:400;}
-  .spec-item-note{font-size:0.82rem;color:var(--gray-800);font-weight:400;margin-top:0.2rem;max-width:24em;line-height:1.5;}
+  .spec-item-note{font-size:0.82rem;color:var(--picker-note);font-weight:400;margin-top:0.2rem;max-width:24em;line-height:1.5;}
 
   .priority-box{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--answer-surface);border:1px solid color-mix(in srgb, var(--rule) 58%, transparent);box-shadow:var(--shadow-well);}
   .priority-box-label{font-size:0.6rem;font-family:var(--font-body);font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:var(--picker-muted);margin-bottom:0.35rem;}
-  .priority-box p{font-size:0.88rem;font-weight:400;color:var(--gray-800);line-height:1.6;}
+  .priority-box p{font-size:0.88rem;font-weight:400;color:var(--picker-note);line-height:1.6;}
   .desktop-prebuilts{margin-top:1.5rem;}
 
   /* Monitor configs: curated tiered list of cards */
@@ -198,13 +199,13 @@
   .laptop-name a:hover, .laptop-rec-featured-name a:hover, .two-machine-desk-note a:hover{border-bottom-color:var(--black);}
   .laptop-rec-badge{font-size:0.5rem;font-family:var(--font-body);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);padding:1px 5px;flex-shrink:0;margin-left:0.6rem;display:none;}
   .laptop-row.is-rec .laptop-rec-badge{display:inline-block;}
-  .laptop-note{font-size:0.8rem;color:var(--gray-800);font-weight:400;margin-top:0.15rem;line-height:1.45;}
-  .laptop-equivalence-note{margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--gray-200);font-size:0.74rem;color:var(--gray-800);font-weight:400;line-height:1.55;}
+  .laptop-note{font-size:0.8rem;color:var(--picker-note);font-weight:400;margin-top:0.15rem;line-height:1.45;}
+  .laptop-equivalence-note{margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--gray-200);font-size:0.74rem;color:var(--picker-note);font-weight:400;line-height:1.55;}
   .laptop-equivalence-label{display:block;margin-bottom:0.15rem;font-size:0.56rem;font-family:var(--font-body);font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--picker-muted);}
   .laptop-meta{display:flex;gap:1rem;flex-shrink:0;align-items:baseline;}
   .laptop-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:400;color:var(--picker-muted);white-space:nowrap;}
   .laptop-list-note{margin-top:0.75rem;font-size:0.72rem;font-weight:400;color:var(--picker-muted);line-height:1.6;font-style:italic;}
-  .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--answer-surface);border:1px solid color-mix(in srgb, var(--rule) 58%, transparent);box-shadow:var(--shadow-well);font-size:0.78rem;font-weight:400;color:var(--gray-800);line-height:1.5;}
+  .two-machine-desk-note{margin-bottom:1.25rem;padding:0.75rem 1rem;background:var(--answer-surface);border:1px solid color-mix(in srgb, var(--rule) 58%, transparent);box-shadow:var(--shadow-well);font-size:0.78rem;font-weight:400;color:var(--picker-note);line-height:1.5;}
 
   /* Progressive disclosure — featured recommendation */
   .laptop-rec-featured{padding-bottom:1.25rem;margin-bottom:1rem;border-bottom:1px solid var(--gray-200);}
@@ -212,7 +213,7 @@
   .laptop-rec-featured-name{font-size:1rem;font-weight:500;margin-bottom:0.35rem;}
   .laptop-rec-featured-meta{display:flex;gap:1rem;align-items:baseline;margin-bottom:0.35rem;}
   .laptop-rec-featured-weight{font-size:0.65rem;font-family:var(--font-body);font-weight:400;color:var(--picker-muted);}
-  .laptop-rec-featured-note{font-size:0.82rem;color:var(--gray-800);font-weight:400;line-height:1.5;}
+  .laptop-rec-featured-note{font-size:0.82rem;color:var(--picker-note);font-weight:400;line-height:1.5;}
   .laptop-see-all-btn{width:100%;border:1px solid var(--gray-300);background:none;cursor:pointer;font-size:0.85rem;font-family:var(--font-body);font-weight:400;color:var(--picker-muted);padding:1rem 1.25rem;text-align:left;display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;transition:border-color 0.15s,color 0.15s;}
   .laptop-see-all-btn:hover{border-color:var(--black);color:var(--black);}
   .laptop-see-all-btn::after{content:'+';font-size:1.2rem;font-weight:300;color:var(--gray-400);line-height:1;transition:color 0.15s;}
