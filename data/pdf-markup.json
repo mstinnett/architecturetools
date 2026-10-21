@@ -13,7 +13,7 @@
     {
       "key": "indie",
       "name": "Small independent tools",
-      "sub": "Markup, measurement and review from one developer or a small studio."
+      "sub": "Markup and measurement from one developer or a small studio."
     },
     {
       "key": "editors",
@@ -219,7 +219,7 @@
     },
     {
       "id": "adequate",
-      "group": "indie",
+      "group": "review",
       "name": "Adequate Design Review",
       "maker": "Adequate Design &middot; in beta",
       "tier": "new",
@@ -235,10 +235,10 @@
       },
       "price": "One-time",
       "notes": [
-        "For reviewing a set against a checklist rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.",
-        "Runs locally and offline on Windows, Mac and Linux. It is for one reviewer, without live team sessions."
+        "For checking a set against a checklist before it is issued, rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.",
+        "Runs locally and offline on Windows, Mac and Linux, so the set stays on your machine. It is for one reviewer, without live team sessions, and it does not detect issues automatically: you work through the checklist yourself."
       ],
-      "disclosure": "Public documentation could not be verified on 19 October 2026. Platform and feature entries are provisional; confirm them before choosing this beta.",
+      "disclosure": "Made by the person who runs this site. Public documentation could not be verified on 19 October 2026. Platform and feature entries are provisional; confirm them before choosing this beta.",
       "meta": "Price: $400 one-time after the beta &middot; <a href=\"https://adequate.design\" rel=\"noopener\">Website</a>"
     },
     {
