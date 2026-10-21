@@ -71,6 +71,30 @@
       "meta": "Price: Free. Paid tiers $6.99&ndash;13.33 a month, billed annually &middot; Also on Android &middot; <a href=\"https://www.drawboard.com\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "caliper",
+      "group": "sets",
+      "name": "Caliper",
+      "maker": "Caliper App LLC",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://caliperapp.co/#:~:text=Windows%2010%20%2F%2011%20%E2%80%94%20Microsoft%20Store"],
+        "mac": ["yes", "", "https://caliperapp.co/#:~:text=macOS%2014%20Sonoma%20or%20later%20%E2%80%94%20Mac%20App%20Store%20or%20direct"],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["no", "", ""],
+        "measure": ["yes", "with takeoff", "https://caliperapp.co/#:~:text=Linear%2C%20poly%2C%20area%20and%20angle%20dimensions"],
+        "team": ["no", "", ""],
+        "compare": ["yes", "revision overlay", "https://caliperapp.co/#:~:text=Lay%20one%20drawing%20over%20another%20with%20adjustable%20opacity"]
+      },
+      "price": "One-time",
+      "notes": [
+        "A PDF markup and takeoff app for Mac and Windows from a licensed architect. Set each page&rsquo;s scale by two points or read it from the printed scale, then measure lengths, areas and angles that snap to the drawing&rsquo;s own lines. Tagged areas total into a schedule that exports to CSV.",
+        "Lay one drawing over another to compare revisions, or open two side by side with scroll and zoom locked together. Markups save into the PDF itself, and files stay on the computer, with no account. After the 30-day trial, marking up stays free, and the license adds saving, printing and export."
+      ],
+      "disclosure": "",
+      "meta": "Price: $149.99 one-time for each platform, with Mac and Windows licensed separately &middot; Also on the Mac App Store &middot; <a href=\"https://caliperapp.co\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "ncored",
       "group": "sets",
       "name": "Ncored",
