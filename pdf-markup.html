@@ -335,7 +335,7 @@
 
       <div class="pick">
         <div class="pick-name"><a href="https://nomic.ai/use-cases/automated-drawing-review" rel="noopener">Nomic</a></div>
-        <div class="pick-meta">Web &middot; priced through sales</div>
+        <div class="pick-meta">Web &middot; one seat from $20 a month</div>
         <div class="pick-note">Checks a set against your firm&rsquo;s own QA/QC standards, building codes and project requirements. Sets sync from Autodesk Construction Cloud or ProjectWise, or upload as PDFs. Each finding cites the standard it breaks and the spot on the drawing, and exports to Excel, JSON or Bluebeam markups.</div>
       </div>
 
@@ -521,6 +521,28 @@
   clear.addEventListener('click', function () { sel = { plat: {}, cap: {}, tier: {} }; apply(); });
   controls.hidden = false;
   apply();
+
+  // a link to a tool's row (#adequate from the notes) clears any filter that
+  // hides it, then opens it; the initial-load hash is handled above
+  function reveal(t) {
+    if (t.hidden) { sel = { plat: {}, cap: {}, tier: {} }; apply(); }
+    setOpen(t, true);
+    t.scrollIntoView({ block: 'start' });
+    t.querySelector('.m-open').focus({ preventScroll: true });
+  }
+  function rowFor(hash) {
+    var t = hash && document.getElementById(hash.slice(1));
+    return t && t.classList.contains('m-row') ? t : null;
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    var t = a && rowFor(a.getAttribute('href'));
+    if (!t) return;
+    e.preventDefault();
+    reveal(t);
+    try { history.replaceState(null, '', location.pathname + location.search + '#' + t.id); } catch (x) {}
+  });
+  window.addEventListener('hashchange', function () { var t = rowFor(location.hash); if (t) reveal(t); });
 
   // pinned scrollbar: shown only with a mouse and only when the table overflows
   var wrap = document.querySelector('.m-wrap');
