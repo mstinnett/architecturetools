@@ -139,7 +139,7 @@
   --nl-ink: #0a0a0a; --nl-hatch: #0a0a0a; --nl-tick: #bbb; --nl-axis: #999;
 
   /* Type — one face for reading, one for the mark (see the @font-face above) */
-  --font-body: 'Verlag', 'Jost', 'Futura PT', sans-serif;
+  --font-body: 'Jost', 'Futura PT', sans-serif;
   --font-mark: 'League Spartan', 'Jost', 'Futura PT', sans-serif;
 
   /* Scale */
@@ -216,7 +216,7 @@ body {
 .page-crumb a:hover { color: var(--ink); border-bottom-color: var(--ink); }
 .page-crumb .crumb-sep { margin: 0 0.1em; }   /* real spaces between segments carry the wrap points */
 .page-header h1 { font-size: var(--text-xl); font-weight: 400; letter-spacing: -0.01em; margin-bottom: var(--space-xs); }
-.page-header p { font-size: var(--text-sm); color: var(--ink-muted); font-weight: 400; max-width: 50em; line-height: 1.6; }
+.page-header p { font-size: var(--text-sm); color: var(--ink-muted); font-weight: 300; max-width: 50em; line-height: 1.6; }
 
 /* ---- SCHEME TOGGLE — the sun/moon key in the title-block corner. Every
    page carries one, so the reader can override the OS scheme wherever they
@@ -555,14 +555,14 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
 .pick { margin-bottom: var(--space-lg); }
 .pick-name { font-size: var(--text-md); font-weight: 400; margin-bottom: 0.15rem; }
 .pick-price { font-size: var(--text-sm); font-weight: 300; color: var(--ink-2); margin-bottom: 0.15rem; }
-.pick-note { font-size: var(--text-sm); font-weight: 400; color: var(--ink-note); line-height: 1.55; }
+.pick-note { font-size: var(--text-sm); font-weight: 300; color: var(--ink-note); line-height: 1.55; }
 .or-divider { font-size: var(--text-xs); font-weight: 300; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; margin: var(--space-md) 0; }
 
 /* ---- BADGES — blueprint chip ---- */
 .fit-badge, .rec-badge { font-size: 0.55rem; background: var(--accent); color: var(--accent-ink); padding: 1px 5px; letter-spacing: 0.1em; text-transform: uppercase; border-radius: var(--radius); }
 
 /* ---- FOOTER ---- */
-.page-footer { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--rule-2); font-size: var(--text-xs); color: var(--ink-muted); font-weight: 400; line-height: 1.7; text-align: center; }
+.page-footer { margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--rule-2); font-size: var(--text-xs); color: var(--ink-muted); font-weight: 300; line-height: 1.7; text-align: center; }
 /* a footer link that opens a panel under the footer line (the calculators'
    "How it's calculated"); wired in ui.js */
 .footer-disclose { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
@@ -578,7 +578,7 @@ svg.nl text { font-family: var(--font-body); stroke: var(--answer-surface); }
    information, not a chooser, and styles itself): the picker's control columns over a grid of tool cards.
    Behaviour is assets/js/chooser.js; the markup contract is in its header. ---- */
 .chooser-lede { font-size: var(--text-base); font-weight: 300; line-height: 1.65; max-width: 46em; margin-bottom: var(--space-xl); }
-.chooser-updated { font-size: var(--text-xs); font-weight: 400; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--space-md); }
+.chooser-updated { font-size: var(--text-xs); color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--space-md); }
 .chooser-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; align-items: start;
                     padding-bottom: var(--space-lg); border-bottom: 2px solid var(--black); }
 .chooser-controls .control-group { display: flex; flex-direction: column; min-width: 0; }
