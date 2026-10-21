@@ -61,6 +61,8 @@ function readTable(rel) {
   const out = [];
   rows.forEach((cells, i) => {
     if (!cells.some((c) => c.trim() !== '')) return; // skip blank lines
+    // more fields than headers means an unquoted comma shifted the row
+    if (cells.length > header.length) fail(`${rel} line ${i + 2}: ${cells.length} fields for ${header.length} columns (a comma in an unquoted field?)`);
     const o = { __line: i + 2 };
     header.forEach((h, c) => { o[h] = (cells[c] ?? '').trim(); });
     out.push(o);
