@@ -240,7 +240,7 @@
       },
       "modeling_viz": {
         "cheapest": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5070 Ti Laptop GPU (12 GB)", "gpuNote": "12 GB of VRAM covers the modeling viewport and typical Enscape scenes.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD" },
-        "value": { "cpu": "Intel Core Ultra X9 or Core Ultra 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5070 Ti (12 GB) or RTX PRO 2000 (8 GB) Laptop GPU", "gpuNote": "Get the 5070 Ti for larger scenes, or the PRO 2000 for a lighter workstation with certified drivers.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD" },
+        "value": { "cpu": "Intel Core Ultra 9 275HX or AMD Ryzen 9 HX", "cpuNote": "A fast core for modeling, with cores to spare for loading scenes.", "gpu": "NVIDIA RTX 5080 Laptop GPU (16 GB)", "gpuNote": "16 GB of VRAM for larger Enscape and Lumion scenes.", "ram": "64 GB", "ramNote": "Holds a model and its visualization at the same time.", "storage": "2 TB SSD" },
         "best": { "cpu": "Intel Core Ultra 9 285HX", "cpuNote": "A fast core for modeling, and 24 cores for loading and rendering.", "gpu": "NVIDIA RTX PRO 5000 Laptop GPU (24 GB)", "gpuNote": "24 GB of VRAM and certified drivers, for large models and scenes together.", "ram": "128 GB", "ramNote": "For large linked models and scenes at once. Workstation laptops take this much.", "storage": "2 TB SSD" }
       },
       "production": {
