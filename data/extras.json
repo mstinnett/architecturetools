@@ -453,9 +453,6 @@
         },
         "modeling": {
           "best": true
-        },
-        "modeling_viz": {
-          "value": true
         }
       }
     },
@@ -534,6 +531,9 @@
       ],
       "recommendedFor": {
         "viz": {
+          "value": true
+        },
+        "modeling_viz": {
           "value": true
         },
         "production": {
