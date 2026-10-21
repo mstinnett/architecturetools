@@ -125,7 +125,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PB64",
       "price": "$600--$900",
-      "note": "Up to 64 GB, drives two displays up to 6K. Mounts behind a monitor, and silent.",
+      "note": "Up to 64 GB, drives four 4K displays. Mounts behind a monitor, and quiet.",
       "workloadProfiles": [
         "review",
         "drafting"
@@ -140,7 +140,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PN55",
       "price": "$600--$800",
-      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Drives two displays up to 6K.",
+      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Up to 96 GB, and drives four 4K displays.",
       "workloadProfiles": [
         "review",
         "drafting"
@@ -167,7 +167,7 @@
     },
     {
       "type": "mini",
-      "name": "Lenovo ThinkCentre Tiny (M90q)",
+      "name": "Lenovo ThinkCentre M90q Gen 6",
       "price": "$700--$1,000",
       "note": "Up to 64 GB. A reliable business mini. vPro adds no value if you're buying for yourself, so don't pay extra for it.",
       "workloadProfiles": [
@@ -182,9 +182,9 @@
     },
     {
       "type": "office",
-      "name": "Lenovo ThinkCentre Neo 50t",
+      "name": "Lenovo ThinkCentre Neo 50t Gen 6",
       "price": "$800--$1,200",
-      "note": "32 GB, with a full GPU slot. Add an RTX 4060 to drive a 3D viewport.",
+      "note": "32 GB, with a full GPU slot. Order the RTX 3050 option to drive a 3D viewport. The stock power supply won't run a faster GPU.",
       "workloadProfiles": [
         "review",
         "drafting",
@@ -201,7 +201,7 @@
       "type": "office",
       "name": "Dell Tower Plus",
       "price": "$900--$1,400",
-      "note": "Up to an RTX 4060 Ti from the factory. The cheapest tower that ships with a dedicated GPU.",
+      "note": "Up to an RTX 5070 from the factory, enough for modeling and light visualization.",
       "workloadProfiles": [
         "review",
         "drafting",
@@ -216,7 +216,7 @@
     },
     {
       "type": "office",
-      "name": "HP ProDesk 4 Tower",
+      "name": "HP ProDesk 4 Tower G1i",
       "price": "$800--$1,200",
       "note": "A plain corporate desktop: cheap, reliable, and everywhere. Fine for documents and 2D, not built for 3D.",
       "workloadProfiles": [
@@ -261,9 +261,9 @@
     },
     {
       "type": "workstation",
-      "name": "Lenovo ThinkStation P3 Tower",
+      "name": "Lenovo ThinkStation P3 Tower Gen 2",
       "price": "$1,200--$2,500",
-      "note": "Up to 128 GB and pro GPUs. A high memory ceiling for large models.",
+      "note": "Up to 256 GB and pro GPUs. A high memory ceiling for large models.",
       "workloadProfiles": [
         "review",
         "drafting",
@@ -293,6 +293,9 @@
         },
         "modeling_viz": {
           "value": true
+        },
+        "production": {
+          "value": true
         }
       }
     },
@@ -300,7 +303,7 @@
       "type": "gaming",
       "name": "MSI MAG Infinite S3",
       "price": "$1,600--$2,200",
-      "note": "RTX 5070, 750W PSU, clean design. Less gamer aesthetic than most.",
+      "note": "RTX 5070, 750W PSU, clean design. Less gamer aesthetic than most. It ships with 16 GB, so add memory.",
       "workloadProfiles": [
         "modeling",
         "viz",
@@ -313,7 +316,7 @@
       "type": "gaming",
       "name": "CyberPowerPC Gamer Xtreme",
       "price": "$1,500--$2,200",
-      "note": "Configurable. Order it with an RTX 5070 Ti and 64 GB. The cheapest way into a powerful GPU.",
+      "note": "Configurable. Order it with an RTX 5070 and 32 GB to start visualization on a budget.",
       "workloadProfiles": [
         "modeling",
         "viz",
@@ -322,8 +325,7 @@
       ],
       "recommendedFor": {
         "production": {
-          "cheapest": true,
-          "value": true
+          "cheapest": true
         },
         "viz": {
           "cheapest": true
@@ -335,9 +337,9 @@
     },
     {
       "type": "gaming",
-      "name": "iBuyPower / NZXT BLD",
+      "name": "iBuyPower",
       "price": "$1,800--$2,800",
-      "note": "Custom config. Pick your CPU, GPU, and RAM. Tidy cable work and quiet builds.",
+      "note": "Custom config. Pick your CPU, GPU, and RAM.",
       "workloadProfiles": [
         "viz",
         "modeling_viz",
@@ -365,8 +367,8 @@
   },
   "PrebuiltTypeNotes": {
     "builder": "Bespoke builders who spec, test, and support the machine, and walk you through the order. The best route for a small firm with no IT.",
-    "mini": "Silent and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.",
-    "office": "A standard office tower. A few fit a low-power GPU, enough for drafting and modeling, but never a fast one.",
+    "mini": "Quiet and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.",
+    "office": "A standard office tower. A few fit a modest GPU, enough for drafting and modeling, but rarely a fast one.",
     "workstation": "Certified and supported for professional software, but limited to pro GPUs, not gaming ones. Fine for modeling, short on power for serious visualization. Most architects don't need the certification, so don't pay the premium for it unless your firm requires it.",
     "gaming": "The best value when you need a powerful GPU. The cooling and power supply it needs come standard, so it beats a pricier workstation at Enscape, Lumion, and V-Ray."
   },
@@ -436,10 +438,10 @@
     {
       "category": "one",
       "platform": "win",
-      "name": "Lenovo ThinkPad P1 Gen 8",
+      "name": "Lenovo ThinkPad P1 Gen 9",
       "price": "$2,800--$3,400",
-      "weight": "3.8 lbs",
-      "note": "Arrow Lake, RTX PRO 2000 (8 GB), up to 64 GB, 3.2K tandem OLED. A true workstation at this weight, with the best keyboard here.",
+      "weight": "3.9 lbs",
+      "note": "Core Ultra X9 (Panther Lake), RTX PRO 2000 (8 GB), up to 64 GB, tandem OLED. A true workstation at this weight, with the best keyboard here.",
       "workloadProfiles": [
         "drafting",
         "modeling",
@@ -482,21 +484,14 @@
       "name": "Asus ROG Zephyrus G16",
       "price": "$2,000--$2,500",
       "weight": "4.1 lbs",
-      "note": "Core Ultra 9, up to RTX 5090, 16-inch 2.5K OLED. Lighter than a workstation with an excellent screen, though the Intel model runs warm under load.",
+      "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. Lighter than a workstation, with an excellent screen.",
       "workloadProfiles": [
         "drafting",
         "modeling",
         "viz",
         "modeling_viz"
       ],
-      "recommendedFor": {
-        "viz": {
-          "cheapest": true
-        },
-        "modeling_viz": {
-          "cheapest": true
-        }
-      }
+      "recommendedFor": {}
     },
     {
       "category": "one",
@@ -504,24 +499,20 @@
       "name": "Asus ROG Zephyrus G14",
       "price": "$1,800--$2,200",
       "weight": "3.3 lbs",
-      "note": "Ryzen AI 9, up to RTX 5080, 14-inch 3K OLED. Memory is soldered, so configure it up front. The thin 14-inch chassis runs the GPU at lower wattage, so it trails heavier machines.",
+      "note": "Core Ultra 9 386H, RTX 5070 Ti, 14-inch OLED. Memory is soldered, so configure it up front. The thin 14-inch chassis runs the GPU at lower wattage, so it trails heavier machines.",
       "workloadProfiles": [
         "drafting",
         "modeling"
       ],
-      "recommendedFor": {
-        "modeling": {
-          "cheapest": true
-        }
-      }
+      "recommendedFor": {}
     },
     {
       "category": "one",
       "platform": "win",
       "name": "Razer Blade 16",
       "price": "$2,500--$3,200",
-      "weight": "4.6 lbs",
-      "note": "Ryzen AI 9 HX 370, up to RTX 5090, 16-inch OLED. The thinnest way to carry a 5090. Premium build, but Razer's support is inconsistent.",
+      "weight": "4.7 lbs",
+      "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. The thinnest way to carry a 5090. Premium build, but Razer's support is inconsistent.",
       "workloadProfiles": [
         "modeling",
         "viz",
@@ -532,7 +523,7 @@
     {
       "category": "desk",
       "platform": "win",
-      "name": "Lenovo Legion Pro 7i",
+      "name": "Lenovo Legion Pro 7i Gen 10",
       "price": "$2,200--$2,800",
       "weight": "5.5 lbs",
       "note": "Core Ultra 9 275HX, up to RTX 5090, 16-inch OLED. Gaming-desktop power for the price. Loud, and desk-bound.",
@@ -593,8 +584,8 @@
       "platform": "win",
       "name": "Dell Pro Max 16 Plus",
       "price": "$3,500--$4,200",
-      "weight": "5.6 lbs",
-      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB ECC), 128 GB, 4K OLED. Replaceable GPU and memory make it the serviceable pick. AEC Magazine rates it highly.",
+      "weight": "6.3 lbs",
+      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB ECC), 128 GB, 4K OLED. Replaceable memory makes it the serviceable pick. AEC Magazine rates it highly.",
       "workloadProfiles": [
         "viz",
         "modeling_viz",
@@ -605,10 +596,27 @@
     {
       "category": "travel",
       "platform": "win",
-      "name": "Lenovo ThinkPad X1 Carbon Gen 13",
+      "name": "Lenovo ThinkPad X1 Carbon Gen 14",
       "price": "$1,500--$1,800",
-      "weight": "2.5 lbs",
-      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch. The standard ultraportable. All-day battery, no discrete GPU, for documents and drafting.",
+      "weight": "2.2 lbs",
+      "note": "Core Ultra (Panther Lake), 32 GB, 14-inch. The standard ultraportable. All-day battery, no discrete GPU, for documents and drafting.",
+      "workloadProfiles": [
+        "review",
+        "drafting"
+      ],
+      "recommendedFor": {
+        "review": {
+          "best": true
+        }
+      }
+    },
+    {
+      "category": "travel",
+      "platform": "win",
+      "name": "Lenovo ThinkPad X9 14 Aura Edition",
+      "price": "$1,600--$2,300",
+      "weight": "2.7 lbs",
+      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch 2.8K OLED. A premium ultraportable for documents and drafting, with no discrete GPU.",
       "workloadProfiles": [
         "review",
         "drafting"
@@ -619,23 +627,6 @@
         },
         "drafting": {
           "value": true
-        }
-      }
-    },
-    {
-      "category": "travel",
-      "platform": "win",
-      "name": "Lenovo ThinkPad X9 14 Aura Edition",
-      "price": "$1,600--$2,300",
-      "weight": "2.7 lbs",
-      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch 2.8K OLED. A premium ultraportable for documents and drafting. A nicer screen and build than the X1 Carbon, with no more power.",
-      "workloadProfiles": [
-        "review",
-        "drafting"
-      ],
-      "recommendedFor": {
-        "review": {
-          "best": true
         }
       }
     },
@@ -694,6 +685,9 @@
       ],
       "recommendedFor": {
         "viz": {
+          "cheapest": true
+        },
+        "modeling_viz": {
           "cheapest": true
         },
         "production": {
@@ -767,7 +761,7 @@
       "name": "MacBook Pro 16\" M5 Max",
       "price": "$3,900--$4,800",
       "weight": "4.7 lbs",
-      "note": "M5 Max, 64–128 GB unified, 16-inch XDR. Serious GPU cores for Enscape and V-Ray on Metal.",
+      "note": "M5 Max, up to 128 GB unified, 16-inch XDR. Serious GPU cores for Enscape and V-Ray on Metal.",
       "workloadProfiles": [
         "viz",
         "modeling_viz",

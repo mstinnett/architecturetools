@@ -98,8 +98,9 @@ scale/slope/tile redesigns and are the standard for every tool page.
 - **Documents / drafting** — almost any machine handles it; the monitor matters
   more than the computer.
 - **Modeling** — one operation at a time; a fast CPU core, not many; a modest
-  dedicated GPU for the viewport. The X3D leads in Revit; the 285K is a
-  rendering chip and belongs in modeling+visualization, not here.
+  dedicated GPU for the viewport. The X3D leads in Revit, with the 270K Plus
+  a few percent behind; the 16-core Ryzen 9s are rendering chips and belong
+  in modeling+visualization, not here.
 - **Real-time visualization** — runs on the GPU; VRAM sets scene size; the CPU
   only loads scenes.
 - **Production rendering** — uses every CPU core; core count sets render times.

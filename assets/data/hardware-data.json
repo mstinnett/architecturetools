@@ -2,21 +2,21 @@
   "_comment": "GENERATED -- do not edit by hand. Source: data/*.csv (+ data/extras.json). Edit in Numbers, export CSV, commit; CI rebuilds. Local: node tools/build-data.mjs. See data/README.md.",
   "Meta": { "dataUpdated": "2026-10-21" },
   "CPUs": {
-    "entry": { "intel": "Intel Core Ultra 5 245K", "amd": "AMD Ryzen 5 9600X", "note": "" },
-    "standard": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 7 9700X", "note": "" },
-    "top": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 9 9950X", "note": "" },
-    "x3d": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 7 9800X3D", "note": "" },
-    "x3d_top": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 7 9800X3D", "note": "" },
-    "mixed": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 9 9950X", "note": "" },
-    "mixed_x3d": { "intel": "Intel Core Ultra 7 265K", "amd": "AMD Ryzen 9 9950X3D", "note": "" },
-    "top_x3d": { "intel": "Intel Core Ultra 9 285K", "amd": "AMD Ryzen 9 9950X3D2", "note": "" },
-    "render12": { "intel": "", "amd": "AMD Ryzen 9 9900X", "note": "" },
+    "entry": { "intel": "Intel Core Ultra 5 250K Plus", "amd": "AMD Ryzen 5 9600X", "note": "" },
+    "standard": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 7 9700X", "note": "" },
+    "top": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 9 9950X", "note": "" },
+    "x3d": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 7 9800X3D", "note": "" },
+    "x3d_top": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 7 9850X3D", "note": "" },
+    "mixed": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 9 9950X", "note": "" },
+    "mixed_x3d": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 9 9950X3D", "note": "" },
+    "top_x3d": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 9 9950X3D2", "note": "" },
+    "render12": { "intel": "Intel Core Ultra 7 270K Plus", "amd": "AMD Ryzen 9 9900X", "note": "" },
     "render16": { "intel": "", "amd": "AMD Ryzen 9 9950X", "note": "" },
     "render_max": { "intel": "", "amd": "AMD Ryzen 9 9950X or AMD Threadripper PRO", "note": "" }
   },
   "GPUs": {
-    "integrated": { "name": "Integrated", "note": "A dedicated GPU is needed if you occasionally open a file but otherwise a CPU with an integrated GPU can work fine. Choose one of the higher end integrated GPU models like the suggested 245k or 9600x, with the 245k edging out the 9600x." },
-    "rtx4060": { "name": "NVIDIA RTX 4060", "note": "" },
+    "integrated": { "name": "Integrated", "note": "A dedicated GPU is needed if you occasionally open a 3D model, but otherwise integrated graphics work fine. Intel's are much stronger than AMD's on these chips. Skip Intel's F models, which have none." },
+    "rtx5060": { "name": "NVIDIA RTX 5060", "note": "" },
     "rtx5070": { "name": "NVIDIA RTX 5070", "note": "" },
     "rtx5070ti": { "name": "NVIDIA RTX 5070 Ti", "note": "16 GB VRAM" },
     "rtx5080": { "name": "NVIDIA RTX 5080", "note": "16 GB VRAM" },
@@ -28,10 +28,10 @@
     "rtxpro6000": { "name": "NVIDIA RTX PRO 6000 Blackwell", "note": "96 GB VRAM. Pro flagship: certified drivers, ECC." }
   },
   "Chips": {
-    "macmini_m4": { "name": "Mac Mini -- M4" },
-    "macmini_m4pro": { "name": "Mac Mini -- M4 Pro" },
-    "macstudio_m4max": { "name": "Mac Studio -- M4 Max" },
-    "macstudio_m3ultra": { "name": "Mac Studio -- M3 Ultra" }
+    "macmini_m6": { "name": "Mac Mini -- M6" },
+    "macmini_m5pro": { "name": "Mac Mini -- M5 Pro" },
+    "macstudio_m5max": { "name": "Mac Studio -- M5 Max" },
+    "macstudio_m5ultra": { "name": "Mac Studio -- M5 Ultra" }
   },
   "Apps": {
     "revit": { "group": "modeling", "platform": "win" },
@@ -59,46 +59,46 @@
   "WindowsSpecs": {
     "review": {
       "small": {
-        "cheapest": { "cpu": "entry", "cpuNote": "Either is fine for office work. Pick on price.", "gpu": "integrated", "gpuNote": "Integrated graphics are all document work needs.", "ram": "16 GB DDR5", "ramNote": "16 GB keeps a stack of PDFs and browser tabs open.", "storage": "1 TB NVMe", "priceRange": "$900--$1,100" },
-        "value": { "cpu": "entry", "cpuNote": "More than enough for documents. Pick on price.", "gpu": "integrated", "gpuNote": "Integrated graphics are all document work needs.", "ram": "32 GB DDR5", "ramNote": "32 GB if you keep a lot open at once.", "storage": "1 TB NVMe", "priceRange": "$1,100--$1,400" },
-        "best": { "cpu": "standard", "cpuNote": "Faster and longer-lived, though documents won't push it.", "gpu": "rtx4060", "gpuNote": "Optional. A 4060 only helps if your role grows past documents.", "ram": "64 GB DDR5", "ramNote": "64 GB is more than documents need, but it lasts.", "storage": "2 TB NVMe", "priceRange": "$1,500--$1,800" }
+        "cheapest": { "cpu": "entry", "cpuNote": "Either is fine for office work. Pick on price.", "gpu": "integrated", "gpuNote": "Integrated graphics are all document work needs, so skip Intel's F models, which have none.", "ram": "16 GB DDR5", "ramNote": "16 GB keeps a stack of PDFs and browser tabs open.", "storage": "1 TB NVMe", "priceRange": "$900--$1,100" },
+        "value": { "cpu": "entry", "cpuNote": "More than enough for documents. Pick on price.", "gpu": "integrated", "gpuNote": "Integrated graphics are all document work needs, so skip Intel's F models, which have none.", "ram": "32 GB DDR5", "ramNote": "32 GB if you keep a lot open at once.", "storage": "1 TB NVMe", "priceRange": "$1,100--$1,400" },
+        "best": { "cpu": "standard", "cpuNote": "Faster and longer-lived, though documents won't push it.", "gpu": "rtx5060", "gpuNote": "Optional. A 5060 only helps if your role grows past documents.", "ram": "64 GB DDR5", "ramNote": "64 GB is more than documents need, but it lasts.", "storage": "2 TB NVMe", "priceRange": "$1,500--$1,800" }
       },
       "large": {
-        "cheapest": { "cpu": "entry", "cpuNote": "Handles large document sets. Pick on price.", "gpu": "integrated", "gpuNote": "Integrated graphics are all document work needs.", "ram": "32 GB DDR5", "ramNote": "32 GB keeps large drawing sets, PDFs, and tabs open together.", "storage": "1 TB NVMe", "priceRange": "$1,100--$1,400" },
-        "value": { "cpu": "standard", "cpuNote": "More than large document sets need. Pick on price.", "gpu": "rtx4060", "gpuNote": "Optional. A 4060 only helps if your role grows past documents.", "ram": "64 GB DDR5", "ramNote": "64 GB keeps large reference sets open at once.", "storage": "2 TB NVMe", "priceRange": "$1,500--$1,800" },
-        "best": { "cpu": "standard", "cpuNote": "More than documents need, but it lasts.", "gpu": "rtx4060", "gpuNote": "Optional. A 4060 only helps if your role grows past documents.", "ram": "64 GB DDR5", "ramNote": "64 GB keeps many apps open, and it lasts.", "storage": "2 TB NVMe", "priceRange": "$1,500--$1,800" }
+        "cheapest": { "cpu": "entry", "cpuNote": "Handles large document sets. Pick on price.", "gpu": "integrated", "gpuNote": "Integrated graphics are all document work needs, so skip Intel's F models, which have none.", "ram": "32 GB DDR5", "ramNote": "32 GB keeps large drawing sets, PDFs, and tabs open together.", "storage": "1 TB NVMe", "priceRange": "$1,100--$1,400" },
+        "value": { "cpu": "standard", "cpuNote": "More than large document sets need. Pick on price.", "gpu": "rtx5060", "gpuNote": "Optional. A 5060 only helps if your role grows past documents.", "ram": "64 GB DDR5", "ramNote": "64 GB keeps large reference sets open at once.", "storage": "2 TB NVMe", "priceRange": "$1,500--$1,800" },
+        "best": { "cpu": "standard", "cpuNote": "More than documents need, but it lasts.", "gpu": "rtx5060", "gpuNote": "Optional. A 5060 only helps if your role grows past documents.", "ram": "64 GB DDR5", "ramNote": "64 GB keeps many apps open, and it lasts.", "storage": "2 TB NVMe", "priceRange": "$1,500--$1,800" }
       },
       "priority": "You primarily work on documents, and almost any current computer handles that. The monitor matters more than the computer."
     },
     "drafting": {
       "small": {
-        "cheapest": { "cpu": "entry", "cpuNote": "The cheapest chip I'd draft on. Either brand is fine.", "gpu": "rtx4060", "gpuNote": "AutoCAD's viewport is light. A 4060 is plenty.", "ram": "32 GB DDR5", "ramNote": "32 GB is plenty for typical drawings.", "storage": "1 TB NVMe", "priceRange": "$1,100--$1,400" },
-        "value": { "cpu": "standard", "cpuNote": "A quick core for CAD. Either brand is fine.", "gpu": "rtx4060", "gpuNote": "AutoCAD's viewport is light. A 4060 is plenty.", "ram": "32 GB DDR5", "ramNote": "32 GB is plenty for typical drawings.", "storage": "1 TB NVMe", "priceRange": "$1,300--$1,600" },
+        "cheapest": { "cpu": "entry", "cpuNote": "The cheapest chip I'd draft on. Either brand is fine.", "gpu": "rtx5060", "gpuNote": "AutoCAD's viewport is light. A 5060 is plenty.", "ram": "32 GB DDR5", "ramNote": "32 GB is plenty for typical drawings.", "storage": "1 TB NVMe", "priceRange": "$1,100--$1,400" },
+        "value": { "cpu": "standard", "cpuNote": "A quick core for CAD. Either brand is fine.", "gpu": "rtx5060", "gpuNote": "AutoCAD's viewport is light. A 5060 is plenty.", "ram": "32 GB DDR5", "ramNote": "32 GB is plenty for typical drawings.", "storage": "1 TB NVMe", "priceRange": "$1,300--$1,600" },
         "best": { "cpu": "top", "cpuNote": "The fastest core available, more than drafting uses.", "gpu": "rtx5070", "gpuNote": "More than AutoCAD needs, but useful if you do 3D too.", "ram": "64 GB DDR5", "ramNote": "64 GB for large drawing sets and multitasking.", "storage": "2 TB NVMe", "priceRange": "$2,200--$2,600" }
       },
       "large": {
-        "cheapest": { "cpu": "standard", "cpuNote": "Handles larger xrefs on a budget. Either brand is fine.", "gpu": "rtx4060", "gpuNote": "Enough for complex 2D work. AutoCAD stays light on the GPU.", "ram": "32 GB DDR5", "ramNote": "32 GB works if you don't keep every xref open at once.", "storage": "1 TB NVMe", "priceRange": "$1,400--$1,700" },
-        "value": { "cpu": "standard", "cpuNote": "A quick core for large drawing sets. Either brand is fine.", "gpu": "rtx4060", "gpuNote": "AutoCAD's viewport is light. A 4060 is plenty.", "ram": "64 GB DDR5", "ramNote": "64 GB for large drawing sets with many xrefs.", "storage": "2 TB NVMe", "priceRange": "$1,600--$1,900" },
+        "cheapest": { "cpu": "standard", "cpuNote": "Handles larger xrefs on a budget. Either brand is fine.", "gpu": "rtx5060", "gpuNote": "Enough for complex 2D work. AutoCAD stays light on the GPU.", "ram": "32 GB DDR5", "ramNote": "32 GB works if you don't keep every xref open at once.", "storage": "1 TB NVMe", "priceRange": "$1,400--$1,700" },
+        "value": { "cpu": "standard", "cpuNote": "A quick core for large drawing sets. Either brand is fine.", "gpu": "rtx5060", "gpuNote": "AutoCAD's viewport is light. A 5060 is plenty.", "ram": "64 GB DDR5", "ramNote": "64 GB for large drawing sets with many xrefs.", "storage": "2 TB NVMe", "priceRange": "$1,600--$1,900" },
         "best": { "cpu": "top", "cpuNote": "The fastest core for regenerating complex drawings.", "gpu": "rtx5070", "gpuNote": "More than AutoCAD needs, but useful if you do 3D too.", "ram": "64 GB DDR5", "ramNote": "64 GB for large drawing sets and multitasking.", "storage": "2 TB NVMe", "priceRange": "$2,400--$2,800" }
       },
       "priority": "AutoCAD runs one operation at a time, so a fast CPU core matters more than many. Most current chips draft smoothly anyway. Drawings with many xrefs and nested blocks want more RAM and fast storage. The monitor matters more than the computer."
     },
     "modeling": {
       "small": {
-        "cheapest": { "cpu": "entry", "cpuNote": "Both are fine here, so pick on price.", "gpu": "rtx4060", "gpuNote": "An integrated GPU will be unreliable for modeling. Rhino and SketchUp use the GPU for the viewport, and integrated drivers have known issues.", "ram": "32 GB DDR5", "ramNote": "Enough for a single building. 64 GB is better for multiple and consultant-linked models.", "storage": "1 TB NVMe", "priceRange": "$1,400--$1,700" },
+        "cheapest": { "cpu": "entry", "cpuNote": "Both are fine here, so pick on price.", "gpu": "rtx5060", "gpuNote": "An integrated GPU will be unreliable for modeling. Rhino and SketchUp use the GPU for the viewport, and integrated drivers have known issues.", "ram": "32 GB DDR5", "ramNote": "Enough for a single building. 64 GB is better for multiple and consultant-linked models.", "storage": "1 TB NVMe", "priceRange": "$1,400--$1,700" },
         "value": { "cpu": "x3d", "cpuNote": "AMD's 3D V-Cache tops Puget's Revit benchmarks, but Intel trails by a few percent. Shop on price.", "gpu": "rtx5070", "gpuNote": "More powerful than Revit needs, but enough for Enscape.", "ram": "64 GB DDR5", "ramNote": "Enough to run Revit with linked models and other programs at the same time.", "storage": "2 TB NVMe", "priceRange": "$1,900--$2,300" },
-        "best": { "cpu": "x3d", "cpuNote": "AMD's X3D is the fastest chip for Revit.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM. Enough for Enscape if your work includes client visualization.", "ram": "64 GB DDR5", "ramNote": "Plenty for a single building with everything else open.", "storage": "2 TB NVMe", "priceRange": "$2,600--$3,100" }
+        "best": { "cpu": "x3d_top", "cpuNote": "AMD's X3D is the fastest chip for Revit.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM. Enough for Enscape if your work includes client visualization.", "ram": "64 GB DDR5", "ramNote": "Plenty for a single building with everything else open.", "storage": "2 TB NVMe", "priceRange": "$2,600--$3,100" }
       },
       "large": {
-        "cheapest": { "cpu": "x3d", "cpuNote": "AMD's X3D is the fastest for Revit. The Intel 265K lags a little but costs less and still does fine on large models.", "gpu": "rtx5070", "gpuNote": "Large models can exceed 8 GB of VRAM in Rhino. 12 GB keeps the viewport stable.", "ram": "64 GB DDR5", "ramNote": "The minimum I would buy for large-model work.", "storage": "2 TB NVMe", "priceRange": "$2,100--$2,500" },
-        "value": { "cpu": "x3d", "cpuNote": "AMD's X3D is the fastest for Revit. The Intel 265K lags a little but costs less and still does fine on large models.", "gpu": "rtx5070", "gpuNote": "More than large-model modeling needs, but enough for Enscape.", "ram": "128 GB DDR5", "ramNote": "Keeps large linked models and consultants open at once.", "storage": "2 TB NVMe", "priceRange": "$2,600--$3,100" },
-        "best": { "cpu": "x3d", "cpuNote": "AMD's X3D is the fastest chip for Revit.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM. Enough for Enscape walkthroughs of large models.", "ram": "128 GB DDR5", "ramNote": "500 MB+ models with full consultant links.", "storage": "4 TB NVMe", "priceRange": "$3,100--$3,700" }
+        "cheapest": { "cpu": "x3d", "cpuNote": "AMD's X3D is the fastest for Revit. The Intel 270K Plus lags a little but costs less and still does fine on large models.", "gpu": "rtx5070", "gpuNote": "Large models can exceed 8 GB of VRAM in Rhino. 12 GB keeps the viewport stable.", "ram": "64 GB DDR5", "ramNote": "The minimum I would buy for large-model work.", "storage": "2 TB NVMe", "priceRange": "$2,100--$2,500" },
+        "value": { "cpu": "x3d", "cpuNote": "AMD's X3D is the fastest for Revit. The Intel 270K Plus lags a little but costs less and still does fine on large models.", "gpu": "rtx5070", "gpuNote": "More than large-model modeling needs, but enough for Enscape.", "ram": "128 GB DDR5", "ramNote": "Keeps large linked models and consultants open at once.", "storage": "2 TB NVMe", "priceRange": "$2,600--$3,100" },
+        "best": { "cpu": "x3d_top", "cpuNote": "AMD's X3D is the fastest chip for Revit.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM. Enough for Enscape walkthroughs of large models.", "ram": "128 GB DDR5", "ramNote": "500 MB+ models with full consultant links.", "storage": "4 TB NVMe", "priceRange": "$3,100--$3,700" }
       },
       "priority": "Modeling runs one operation at a time. What counts is how fast each CPU core is, not how many. That's what makes Revit, Rhino, and SketchUp feel responsive. It also wants a modest dedicated GPU for stable viewports. More powerful ones are only needed for visualization."
     },
     "viz": {
       "small": {
-        "cheapest": { "cpu": "x3d", "cpuNote": "Plenty for loading scenes. Pick on price.", "gpu": "rtx5070", "gpuNote": "12 GB of VRAM is the cheapest GPU that handles full scenes.", "ram": "32 GB DDR5", "ramNote": "32 GB to load typical scenes.", "storage": "1 TB NVMe", "priceRange": "$1,900--$2,300" },
+        "cheapest": { "cpu": "x3d", "cpuNote": "Plenty for loading scenes. Pick on price.", "gpu": "rtx5070", "gpuNote": "12 GB of VRAM holds typical scenes.", "ram": "32 GB DDR5", "ramNote": "32 GB to load typical scenes.", "storage": "1 TB NVMe", "priceRange": "$1,900--$2,300" },
         "value": { "cpu": "x3d", "cpuNote": "Loads scenes fast. Either brand is fine.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM. The best value in real-time visualization right now.", "ram": "64 GB DDR5", "ramNote": "64 GB for larger scenes and assets.", "storage": "2 TB NVMe", "priceRange": "$2,400--$2,900" },
         "best": { "cpu": "top", "cpuNote": "16 CPU cores load and process scenes fast.", "gpu": "rtx5090", "gpuNote": "32 GB of VRAM. Maximum real-time performance, enough for VR and large scenes.", "ram": "64 GB DDR5", "ramNote": "64 GB for large scenes.", "storage": "2 TB NVMe", "priceRange": "$4,500--$5,500" }
       },
@@ -124,7 +124,7 @@
     },
     "production": {
       "small": {
-        "cheapest": { "cpu": "render12", "cpuNote": "12 cores is where a render box starts to make sense.", "gpu": "rtx5070", "gpuNote": "A 5070 is enough for hybrid GPU rendering without overspending.", "ram": "64 GB DDR5", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB NVMe", "priceRange": "$2,300--$2,800" },
+        "cheapest": { "cpu": "render12", "cpuNote": "Enough CPU cores to start a render box. The Intel renders faster for the money.", "gpu": "rtx5070", "gpuNote": "A 5070 is enough for hybrid GPU rendering without overspending.", "ram": "64 GB DDR5", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB NVMe", "priceRange": "$2,300--$2,800" },
         "value": { "cpu": "render16", "cpuNote": "16 cores cut render times over 12.", "gpu": "rtx5070ti", "gpuNote": "16 GB of VRAM for hybrid rendering and visualization.", "ram": "64 GB DDR5", "ramNote": "64 GB to hold scenes while rendering.", "storage": "2 TB NVMe", "priceRange": "$2,600--$3,100" },
         "best": { "cpu": "render_max", "cpuNote": "16 cores cover most rendering. Threadripper PRO goes further on a dedicated render box.", "gpu": "rtx5090", "gpuNote": "32 GB of VRAM covers almost all GPU rendering. The largest scenes can exceed it, but V-Ray pages the overflow to system memory.", "ram": "128 GB DDR5", "ramNote": "128 GB so large scenes load fully before rendering.", "storage": "4 TB NVMe", "priceRange": "$5,000--$6,000" }
       },
@@ -139,81 +139,81 @@
   "MacSpecs": {
     "review": {
       "small": {
-        "cheapest": { "chip": "macmini_m4", "cpuNote": "Quiet and small. Plenty for documents. For review work, a refurbished previous-gen Mac is great value.", "memory": "16 GB unified", "memoryNote": "Enough for documents and a stack of tabs.", "storage": "512 GB SSD", "price": "$800--$1,000" },
-        "value": { "chip": "macmini_m4pro", "cpuNote": "More than enough for documents.", "memory": "24 GB unified", "memoryNote": "More than documents need.", "storage": "512 GB SSD", "price": "$1,400--$1,600" },
-        "best": { "chip": "macmini_m4pro", "cpuNote": "More chip than documents need.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
+        "cheapest": { "chip": "macmini_m6", "cpuNote": "Quiet and small. Plenty for documents. For review work, a refurbished previous-gen Mac is great value.", "memory": "16 GB unified", "memoryNote": "Enough for documents and a stack of tabs.", "storage": "512 GB SSD", "price": "$800--$1,000" },
+        "value": { "chip": "macmini_m5pro", "cpuNote": "More than enough for documents.", "memory": "24 GB unified", "memoryNote": "More than documents need.", "storage": "512 GB SSD", "price": "$1,400--$1,600" },
+        "best": { "chip": "macmini_m5pro", "cpuNote": "More chip than documents need.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
       },
       "large": {
-        "cheapest": { "chip": "macmini_m4", "cpuNote": "Handles larger document sets. A refurbished previous-gen Mac also does this work well.", "memory": "24 GB unified", "memoryNote": "Holds large document sets.", "storage": "512 GB SSD", "price": "$1,000--$1,200" },
-        "value": { "chip": "macmini_m4pro", "cpuNote": "Even large document sets use little of the chip.", "memory": "48 GB unified", "memoryNote": "Keeps many large sets open at once.", "storage": "1 TB SSD", "price": "$1,800--$2,000" },
-        "best": { "chip": "macmini_m4pro", "cpuNote": "Far more chip than documents need.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
+        "cheapest": { "chip": "macmini_m6", "cpuNote": "Handles larger document sets. A refurbished previous-gen Mac also does this work well.", "memory": "24 GB unified", "memoryNote": "Holds large document sets.", "storage": "512 GB SSD", "price": "$1,000--$1,200" },
+        "value": { "chip": "macmini_m5pro", "cpuNote": "Even large document sets use little of the chip.", "memory": "48 GB unified", "memoryNote": "Keeps many large sets open at once.", "storage": "1 TB SSD", "price": "$1,800--$2,000" },
+        "best": { "chip": "macmini_m5pro", "cpuNote": "Far more chip than documents need.", "memory": "48 GB unified", "memoryNote": "Far more than documents will use.", "storage": "1 TB SSD", "price": "$1,800--$2,000" }
       },
       "priority": "You primarily work on documents, and any Mac handles that. The display matters more than the Mac."
     },
     "drafting": {
       "small": {
-        "cheapest": { "chip": "macmini_m4pro", "cpuNote": "The cheapest Mac I'd draft on.", "memory": "24 GB unified", "memoryNote": "Plenty for 2D drawings.", "storage": "512 GB SSD", "price": "$1,400--$1,600" },
-        "value": { "chip": "macmini_m4pro", "cpuNote": "Fast enough for 2D CAD.", "memory": "24 GB unified", "memoryNote": "Plenty for 2D drawings.", "storage": "1 TB SSD", "price": "$1,600--$1,800" },
-        "best": { "chip": "macstudio_m4max", "cpuNote": "More than drafting needs, and it also handles larger drawings.", "memory": "36 GB unified", "memoryNote": "More than 2D drafting needs.", "storage": "1 TB SSD", "price": "$2,000--$2,400" }
+        "cheapest": { "chip": "macmini_m5pro", "cpuNote": "The cheapest Mac I'd draft on.", "memory": "24 GB unified", "memoryNote": "Plenty for 2D drawings.", "storage": "512 GB SSD", "price": "$1,400--$1,600" },
+        "value": { "chip": "macmini_m5pro", "cpuNote": "Fast enough for 2D CAD.", "memory": "24 GB unified", "memoryNote": "Plenty for 2D drawings.", "storage": "1 TB SSD", "price": "$1,600--$1,800" },
+        "best": { "chip": "macstudio_m5max", "cpuNote": "More than drafting needs, and it also handles larger drawings.", "memory": "36 GB unified", "memoryNote": "More than 2D drafting needs.", "storage": "1 TB SSD", "price": "$2,000--$2,400" }
       },
       "large": {
-        "cheapest": { "chip": "macmini_m4pro", "cpuNote": "Workable for big drawing sets on a budget.", "memory": "24 GB unified", "memoryNote": "Enough for large drawing sets.", "storage": "1 TB SSD", "price": "$1,600--$1,800" },
-        "value": { "chip": "macstudio_m4max", "cpuNote": "Handles large drawing sets with many xrefs.", "memory": "36 GB unified", "memoryNote": "Handles large drawing sets.", "storage": "1 TB SSD", "price": "$2,000--$2,400" },
-        "best": { "chip": "macstudio_m4max", "cpuNote": "More chip than 2D drafting needs, even for complex drawings.", "memory": "64 GB unified", "memoryNote": "Room for complex drawings and multitasking.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
+        "cheapest": { "chip": "macmini_m5pro", "cpuNote": "Workable for big drawing sets on a budget.", "memory": "24 GB unified", "memoryNote": "Enough for large drawing sets.", "storage": "1 TB SSD", "price": "$1,600--$1,800" },
+        "value": { "chip": "macstudio_m5max", "cpuNote": "Handles large drawing sets with many xrefs.", "memory": "36 GB unified", "memoryNote": "Handles large drawing sets.", "storage": "1 TB SSD", "price": "$2,000--$2,400" },
+        "best": { "chip": "macstudio_m5max", "cpuNote": "More chip than 2D drafting needs, even for complex drawings.", "memory": "64 GB unified", "memoryNote": "Room for complex drawings and multitasking.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
       },
       "priority": "Drafting runs one operation at a time, and Apple's CPU cores are fast at it. The display matters more than the Mac."
     },
     "modeling": {
       "small": {
-        "cheapest": { "chip": "macmini_m4pro", "cpuNote": "Handles ArchiCAD, Rhino, and SketchUp while models stay moderate.", "memory": "48 GB unified", "memoryNote": "Holds a single building, GPU included.", "storage": "1 TB SSD", "price": "$1,800--$2,100" },
-        "value": { "chip": "macstudio_m4max", "cpuNote": "GPU cores keep ArchiCAD, Rhino, and SketchUp viewports smooth.", "memory": "36 GB unified", "memoryNote": "Enough for a single building.", "storage": "1 TB SSD", "price": "$2,000--$2,400" },
-        "best": { "chip": "macstudio_m4max", "cpuNote": "The top single-core for modeling.", "memory": "64 GB unified", "memoryNote": "Comfortable with larger, linked models.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
+        "cheapest": { "chip": "macmini_m5pro", "cpuNote": "Handles ArchiCAD, Rhino, and SketchUp while models stay moderate.", "memory": "48 GB unified", "memoryNote": "Holds a single building, GPU included.", "storage": "1 TB SSD", "price": "$1,800--$2,100" },
+        "value": { "chip": "macstudio_m5max", "cpuNote": "GPU cores keep ArchiCAD, Rhino, and SketchUp viewports smooth.", "memory": "36 GB unified", "memoryNote": "Enough for a single building.", "storage": "1 TB SSD", "price": "$2,000--$2,400" },
+        "best": { "chip": "macstudio_m5max", "cpuNote": "A fast core for modeling, with GPU cores that keep large viewports smooth.", "memory": "64 GB unified", "memoryNote": "Comfortable with larger, linked models.", "storage": "2 TB SSD", "price": "$2,800--$3,200" }
       },
       "large": {
-        "cheapest": { "chip": "macmini_m4pro", "cpuNote": "Even large models run fine here. This clears ArchiCAD's commercial baseline.", "memory": "48 GB unified", "memoryNote": "The least I'd use for large models.", "storage": "1 TB SSD", "price": "$2,400--$2,800" },
-        "value": { "chip": "macstudio_m4max", "cpuNote": "Smooth with large, linked consultant models.", "memory": "64 GB unified", "memoryNote": "Holds large, consultant-linked models.", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
-        "best": { "chip": "macstudio_m4max", "cpuNote": "The top chip for modeling. An Ultra costs more for weaker single-core, so skip it here.", "memory": "128 GB unified", "memoryNote": "Room for the largest models.", "storage": "2 TB SSD", "price": "$4,000--$5,000" }
+        "cheapest": { "chip": "macmini_m5pro", "cpuNote": "Even large models run fine here. This clears ArchiCAD's commercial baseline.", "memory": "48 GB unified", "memoryNote": "The least I'd use for large models.", "storage": "1 TB SSD", "price": "$2,400--$2,800" },
+        "value": { "chip": "macstudio_m5max", "cpuNote": "Smooth with large, linked consultant models.", "memory": "64 GB unified", "memoryNote": "Holds large, consultant-linked models.", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
+        "best": { "chip": "macstudio_m5max", "cpuNote": "The top chip for modeling. An Ultra adds GPU cores that modeling doesn't use, so skip it here.", "memory": "128 GB unified", "memoryNote": "Room for the largest models.", "storage": "2 TB SSD", "price": "$4,000--$5,000" }
       },
       "priority": "Revit doesn't run on macOS, but ArchiCAD, Vectorworks, SketchUp, and Rhino do. Like any modeler, they want a fast CPU core. Bigger models want more unified memory and GPU cores."
     },
     "viz": {
       "small": {
-        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "The cheapest Mac I'd call a visualization machine.", "memory": "36 GB unified", "memoryNote": "Holds typical scenes, GPU included.", "storage": "1 TB SSD", "price": "$2,300--$2,700" },
-        "value": { "chip": "macstudio_m4max", "cpuNote": "Enough for Enscape and Twinmotion on smaller projects.", "memory": "48 GB unified", "memoryNote": "Room for larger Enscape and Twinmotion scenes.", "storage": "1 TB SSD", "price": "$2,500--$3,000" },
-        "best": { "chip": "macstudio_m3ultra", "cpuNote": "Maximum GPU cores for real-time work.", "memory": "96 GB unified", "memoryNote": "Holds large scenes and their assets.", "storage": "2 TB SSD", "price": "$4,000--$5,000" }
+        "cheapest": { "chip": "macstudio_m5max", "cpuNote": "The cheapest Mac I'd call a visualization machine.", "memory": "36 GB unified", "memoryNote": "Holds typical scenes, GPU included.", "storage": "1 TB SSD", "price": "$2,300--$2,700" },
+        "value": { "chip": "macstudio_m5max", "cpuNote": "Enough for Enscape and Twinmotion on smaller projects.", "memory": "48 GB unified", "memoryNote": "Room for larger Enscape and Twinmotion scenes.", "storage": "1 TB SSD", "price": "$2,500--$3,000" },
+        "best": { "chip": "macstudio_m5ultra", "cpuNote": "Maximum GPU cores for real-time work.", "memory": "96 GB unified", "memoryNote": "Holds large scenes and their assets.", "storage": "2 TB SSD", "price": "$4,000--$5,000" }
       },
       "large": {
-        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "Enough for large scenes. You won't need an Ultra unless they get extremely complex.", "memory": "64 GB unified", "memoryNote": "Holds large scenes.", "storage": "2 TB SSD", "price": "$3,600--$4,300" },
-        "value": { "chip": "macstudio_m3ultra", "cpuNote": "Large scenes need every GPU core.", "memory": "96 GB unified", "memoryNote": "Room for large urban scenes.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "best": { "chip": "macstudio_m3ultra", "cpuNote": "The maximum Mac for large-scene visualization.", "memory": "192 GB unified", "memoryNote": "Holds the largest scenes.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
+        "cheapest": { "chip": "macstudio_m5max", "cpuNote": "Enough for large scenes. You won't need an Ultra unless they get extremely complex.", "memory": "64 GB unified", "memoryNote": "Holds large scenes.", "storage": "2 TB SSD", "price": "$3,600--$4,300" },
+        "value": { "chip": "macstudio_m5ultra", "cpuNote": "Large scenes need every GPU core.", "memory": "96 GB unified", "memoryNote": "Room for large urban scenes.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
+        "best": { "chip": "macstudio_m5ultra", "cpuNote": "The maximum Mac for large-scene visualization.", "memory": "256 GB unified", "memoryNote": "Holds the largest scenes.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
-      "priority": "Real-time visualization is limited on Mac. Enscape and Twinmotion run (Twinmotion through Rosetta), while Lumion and D5 are Windows-only. The apps that run scale with GPU cores and unified memory."
+      "priority": "Real-time visualization is limited on Mac. Enscape and Twinmotion run, while Lumion and D5 are Windows-only. The apps that run scale with GPU cores and unified memory."
     },
     "modeling_viz": {
       "small": {
-        "cheapest": { "chip": "macmini_m4pro", "cpuNote": "The cheapest machine that balances modeling and visualization.", "memory": "48 GB unified", "memoryNote": "Fits a model and a scene at once.", "storage": "1 TB SSD", "price": "$2,100--$2,500" },
-        "value": { "chip": "macstudio_m4max", "cpuNote": "The pick when modeling matters more than visualization.", "memory": "64 GB unified", "memoryNote": "Holds a model and a scene together.", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
-        "best": { "chip": "macstudio_m3ultra", "cpuNote": "The pick when visualization matters more than modeling.", "memory": "128 GB unified", "memoryNote": "Room for a large model plus a scene.", "storage": "2 TB SSD", "price": "$4,000--$5,000" }
+        "cheapest": { "chip": "macmini_m5pro", "cpuNote": "The cheapest machine that balances modeling and visualization.", "memory": "48 GB unified", "memoryNote": "Fits a model and a scene at once.", "storage": "1 TB SSD", "price": "$2,100--$2,500" },
+        "value": { "chip": "macstudio_m5max", "cpuNote": "The pick when modeling matters more than visualization.", "memory": "64 GB unified", "memoryNote": "Holds a model and a scene together.", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
+        "best": { "chip": "macstudio_m5ultra", "cpuNote": "The pick when visualization matters more than modeling.", "memory": "96 GB unified", "memoryNote": "Room for a large model plus a scene.", "storage": "2 TB SSD", "price": "$4,000--$5,000" }
       },
       "large": {
-        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "The cheapest balanced choice for large mixed work.", "memory": "64 GB unified", "memoryNote": "Enough for large mixed work.", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
-        "value": { "chip": "macstudio_m3ultra", "cpuNote": "The Ultra has more GPU cores for large-model visualization, but at the cost of some modeling speed. The Max is also a good choice.", "memory": "128 GB unified", "memoryNote": "Holds a large model and scene together.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "best": { "chip": "macstudio_m3ultra", "cpuNote": "The maximum Mac for large modeling and visualization.", "memory": "192 GB unified", "memoryNote": "Room for the largest mixed work.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
+        "cheapest": { "chip": "macstudio_m5max", "cpuNote": "The cheapest balanced choice for large mixed work.", "memory": "64 GB unified", "memoryNote": "Enough for large mixed work.", "storage": "2 TB SSD", "price": "$2,800--$3,200" },
+        "value": { "chip": "macstudio_m5ultra", "cpuNote": "The Ultra's extra GPU cores speed up visualization of large models. If modeling dominates, the Max is a good choice.", "memory": "96 GB unified", "memoryNote": "Holds a large model and scene together.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
+        "best": { "chip": "macstudio_m5ultra", "cpuNote": "The maximum Mac for large modeling and visualization.", "memory": "256 GB unified", "memoryNote": "Room for the largest mixed work.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
-      "priority": "On a Mac, these two tasks want different chips. A high-memory M4 Max has the best single-core for modeling. An M3 Ultra adds GPU cores for visualization, but with weaker single-core. Pick by which side dominates your work. Unified memory is both RAM and VRAM, so buy enough of it."
+      "priority": "On a Mac, the M5 Max and M5 Ultra model at the same speed, since they share the same CPU cores. The Ultra adds GPU cores for visualization. Pick by how much visualization you do. Unified memory is both RAM and VRAM, so buy enough of it."
     },
     "production": {
       "small": {
-        "cheapest": { "chip": "macstudio_m4max", "cpuNote": "The entry point if you're set on rendering on a Mac, though a PC offers far better value for this work.", "memory": "64 GB unified", "memoryNote": "Holds small render scenes.", "storage": "2 TB SSD", "price": "$3,200--$3,800" },
-        "value": { "chip": "macstudio_m3ultra", "cpuNote": "Maximum cores for V-Ray, plus Metal GPU rendering.", "memory": "96 GB unified", "memoryNote": "Room for larger render scenes.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "best": { "chip": "macstudio_m3ultra", "cpuNote": "Maximum cores for small-scale rendering.", "memory": "128 GB unified", "memoryNote": "Holds small-scale renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
+        "cheapest": { "chip": "macstudio_m5max", "cpuNote": "The entry point if you're set on rendering on a Mac, though a PC offers far better value for this work.", "memory": "64 GB unified", "memoryNote": "Holds small render scenes.", "storage": "2 TB SSD", "price": "$3,200--$3,800" },
+        "value": { "chip": "macstudio_m5ultra", "cpuNote": "Maximum cores for V-Ray, plus Metal GPU rendering.", "memory": "96 GB unified", "memoryNote": "Room for larger render scenes.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
+        "best": { "chip": "macstudio_m5ultra", "cpuNote": "Maximum cores for small-scale rendering.", "memory": "96 GB unified", "memoryNote": "Holds small-scale renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
       "large": {
-        "cheapest": { "chip": "macstudio_m3ultra", "cpuNote": "The cheapest Mac I'd trust with large renders.", "memory": "96 GB unified", "memoryNote": "Holds large renders.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
-        "value": { "chip": "macstudio_m3ultra", "cpuNote": "Maximum cores for large renders.", "memory": "128 GB unified", "memoryNote": "Room to hold large renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" },
-        "best": { "chip": "macstudio_m3ultra", "cpuNote": "The maximum Mac, and still slower than a mid-range RTX 4070 PC at V-Ray.", "memory": "192 GB unified", "memoryNote": "Holds the largest renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
+        "cheapest": { "chip": "macstudio_m5ultra", "cpuNote": "The cheapest Mac I'd trust with large renders.", "memory": "96 GB unified", "memoryNote": "Holds large renders.", "storage": "2 TB SSD", "price": "$4,000--$5,000" },
+        "value": { "chip": "macstudio_m5ultra", "cpuNote": "Maximum cores for large renders.", "memory": "96 GB unified", "memoryNote": "Room to hold large renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" },
+        "best": { "chip": "macstudio_m5ultra", "cpuNote": "The most CPU and GPU cores of any Mac, for the largest renders.", "memory": "256 GB unified", "memoryNote": "Holds the largest renders.", "storage": "4 TB SSD", "price": "$5,500--$7,000" }
       },
-      "priority": "Final rendering is the Mac's weakest workload. V-Ray runs on Metal, but a mid-range Windows PC with an RTX 4070 still outrenders a maxed Mac Studio. Choose Mac here for the ecosystem, display, and silence. Not for render speed."
+      "priority": "Final rendering is the Mac's weakest workload. V-Ray runs on Metal, but a Windows PC goes further, with a Threadripper's CPU cores or a second NVIDIA GPU, and it can be upgraded later. Choose Mac here for the ecosystem, display, and silence."
     }
   },
   "Prebuilts": [
@@ -245,7 +245,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PB64",
       "price": "$600--$900",
-      "note": "Up to 64 GB, drives two displays up to 6K. Mounts behind a monitor, and silent.",
+      "note": "Up to 64 GB, drives four 4K displays. Mounts behind a monitor, and quiet.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "value": true }
@@ -255,7 +255,7 @@
       "type": "mini",
       "name": "ASUS ExpertCenter PN55",
       "price": "$600--$800",
-      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Drives two displays up to 6K.",
+      "note": "The AMD mini, with a stronger integrated GPU for light 3D. Up to 96 GB, and drives four 4K displays.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
         "review": { "cheapest": true },
@@ -272,7 +272,7 @@
     },
     {
       "type": "mini",
-      "name": "Lenovo ThinkCentre Tiny (M90q)",
+      "name": "Lenovo ThinkCentre M90q Gen 6",
       "price": "$700--$1,000",
       "note": "Up to 64 GB. A reliable business mini. vPro adds no value if you're buying for yourself, so don't pay extra for it.",
       "workloadProfiles": [ "review", "drafting" ],
@@ -282,9 +282,9 @@
     },
     {
       "type": "office",
-      "name": "Lenovo ThinkCentre Neo 50t",
+      "name": "Lenovo ThinkCentre Neo 50t Gen 6",
       "price": "$800--$1,200",
-      "note": "32 GB, with a full GPU slot. Add an RTX 4060 to drive a 3D viewport.",
+      "note": "32 GB, with a full GPU slot. Order the RTX 3050 option to drive a 3D viewport. The stock power supply won't run a faster GPU.",
       "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "drafting": { "value": true }
@@ -294,7 +294,7 @@
       "type": "office",
       "name": "Dell Tower Plus",
       "price": "$900--$1,400",
-      "note": "Up to an RTX 4060 Ti from the factory. The cheapest tower that ships with a dedicated GPU.",
+      "note": "Up to an RTX 5070 from the factory, enough for modeling and light visualization.",
       "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "modeling": { "cheapest": true }
@@ -302,7 +302,7 @@
     },
     {
       "type": "office",
-      "name": "HP ProDesk 4 Tower",
+      "name": "HP ProDesk 4 Tower G1i",
       "price": "$800--$1,200",
       "note": "A plain corporate desktop: cheap, reliable, and everywhere. Fine for documents and 2D, not built for 3D.",
       "workloadProfiles": [ "review", "drafting" ],
@@ -330,9 +330,9 @@
     },
     {
       "type": "workstation",
-      "name": "Lenovo ThinkStation P3 Tower",
+      "name": "Lenovo ThinkStation P3 Tower Gen 2",
       "price": "$1,200--$2,500",
-      "note": "Up to 128 GB and pro GPUs. A high memory ceiling for large models.",
+      "note": "Up to 256 GB and pro GPUs. A high memory ceiling for large models.",
       "workloadProfiles": [ "review", "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "modeling": { "best": true }
@@ -346,14 +346,15 @@
       "workloadProfiles": [ "modeling", "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "value": true },
-        "modeling_viz": { "value": true }
+        "modeling_viz": { "value": true },
+        "production": { "value": true }
       }
     },
     {
       "type": "gaming",
       "name": "MSI MAG Infinite S3",
       "price": "$1,600--$2,200",
-      "note": "RTX 5070, 750W PSU, clean design. Less gamer aesthetic than most.",
+      "note": "RTX 5070, 750W PSU, clean design. Less gamer aesthetic than most. It ships with 16 GB, so add memory.",
       "workloadProfiles": [ "modeling", "viz", "modeling_viz", "production" ],
       "recommendedFor": {}
     },
@@ -361,19 +362,19 @@
       "type": "gaming",
       "name": "CyberPowerPC Gamer Xtreme",
       "price": "$1,500--$2,200",
-      "note": "Configurable. Order it with an RTX 5070 Ti and 64 GB. The cheapest way into a powerful GPU.",
+      "note": "Configurable. Order it with an RTX 5070 and 32 GB to start visualization on a budget.",
       "workloadProfiles": [ "modeling", "viz", "modeling_viz", "production" ],
       "recommendedFor": {
-        "production": { "cheapest": true, "value": true },
+        "production": { "cheapest": true },
         "viz": { "cheapest": true },
         "modeling_viz": { "cheapest": true }
       }
     },
     {
       "type": "gaming",
-      "name": "iBuyPower / NZXT BLD",
+      "name": "iBuyPower",
       "price": "$1,800--$2,800",
-      "note": "Custom config. Pick your CPU, GPU, and RAM. Tidy cable work and quiet builds.",
+      "note": "Custom config. Pick your CPU, GPU, and RAM.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "best": true },
@@ -383,7 +384,7 @@
     }
   ],
   "PrebuiltTypeLabels": { "builder": "Built to Order", "mini": "Mini PC", "office": "Office Tower", "workstation": "Entry Workstation", "gaming": "Gaming Desktop" },
-  "PrebuiltTypeNotes": { "builder": "Bespoke builders who spec, test, and support the machine, and walk you through the order. The best route for a small firm with no IT.", "mini": "Silent and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.", "office": "A standard office tower. A few fit a low-power GPU, enough for drafting and modeling, but never a fast one.", "workstation": "Certified and supported for professional software, but limited to pro GPUs, not gaming ones. Fine for modeling, short on power for serious visualization. Most architects don't need the certification, so don't pay the premium for it unless your firm requires it.", "gaming": "The best value when you need a powerful GPU. The cooling and power supply it needs come standard, so it beats a pricier workstation at Enscape, Lumion, and V-Ray." },
+  "PrebuiltTypeNotes": { "builder": "Bespoke builders who spec, test, and support the machine, and walk you through the order. The best route for a small firm with no IT.", "mini": "Quiet and tiny, with no dedicated GPU. Good for documents, drafting, and light modeling, not visualization.", "office": "A standard office tower. A few fit a modest GPU, enough for drafting and modeling, but rarely a fast one.", "workstation": "Certified and supported for professional software, but limited to pro GPUs, not gaming ones. Fine for modeling, short on power for serious visualization. Most architects don't need the certification, so don't pay the premium for it unless your firm requires it.", "gaming": "The best value when you need a powerful GPU. The cooling and power supply it needs come standard, so it beats a pricier workstation at Enscape, Lumion, and V-Ray." },
   "Monitors": [
     { "id": "m5k27", "name": "27\" 5K", "price": 800, "platform": "both", "width": 39, "height": 25 },
     { "id": "m6k32", "name": "32\" 6K", "price": 1300, "platform": "both", "width": 46, "height": 29 },
@@ -456,10 +457,10 @@
     {
       "category": "one",
       "platform": "win",
-      "name": "Lenovo ThinkPad P1 Gen 8",
+      "name": "Lenovo ThinkPad P1 Gen 9",
       "price": "$2,800--$3,400",
-      "weight": "3.8 lbs",
-      "note": "Arrow Lake, RTX PRO 2000 (8 GB), up to 64 GB, 3.2K tandem OLED. A true workstation at this weight, with the best keyboard here.",
+      "weight": "3.9 lbs",
+      "note": "Core Ultra X9 (Panther Lake), RTX PRO 2000 (8 GB), up to 64 GB, tandem OLED. A true workstation at this weight, with the best keyboard here.",
       "workloadProfiles": [ "drafting", "modeling", "modeling_viz" ],
       "recommendedFor": {
         "drafting": { "best": true },
@@ -485,12 +486,9 @@
       "name": "Asus ROG Zephyrus G16",
       "price": "$2,000--$2,500",
       "weight": "4.1 lbs",
-      "note": "Core Ultra 9, up to RTX 5090, 16-inch 2.5K OLED. Lighter than a workstation with an excellent screen, though the Intel model runs warm under load.",
+      "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. Lighter than a workstation, with an excellent screen.",
       "workloadProfiles": [ "drafting", "modeling", "viz", "modeling_viz" ],
-      "recommendedFor": {
-        "viz": { "cheapest": true },
-        "modeling_viz": { "cheapest": true }
-      }
+      "recommendedFor": {}
     },
     {
       "category": "one",
@@ -498,26 +496,24 @@
       "name": "Asus ROG Zephyrus G14",
       "price": "$1,800--$2,200",
       "weight": "3.3 lbs",
-      "note": "Ryzen AI 9, up to RTX 5080, 14-inch 3K OLED. Memory is soldered, so configure it up front. The thin 14-inch chassis runs the GPU at lower wattage, so it trails heavier machines.",
+      "note": "Core Ultra 9 386H, RTX 5070 Ti, 14-inch OLED. Memory is soldered, so configure it up front. The thin 14-inch chassis runs the GPU at lower wattage, so it trails heavier machines.",
       "workloadProfiles": [ "drafting", "modeling" ],
-      "recommendedFor": {
-        "modeling": { "cheapest": true }
-      }
+      "recommendedFor": {}
     },
     {
       "category": "one",
       "platform": "win",
       "name": "Razer Blade 16",
       "price": "$2,500--$3,200",
-      "weight": "4.6 lbs",
-      "note": "Ryzen AI 9 HX 370, up to RTX 5090, 16-inch OLED. The thinnest way to carry a 5090. Premium build, but Razer's support is inconsistent.",
+      "weight": "4.7 lbs",
+      "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. The thinnest way to carry a 5090. Premium build, but Razer's support is inconsistent.",
       "workloadProfiles": [ "modeling", "viz", "modeling_viz" ],
       "recommendedFor": {}
     },
     {
       "category": "desk",
       "platform": "win",
-      "name": "Lenovo Legion Pro 7i",
+      "name": "Lenovo Legion Pro 7i Gen 10",
       "price": "$2,200--$2,800",
       "weight": "5.5 lbs",
       "note": "Core Ultra 9 275HX, up to RTX 5090, 16-inch OLED. Gaming-desktop power for the price. Loud, and desk-bound.",
@@ -557,22 +553,21 @@
       "platform": "win",
       "name": "Dell Pro Max 16 Plus",
       "price": "$3,500--$4,200",
-      "weight": "5.6 lbs",
-      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB ECC), 128 GB, 4K OLED. Replaceable GPU and memory make it the serviceable pick. AEC Magazine rates it highly.",
+      "weight": "6.3 lbs",
+      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB ECC), 128 GB, 4K OLED. Replaceable memory makes it the serviceable pick. AEC Magazine rates it highly.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {}
     },
     {
       "category": "travel",
       "platform": "win",
-      "name": "Lenovo ThinkPad X1 Carbon Gen 13",
+      "name": "Lenovo ThinkPad X1 Carbon Gen 14",
       "price": "$1,500--$1,800",
-      "weight": "2.5 lbs",
-      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch. The standard ultraportable. All-day battery, no discrete GPU, for documents and drafting.",
+      "weight": "2.2 lbs",
+      "note": "Core Ultra (Panther Lake), 32 GB, 14-inch. The standard ultraportable. All-day battery, no discrete GPU, for documents and drafting.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
-        "review": { "value": true },
-        "drafting": { "value": true }
+        "review": { "best": true }
       }
     },
     {
@@ -581,10 +576,11 @@
       "name": "Lenovo ThinkPad X9 14 Aura Edition",
       "price": "$1,600--$2,300",
       "weight": "2.7 lbs",
-      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch 2.8K OLED. A premium ultraportable for documents and drafting. A nicer screen and build than the X1 Carbon, with no more power.",
+      "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch 2.8K OLED. A premium ultraportable for documents and drafting, with no discrete GPU.",
       "workloadProfiles": [ "review", "drafting" ],
       "recommendedFor": {
-        "review": { "best": true }
+        "review": { "value": true },
+        "drafting": { "value": true }
       }
     },
     {
@@ -622,6 +618,7 @@
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "cheapest": true },
+        "modeling_viz": { "cheapest": true },
         "production": { "cheapest": true }
       }
     },
@@ -669,7 +666,7 @@
       "name": "MacBook Pro 16\" M5 Max",
       "price": "$3,900--$4,800",
       "weight": "4.7 lbs",
-      "note": "M5 Max, 64–128 GB unified, 16-inch XDR. Serious GPU cores for Enscape and V-Ray on Metal.",
+      "note": "M5 Max, up to 128 GB unified, 16-inch XDR. Serious GPU cores for Enscape and V-Ray on Metal.",
       "workloadProfiles": [ "viz", "modeling_viz", "production" ],
       "recommendedFor": {
         "viz": { "value": true, "best": true },
