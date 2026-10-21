@@ -4,7 +4,7 @@
      so the matrix reads like a drawing schedule.
 
      The page is one feature matrix: a row per tool, grouped by what each is
-     built for, with small independent tools as a group of their own
+     built for, with small independent markup tools as a group of their own
      (alphabetical within a group), columns for platforms and
      capabilities, then price. The rows are GENERATED from
      data/pdf-markup.json by tools/build-pdf-markup.mjs: edit the JSON, then
@@ -146,8 +146,8 @@
 
   <p class="chooser-updated">Reviewed 19 October 2026</p>
   <p class="chooser-lede">Twenty apps architects use to mark up, measure and review PDF drawings,
-     grouped by what each is built for, with small independent tools in a group of their own,
-     and listed alphabetically within each group.
+     grouped by what each is built for, with small independent markup tools in a group of their own,
+     and listed alphabetically within each group. Below the matrix: AI services that check a whole set for issues.
      Open a tool&rsquo;s name for its notes and full price, and a mark for the page that shows it.</p>
   <p class="list-disclosure">One of them, Adequate Design Review, is made by the person who runs this site.</p>
 
@@ -207,6 +207,13 @@
             <td colspan="10"><div class="d-body"><p>A Windows editor for one person working alone. Clouds, callouts, stamps, and calibrated length, perimeter and area measurement. The Plus edition compares two documents. It has no shared review.</p><p class="d-meta">Price: One-time license &middot; <a href="https://www.pdf-xchange.com/product/pdf-xchange-editor" rel="noopener">Website</a></p></div></td>
           </tr>
           <tr class="m-group" data-group="review"><th colspan="10" scope="colgroup" id="review"><span class="m-group-label"><span class="m-group-name">Built around a review process</span> <span class="m-group-sub">Review kept as a record: issues, checklists, versions.</span></span></th></tr>
+          <tr class="m-row" id="adequate" data-group="review" data-plat="win mac linux" data-cap="measure compare" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="adequate-d"><span class="m-tool">Adequate Design Review</span><span class="m-maker">Adequate Design &middot; in beta &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, revision overlay</span><span class="m-txt">revision overlay</span></td><td class="m-price">One-time</td>
+          </tr>
+          <tr class="m-detail" id="adequate-d" data-group="review">
+            <td colspan="10"><div class="d-body"><p>For checking a set against a checklist before it is issued, rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.</p><p>Runs locally and offline on Windows, Mac and Linux, so the set stays on your machine. It is for one reviewer, without live team sessions, and it does not detect issues automatically: you work through the checklist yourself.</p><p class="d-disclosure">Made by the person who runs this site. Public documentation could not be verified on 19 October 2026. Platform and feature entries are provisional; confirm them before choosing this beta.</p><p class="d-meta">Price: $400 one-time after the beta &middot; <a href="https://adequate.design" rel="noopener">Website</a></p></div></td>
+          </tr>
           <tr class="m-row" id="drawboard-projects" data-group="review" data-plat="win ipad web" data-cap="measure team compare" data-tier="leader">
             <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="drawboard-projects-d"><span class="m-tool">Drawboard Projects</span><span class="m-maker">Drawboard &middot; <span class="m-tier m-tier-leader">shortlist</span></span></button></th>
             <td class="m-yes"><a class="m-ev" href="https://www.drawboard.com/pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><a class="m-ev" href="https://www.drawboard.com/pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.drawboard.com/pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.drawboard.com/pricing#:~:text=Calibrated%20measurements%20including%20length" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.drawboard.com/projects#:~:text=limited-access%20guests" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Team review: yes, task lists, free guests</span><span class="m-txt">task lists, free guests</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.drawboard.com/blog/overlay-pdf#:~:text=you%20can%20layer%20revisions%20or%20related%20drawings%20together%20and%20compare%20them%20visually%20in%20one%20place" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, overlay</span><span class="m-txt">overlay</span></a></td><td class="m-price">Subscription</td>
@@ -214,14 +221,7 @@
           <tr class="m-detail" id="drawboard-projects-d" data-group="review">
             <td colspan="10"><div class="d-body"><p>Drawboard&rsquo;s team product for drawing review. Drawings live in one project with versions, markups sync live, and tasks are pinned to a spot on a sheet with an owner and a status, collected into task lists such as a punch list or RFIs. Overlay stacks up to five revisions in different colors. Clients and consultants join as guests without a paid license.</p><p>Task lists track what was found. There is no checklist of items to review a set against. On a Mac it runs in the browser.</p><p class="d-meta">Price: From $29 per user a month &middot; <a href="https://www.drawboard.com/projects" rel="noopener">Website</a></p></div></td>
           </tr>
-          <tr class="m-group" data-group="indie"><th colspan="10" scope="colgroup" id="indie"><span class="m-group-label"><span class="m-group-name">Small independent tools</span> <span class="m-group-sub">Markup, measurement and review from one developer or a small studio.</span></span></th></tr>
-          <tr class="m-row" id="adequate" data-group="indie" data-plat="win mac linux" data-cap="measure compare" data-tier="new">
-            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="adequate-d"><span class="m-tool">Adequate Design Review</span><span class="m-maker">Adequate Design &middot; in beta &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
-            <td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-yes"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, revision overlay</span><span class="m-txt">revision overlay</span></td><td class="m-price">One-time</td>
-          </tr>
-          <tr class="m-detail" id="adequate-d" data-group="indie">
-            <td colspan="10"><div class="d-body"><p>For reviewing a set against a checklist rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.</p><p>Runs locally and offline on Windows, Mac and Linux. It is for one reviewer, without live team sessions.</p><p class="d-disclosure">Public documentation could not be verified on 19 October 2026. Platform and feature entries are provisional; confirm them before choosing this beta.</p><p class="d-meta">Price: $400 one-time after the beta &middot; <a href="https://adequate.design" rel="noopener">Website</a></p></div></td>
-          </tr>
+          <tr class="m-group" data-group="indie"><th colspan="10" scope="colgroup" id="indie"><span class="m-group-label"><span class="m-group-name">Small independent tools</span> <span class="m-group-sub">Markup and measurement from one developer or a small studio.</span></span></th></tr>
           <tr class="m-row" id="caliper" data-group="indie" data-plat="win mac" data-cap="measure compare" data-tier="new">
             <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="caliper-d"><span class="m-tool">Caliper</span><span class="m-maker">Caliper App LLC &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
             <td class="m-yes"><a class="m-ev" href="https://caliperapp.co/#:~:text=Windows%2010%20%2F%2011%20%E2%80%94%20Microsoft%20Store" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://caliperapp.co/#:~:text=macOS%2014%20Sonoma%20or%20later%20%E2%80%94%20Mac%20App%20Store%20or%20direct" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://caliperapp.co/#:~:text=Linear%2C%20poly%2C%20area%20and%20angle%20dimensions" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, with takeoff</span><span class="m-txt">with takeoff</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-yes"><a class="m-ev" href="https://caliperapp.co/#:~:text=Lay%20one%20drawing%20over%20another%20with%20adjustable%20opacity" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, revision overlay</span><span class="m-txt">revision overlay</span></a></td><td class="m-price">One-time</td>
@@ -329,6 +329,49 @@
   <p class="m-none" id="noMatch" hidden>No tool here matches every filter selected. Clear one to see more.</p>
 
   <div class="chooser-notes">
+    <section id="ai-checkers">
+      <div class="section-label">Also: AI drawing checkers</div>
+      <p>These services read a whole set and return a list of possible issues, each tied to a sheet and a location on it. They check a set; they are not markup apps. You upload the set to the vendor, and findings usually come back as Bluebeam markups or a spreadsheet. A reviewer still confirms or dismisses each finding on the sheet.</p>
+
+      <div class="pick">
+        <div class="pick-name"><a href="https://nomic.ai/use-cases/automated-drawing-review" rel="noopener">Nomic</a></div>
+        <div class="pick-meta">Web &middot; priced through sales</div>
+        <div class="pick-note">Checks a set against your firm&rsquo;s own QA/QC standards, building codes and project requirements. Sets sync from Autodesk Construction Cloud or ProjectWise, or upload as PDFs. Each finding cites the standard it breaks and the spot on the drawing, and exports to Excel, JSON or Bluebeam markups.</div>
+      </div>
+
+      <div class="pick">
+        <div class="pick-name"><a href="https://getstructured.ai" rel="noopener">Structured AI</a></div>
+        <div class="pick-meta">Web &middot; Revit &middot; priced through sales</div>
+        <div class="pick-note">Reviews PDF sets and live Revit models against your standards and codes. Findings are tied to a sheet and location, with a record of who handled each, and publish back as Bluebeam markups. Inside Revit it can write an approved fix into the model.</div>
+      </div>
+
+      <div class="pick">
+        <div class="pick-name"><a href="https://up.codes/features/plan-review" rel="noopener">UpCodes Plan Review</a></div>
+        <div class="pick-meta">Web &middot; priced through sales</div>
+        <div class="pick-note">A first pass against locally adopted codes, your specifications and project requirements, with custom checks for firm standards. Findings can be assigned, commented on and tracked across revisions. It runs inside UpCodes projects.</div>
+      </div>
+
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.inspectmind.ai" rel="noopener">InspectMind</a></div>
+        <div class="pick-meta">Web &middot; pay per check</div>
+        <div class="pick-note">No subscription: a check costs $50 for up to 50 sheets, up to $500 for 500, with code checks extra. A revised set is billed as a new check. Uploads may be used to improve its models unless you opt out.</div>
+      </div>
+
+      <div class="pick">
+        <div class="pick-name"><a href="https://buildcheck.ai" rel="noopener">Buildcheck</a></div>
+        <div class="pick-meta">Web &middot; priced through sales</div>
+        <div class="pick-note">For contractors and developers reviewing a set before bid or construction, more than for the design team issuing it. The vendor&rsquo;s own experts confirm each finding before it reaches you.</div>
+      </div>
+
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.bluebeam.com/bluebeam-max/" rel="noopener">Bluebeam Max</a></div>
+        <div class="pick-meta">Revu, web and mobile &middot; $590 per user a year</div>
+        <div class="pick-note">Bluebeam&rsquo;s AI tier, inside the Revu you may already use. Smart Review flags issues such as missing sheets, missing door or fixture tags and gridline inconsistencies, as markups you can track. Smart Overlay finds changes between revisions. Both are in preview, and Smart Review is tuned for US vertical commercial construction. The price is introductory, held through a 2027 renewal.</div>
+      </div>
+
+      <p>If your set cannot leave the office, or you check alone against your own list, <a href="#adequate">Adequate Design Review</a> in the matrix above runs the review offline on your machine: a checklist you work through, with the evidence and a report kept for each revision. It finds nothing on its own. It is made by the person who runs this site.</p>
+    </section>
+
     <section id="platforms">
       <div class="section-label">Also: review inside a project platform</div>
       <p>Project platforms such as <a href="https://construction.autodesk.com/products/autodesk-docs/" rel="noopener">Autodesk Docs</a> and <a href="https://www.procore.com" rel="noopener">Procore</a> have their own markup. Comments made there stay attached to the sheet version the contractor builds from.</p>
