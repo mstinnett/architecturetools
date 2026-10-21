@@ -101,6 +101,7 @@ They are part of the site structure, but they do not need premature renaming or 
 │   ├── chips.csv                   # Each Mac chip — key, name
 │   ├── specs-win.csv               # Windows spec matrix (one row per cell)
 │   ├── specs-mac.csv               # Mac spec matrix (one row per cell)
+│   ├── specs-laptop.csv            # Laptop-only spec (platform / profile / tier)
 │   ├── priorities.csv              # Per-profile "where the money matters" note
 │   ├── extras.json                 # Non-tabular data (apps, prebuilts, monitors…)
 │   └── README.md                   # The authoritative data-pipeline contract
@@ -244,6 +245,8 @@ The picker fetches `assets/data/hardware-data.json` at runtime, but that file is
   GPU, and Mac chip (key, name(s), standard note), each defined **once**.
 - `data/specs-win.csv`, `data/specs-mac.csv` — the spec matrices, one row per
   `profile / scale / tier` cell, naming components by their catalog key.
+- `data/specs-laptop.csv` — the spec shown when Setup is Laptop, one row per
+  `platform / profile / tier`, with laptop parts named in full.
 - `data/priorities.csv` — the per-profile "where the money matters" note.
 - `data/extras.json` — everything not tabular (apps, prebuilts, monitors,
   laptops, label maps).

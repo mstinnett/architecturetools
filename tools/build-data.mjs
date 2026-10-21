@@ -7,6 +7,8 @@
 //     data/chips.csv       Mac chips — name, defined once
 //     data/specs-win.csv   Windows spec matrix, one row per cell
 //     data/specs-mac.csv   Mac spec matrix, one row per cell
+//     data/specs-laptop.csv laptop-only spec, one row per platform/profile/tier,
+//                          parts named in full (laptop parts aren't in the catalogs)
 //     data/priorities.csv  the per-profile "where the money matters" note
 //     data/extras.json     everything not tabular (apps, prebuilts, monitors...)
 //
@@ -121,6 +123,30 @@ const macByProfile = buildSpecs('data/specs-mac.csv', (r, where) => {
   return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, memoryNote: r.memoryNote, storage: r.storage, price: r.price };
 });
 
+// ---- laptop spec (Setup: Laptop) ----
+// No scale: a laptop tops out before project size changes the parts. Mac rows
+// carry the MacBook and chip in cpu and unified memory in ram, with gpu blank,
+// and come out shaped like a Mac cell so the picker renders both the same way.
+const laptopByPlatform = { win: {}, mac: {} };
+{
+  const rel = 'data/specs-laptop.csv';
+  for (const r of readTable(rel)) {
+    const where = `${rel} line ${r.__line}`;
+    const byProfile = laptopByPlatform[r.platform];
+    if (!byProfile) { fail(`${where}: bad platform "${r.platform}"`); continue; }
+    if (!PROFILES.includes(r.profile)) fail(`${where}: bad profile "${r.profile}"`);
+    if (!TIERS.includes(r.tier)) fail(`${where}: bad tier "${r.tier}"`);
+    if ((byProfile[r.profile] ??= {})[r.tier]) fail(`${where}: duplicate cell ${r.platform}/${r.profile}/${r.tier}`);
+    for (const k of ['cpu', 'cpuNote', 'ram', 'storage']) if (!r[k]) fail(`${where}: missing ${k}`);
+    if (r.platform === 'win' && !r.gpu) fail(`${where}: missing gpu`);
+    byProfile[r.profile][r.tier] = r.platform === 'win'
+      ? { cpu: r.cpu, cpuNote: r.cpuNote, gpu: r.gpu, gpuNote: r.gpuNote, ram: r.ram, ramNote: r.ramNote, storage: r.storage }
+      : { chip: r.cpu, cpuNote: r.cpuNote, memory: r.ram, memoryNote: r.ramNote, storage: r.storage };
+  }
+  for (const plat of ['win', 'mac']) for (const p of PROFILES) for (const t of TIERS)
+    if (!laptopByPlatform[plat][p]?.[t]) fail(`${rel}: missing cell ${plat}/${p}/${t}`);
+}
+
 // ---- priorities ----
 for (const r of readTable('data/priorities.csv')) {
   const where = `data/priorities.csv line ${r.__line}`;
@@ -158,6 +184,7 @@ const data = {
   PickerOptions: extras.PickerOptions,
   WindowsSpecs: assembleSpecs(winByProfile),
   MacSpecs: assembleSpecs(macByProfile),
+  LaptopSpecs: laptopByPlatform,
   Prebuilts: extras.Prebuilts,
   PrebuiltTypeLabels: extras.PrebuiltTypeLabels,
   PrebuiltTypeNotes: extras.PrebuiltTypeNotes,

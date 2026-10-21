@@ -15,6 +15,7 @@ Edit the files here instead.
 | `chips.csv` | Each Mac chip — `key`, `name` — defined **once**. |
 | `specs-win.csv` | Windows spec matrix: one row per `profile / scale / tier` cell. |
 | `specs-mac.csv` | Mac spec matrix: one row per cell. |
+| `specs-laptop.csv` | The spec shown when Setup is Laptop: one row per `platform / profile / tier`, no scale. Parts are named in full, since laptop parts aren't in the catalogs. Mac rows put the MacBook and chip in `cpu` and unified memory in `ram`, and leave `gpu` blank. |
 | `priorities.csv` | The per-profile "where the money matters" note. |
 | `extras.json` | Everything that isn't a table (apps, prebuilts, monitors, laptops, labels). |
 

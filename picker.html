@@ -387,6 +387,7 @@
     <div class="panel-label">Laptop</div>
     <div class="result-columns">
       <div class="result-main">
+        <div class="spec-block hidden" id="m-spec"></div>
         <div id="m-content"></div>
         <div id="m-priority" class="priority-box"></div>
       </div>
@@ -868,6 +869,18 @@ function runPicker(){
     var selectedMonitorConfig = Data.MonitorConfigs[State.monitorConfig];
     document.getElementById('monDrawerSummary').textContent = selectedMonitorConfig ? selectedMonitorConfig.name : 'Choose a layout';
 
+    // Laptop-only spec: laptop parts by workload and budget. The desktop
+    // panel is hidden in this setup, so its spec can't stand in.
+    var laptopSpecElement = document.getElementById('m-spec');
+    var isLaptopOnly = State.machineType === 'laptop';
+    laptopSpecElement.classList.toggle('hidden', !isLaptopOnly);
+    if (isLaptopOnly) {
+      var laptopSpec = Data.LaptopSpecs[isMacPlatform ? 'mac' : 'win'][activeWorkloadProfile][State.budget];
+      laptopSpecElement.innerHTML = isMacPlatform ? macSpecHTML(laptopSpec) : windowsSpecHTML(laptopSpec);
+    } else {
+      laptopSpecElement.innerHTML = '';
+    }
+
     // Laptop
     var mobileStrategy = State.machineType === 'desktop_travel' ? 'travel' : State.machineType === 'desktop_workstation' ? 'workstation' : 'one';
     var windowsCategoriesByStrategy = { one: ['one', 'desk', 'travel', 'student'], travel: ['travel'], workstation: ['one', 'desk', 'travel', 'student'] };
@@ -979,7 +992,7 @@ function runPicker(){
     // Auto-link glossary terms in the freshly rendered copy. innerHTML is rebuilt
     // each update, so this re-runs cleanly over plain text every time.
     hideGlossPop();
-    ['d-priority', 'd-spec', 'd-prebuilts', 'm-content', 'm-priority'].forEach(function(id) {
+    ['d-priority', 'd-spec', 'd-prebuilts', 'm-spec', 'm-content', 'm-priority'].forEach(function(id) {
       glossifyContainer(document.getElementById(id));
     });
   }
