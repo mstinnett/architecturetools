@@ -141,8 +141,13 @@ const laptopByPlatform = { win: {}, mac: {} };
     if ((byProfile[r.profile] ??= {})[r.tier]) fail(`${where}: duplicate cell ${r.platform}/${r.profile}/${r.tier}`);
     for (const k of ['cpu', 'cpuNote', 'ram', 'storage']) if (!r[k]) fail(`${where}: missing ${k}`);
     if (r.platform === 'win' && !r.gpu) fail(`${where}: missing gpu`);
+    // minVram: the least VRAM (GB) a listed laptop must reach for this cell.
+    // Blank means no floor; the picker hides laptops whose maxVram is short.
+    const minVram = r.minVram ? Number(r.minVram) : null;
+    if (r.minVram && !(minVram > 0)) fail(`${where}: minVram "${r.minVram}" is not a number`);
+    if (minVram && r.platform !== 'win') fail(`${where}: minVram is for Windows rows (Mac memory is unified)`);
     byProfile[r.profile][r.tier] = r.platform === 'win'
-      ? { cpu: r.cpu, cpuNote: r.cpuNote, gpu: r.gpu, gpuNote: r.gpuNote, ram: r.ram, ramNote: r.ramNote, storage: r.storage }
+      ? { cpu: r.cpu, cpuNote: r.cpuNote, gpu: r.gpu, gpuNote: r.gpuNote, ram: r.ram, ramNote: r.ramNote, storage: r.storage, ...(minVram && { minVram }) }
       : { chip: r.cpu, cpuNote: r.cpuNote, memory: r.ram, memoryNote: r.ramNote, storage: r.storage };
   }
   for (const plat of ['win', 'mac']) for (const p of PROFILES) for (const t of TIERS)
@@ -171,6 +176,23 @@ function assembleSpecs(byProfile) {
 }
 
 const extras = JSON.parse(readFileSync(join(ROOT, 'data/extras.json'), 'utf8'));
+
+// ---- laptops vs the laptop spec's VRAM floors ----
+// A laptop listed under a floored profile names maxVram (the most VRAM it can
+// be configured with), must clear the floor at one tier at least, and must
+// clear it at every tier it carries a rec badge for.
+for (const l of extras.Laptops) {
+  const where = `extras.json laptop "${l.name}"`;
+  if (l.maxVram !== undefined && !(typeof l.maxVram === 'number' && l.maxVram > 0)) fail(`${where}: maxVram must be a number of GB`);
+  for (const p of l.workloadProfiles) {
+    const cells = laptopByPlatform[l.platform]?.[p];
+    if (!cells || !TIERS.some((t) => cells[t]?.minVram)) continue;
+    if (l.maxVram === undefined) { fail(`${where}: listed for ${p}, which has a VRAM floor, but has no maxVram`); continue; }
+    if (!TIERS.some((t) => l.maxVram >= (cells[t]?.minVram || 0))) fail(`${where}: maxVram ${l.maxVram} is below the ${p} floor at every tier, so it never shows`);
+    for (const t in l.recommendedFor?.[p] || {})
+      if (l.maxVram < (cells[t]?.minVram || 0)) fail(`${where}: rec for ${p}/${t} but maxVram ${l.maxVram} is below that cell's minVram ${cells[t].minVram}`);
+  }
+}
 
 if (problems.length) {
   console.error(`build-data: ${problems.length} problem(s):`);

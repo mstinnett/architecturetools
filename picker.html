@@ -888,6 +888,9 @@ function runPicker(){
     var activeCategories = isMacPlatform ? macCategoriesByStrategy[mobileStrategy] : windowsCategoriesByStrategy[mobileStrategy];
     // Collect all matching laptops across categories
     var laptopBudgetTier = State.budget;
+    // GPU-led workloads set a VRAM floor per budget in the laptop spec. A laptop
+    // that can't be configured to reach it drops out, so the list follows the tier.
+    var laptopMinVram = Data.LaptopSpecs[activePlatform][activeWorkloadProfile][laptopBudgetTier].minVram || 0;
     var allLaptopMatches = [];
     for (var categoryIndex = 0; categoryIndex < activeCategories.length; categoryIndex++) {
       var activeCategory = activeCategories[categoryIndex];
@@ -895,6 +898,7 @@ function runPicker(){
         var laptop = Data.Laptops[laptopIndex];
         if (laptop.category !== activeCategory || laptop.platform !== activePlatform) continue;
         if (mobileStrategy !== 'travel' && !hasWorkloadProfile(laptop.workloadProfiles, activeWorkloadProfile)) continue;
+        if (mobileStrategy !== 'travel' && (laptop.maxVram || 0) < laptopMinVram) continue;
         allLaptopMatches.push({ laptop: laptop, category: activeCategory });
       }
     }

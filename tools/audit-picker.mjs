@@ -98,20 +98,29 @@ for (const platform of ['win', 'mac']) {
     for (const profile of PROFILES) {
       if (!reach[platform].has(profile)) continue;
       const cats = catsByStrategy[strategy];
-      const matches = [];
-      for (const cat of cats) {
-        for (const l of Data.Laptops) {
-          if (l.category !== cat || l.platform !== platform) continue;
-          if (strategy !== 'travel' && !l.workloadProfiles.includes(profile)) continue;
-          matches.push(l);
+      const listFor = (minVram) => {
+        const out = [];
+        for (const cat of cats) {
+          for (const l of Data.Laptops) {
+            if (l.category !== cat || l.platform !== platform) continue;
+            if (strategy !== 'travel' && !l.workloadProfiles.includes(profile)) continue;
+            if (strategy !== 'travel' && (l.maxVram || 0) < minVram) continue;
+            out.push(l);
+          }
         }
-      }
-      if (!matches.length) {
+        return out;
+      };
+      const unfloored = listFor(0);
+      if (!unfloored.length) {
         flag(`laptops ${platform}/${strategy}/${profile}: no matching laptop at all`);
         continue;
       }
       for (const tier of TIERS) {
         if (strategy === 'travel') continue; // travel features the first match, no budget logic
+        // the laptop spec's VRAM floor for this tier hides laptops that can't reach it
+        const minVram = Data.LaptopSpecs[platform][profile][tier].minVram || 0;
+        const matches = listFor(minVram);
+        if (!matches.length) { flag(`laptops ${platform}/${strategy}/${profile}/${tier}: no laptop reaches the ${minVram} GB VRAM floor`); continue; }
         const rec = matches.find((l) => l.recommendedFor?.[profile]?.[tier]);
         if (!rec) note(`laptops ${platform}/${strategy}/${profile}/${tier}: no budget-flagged rec; falls back to first match ("${matches[0].name}")`);
         const all = matches.filter((l) => l.recommendedFor?.[profile]?.[tier]);
