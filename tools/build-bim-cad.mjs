@@ -54,7 +54,17 @@ const fail = msg => { console.error('build-bim-cad: ' + msg); process.exit(1); }
 
 const { groups, tools } = JSON.parse(readFileSync(DATA, 'utf8'));
 const missing = [];
-const ids = new Set();
+
+const page = readFileSync(PAGE, 'utf8').replace(/\r\n/g, '\n');
+const re = /(<!-- matrix:start[^>]*-->\n)[\s\S]*?(<!-- matrix:end -->)/;
+if (!re.test(page)) fail('matrix markers not found in bim-cad.html');
+// group headings, rows and detail rows take ids of their own, so none may
+// match another or an id the rest of the page already uses
+const ids = new Set([...page.replace(re, '').matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
+for (const id of groups.map(g => g.key).concat(tools.flatMap(t => [t.id, t.id + '-d']))) {
+  if (ids.has(id)) fail(`id "${id}" is used twice on the page`);
+  ids.add(id);
+}
 
 function cell(tool, key, label, i) {
   const c = tool.cells[key];
@@ -85,8 +95,6 @@ function rowsFor(g, cols) {
   const ncol = cols.length + 2;
   let out = `          <tr class="m-group" data-group="${g.key}"><th colspan="${ncol}" scope="colgroup" id="${g.key}"><span class="m-group-label"><span class="m-group-name">${g.name}</span> <span class="m-group-sub">${g.sub}</span></span></th></tr>\n`;
   for (const t of tools.filter(t => t.group === g.key).sort((a, b) => a.name.localeCompare(b.name))) {
-    if (ids.has(t.id)) fail('duplicate id ' + t.id);
-    ids.add(t.id);
     for (const k of Object.keys(t.cells)) if (!COLS.concat(g.webOnly ? MODEL : []).some(c => c[0] === k)) fail(`${t.id}: unknown cell ${k}`);
     if (g.webOnly) {
       if (PLATS.some(k => k !== 'web' && t.cells[k])) fail(`${t.id}: a browser-only row takes no win/mac/linux/ipad cells`);
@@ -139,9 +147,6 @@ for (const g of groups) {
 }
 const out = runs.map(r => table(r.gs, r.webOnly)).join('');
 
-const page = readFileSync(PAGE, 'utf8').replace(/\r\n/g, '\n');
-const re = /(<!-- matrix:start[^>]*-->\n)[\s\S]*?(<!-- matrix:end -->)/;
-if (!re.test(page)) fail('matrix markers not found in bim-cad.html');
 let next = page.replace(re, (m, a, b) => a + out + '  ' + b);
 next = next.replace(/(<span id="resultCount"[^>]*>)\d+ tools/, `$1${tools.length} tools`);
 writeFileSync(PAGE, next);
