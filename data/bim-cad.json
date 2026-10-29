@@ -402,7 +402,7 @@
         ],
         "dwg": [
           "yes",
-          "native",
+          "",
           "https://bricscad.octave.com/store/bricscad"
         ],
         "ifc": [
@@ -423,7 +423,7 @@
       },
       "price": "Subscription or one-time",
       "notes": [
-        "BIM on native DWG with AutoCAD-style commands, built on BricsCAD Pro. The only BIM authoring app here that runs on Linux.",
+        "BIM that saves to DWG, with AutoCAD-style commands, built on BricsCAD Pro. The only BIM authoring app here that runs on Linux.",
         "Revit files come in as geometry. Shared work is file-based."
       ],
       "disclosure": "",
@@ -463,7 +463,7 @@
         ],
         "drawings": [
           "yes",
-          "drafted by hand",
+          "",
           "https://www.autodesk.com/products/autocad/overview"
         ],
         "dwg": [
@@ -489,7 +489,7 @@
       },
       "price": "Subscription",
       "notes": [
-        "Drafting in DWG. Plans, sections and schedules are coordinated by hand, and shared work runs through files and external references.",
+        "Drafting and documentation in DWG, with shared work through files and external references.",
         "The Mac version lacks some Windows features and add-ons. The web and mobile apps have a reduced command set."
       ],
       "disclosure": "",
@@ -534,7 +534,7 @@
         ],
         "dwg": [
           "yes",
-          "native",
+          "",
           "https://bricscad.octave.com/store/bricscad"
         ],
         "ifc": [
@@ -600,7 +600,7 @@
         ],
         "dwg": [
           "yes",
-          "native",
+          "",
           "https://www.zwsoft.com/product/zwcad/pricing"
         ],
         "ifc": [
@@ -1589,18 +1589,18 @@
       "tier": "new",
       "cells": {
         "win": [
-          "part",
-          "from source",
+          "yes",
+          "",
           "https://github.com/kristiangl/OpenArchBIM"
         ],
         "mac": [
-          "part",
-          "from source",
+          "yes",
+          "",
           "https://github.com/kristiangl/OpenArchBIM"
         ],
         "linux": [
-          "part",
-          "from source",
+          "yes",
+          "",
           "https://github.com/kristiangl/OpenArchBIM"
         ],
         "ipad": [
@@ -1642,7 +1642,7 @@
       "price": "Free",
       "notes": [
         "BIM written from scratch in Rust. It models layered walls, floors, roofs and families, with plans, elevations, sections and schedules.",
-        "In early development, with no releases yet, so it runs only when built from source. Sheets and PDF, DXF and IFC export are planned."
+        "In early development, with no releases yet. Sheets and PDF, DXF and IFC export are planned."
       ],
       "disclosure": "",
       "meta": "Price: Free, open source (AGPL-3.0) &middot; <a href=\"https://github.com/kristiangl/OpenArchBIM\" rel=\"noopener\">Website</a>",
@@ -1727,17 +1727,17 @@
       "cells": {
         "win": [
           "yes",
-          "in Studio",
+          "",
           "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
         ],
         "mac": [
           "yes",
-          "in Studio",
+          "",
           "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
         ],
         "linux": [
           "yes",
-          "in Studio",
+          "",
           "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
         ],
         "ipad": [
@@ -1795,17 +1795,17 @@
       "cells": {
         "win": [
           "yes",
-          "in Studio",
+          "",
           "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
         ],
         "mac": [
           "yes",
-          "in Studio",
+          "",
           "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
         ],
         "linux": [
           "yes",
-          "in Studio",
+          "",
           "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
         ],
         "ipad": [
