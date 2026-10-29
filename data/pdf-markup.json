@@ -13,7 +13,7 @@
     {
       "key": "indie",
       "name": "Small independent tools",
-      "sub": "Markup and measurement from one developer or a small studio."
+      "sub": "Markup, measurement and comparison from one developer or a small studio."
     },
     {
       "key": "editors",
@@ -122,6 +122,30 @@
       ],
       "disclosure": "",
       "meta": "Price: Free, open source &middot; <a href=\"https://github.com/ColbyGallagher/redcolumn\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "reviff",
+      "group": "indie",
+      "name": "REVIFF",
+      "maker": "AEC DX Labs",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://apps.microsoft.com/detail/9np4kth0hhhj"],
+        "mac": ["no", "", ""],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["no", "", ""],
+        "measure": ["no", "", ""],
+        "team": ["no", "", ""],
+        "compare": ["yes", "diff, clouds", "https://www.reviff.com"]
+      },
+      "price": "Free",
+      "notes": [
+        "A revision comparison app for Windows from one architectural designer. Open two versions of a sheet, as PDFs or images, and it clouds each area that changed, with added and removed content in different colors. When the sheets don&rsquo;t line up, Auto-align corrects scale and offset, and Partial Align realigns one region.",
+        "It compares; it does not mark up or measure. The comparison runs on your computer, with no upload, account or watermark. Version 1.0 came out in March 2026."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, on the Microsoft Store &middot; <a href=\"https://www.reviff.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "ncored",
