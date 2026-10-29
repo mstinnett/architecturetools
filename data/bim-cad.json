@@ -24,7 +24,7 @@
     {
       "key": "free",
       "name": "Free and open source",
-      "sub": "No license fee for professional work. Check each one's file exchange before a project depends on it."
+      "sub": "No license fee. Check each one's file exchange before a project depends on it."
     }
   ],
   "tools": [
@@ -352,7 +352,8 @@
       },
       "price": "Subscription",
       "notes": [
-        "Residential design from house plans to framing, roofs, cabinets, 3D views and permit sets. Home Designer is the consumer version."
+        "Residential design from house plans to framing, roofs, cabinets, 3D views and permit sets. Home Designer is the consumer version.",
+        "It imports and exports DXF, DWG, 3DS, SKP, STL and DAE. It does not read or write IFC."
       ],
       "disclosure": "",
       "meta": "Price: $1,995 a year &middot; <a href=\"https://www.chiefarchitect.com\" rel=\"noopener\">Website</a>"
@@ -928,7 +929,7 @@
       "price": "Subscription",
       "notes": [
         "Site analysis and schematic design in the browser. Building Design, added in April 2026, is included with Revit and the AEC Collection.",
-        "Autodesk says Forma will replace Revit over time, with no date. It does not draw construction documents."
+        "Autodesk <a href=\"https://aecmag.com/bim/autodesk-confirms-forma-will-replace-revit-over-time/\" rel=\"noopener\">says Forma will replace Revit over time</a>, with no date. It does not draw construction documents."
       ],
       "disclosure": "",
       "meta": "Price: $700 a year. Flex: 6 tokens a day &middot; <a href=\"https://www.autodesk.com/products/forma/overview\" rel=\"noopener\">Website</a>"
@@ -1839,73 +1840,6 @@
       "price": "Free",
       "notes": [
         "BIM authoring: parametric walls, doors and windows on levels and grids, with views, schedules, sheets and clash checks. Its maker says it will feel familiar to Revit users. It does not open or save RVT, so exchange with Revit goes through IFC.",
-        "The apps ship together in CadCraft Studio for Windows, Mac, Linux and Android, and early builds run in the browser. The downloads are not code-signed yet, so the operating system warns the first time they open. Saving in the browser waits for a paid team plan."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href=\"https://getcadcraft.com\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>"
-    },
-    {
-      "id": "modelcraft",
-      "group": "free",
-      "name": "ModelCraft",
-      "maker": "The Data Design Group",
-      "tier": "new",
-      "status": "v0.7",
-      "cells": {
-        "win": [
-          "yes",
-          "in Studio",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "mac": [
-          "yes",
-          "in Studio",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "linux": [
-          "yes",
-          "in Studio",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "yes",
-          "early builds",
-          "https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today"
-        ],
-        "drawings": [
-          "unk",
-          "",
-          ""
-        ],
-        "dwg": [
-          "yes",
-          "by its own account",
-          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
-        ],
-        "ifc": [
-          "yes",
-          "by its own account",
-          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "unk",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "Push-pull 3D modeling for massing and early design, with groups, components, guides and inference snapping.",
         "The apps ship together in CadCraft Studio for Windows, Mac, Linux and Android, and early builds run in the browser. The downloads are not code-signed yet, so the operating system warns the first time they open. Saving in the browser waits for a paid team plan."
       ],
       "disclosure": "",
