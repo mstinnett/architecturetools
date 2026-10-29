@@ -508,12 +508,12 @@ promote them as each is ready, not to land them all at once.
   editorial and labelled so. Adequate Design Review is listed on the PDF
   page with a disclosure. Prices are rounded from third-party sources —
   re-check vendor facts when updating.
-  `bim-cad.html` (BIM, Modeling & Drafting, 2026-10-28) is the PDF markup
-  page's matrix for authoring tools: platforms, drawings, DWG, IFC, Revit
-  exchange, shared model and price, with a "?" mark for what a vendor does
-  not say, a Free filter and group, a To watch group for early free apps
-  as AI-built clones appear, and a closing section on education licenses
-  and free viewers. Rows come from `data/bim-cad.json` through
+  `bim-cad.html` (BIM, Modeling & Drafting, promoted 2026-10-29) is the PDF
+  markup page's matrix for authoring tools: platforms, drawings, DWG, IFC,
+  Revit exchange, shared model and price, with a "?" mark for what a vendor
+  does not say, a Free filter and group, a To watch group for early free
+  apps as AI-built clones appear, and a closing section on education
+  licenses and free viewers. Rows come from `data/bim-cad.json` through
   `tools/build-bim-cad.mjs`. Renderers stay on `bim.html`.
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
