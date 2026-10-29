@@ -511,8 +511,9 @@ promote them as each is ready, not to land them all at once.
   `bim-cad.html` (BIM, Modeling & Drafting, 2026-10-28) is the PDF markup
   page's matrix for authoring tools: platforms, drawings, DWG, IFC, Revit
   exchange, shared model and price, with a "?" mark for what a vendor does
-  not say, a Free filter and group, and a closing section on education
-  licenses and free viewers. Rows come from `data/bim-cad.json` through
+  not say, a Free filter and group, a To watch group for early free apps
+  as AI-built clones appear, and a closing section on education licenses
+  and free viewers. Rows come from `data/bim-cad.json` through
   `tools/build-bim-cad.mjs`. Renderers stay on `bim.html`.
 - Navigation, interim (see SITE_FRAMEWORK "Hierarchy"): every title block
   opens with a crumb — site title linking home, then the set trail as a
