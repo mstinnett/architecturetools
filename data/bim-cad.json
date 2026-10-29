@@ -1,0 +1,2057 @@
+{
+  "groups": [
+    {
+      "key": "bim",
+      "name": "BIM authoring",
+      "sub": "Plans, sections, elevations and schedules drawn from one building model."
+    },
+    {
+      "key": "drafting",
+      "name": "2D and 3D drafting",
+      "sub": "Plans and details drawn in DWG, shared as files and external references."
+    },
+    {
+      "key": "modeling",
+      "name": "3D modeling",
+      "sub": "Massing, form and design studies by editing geometry directly."
+    },
+    {
+      "key": "browser",
+      "name": "In the browser",
+      "sub": "Newer tools that run in a web browser, several people in one file.",
+      "webOnly": true
+    },
+    {
+      "key": "free",
+      "name": "Free and open source",
+      "sub": "No license fee."
+    },
+    {
+      "key": "watch",
+      "name": "To watch",
+      "sub": "Free apps in early release or development, from one developer or a small studio."
+    }
+  ],
+  "tools": [
+    {
+      "id": "revit",
+      "group": "bim",
+      "name": "Revit",
+      "maker": "Autodesk",
+      "tier": "leader",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/revit/features"
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/revit/features"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/revit/features"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/revit/features"
+        ],
+        "revit": [
+          "yes",
+          "native",
+          "https://www.autodesk.com/products/revit/features"
+        ],
+        "team": [
+          "yes",
+          "local; cloud extra",
+          "https://www.autodesk.com/products/revit/features"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "RVT is the usual coordination format in US practice. Worksharing puts several people in one model on a local server. Cloud worksharing is a separate entitlement.",
+        "On a Mac it runs in a Windows virtual machine."
+      ],
+      "disclosure": "",
+      "meta": "Price: $3,012 a year or $380 a month. AEC Collection $3,675 a year or $460 a month. Flex: $99 for 33 tokens, and Revit uses 10 tokens a day &middot; <a href=\"https://www.autodesk.com/products/revit/overview\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "archicad",
+      "group": "bim",
+      "name": "Archicad",
+      "maker": "Graphisoft",
+      "tier": "leader",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://graphisoft.com/solutions/archicad"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://graphisoft.com/solutions/archicad"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://graphisoft.com/solutions/archicad"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://help.graphisoft.com/AC/27/INT/_AC27_Help/120_Interoperability/120_Interoperability-42.htm"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://help.graphisoft.com/AC/27/INT/_AC27_Help/120_Interoperability/120_Interoperability-42.htm"
+        ],
+        "revit": [
+          "part",
+          "geometry",
+          "https://help.graphisoft.com/AC/27/INT/_AC27_Help/120_Interoperability/120_Interoperability-42.htm"
+        ],
+        "team": [
+          "yes",
+          "Teamwork",
+          "https://graphisoft.com/solutions/archicad"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Teamwork and BIMcloud put several people in one model.",
+        "Revit exchange carries 3D geometry, not an editable Revit project."
+      ],
+      "disclosure": "",
+      "meta": "Price: Studio from $2,414 a year, Collaborate from $2,840 a year &middot; <a href=\"https://graphisoft.com/solutions/archicad\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "vectorworks",
+      "group": "bim",
+      "name": "Vectorworks Architect",
+      "maker": "Vectorworks",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.vectorworks.net/en-US/architect"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.vectorworks.net/en-US/architect"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://www.vectorworks.net/en-US/architect"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://www.vectorworks.net/en-US/architect"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://www.vectorworks.net/en-US/architect"
+        ],
+        "revit": [
+          "part",
+          "RVT / RFA import",
+          "https://app-help.vectorworks.net/2025/eng/VW2025_Guide/Import/Importing_Revit.htm"
+        ],
+        "team": [
+          "yes",
+          "Project Sharing",
+          "https://www.vectorworks.net/en-US/architect"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "2D drafting, 3D modeling and BIM in one app, also used for landscape and stage work. Project Sharing puts several people in one file.",
+        "It imports Revit projects and families but does not save RVT."
+      ],
+      "disclosure": "",
+      "meta": "Price: Architect $1,530 a year or $170 a month. Design Suite, with landscape tools and library, $1,980 a year or $220 a month &middot; <a href=\"https://www.vectorworks.net/en-US/architect\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "allplan",
+      "group": "bim",
+      "name": "Allplan",
+      "maker": "Nemetschek",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf"
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf"
+        ],
+        "revit": [
+          "part",
+          "RVT import",
+          "https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf"
+        ],
+        "team": [
+          "yes",
+          "Allplan Share",
+          "https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Architecture and structure in one model, with reinforcement and precast detailing. Common in Germany and central Europe.",
+        "RVT import has version limits."
+      ],
+      "disclosure": "",
+      "meta": "Price: Pro $3,588 a year &middot; <a href=\"https://www.allplan.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "chief",
+      "group": "bim",
+      "name": "Chief Architect Premier",
+      "maker": "Chief Architect",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.chiefarchitect.com"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.chiefarchitect.com"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "residential",
+          "https://www.chiefarchitect.com"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://www.chiefarchitect.com"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Residential design: house plans, framing, roofs, cabinets, 3D views and permit sets. Home Designer is the consumer version.",
+        "It imports and exports DXF, DWG, 3DS, SKP, STL and DAE, but not IFC."
+      ],
+      "disclosure": "",
+      "meta": "Price: $1,995 a year &middot; <a href=\"https://www.chiefarchitect.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "bricscad-bim",
+      "group": "bim",
+      "name": "BricsCAD BIM",
+      "maker": "Bricsys",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "revit": [
+          "part",
+          "geometry",
+          "https://help.bricsys.com/en-us/document/bricscad-bim/project-collaboration/import-autodesk-revit-files-in-bricscad"
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription or one-time",
+      "notes": [
+        "BIM that saves to DWG, with AutoCAD-style commands, built on BricsCAD Pro. The only BIM authoring app here that runs on Linux.",
+        "Revit files come in as geometry. Shared work is file-based."
+      ],
+      "disclosure": "",
+      "meta": "Price: $1,166 a year or $2,616 perpetual &middot; <a href=\"https://www.bricsys.com/bricscad-bim\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "autocad",
+      "group": "drafting",
+      "name": "AutoCAD",
+      "maker": "Autodesk",
+      "tier": "leader",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/autocad/overview"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/autocad/overview"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "part",
+          "AutoCAD mobile",
+          "https://www.autodesk.com/products/autocad/overview"
+        ],
+        "web": [
+          "part",
+          "AutoCAD Web",
+          "https://www.autodesk.com/products/autocad/overview"
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/autocad/overview"
+        ],
+        "dwg": [
+          "yes",
+          "native",
+          "https://www.autodesk.com/products/autocad/overview"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Drafting and documentation in DWG, with shared work through files and external references.",
+        "The Mac version lacks some Windows features and add-ons. The web and mobile apps have a reduced command set."
+      ],
+      "disclosure": "",
+      "meta": "Price: $2,095 a year. AEC Collection $3,675 a year or $460 a month. Flex: AutoCAD uses 7 tokens a day. AutoCAD LT, 2D only, costs less &middot; <a href=\"https://www.autodesk.com/products/autocad/overview\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "bricscad",
+      "group": "drafting",
+      "name": "BricsCAD Lite / Pro",
+      "maker": "Bricsys",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://bricscad.octave.com/store/bricscad"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription or one-time",
+      "notes": [
+        "DWG drafting with AutoCAD-style commands. Lite is 2D. Pro adds 3D modeling, point clouds and third-party apps.",
+        "IFC and Revit import are in BricsCAD BIM only."
+      ],
+      "disclosure": "",
+      "meta": "Price: Lite $345 a year or $780 perpetual. Pro $780 a year or $1,752 perpetual &middot; <a href=\"https://www.bricsys.com/bricscad\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "zwcad",
+      "group": "drafting",
+      "name": "ZWCAD",
+      "maker": "ZWSOFT",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.zwsoft.com/user-guide/zwcad-system-requirement"
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://www.zwsoft.com/product/zwcad/pricing"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://www.zwsoft.com/product/zwcad/pricing"
+        ],
+        "ifc": [
+          "part",
+          "Professional",
+          "https://www.zwsoft.com/product/zwcad/pricing"
+        ],
+        "revit": [
+          "part",
+          "Professional, import",
+          "https://www.zwsoft.com/product/zwcad/pricing"
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "One-time",
+      "notes": [
+        "Standard covers 2D drafting, annotation and plotting in DWG. Professional adds 3D modeling, IFC editing and RVT import."
+      ],
+      "disclosure": "",
+      "meta": "Price: Standard $899, Professional $1,399 perpetual &middot; <a href=\"https://www.zwsoft.com/product/zwcad\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "sketchup",
+      "group": "modeling",
+      "name": "SketchUp Pro",
+      "maker": "Trimble",
+      "tier": "leader",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.sketchup.com/en/plans-and-pricing"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.sketchup.com/en/plans-and-pricing"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "yes",
+          "",
+          "https://www.sketchup.com/en/plans-and-pricing"
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://www.sketchup.com/en/plans-and-pricing"
+        ],
+        "drawings": [
+          "yes",
+          "LayOut",
+          "https://www.sketchup.com/en/plans-and-pricing"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://www.sketchup.com/en/plans-and-pricing"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://www.sketchup.com/en/plans-and-pricing"
+        ],
+        "revit": [
+          "part",
+          "import, Windows",
+          "https://help.sketchup.com/en/extending-sketchup/revit-interoperability"
+        ],
+        "team": [
+          "part",
+          "file sharing",
+          "https://help.sketchup.com/en/accounts-and-administration/trimble-connect-sketchup-desktop"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Surface modeling with a large library of models and extensions. LayOut turns model views into scaled, dimensioned sheets.",
+        "The Revit Importer runs on Windows, in eligible plans. Trimble Connect shares files, one person editing at a time."
+      ],
+      "disclosure": "",
+      "meta": "Price: Pro $399 a year. Go and Studio plans are also offered &middot; <a href=\"https://www.sketchup.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "rhino",
+      "group": "modeling",
+      "name": "Rhino + Grasshopper",
+      "maker": "McNeel",
+      "tier": "leader",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.rhino3d.com/features/file-formats/"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.rhino3d.com/features/file-formats/"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "layouts, dimensions",
+          "https://www.rhino3d.com/docs/guides/user-guide-new/drafting-architecture/"
+        ],
+        "dwg": [
+          "yes",
+          "",
+          "https://www.rhino3d.com/features/file-formats/"
+        ],
+        "ifc": [
+          "part",
+          "with VisualARQ",
+          "https://www.rhino3d.com/features/file-formats/"
+        ],
+        "revit": [
+          "part",
+          "Rhino.Inside, Windows",
+          "https://www.rhino3d.com/inside/revit/1.0/"
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "One-time",
+      "notes": [
+        "NURBS modeling for freeform surfaces, with Grasshopper built in for parametric geometry. VisualARQ, a paid plug-in, adds BIM objects and IFC on Windows.",
+        "Rhino.Inside.Revit runs Rhino and Grasshopper inside Revit on Windows. Shared work runs through worksessions of linked files."
+      ],
+      "disclosure": "",
+      "meta": "Price: $995 one-time, upgrade $595. A 90-day evaluation is free &middot; <a href=\"https://www.rhino3d.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "motif",
+      "group": "browser",
+      "name": "Motif Design",
+      "maker": "Motif",
+      "tier": "new",
+      "cells": {
+        "web": [
+          "yes",
+          "",
+          "https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access"
+        ],
+        "drawings": [
+          "yes",
+          "drawing sets",
+          "https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access#:~:text=parametric%20modeling%2C%20drawing%20sets"
+        ],
+        "dwg": [
+          "unk",
+          "via Rhino or Revit",
+          "https://help.motif.io/articles/3382086132-publish-from-rhino"
+        ],
+        "ifc": [
+          "part",
+          "import",
+          "https://help.motif.io/collections/4557041249-motif_design#:~:text=bring%20in%20Revit%2C%20Rhino%2C%20and%20IFC%20files"
+        ],
+        "revit": [
+          "part",
+          "streams in",
+          "https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access"
+        ],
+        "team": [
+          "yes",
+          "",
+          "https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access"
+        ],
+        "3d": [
+          "yes",
+          "",
+          "https://motif.io/#:~:text=with%20models%20that%20look%20like%20real%20buildings"
+        ],
+        "bim": [
+          "yes",
+          "parametric",
+          "https://motif.io/#:~:text=Genuine%20parametric%2C%20associative%20modeling"
+        ],
+        "stage": [
+          "Design to drawing sets",
+          "https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access#:~:text=parametric%20modeling%2C%20drawing%20sets"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Browser BIM and drawing sets, with AI agents that work in the same model as the team. Access follows a demo request.",
+        "Revit and Rhino models stream in, and IFC files import. Nothing exports back to Revit yet. Motif Review is a separate product."
+      ],
+      "disclosure": "",
+      "meta": "Price: Design $150 a month, Review $25 a month &middot; <a href=\"https://motif.io\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "qonic",
+      "group": "browser",
+      "name": "Qonic",
+      "maker": "Qonic",
+      "tier": "new",
+      "cells": {
+        "web": [
+          "yes",
+          "",
+          "https://www.qonic.com/downloads"
+        ],
+        "drawings": [
+          "yes",
+          "since April 2026",
+          "https://www.qonic.com/downloads"
+        ],
+        "dwg": [
+          "part",
+          "drawing export",
+          "https://www.qonic.com/downloads"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://www.qonic.com/downloads"
+        ],
+        "revit": [
+          "yes",
+          "plugin, both ways",
+          "https://www.qonic.com/downloads"
+        ],
+        "team": [
+          "yes",
+          "",
+          "https://www.qonic.com/downloads"
+        ],
+        "3d": [
+          "yes",
+          "",
+          "https://www.qonic.com/#:~:text=Start%20modelling%20in%20Qonic%20or%20bring%20existing%20models%20together"
+        ],
+        "bim": [
+          "yes",
+          "IFC-based",
+          "https://www.qonic.com/#:~:text=The%20fastest%20agentic%20BIM%20platform%20to%20model%2C%20coordinate%20and%20deliver"
+        ],
+        "stage": [
+          "Modeling, coordination",
+          "https://www.qonic.com/#:~:text=The%20fastest%20agentic%20BIM%20platform%20to%20model%2C%20coordinate%20and%20deliver"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Opens large RVT and IFC models in the browser for coordination, quantities and editing. A Revit plugin moves changes both ways.",
+        "Since April 2026 it draws annotated plans and sections that update with the model and export to DWG."
+      ],
+      "disclosure": "",
+      "meta": "Price: depends on configuration. The full configuration is $240 a month or $2,582 a year &middot; <a href=\"https://www.qonic.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "forma",
+      "group": "browser",
+      "name": "Forma",
+      "maker": "Autodesk",
+      "tier": "",
+      "cells": {
+        "web": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/forma/product-details"
+        ],
+        "drawings": [
+          "no",
+          "",
+          ""
+        ],
+        "dwg": [
+          "part",
+          "DXF import",
+          "https://forums.autodesk.com/t5/forma-forum/vector-format-imports/m-p/13682998"
+        ],
+        "ifc": [
+          "part",
+          "import",
+          "https://www.autodesk.com/products/forma/product-details"
+        ],
+        "revit": [
+          "yes",
+          "connection",
+          "https://www.autodesk.com/products/forma-building-design/overview"
+        ],
+        "team": [
+          "unk",
+          "",
+          ""
+        ],
+        "3d": [
+          "yes",
+          "",
+          "https://www.autodesk.com/products/forma-site-design/overview#:~:text=Create%2C%20explore%2C%20and%20iterate%20massing%20concepts"
+        ],
+        "bim": [
+          "no",
+          "BIM in Revit",
+          "https://www.autodesk.com/products/forma-building-design/overview#:~:text=Then%20continue%20into%20Revit%20with%20native%20BIM%20geometry"
+        ],
+        "stage": [
+          "Site and schematic design",
+          "https://www.autodesk.com/products/forma-building-design/overview#:~:text=Forma%20Building%20Design%20is%20a%20cloud-based%20design%20and%20analysis%20software%20for%20schematic%20design"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Site analysis and schematic design. Building Design, added in April 2026, is included with Revit and the AEC Collection.",
+        "Autodesk <a href=\"https://aecmag.com/bim/autodesk-confirms-forma-will-replace-revit-over-time/\" rel=\"noopener\">says Forma will replace Revit over time</a>, with no date. It does not draw construction documents."
+      ],
+      "disclosure": "",
+      "meta": "Price: $700 a year. Flex: 6 tokens a day &middot; <a href=\"https://www.autodesk.com/products/forma/overview\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "snaptrude",
+      "group": "browser",
+      "name": "Snaptrude",
+      "maker": "Snaptrude",
+      "tier": "new",
+      "cells": {
+        "web": [
+          "yes",
+          "",
+          "https://snaptrude.com/vs/revit"
+        ],
+        "drawings": [
+          "part",
+          "schematic",
+          "https://snaptrude.com/vs/revit"
+        ],
+        "dwg": [
+          "part",
+          "export",
+          "https://snaptrude.com/vs/revit"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://snaptrude.com/vs/revit"
+        ],
+        "revit": [
+          "part",
+          "by its own account",
+          "https://snaptrude.com/vs/revit"
+        ],
+        "team": [
+          "yes",
+          "",
+          "https://snaptrude.com/vs/revit"
+        ],
+        "3d": [
+          "yes",
+          "",
+          "https://www.snaptrude.com/#:~:text=Model%20in%20both%202D%20and%203D"
+        ],
+        "bim": [
+          "yes",
+          "walls, floors, roofs",
+          "https://www.snaptrude.com/#:~:text=Convert%20early-stage%20massing%20into%20full%20BIM%20models%20with%20walls%2C%20floors%2C%20roofs"
+        ],
+        "stage": [
+          "Concept design",
+          "https://www.snaptrude.com/#:~:text=Model%20in%20both%202D%20and%203D"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Concept to schematic design. Models start from a brief or a sketch, drawings update live, and several people work in one model at once.",
+        "Snaptrude describes Revit exchange as two-way. Its pages and release notes differ on how."
+      ],
+      "disclosure": "",
+      "meta": "Price: Solo $60 a month, Organization $100 a month &middot; <a href=\"https://www.snaptrude.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "arcol",
+      "group": "browser",
+      "name": "Arcol",
+      "maker": "Arcol",
+      "tier": "new",
+      "cells": {
+        "web": [
+          "yes",
+          "",
+          "https://arcol.io"
+        ],
+        "drawings": [
+          "part",
+          "boards",
+          "https://arcol.io"
+        ],
+        "dwg": [
+          "part",
+          "import, as reference",
+          "https://intercom.help/arcol/en/articles/10448029-importing-a-dwg-dxf#:~:text=Arcol%20currently%20supports%20importing%20both%202D%20and%203D%20DWG%20and%20DXF%20files"
+        ],
+        "ifc": [
+          "part",
+          "import",
+          "https://intercom.help/arcol/en/articles/10448028-importing-a-3d-model#:~:text=Arcol%20currently%20supports%20the%20following%203D%20model%20formats%20for%20import"
+        ],
+        "revit": [
+          "part",
+          "massing export",
+          "https://arcol.io"
+        ],
+        "team": [
+          "yes",
+          "",
+          "https://arcol.io"
+        ],
+        "3d": [
+          "yes",
+          "",
+          "https://arcol.io/product/modeling#:~:text=Arcol%20is%20a%20parametric%20modeler%20with%20lofts%2C%20booleans"
+        ],
+        "bim": [
+          "no",
+          "masses, floors",
+          "https://arcol.io/product/modeling#:~:text=Divide%20your%20mass%20into%20floors%20and%20create%20floor%20plans"
+        ],
+        "stage": [
+          "Feasibility, massing",
+          "https://arcol.io/use-cases/feasibility-studies#:~:text=Pro%20forma%20in%20the%20same%20model%20as%20your%20massing"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Massing, floor plans, area metrics and presentation boards in one shared file.",
+        "DWG and DXF import as references to trace over, and IFC imports. Exports are GLB, STL and CSV, plus massing to Revit through an add-in on paid plans."
+      ],
+      "disclosure": "",
+      "meta": "Price: $100 a month &middot; <a href=\"https://arcol.io\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "rayon",
+      "group": "browser",
+      "name": "Rayon",
+      "maker": "Rayon",
+      "tier": "new",
+      "cells": {
+        "web": [
+          "yes",
+          "",
+          "https://docs.rayon.design/documentation/import-export/exporting-and-printing"
+        ],
+        "drawings": [
+          "yes",
+          "2D sheets",
+          "https://docs.rayon.design/documentation/import-export/exporting-and-printing"
+        ],
+        "dwg": [
+          "part",
+          "paid tier",
+          "https://docs.rayon.design/documentation/import-export/exporting-and-printing"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "yes",
+          "",
+          "https://docs.rayon.design/documentation/import-export/exporting-and-printing"
+        ],
+        "3d": [
+          "no",
+          "due in V4",
+          "https://aecmag.com/cad/rayon-raises-e10m-for-3d-and-agentic-ai/#:~:text=Rayon%20says%20V4%2C%20due%20later%20this%20year%2C%20will%20bring%203D"
+        ],
+        "bim": [
+          "part",
+          "2D wall tools",
+          "https://www.rayon.design/#:~:text=Draw%20faster%20with%20our%20drafting%20tool%20set"
+        ],
+        "stage": [
+          "Space planning, interiors",
+          "https://www.rayon.design/#:~:text=professional-grade%20CAD%20software%20for%20interior%20architects%20and%20designers"
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Shared 2D plans for interiors and space planning. It imports DWG, DXF and PDF, and several people edit one file at once.",
+        "Rayon says version 4, due by the end of 2026, adds 3D."
+      ],
+      "disclosure": "",
+      "meta": "Price: $21 a month, with DWG $38 a month &middot; <a href=\"https://www.rayon.design\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "freecad",
+      "group": "free",
+      "name": "FreeCAD",
+      "maker": "Open source",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.freecad.org/downloads.php#:~:text=Windows%2010%20is%20the%20minimum%20supported%20version"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.freecad.org/downloads.php#:~:text=macOS%2012%20Monterey%20is%20the%20minimum%20supported%20version"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.freecad.org/downloads.php#:~:text=Multiple%20Linux%2Dbased%20OSs%20are%20supported"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "TechDraw",
+          "https://www.freecad.org/features.php#:~:text=create%202D%20drawings%20and%20views%20of%20your%20models"
+        ],
+        "dwg": [
+          "part",
+          "via converter",
+          "https://wiki.freecad.org/FreeCAD_and_DWG_Import"
+        ],
+        "ifc": [
+          "yes",
+          "native IFC",
+          "https://www.freecad.org/#:~:text=It%20reads%20and%20writes%20to%20many%20open%20file%20formats"
+        ],
+        "revit": [
+          "no",
+          "through IFC",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A parametric 3D modeler with a BIM workbench built in since version 1.0: walls, slabs, windows, stairs, spaces and schedules. It works on IFC files directly. Drawings are model views placed on TechDraw pages at scale.",
+        "DWG goes through an external converter, such as the ODA File Converter. There is no RVT import."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (LGPL) &middot; <a href=\"https://www.freecad.org\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "bonsai",
+      "group": "free",
+      "name": "Bonsai",
+      "maker": "Open source, on Blender",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "in Blender",
+          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
+        ],
+        "mac": [
+          "yes",
+          "in Blender",
+          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
+        ],
+        "linux": [
+          "yes",
+          "in Blender",
+          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "early drafting",
+          "https://docs.bonsaibim.org/studio/guides/drawings/index.html#:~:text=Bonsai%20provides%20powerful%20tools%20for%20generating%202D%20drawings"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "yes",
+          "native IFC",
+          "https://bonsaibim.org/#:~:text=Every%20edit%20reads%20and%20writes%20real%20IFC"
+        ],
+        "revit": [
+          "no",
+          "through IFC",
+          ""
+        ],
+        "team": [
+          "part",
+          "Git, experimental",
+          "https://docs.bonsaibim.org/studio/guides/authoring/git_support.html#:~:text=Bonsai%20supports%20tracking%20the%20development%20of%20your%20IFC%20files%20with%20a%20Git%20repository"
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A Blender add-on that stores every object as IFC, so the IFC file is the project file. It adds schedules, quantities, costing, 4D scheduling and COBie.",
+        "Drawings are generated from the model as SVG, and its documentation calls the drafting tools early-stage. Merging other people&rsquo;s changes needs the separate ifcmerge tool and is experimental."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source &middot; Bonsai Viewer, a standalone IFC viewer, is separate &middot; <a href=\"https://bonsaibim.org\" rel=\"noopener\">Website</a>",
+      "status": "0.9"
+    },
+    {
+      "id": "blender",
+      "group": "free",
+      "name": "Blender",
+      "maker": "Blender Foundation",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.blender.org/download/"
+        ],
+        "mac": [
+          "yes",
+          "Apple silicon",
+          "https://www.blender.org/download/#:~:text=Requires%20macOS%2013%20%28Ventura%29%20or%20newer"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.blender.org/download/"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "no",
+          "with Bonsai",
+          ""
+        ],
+        "dwg": [
+          "part",
+          "DXF import add-on",
+          "https://extensions.blender.org/add-ons/import-autocad-dxf-format-dxf/#:~:text=Import%20files%20in%20the%20Autocad%20DXF%20format"
+        ],
+        "ifc": [
+          "no",
+          "with Bonsai",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A general 3D modeler of meshes and curves, with its own renderer. It has no building objects, dimensions or sheets. Those come from the Bonsai add-on.",
+        "DXF import is a community extension. Mac builds need Apple silicon."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL) &middot; <a href=\"https://www.blender.org\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "librecad",
+      "group": "free",
+      "name": "LibreCAD",
+      "maker": "Open source",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "2D only",
+          "https://github.com/LibreCAD/LibreCAD"
+        ],
+        "dwg": [
+          "part",
+          "reads DWG",
+          "https://github.com/LibreCAD/LibreCAD#:~:text=It%20can%20read%20DXF%2FDWG%2C%20and%20write%20DXF%2FDWG%2FPDF%2FSVG%20files"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "2D drafting with layers, blocks, dimensions and hatches, printing to PDF and SVG.",
+        "DXF is its native format. It reads DWG, and saving DWG needs a build compiled with DWG support."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPLv2) &middot; <a href=\"https://librecad.org\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "qcad",
+      "group": "free",
+      "name": "QCAD Community Edition",
+      "maker": "RibbonSoft",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.qcad.org/en/faq/"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.qcad.org/en/faq/"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.qcad.org/en/faq/"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "2D only",
+          "https://www.qcad.org/en/features/"
+        ],
+        "dwg": [
+          "part",
+          "DXF; DWG in Pro",
+          "https://www.qcad.org/en/faq/#:~:text=QCAD%20Professional%20is%20the%20latest%20version%20of%20QCAD%20with%20add%2Dons%20for%20advanced%20DXF%20support%2C%20DWG%20support"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free; Professional paid",
+      "notes": [
+        "2D drafting with layers, blocks, dimensions, hatching and a large part library. The open-source Community Edition saves DXF.",
+        "DWG comes with QCAD Professional, a paid add-on. The download is the Professional trial, and removing the add-on leaves the Community Edition."
+      ],
+      "disclosure": "",
+      "meta": "Price: Community Edition free, open source. Professional is a paid license &middot; <a href=\"https://www.qcad.org\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "sketchup-free",
+      "group": "free",
+      "name": "SketchUp Free",
+      "maker": "Trimble",
+      "tier": "",
+      "cells": {
+        "win": [
+          "no",
+          "",
+          ""
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free#:~:text=core%203D%20modeler%20runs%20right%20in%20your%20web%20browser"
+        ],
+        "drawings": [
+          "no",
+          "",
+          ""
+        ],
+        "dwg": [
+          "no",
+          "paid plans",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free, non-commercial",
+      "notes": [
+        "SketchUp&rsquo;s modeler in the browser, with 10 GB of Trimble Connect storage. There is no LayOut, so no sheets. DWG and other CAD formats need a paid plan.",
+        "Trimble&rsquo;s terms limit free versions to non-commercial use."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free for non-commercial use &middot; <a href=\"https://www.trimble.com/en/legal/offering-terms/terms/english#:~:text=Customer%20may%20only%20use%20Free%20Versions%20in%20a%20non%2Dproduction%20environment%20and%20for%20non%2Dcommercial%20purposes\" rel=\"noopener\">Terms</a> &middot; <a href=\"https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "sweet-home-3d",
+      "group": "free",
+      "name": "Sweet Home 3D",
+      "maker": "eTeks",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/download.jsp"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/download.jsp"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/download.jsp"
+        ],
+        "ipad": [
+          "part",
+          "paid app",
+          "https://www.sweethome3d.com/download.jsp#:~:text=This%20paid%20version%20contains%20more%20than%2010.000%20pieces%20of%20furniture"
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/#:~:text=with%20any%20WebGL%20browser"
+        ],
+        "drawings": [
+          "part",
+          "plan to PDF",
+          "https://www.sweethome3d.com/features/#:~:text=Print%20and%20export%20PDFs%2C%20bitmap%20or%20vector%20graphics%20images"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free; mobile app paid",
+      "notes": [
+        "Home and interior layout: walls, rooms, doors and windows in plan, furniture from a library, and a 3D view that updates. Plans export to PDF and vector images, the model to OBJ.",
+        "The desktop and browser versions are free and open source. The mobile app is paid."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL). Mobile app paid &middot; <a href=\"https://www.sweethome3d.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "openarch-bim",
+      "group": "watch",
+      "name": "OpenArch BIM",
+      "maker": "Open source",
+      "tier": "new",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "part",
+          "views, no sheets",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "dwg": [
+          "no",
+          "DXF planned",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "planned",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "BIM written from scratch in Rust. It models layered walls, floors, roofs and families, with plans, elevations, sections and schedules.",
+        "In early development, with no releases yet. Sheets and PDF, DXF and IFC export are planned."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (AGPL-3.0) &middot; <a href=\"https://github.com/kristiangl/OpenArchBIM\" rel=\"noopener\">Website</a>",
+      "status": "early development",
+      "free": true
+    },
+    {
+      "id": "bimopen",
+      "group": "watch",
+      "name": "BIMopen",
+      "maker": "Independent developer",
+      "tier": "new",
+      "cells": {
+        "win": [
+          "yes",
+          "test build",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "yes",
+          "test build",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
+        ],
+        "drawings": [
+          "yes",
+          "PDF sheets",
+          "https://atsanna.github.io/bimopen-site/"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "yes",
+          "IFC4 export",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Export%20IFC4"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A BIM modeler from one developer, written with Claude Code. Plans export as SVG, sheets as PDF, schedules as CSV and models as IFC4. It opens IFC2x3 and IFC4.",
+        "Ceilings, phases, loadable families and DWG export are still missing. The source is not public yet. The site is in Italian."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free &middot; Also on Android &middot; <a href=\"https://atsanna.github.io/bimopen-site/\" rel=\"noopener\">Website</a>",
+      "status": "test builds",
+      "free": true
+    },
+    {
+      "id": "cadcraft",
+      "group": "watch",
+      "name": "CadCraft",
+      "maker": "The Data Design Group",
+      "tier": "new",
+      "status": "v0.7",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "early builds",
+          "https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today"
+        ],
+        "drawings": [
+          "yes",
+          "plottable layouts",
+          "https://github.com/getcadcraft"
+        ],
+        "dwg": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "ifc": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "unk",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "Command-line 2D drafting with layers, blocks, dimensions and plottable layouts, meant to feel familiar to AutoCAD users. One of eight free apps from the same studio.",
+        "The apps ship together in CadCraft Studio, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href=\"https://getcadcraft.com\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "bimcraft",
+      "group": "watch",
+      "name": "BimCraft",
+      "maker": "The Data Design Group",
+      "tier": "new",
+      "status": "v0.7",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "early builds",
+          "https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today"
+        ],
+        "drawings": [
+          "yes",
+          "views, sheets",
+          "https://github.com/getcadcraft"
+        ],
+        "dwg": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "ifc": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "unk",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "Parametric walls, doors and windows on levels and grids, with views, schedules, sheets and clash checks, meant to feel familiar to Revit users. It does not open or save RVT.",
+        "It ships in CadCraft Studio with CadCraft, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href=\"https://getcadcraft.com\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "ingetrazo",
+      "group": "watch",
+      "name": "IngeTrazo",
+      "maker": "IngeLibre",
+      "tier": "new",
+      "status": "v0.5.11",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://ingetrazo.com/en/#:~:text=Windows%2010%2F11"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://ingetrazo.com/en/#:~:text=Apple%20Silicon%20%C2%B7%20macOS"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://ingetrazo.com/en/#:~:text=Linux%20%C2%B7%20x86_64"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "scaled PDF sheets",
+          "https://ingetrazo.com/en/#:~:text=True%20scale%2C%20guaranteed"
+        ],
+        "dwg": [
+          "part",
+          "import, DXF out",
+          "https://ingetrazo.com/en/#:~:text=IngeTrazo%20imports%20DWG%20and%20DXF%20drawings"
+        ],
+        "ifc": [
+          "part",
+          "IFC 4 export",
+          "https://ingetrazo.com/en/#:~:text=IFC%204%20export"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A 3D modeler for architecture and engineering from Peru, with push-pull solids and typed lengths. An optional BIM layer, still in development, tags walls, slabs, columns and doors and exports IFC 4.",
+        "Sheets hold scaled views with dimensions tied to the model and print to vector PDF. DWG import does not work on Mac yet.",
+        "A built-in AI assistant runs on your own key, and an MCP bridge lets Claude draw in the open app."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL-3.0), with no paid editions &middot; <a href=\"https://ingetrazo.com/en/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/ingelibre/ingetrazo\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "tinkercad",
+      "group": "free",
+      "name": "Tinkercad",
+      "maker": "Autodesk",
+      "tier": "",
+      "cells": {
+        "win": [
+          "no",
+          "",
+          ""
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "yes",
+          "app",
+          "https://www.tinkercad.com/ipad-app"
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://www.tinkercad.com/"
+        ],
+        "drawings": [
+          "no",
+          "",
+          ""
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "yes",
+          "invite link",
+          "https://www.tinkercad.com/help-center/sharing-designs-and-collaborating"
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "Beginner 3D modeling by combining and subtracting basic shapes. It exports STL, OBJ, glTF and SVG, and imports STL, OBJ and SVG.",
+        "Invited collaborators edit the same design at the same time."
+      ],
+      "meta": "Price: Free &middot; <a href=\"https://www.tinkercad.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "flatcad",
+      "group": "watch",
+      "name": "FlatCad",
+      "maker": "Independent developer",
+      "tier": "",
+      "cells": {
+        "win": [
+          "no",
+          "",
+          ""
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://flatcad.com/about#:~:text=Any%20current%20browser%20with%20WebGL"
+        ],
+        "drawings": [
+          "yes",
+          "scaled PDF",
+          "https://flatcad.com/floor-plan-drawing#:~:text=print%20the%20plan%20at%201%3A50"
+        ],
+        "dwg": [
+          "part",
+          "DXF in and out",
+          "https://flatcad.com/about#:~:text=opens%20DXF"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "2D drafting for laser cutting, CNC and floor plans, from one developer. It opens DXF, SVG, Illustrator and PDF files, exports DXF and SVG, and prints PDF at a true scale such as 1:50.",
+        "Its maker says it is not an architecture program, with no walls, storeys or furniture libraries. Drawings stay in the browser."
+      ],
+      "meta": "Price: Free &middot; <a href=\"https://flatcad.com\" rel=\"noopener\">Website</a>",
+      "free": true
+    }
+  ]
+}

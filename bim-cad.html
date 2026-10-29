@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<!-- BIM, 3D modeling and drafting software — the apps architects draw and
+     model buildings in. data-family: picker, the same monochrome ink family
+     as the PDF markup page, which this page follows in shape.
+
+     The feature matrix: a row per tool, grouped by what each is built for,
+     with free and open-source tools as a group of their own and the early
+     free apps after them under To watch (alphabetical within a group),
+     columns for platforms and file exchange, then price.
+     Browser-only tools sit in a table of their own with no platform columns.
+     The rows are GENERATED from data/bim-cad.json by tools/build-bim-cad.mjs:
+     edit the JSON, then run the build. Each mark links, unstyled, to the page
+     that shows it; "?" marks what the vendor does not say. Filters: platforms
+     OR, capabilities AND, and Shortlist / Newcomers / Free (OR); the column
+     headings toggle the same filters. Below the matrix, the free routes that
+     are not a tool of their own: education licenses and free viewers.
+     Every row is static HTML, so without JavaScript the matrix reads in full
+     with every detail row open. Copy follows docs/voice.md: no verdicts. -->
+<html lang="en" data-family="picker" data-stage="live">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIM, 3D Modeling and Drafting Software for Architects -- architecture.tools</title>
+<meta name="description" content="BIM, 3D modeling and 2D drafting software for architects in one feature matrix: platforms, drawings, DWG, IFC, Revit exchange, shared models and price. Revit, Archicad, Vectorworks, AutoCAD, BricsCAD, SketchUp, Rhino, browser newcomers, and free tools such as FreeCAD, Bonsai and Blender.">
+<link rel="canonical" href="https://architecture.tools/bim-cad.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://architecture.tools/bim-cad.html">
+<meta property="og:title" content="BIM, 3D Modeling and Drafting Software for Architects -- architecture.tools">
+<meta property="og:description" content="BIM, modeling and drafting apps in one feature matrix, with a section on free tools.">
+<meta name="twitter:card" content="summary">
+<script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
+<script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+</script>
+<script>
+// Resolve the color scheme before first paint: a stored choice wins, else
+// follow the system. The shared dark tokens key off html[data-scheme="dark"].
+(function(){
+  var stored = null;
+  try { stored = localStorage.getItem('scheme'); } catch (e) {}
+  var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.scheme = dark ? 'dark' : 'light';
+})();
+</script>
+<link rel="stylesheet" href="assets/css/global.css">
+<style>
+  /* ---- page-specific only: the feature matrix and its filters (as pdf-markup.html) ---- */
+  .page-wide { max-width: 1440px; }
+  .list-disclosure { font-size: var(--text-sm); font-weight: 300; color: var(--ink-muted); margin: calc(-1 * var(--space-md)) 0 var(--space-lg); }
+  .m-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; padding: var(--space-md) 0; border-top: 1px solid var(--rule); }
+  .m-filter[hidden] { display: none; }
+  .m-filter .section-label { margin: 0; }
+  .m-fgroup { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; }
+  /* column headings double as filters once the script runs */
+  .m-hf { background: none; border: 0; padding: 0; margin: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; border-bottom: 1px dotted transparent; }
+  .m-hf:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .m-hf[aria-pressed="true"] { color: var(--accent); border-bottom: 2px solid var(--accent); }
+  /* a mark links to its evidence, but reads as a plain mark */
+  .m-ev { display: block; color: inherit; text-decoration: none; }
+  .m-ev:hover .m { opacity: 0.7; }
+  .m-ev:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .m-tier { letter-spacing: 0.04em; }
+  .m-tier-leader { color: var(--accent); }
+  .m-tier-new { color: var(--ink-muted); font-style: italic; }
+  .m-status { display: flex; gap: 0.75rem; align-items: baseline; font-size: var(--text-sm); font-weight: 300; color: var(--ink-muted); }
+  .m-clear { background: none; border: 0; padding: 0.35rem 0; font: inherit; font-size: var(--text-sm); color: var(--accent); cursor: pointer;
+             text-decoration: underline; text-underline-offset: 3px; }
+  .m-legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: var(--text-xs); color: var(--ink-muted); margin: 0 0 var(--space-sm); }
+  .m-legend .m { margin-right: 0.3rem; }
+  .m-wrap { overflow-x: auto; container-type: inline-size; border-top: 2px solid var(--black); }
+  .m-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  /* with a mouse, the table's own scrollbar sits below a long table and out
+     of sight; this copy stays pinned to the bottom of the window instead */
+  .m-hscroll { position: sticky; bottom: 0; z-index: 2; overflow-x: auto; overflow-y: hidden; background: var(--card); border-top: var(--border-light); }
+  .m-hscroll[hidden] { display: none; }
+  .m-hscroll > div { height: 1px; }
+  .m-wrap.has-hscroll { scrollbar-width: none; }
+  .m-wrap.has-hscroll::-webkit-scrollbar { display: none; }
+  .matrix { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 75.5rem; font-size: var(--text-sm); font-weight: 300; }
+  .matrix th, .matrix td { position: relative; padding: 0.55rem 0.45rem; border-bottom: var(--border-light); text-align: center; vertical-align: top; background: var(--card); }  /* relative: keeps the .vh labels inside the scroll box */
+  .matrix thead th { font-size: 0.75rem; font-weight: 400; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-muted); vertical-align: bottom; }
+  .matrix thead abbr { text-decoration: none; }
+  .matrix thead .m-band th { border-bottom: 0; padding-bottom: 0; color: var(--ink-muted); }
+  .matrix .m-cap1 { border-left: 1px solid var(--rule); }
+  .matrix th:first-child { position: sticky; left: 0; z-index: 1; text-align: left; width: 8.5rem; min-width: 8.5rem; box-shadow: 1px 0 0 var(--rule); }
+  .matrix .m-group th { position: static; text-align: left; padding-top: 1.2rem; font-weight: 400; box-shadow: none; }
+  .m-group-label { position: sticky; left: 0.45rem; display: inline-block; }
+  .m-group-name { font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+  .m-group-sub { font-size: var(--text-xs); color: var(--ink-muted); font-weight: 300; margin-left: 0.5rem; }
+  .m-open { display: block; width: 100%; background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .m-tool { display: block; font-size: var(--text-base); font-weight: 400; line-height: 1.25; }
+  .js .m-tool::after { content: "\00a0+"; color: var(--ink-3); font-weight: 300; }  /* no-break space: the + never sits alone */
+  .js .m-open[aria-expanded="true"] .m-tool::after { content: "\00a0\2212"; }
+  .m-open:hover .m-tool { color: var(--accent); }
+  .m-maker { display: block; font-size: var(--text-xs); color: var(--ink-muted); margin-top: 0.1rem; }
+  .matrix td .m, .m-legend .m { font-size: var(--text-base); line-height: 1.2; }
+  .matrix td .m { display: block; }
+  .m-yes .m, .m-part .m { color: var(--accent); }
+  .m-no .m { color: var(--ink-muted); }
+  .m-unk .m { color: var(--ink-muted); font-weight: 400; }
+  /* the font draws the half circle larger than the full one, so both are
+     drawn here at one size; the glyph stays as the plain-text fallback */
+  .matrix td.m-yes .m, .matrix td.m-part .m { display: flex; align-items: center; justify-content: center; height: calc(var(--text-base) * 1.2); font-size: 0; }
+  .m-legend .m.m-yes, .m-legend .m.m-part { display: inline-block; font-size: 0; vertical-align: -0.05em; }
+  .matrix td.m-yes .m::before, .matrix td.m-part .m::before,
+  .m-legend .m.m-yes::before, .m-legend .m.m-part::before { content: ""; display: block; width: 0.7rem; height: 0.7rem; border-radius: 50%; border: 1.5px solid currentColor; box-sizing: border-box; }
+  .matrix td.m-yes .m::before, .m-legend .m.m-yes::before { background: currentColor; }
+  .matrix td.m-part .m::before, .m-legend .m.m-part::before { background: linear-gradient(90deg, currentColor 50%, transparent 50%); }
+  .m-txt { display: block; margin: 0.25rem auto 0; font-size: var(--text-sm); color: var(--ink-muted); line-height: 1.45; overflow-wrap: break-word; }
+  .matrix.m-noplat { min-width: 74.5rem; }  /* the browser table: model columns in place of platforms */
+  .matrix col.c-stage { width: 9rem; }
+  .matrix td.m-stage { font-size: var(--text-sm); line-height: 1.45; }
+  .m-hscroll + .m-wrap { margin-top: var(--space-xl); }
+  .matrix .m-price { text-align: left; color: var(--ink-muted); font-size: var(--text-sm); line-height: 1.45; }
+  /* fixed columns: every platform the same width and every capability the
+     same, so the marks sit on a grid whatever their labels say */
+  .matrix { table-layout: fixed; }
+  .matrix col.c-name { width: 10.5rem; }
+  .matrix col.c-plat { width: 4.25rem; }
+  .matrix col.c-cap { width: 7rem; }
+  .matrix col.c-price { width: 8.75rem; }
+  .matrix .m-detail td { text-align: left; padding: 0 0.45rem 1rem; }
+  .d-body { position: sticky; left: 0.45rem; max-width: min(44rem, calc(100cqw - 1rem)); font-size: var(--text-sm); line-height: 1.6; color: var(--ink-note); }
+  .d-body p { margin: 0 0 0.4rem; }
+  .d-meta { font-size: var(--text-xs); color: var(--ink-muted); }
+  .d-meta a { color: inherit; }
+  .d-disclosure { font-style: italic; }
+  .m-none { padding: var(--space-md) 0; color: var(--ink-muted); font-size: var(--text-sm); }
+  .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (max-width: 600px) {
+    .matrix th:first-child { width: 8.5rem; min-width: 8.5rem; }
+    .m-group-sub { display: block; margin-left: 0; max-width: calc(100vw - 4rem); }
+  }
+</style>
+</head>
+<body>
+<div class="page-wide">
+
+  <div class="page-header">
+    <nav class="page-crumb" aria-label="Breadcrumb">
+      <a href="index.html">architecture.tools</a> <span class="crumb-sep">&middot;</span> <span>Software</span> <span class="crumb-sep">&rarr;</span> <span aria-current="page">BIM, Modeling &amp; Drafting</span>
+    </nav>
+    <h1>BIM, 3D modeling and drafting software for architects</h1>
+    <p>Apps for modeling buildings and drawing them, from BIM authoring to DWG drafting, in one matrix.</p>
+    <!-- light/dark key — shared style (global.css) + wiring (assets/js/ui.js) -->
+    <button type="button" class="scheme-toggle">
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </div>
+
+  <p class="chooser-updated">Reviewed 29 October 2026</p>
+  <p class="chooser-lede">Listed alphabetically within each section.</p>
+
+  <div class="m-filter" id="controls" hidden>
+    <div class="m-fgroup">
+      <span class="section-label" id="tierLabel">Show only</span>
+      <div class="option-row" role="group" aria-labelledby="tierLabel"><button type="button" class="app-toggle" aria-pressed="false" data-tier="leader">Shortlist</button><button type="button" class="app-toggle" aria-pressed="false" data-tier="new">Newcomers</button><button type="button" class="app-toggle" aria-pressed="false" data-tier="free">Free</button></div>
+    </div>
+    <div class="m-fgroup">
+      <span class="section-label" id="platLabel">Runs on any of</span>
+      <div class="option-row" role="group" aria-labelledby="platLabel"><button type="button" class="app-toggle" aria-pressed="false" data-plat="win">Windows</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="mac">Mac</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="linux">Linux</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="ipad">iPad</button><button type="button" class="app-toggle" aria-pressed="false" data-plat="web">Web</button></div>
+    </div>
+    <div class="m-fgroup">
+      <span class="section-label" id="capLabel">Does all of</span>
+      <div class="option-row" role="group" aria-labelledby="capLabel"><button type="button" class="app-toggle" aria-pressed="false" data-cap="drawings">Drawings</button><button type="button" class="app-toggle" aria-pressed="false" data-cap="dwg">DWG</button><button type="button" class="app-toggle" aria-pressed="false" data-cap="ifc">IFC</button><button type="button" class="app-toggle" aria-pressed="false" data-cap="revit">Revit exchange</button><button type="button" class="app-toggle" aria-pressed="false" data-cap="team">Shared model</button></div>
+    </div>
+    <div class="m-status"><span id="resultCount" aria-live="polite">31 tools</span><button type="button" class="m-clear" id="clearPlat" hidden>Clear</button></div>
+  </div>
+  <p class="m-legend"><span><span class="m m-yes" aria-hidden="true">&#9679;</span>Yes</span><span><span class="m m-part" aria-hidden="true">&#9680;</span>Partly, or on a paid tier</span><span><span class="m m-no" aria-hidden="true">&ndash;</span>No</span><span><span class="m" aria-hidden="true">?</span>The vendor does not say</span><span>Shortlist is an editorial selection, not a market-share ranking. Platforms are the main app. Web and mobile versions often do less.</span><span>Drawings: 2D plans, sections and sheets. Revit exchange: native RVT, geometry only, or a connection through an add-in. Shared model: several people work in one model or file at once.</span><span>In the browser table, BIM elements: walls, slabs and doors as building objects, not only shapes. Stage: the part of a project the tool is built for, in the vendor&rsquo;s words.</span></p>
+
+  <!-- matrix:start — generated from data/bim-cad.json by tools/build-bim-cad.mjs; edit the JSON, not these tables -->
+  <div class="m-wrap" tabindex="0" role="region" aria-label="Feature matrix, scrolls sideways">
+    <table class="matrix">
+      <colgroup><col class="c-name"><col class="c-plat" span="5"><col class="c-cap" span="5"><col class="c-price"></colgroup>
+      <thead>
+        <tr class="m-band"><th scope="col"><span class="vh">Tool</span></th><th colspan="5" scope="colgroup">Platforms</th><th colspan="5" scope="colgroup" class="m-cap1">Drawings and file exchange</th><th scope="col"><span class="vh">Pricing model</span></th></tr>
+        <tr><th scope="col">Tool</th><th scope="col" data-kind="plat" data-key="win"><abbr title="Windows">Win</abbr></th><th scope="col" data-kind="plat" data-key="mac"><abbr title="Mac">Mac</abbr></th><th scope="col" data-kind="plat" data-key="linux"><abbr title="Linux">Linux</abbr></th><th scope="col" data-kind="plat" data-key="ipad"><abbr title="iPad">iPad</abbr></th><th scope="col" data-kind="plat" data-key="web"><abbr title="Web">Web</abbr></th><th scope="col" class="m-cap1" data-kind="cap" data-key="drawings"><abbr title="2D drawings and sheets">Drawings</abbr></th><th scope="col" data-kind="cap" data-key="dwg"><abbr title="Opens and saves DWG">DWG</abbr></th><th scope="col" data-kind="cap" data-key="ifc"><abbr title="IFC import and export">IFC</abbr></th><th scope="col" data-kind="cap" data-key="revit"><abbr title="Revit exchange">Revit</abbr></th><th scope="col" data-kind="cap" data-key="team"><abbr title="Shared model">Shared</abbr></th><th scope="col">Pricing model</th></tr>
+      </thead>
+      <tbody>
+          <tr class="m-group" data-group="bim"><th colspan="12" scope="colgroup" id="bim"><span class="m-group-label"><span class="m-group-name">BIM authoring</span> <span class="m-group-sub">Plans, sections, elevations and schedules drawn from one building model.</span></span></th></tr>
+          <tr class="m-row" id="allplan" data-group="bim" data-plat="win" data-cap="drawings dwg ifc revit team">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="allplan-d"><span class="m-tool">Allplan</span><span class="m-maker">Nemetschek</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, RVT import</span><span class="m-txt">RVT import</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.allplan.com/fileadmin/user_upload/countries/international/pdfs/system/Data_exchange_formats_ALLPLAN_2026_EN.pdf" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes, Allplan Share</span><span class="m-txt">Allplan Share</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="allplan-d" data-group="bim">
+            <td colspan="12"><div class="d-body"><p>Architecture and structure in one model, with reinforcement and precast detailing. Common in Germany and central Europe.</p><p>RVT import has version limits.</p><p class="d-meta">Price: Pro $3,588 a year &middot; <a href="https://www.allplan.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="archicad" data-group="bim" data-plat="win mac" data-cap="drawings dwg ifc revit team" data-tier="leader">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="archicad-d"><span class="m-tool">Archicad</span><span class="m-maker">Graphisoft &middot; <span class="m-tier m-tier-leader">shortlist</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://graphisoft.com/solutions/archicad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://graphisoft.com/solutions/archicad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://graphisoft.com/solutions/archicad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://help.graphisoft.com/AC/27/INT/_AC27_Help/120_Interoperability/120_Interoperability-42.htm" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://help.graphisoft.com/AC/27/INT/_AC27_Help/120_Interoperability/120_Interoperability-42.htm" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://help.graphisoft.com/AC/27/INT/_AC27_Help/120_Interoperability/120_Interoperability-42.htm" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, geometry</span><span class="m-txt">geometry</span></a></td><td class="m-yes"><a class="m-ev" href="https://graphisoft.com/solutions/archicad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes, Teamwork</span><span class="m-txt">Teamwork</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="archicad-d" data-group="bim">
+            <td colspan="12"><div class="d-body"><p>Teamwork and BIMcloud put several people in one model.</p><p>Revit exchange carries 3D geometry, not an editable Revit project.</p><p class="d-meta">Price: Studio from $2,414 a year, Collaborate from $2,840 a year &middot; <a href="https://graphisoft.com/solutions/archicad" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="bricscad-bim" data-group="bim" data-plat="win mac linux" data-cap="drawings dwg ifc revit">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="bricscad-bim-d"><span class="m-tool">BricsCAD BIM</span><span class="m-maker">Bricsys</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://help.bricsys.com/en-us/document/bricscad-bim/project-collaboration/import-autodesk-revit-files-in-bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, geometry</span><span class="m-txt">geometry</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Subscription or one-time</td>
+          </tr>
+          <tr class="m-detail" id="bricscad-bim-d" data-group="bim">
+            <td colspan="12"><div class="d-body"><p>BIM that saves to DWG, with AutoCAD-style commands, built on BricsCAD Pro. The only BIM authoring app here that runs on Linux.</p><p>Revit files come in as geometry. Shared work is file-based.</p><p class="d-meta">Price: $1,166 a year or $2,616 perpetual &middot; <a href="https://www.bricsys.com/bricscad-bim" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="chief" data-group="bim" data-plat="win mac" data-cap="drawings dwg">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="chief-d"><span class="m-tool">Chief Architect Premier</span><span class="m-maker">Chief Architect</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.chiefarchitect.com" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.chiefarchitect.com" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.chiefarchitect.com" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, residential</span><span class="m-txt">residential</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.chiefarchitect.com" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="chief-d" data-group="bim">
+            <td colspan="12"><div class="d-body"><p>Residential design: house plans, framing, roofs, cabinets, 3D views and permit sets. Home Designer is the consumer version.</p><p>It imports and exports DXF, DWG, 3DS, SKP, STL and DAE, but not IFC.</p><p class="d-meta">Price: $1,995 a year &middot; <a href="https://www.chiefarchitect.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="revit" data-group="bim" data-plat="win" data-cap="drawings dwg ifc revit team" data-tier="leader">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="revit-d"><span class="m-tool">Revit</span><span class="m-maker">Autodesk &middot; <span class="m-tier m-tier-leader">shortlist</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/revit/features" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.autodesk.com/products/revit/features" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/revit/features" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/revit/features" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/revit/features" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Revit exchange: yes, native</span><span class="m-txt">native</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/revit/features" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes, local; cloud extra</span><span class="m-txt">local; cloud extra</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="revit-d" data-group="bim">
+            <td colspan="12"><div class="d-body"><p>RVT is the usual coordination format in US practice. Worksharing puts several people in one model on a local server. Cloud worksharing is a separate entitlement.</p><p>On a Mac it runs in a Windows virtual machine.</p><p class="d-meta">Price: $3,012 a year or $380 a month. AEC Collection $3,675 a year or $460 a month. Flex: $99 for 33 tokens, and Revit uses 10 tokens a day &middot; <a href="https://www.autodesk.com/products/revit/overview" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="vectorworks" data-group="bim" data-plat="win mac" data-cap="drawings dwg ifc revit team">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="vectorworks-d"><span class="m-tool">Vectorworks Architect</span><span class="m-maker">Vectorworks</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.vectorworks.net/en-US/architect" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.vectorworks.net/en-US/architect" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.vectorworks.net/en-US/architect" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.vectorworks.net/en-US/architect" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.vectorworks.net/en-US/architect" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://app-help.vectorworks.net/2025/eng/VW2025_Guide/Import/Importing_Revit.htm" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, RVT / RFA import</span><span class="m-txt">RVT / RFA import</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.vectorworks.net/en-US/architect" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes, Project Sharing</span><span class="m-txt">Project Sharing</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="vectorworks-d" data-group="bim">
+            <td colspan="12"><div class="d-body"><p>2D drafting, 3D modeling and BIM in one app, also used for landscape and stage work. Project Sharing puts several people in one file.</p><p>It imports Revit projects and families but does not save RVT.</p><p class="d-meta">Price: Architect $1,530 a year or $170 a month. Design Suite, with landscape tools and library, $1,980 a year or $220 a month &middot; <a href="https://www.vectorworks.net/en-US/architect" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-group" data-group="drafting"><th colspan="12" scope="colgroup" id="drafting"><span class="m-group-label"><span class="m-group-name">2D and 3D drafting</span> <span class="m-group-sub">Plans and details drawn in DWG, shared as files and external references.</span></span></th></tr>
+          <tr class="m-row" id="autocad" data-group="drafting" data-plat="win mac ipad web" data-cap="drawings dwg" data-tier="leader">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="autocad-d"><span class="m-tool">AutoCAD</span><span class="m-maker">Autodesk &middot; <span class="m-tier m-tier-leader">shortlist</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/autocad/overview" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/autocad/overview" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-part"><a class="m-ev" href="https://www.autodesk.com/products/autocad/overview" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">iPad: partly, AutoCAD mobile</span><span class="m-txt">AutoCAD mobile</span></a></td><td class="m-part"><a class="m-ev" href="https://www.autodesk.com/products/autocad/overview" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Web: partly, AutoCAD Web</span><span class="m-txt">AutoCAD Web</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.autodesk.com/products/autocad/overview" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/autocad/overview" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes, native</span><span class="m-txt">native</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="autocad-d" data-group="drafting">
+            <td colspan="12"><div class="d-body"><p>Drafting and documentation in DWG, with shared work through files and external references.</p><p>The Mac version lacks some Windows features and add-ons. The web and mobile apps have a reduced command set.</p><p class="d-meta">Price: $2,095 a year. AEC Collection $3,675 a year or $460 a month. Flex: AutoCAD uses 7 tokens a day. AutoCAD LT, 2D only, costs less &middot; <a href="https://www.autodesk.com/products/autocad/overview" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="bricscad" data-group="drafting" data-plat="win mac linux" data-cap="drawings dwg">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="bricscad-d"><span class="m-tool">BricsCAD Lite / Pro</span><span class="m-maker">Bricsys</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://bricscad.octave.com/store/bricscad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Subscription or one-time</td>
+          </tr>
+          <tr class="m-detail" id="bricscad-d" data-group="drafting">
+            <td colspan="12"><div class="d-body"><p>DWG drafting with AutoCAD-style commands. Lite is 2D. Pro adds 3D modeling, point clouds and third-party apps.</p><p>IFC and Revit import are in BricsCAD BIM only.</p><p class="d-meta">Price: Lite $345 a year or $780 perpetual. Pro $780 a year or $1,752 perpetual &middot; <a href="https://www.bricsys.com/bricscad" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="zwcad" data-group="drafting" data-plat="win" data-cap="drawings dwg ifc revit">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="zwcad-d"><span class="m-tool">ZWCAD</span><span class="m-maker">ZWSOFT</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.zwsoft.com/user-guide/zwcad-system-requirement" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.zwsoft.com/product/zwcad/pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.zwsoft.com/product/zwcad/pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://www.zwsoft.com/product/zwcad/pricing" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">IFC: partly, Professional</span><span class="m-txt">Professional</span></a></td><td class="m-part"><a class="m-ev" href="https://www.zwsoft.com/product/zwcad/pricing" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, Professional, import</span><span class="m-txt">Professional, import</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">One-time</td>
+          </tr>
+          <tr class="m-detail" id="zwcad-d" data-group="drafting">
+            <td colspan="12"><div class="d-body"><p>Standard covers 2D drafting, annotation and plotting in DWG. Professional adds 3D modeling, IFC editing and RVT import.</p><p class="d-meta">Price: Standard $899, Professional $1,399 perpetual &middot; <a href="https://www.zwsoft.com/product/zwcad" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-group" data-group="modeling"><th colspan="12" scope="colgroup" id="modeling"><span class="m-group-label"><span class="m-group-name">3D modeling</span> <span class="m-group-sub">Massing, form and design studies by editing geometry directly.</span></span></th></tr>
+          <tr class="m-row" id="rhino" data-group="modeling" data-plat="win mac" data-cap="drawings dwg ifc revit" data-tier="leader">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="rhino-d"><span class="m-tool">Rhino + Grasshopper</span><span class="m-maker">McNeel &middot; <span class="m-tier m-tier-leader">shortlist</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.rhino3d.com/features/file-formats/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.rhino3d.com/features/file-formats/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.rhino3d.com/docs/guides/user-guide-new/drafting-architecture/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, layouts, dimensions</span><span class="m-txt">layouts, dimensions</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.rhino3d.com/features/file-formats/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://www.rhino3d.com/features/file-formats/" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">IFC: partly, with VisualARQ</span><span class="m-txt">with VisualARQ</span></a></td><td class="m-part"><a class="m-ev" href="https://www.rhino3d.com/inside/revit/1.0/" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, Rhino.Inside, Windows</span><span class="m-txt">Rhino.Inside, Windows</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">One-time</td>
+          </tr>
+          <tr class="m-detail" id="rhino-d" data-group="modeling">
+            <td colspan="12"><div class="d-body"><p>NURBS modeling for freeform surfaces, with Grasshopper built in for parametric geometry. VisualARQ, a paid plug-in, adds BIM objects and IFC on Windows.</p><p>Rhino.Inside.Revit runs Rhino and Grasshopper inside Revit on Windows. Shared work runs through worksessions of linked files.</p><p class="d-meta">Price: $995 one-time, upgrade $595. A 90-day evaluation is free &middot; <a href="https://www.rhino3d.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="sketchup" data-group="modeling" data-plat="win mac ipad web" data-cap="drawings dwg ifc revit team" data-tier="leader">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="sketchup-d"><span class="m-tool">SketchUp Pro</span><span class="m-maker">Trimble &middot; <span class="m-tier m-tier-leader">shortlist</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.sketchup.com/en/plans-and-pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.sketchup.com/en/plans-and-pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><a class="m-ev" href="https://www.sketchup.com/en/plans-and-pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.sketchup.com/en/plans-and-pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.sketchup.com/en/plans-and-pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, LayOut</span><span class="m-txt">LayOut</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.sketchup.com/en/plans-and-pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.sketchup.com/en/plans-and-pricing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://help.sketchup.com/en/extending-sketchup/revit-interoperability" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, import, Windows</span><span class="m-txt">import, Windows</span></a></td><td class="m-part"><a class="m-ev" href="https://help.sketchup.com/en/accounts-and-administration/trimble-connect-sketchup-desktop" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Shared model: partly, file sharing</span><span class="m-txt">file sharing</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="sketchup-d" data-group="modeling">
+            <td colspan="12"><div class="d-body"><p>Surface modeling with a large library of models and extensions. LayOut turns model views into scaled, dimensioned sheets.</p><p>The Revit Importer runs on Windows, in eligible plans. Trimble Connect shares files, one person editing at a time.</p><p class="d-meta">Price: Pro $399 a year. Go and Studio plans are also offered &middot; <a href="https://www.sketchup.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="m-hscroll" aria-hidden="true" hidden><div></div></div>
+  <div class="m-wrap" tabindex="0" role="region" aria-label="Browser tools, scroll sideways">
+    <table class="matrix m-noplat">
+      <colgroup><col class="c-name"><col class="c-plat"><col class="c-cap"><col class="c-stage"><col class="c-cap" span="5"><col class="c-price"></colgroup>
+      <thead>
+        <tr class="m-band"><th scope="col"><span class="vh">Tool</span></th><th colspan="3" scope="colgroup">The model</th><th colspan="5" scope="colgroup" class="m-cap1">Drawings and file exchange</th><th scope="col"><span class="vh">Pricing model</span></th></tr>
+        <tr><th scope="col">Tool</th><th scope="col"><abbr title="3D model">3D</abbr></th><th scope="col"><abbr title="BIM elements: walls, slabs and doors as building objects">BIM</abbr></th><th scope="col"><abbr title="The design stage it is built for">Stage</abbr></th><th scope="col" class="m-cap1" data-kind="cap" data-key="drawings"><abbr title="2D drawings and sheets">Drawings</abbr></th><th scope="col" data-kind="cap" data-key="dwg"><abbr title="Opens and saves DWG">DWG</abbr></th><th scope="col" data-kind="cap" data-key="ifc"><abbr title="IFC import and export">IFC</abbr></th><th scope="col" data-kind="cap" data-key="revit"><abbr title="Revit exchange">Revit</abbr></th><th scope="col" data-kind="cap" data-key="team"><abbr title="Shared model">Shared</abbr></th><th scope="col">Pricing model</th></tr>
+      </thead>
+      <tbody>
+          <tr class="m-group" data-group="browser"><th colspan="10" scope="colgroup" id="browser"><span class="m-group-label"><span class="m-group-name">In the browser</span> <span class="m-group-sub">Newer tools that run in a web browser, several people in one file.</span></span></th></tr>
+          <tr class="m-row" id="arcol" data-group="browser" data-plat="web" data-cap="drawings dwg ifc revit team" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="arcol-d"><span class="m-tool">Arcol</span><span class="m-maker">Arcol &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://arcol.io/product/modeling#:~:text=Arcol%20is%20a%20parametric%20modeler%20with%20lofts%2C%20booleans" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">3D model: yes</span></a></td><td class="m-no"><a class="m-ev" href="https://arcol.io/product/modeling#:~:text=Divide%20your%20mass%20into%20floors%20and%20create%20floor%20plans" rel="noopener"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">BIM elements: no, masses, floors</span><span class="m-txt">masses, floors</span></a></td><td class="m-stage"><a class="m-ev" href="https://arcol.io/use-cases/feasibility-studies#:~:text=Pro%20forma%20in%20the%20same%20model%20as%20your%20massing" rel="noopener"><span class="vh">Stage: </span>Feasibility, massing</a></td><td class="m-part m-cap1"><a class="m-ev" href="https://arcol.io" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Drawings: partly, boards</span><span class="m-txt">boards</span></a></td><td class="m-part"><a class="m-ev" href="https://intercom.help/arcol/en/articles/10448029-importing-a-dwg-dxf#:~:text=Arcol%20currently%20supports%20importing%20both%202D%20and%203D%20DWG%20and%20DXF%20files" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, import, as reference</span><span class="m-txt">import, as reference</span></a></td><td class="m-part"><a class="m-ev" href="https://intercom.help/arcol/en/articles/10448028-importing-a-3d-model#:~:text=Arcol%20currently%20supports%20the%20following%203D%20model%20formats%20for%20import" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">IFC: partly, import</span><span class="m-txt">import</span></a></td><td class="m-part"><a class="m-ev" href="https://arcol.io" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, massing export</span><span class="m-txt">massing export</span></a></td><td class="m-yes"><a class="m-ev" href="https://arcol.io" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="arcol-d" data-group="browser">
+            <td colspan="10"><div class="d-body"><p>Massing, floor plans, area metrics and presentation boards in one shared file.</p><p>DWG and DXF import as references to trace over, and IFC imports. Exports are GLB, STL and CSV, plus massing to Revit through an add-in on paid plans.</p><p class="d-meta">Price: $100 a month &middot; <a href="https://arcol.io" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="forma" data-group="browser" data-plat="web" data-cap="dwg ifc revit">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="forma-d"><span class="m-tool">Forma</span><span class="m-maker">Autodesk</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/forma-site-design/overview#:~:text=Create%2C%20explore%2C%20and%20iterate%20massing%20concepts" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">3D model: yes</span></a></td><td class="m-no"><a class="m-ev" href="https://www.autodesk.com/products/forma-building-design/overview#:~:text=Then%20continue%20into%20Revit%20with%20native%20BIM%20geometry" rel="noopener"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">BIM elements: no, BIM in Revit</span><span class="m-txt">BIM in Revit</span></a></td><td class="m-stage"><a class="m-ev" href="https://www.autodesk.com/products/forma-building-design/overview#:~:text=Forma%20Building%20Design%20is%20a%20cloud-based%20design%20and%20analysis%20software%20for%20schematic%20design" rel="noopener"><span class="vh">Stage: </span>Site and schematic design</a></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Drawings: no</span></td><td class="m-part"><a class="m-ev" href="https://forums.autodesk.com/t5/forma-forum/vector-format-imports/m-p/13682998" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, DXF import</span><span class="m-txt">DXF import</span></a></td><td class="m-part"><a class="m-ev" href="https://www.autodesk.com/products/forma/product-details" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">IFC: partly, import</span><span class="m-txt">import</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.autodesk.com/products/forma-building-design/overview" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Revit exchange: yes, connection</span><span class="m-txt">connection</span></a></td><td class="m-unk"><span class="m" aria-hidden="true">?</span><span class="vh">Shared model: not stated</span></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="forma-d" data-group="browser">
+            <td colspan="10"><div class="d-body"><p>Site analysis and schematic design. Building Design, added in April 2026, is included with Revit and the AEC Collection.</p><p>Autodesk <a href="https://aecmag.com/bim/autodesk-confirms-forma-will-replace-revit-over-time/" rel="noopener">says Forma will replace Revit over time</a>, with no date. It does not draw construction documents.</p><p class="d-meta">Price: $700 a year. Flex: 6 tokens a day &middot; <a href="https://www.autodesk.com/products/forma/overview" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="motif" data-group="browser" data-plat="web" data-cap="drawings ifc revit team" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="motif-d"><span class="m-tool">Motif Design</span><span class="m-maker">Motif &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://motif.io/#:~:text=with%20models%20that%20look%20like%20real%20buildings" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">3D model: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://motif.io/#:~:text=Genuine%20parametric%2C%20associative%20modeling" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">BIM elements: yes, parametric</span><span class="m-txt">parametric</span></a></td><td class="m-stage"><a class="m-ev" href="https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access#:~:text=parametric%20modeling%2C%20drawing%20sets" rel="noopener"><span class="vh">Stage: </span>Design to drawing sets</a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access#:~:text=parametric%20modeling%2C%20drawing%20sets" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, drawing sets</span><span class="m-txt">drawing sets</span></a></td><td class="m-unk"><a class="m-ev" href="https://help.motif.io/articles/3382086132-publish-from-rhino" rel="noopener"><span class="m" aria-hidden="true">?</span><span class="vh">DWG: not stated, via Rhino or Revit</span><span class="m-txt">via Rhino or Revit</span></a></td><td class="m-part"><a class="m-ev" href="https://help.motif.io/collections/4557041249-motif_design#:~:text=bring%20in%20Revit%2C%20Rhino%2C%20and%20IFC%20files" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">IFC: partly, import</span><span class="m-txt">import</span></a></td><td class="m-part"><a class="m-ev" href="https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, streams in</span><span class="m-txt">streams in</span></a></td><td class="m-yes"><a class="m-ev" href="https://help.motif.io/articles/5348679184-motif-design-what-it-is-and-how-to-get-access" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="motif-d" data-group="browser">
+            <td colspan="10"><div class="d-body"><p>Browser BIM and drawing sets, with AI agents that work in the same model as the team. Access follows a demo request.</p><p>Revit and Rhino models stream in, and IFC files import. Nothing exports back to Revit yet. Motif Review is a separate product.</p><p class="d-meta">Price: Design $150 a month, Review $25 a month &middot; <a href="https://motif.io" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="qonic" data-group="browser" data-plat="web" data-cap="drawings dwg ifc revit team" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="qonic-d"><span class="m-tool">Qonic</span><span class="m-maker">Qonic &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.qonic.com/#:~:text=Start%20modelling%20in%20Qonic%20or%20bring%20existing%20models%20together" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">3D model: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.qonic.com/#:~:text=The%20fastest%20agentic%20BIM%20platform%20to%20model%2C%20coordinate%20and%20deliver" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">BIM elements: yes, IFC-based</span><span class="m-txt">IFC-based</span></a></td><td class="m-stage"><a class="m-ev" href="https://www.qonic.com/#:~:text=The%20fastest%20agentic%20BIM%20platform%20to%20model%2C%20coordinate%20and%20deliver" rel="noopener"><span class="vh">Stage: </span>Modeling, coordination</a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.qonic.com/downloads" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, since April 2026</span><span class="m-txt">since April 2026</span></a></td><td class="m-part"><a class="m-ev" href="https://www.qonic.com/downloads" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, drawing export</span><span class="m-txt">drawing export</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.qonic.com/downloads" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.qonic.com/downloads" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Revit exchange: yes, plugin, both ways</span><span class="m-txt">plugin, both ways</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.qonic.com/downloads" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="qonic-d" data-group="browser">
+            <td colspan="10"><div class="d-body"><p>Opens large RVT and IFC models in the browser for coordination, quantities and editing. A Revit plugin moves changes both ways.</p><p>Since April 2026 it draws annotated plans and sections that update with the model and export to DWG.</p><p class="d-meta">Price: depends on configuration. The full configuration is $240 a month or $2,582 a year &middot; <a href="https://www.qonic.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="rayon" data-group="browser" data-plat="web" data-cap="drawings dwg team" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="rayon-d"><span class="m-tool">Rayon</span><span class="m-maker">Rayon &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-no"><a class="m-ev" href="https://aecmag.com/cad/rayon-raises-e10m-for-3d-and-agentic-ai/#:~:text=Rayon%20says%20V4%2C%20due%20later%20this%20year%2C%20will%20bring%203D" rel="noopener"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">3D model: no, due in V4</span><span class="m-txt">due in V4</span></a></td><td class="m-part"><a class="m-ev" href="https://www.rayon.design/#:~:text=Draw%20faster%20with%20our%20drafting%20tool%20set" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">BIM elements: partly, 2D wall tools</span><span class="m-txt">2D wall tools</span></a></td><td class="m-stage"><a class="m-ev" href="https://www.rayon.design/#:~:text=professional-grade%20CAD%20software%20for%20interior%20architects%20and%20designers" rel="noopener"><span class="vh">Stage: </span>Space planning, interiors</a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://docs.rayon.design/documentation/import-export/exporting-and-printing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, 2D sheets</span><span class="m-txt">2D sheets</span></a></td><td class="m-part"><a class="m-ev" href="https://docs.rayon.design/documentation/import-export/exporting-and-printing" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, paid tier</span><span class="m-txt">paid tier</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-yes"><a class="m-ev" href="https://docs.rayon.design/documentation/import-export/exporting-and-printing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="rayon-d" data-group="browser">
+            <td colspan="10"><div class="d-body"><p>Shared 2D plans for interiors and space planning. It imports DWG, DXF and PDF, and several people edit one file at once.</p><p>Rayon says version 4, due by the end of 2026, adds 3D.</p><p class="d-meta">Price: $21 a month, with DWG $38 a month &middot; <a href="https://www.rayon.design" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="snaptrude" data-group="browser" data-plat="web" data-cap="drawings dwg ifc revit team" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="snaptrude-d"><span class="m-tool">Snaptrude</span><span class="m-maker">Snaptrude &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.snaptrude.com/#:~:text=Model%20in%20both%202D%20and%203D" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">3D model: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.snaptrude.com/#:~:text=Convert%20early-stage%20massing%20into%20full%20BIM%20models%20with%20walls%2C%20floors%2C%20roofs" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">BIM elements: yes, walls, floors, roofs</span><span class="m-txt">walls, floors, roofs</span></a></td><td class="m-stage"><a class="m-ev" href="https://www.snaptrude.com/#:~:text=Model%20in%20both%202D%20and%203D" rel="noopener"><span class="vh">Stage: </span>Concept design</a></td><td class="m-part m-cap1"><a class="m-ev" href="https://snaptrude.com/vs/revit" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Drawings: partly, schematic</span><span class="m-txt">schematic</span></a></td><td class="m-part"><a class="m-ev" href="https://snaptrude.com/vs/revit" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, export</span><span class="m-txt">export</span></a></td><td class="m-yes"><a class="m-ev" href="https://snaptrude.com/vs/revit" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://snaptrude.com/vs/revit" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Revit exchange: partly, by its own account</span><span class="m-txt">by its own account</span></a></td><td class="m-yes"><a class="m-ev" href="https://snaptrude.com/vs/revit" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes</span></a></td><td class="m-price">Subscription</td>
+          </tr>
+          <tr class="m-detail" id="snaptrude-d" data-group="browser">
+            <td colspan="10"><div class="d-body"><p>Concept to schematic design. Models start from a brief or a sketch, drawings update live, and several people work in one model at once.</p><p>Snaptrude describes Revit exchange as two-way. Its pages and release notes differ on how.</p><p class="d-meta">Price: Solo $60 a month, Organization $100 a month &middot; <a href="https://www.snaptrude.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="m-hscroll" aria-hidden="true" hidden><div></div></div>
+  <div class="m-wrap" tabindex="0" role="region" aria-label="Feature matrix, scrolls sideways">
+    <table class="matrix">
+      <colgroup><col class="c-name"><col class="c-plat" span="5"><col class="c-cap" span="5"><col class="c-price"></colgroup>
+      <thead>
+        <tr class="m-band"><th scope="col"><span class="vh">Tool</span></th><th colspan="5" scope="colgroup">Platforms</th><th colspan="5" scope="colgroup" class="m-cap1">Drawings and file exchange</th><th scope="col"><span class="vh">Pricing model</span></th></tr>
+        <tr><th scope="col">Tool</th><th scope="col" data-kind="plat" data-key="win"><abbr title="Windows">Win</abbr></th><th scope="col" data-kind="plat" data-key="mac"><abbr title="Mac">Mac</abbr></th><th scope="col" data-kind="plat" data-key="linux"><abbr title="Linux">Linux</abbr></th><th scope="col" data-kind="plat" data-key="ipad"><abbr title="iPad">iPad</abbr></th><th scope="col" data-kind="plat" data-key="web"><abbr title="Web">Web</abbr></th><th scope="col" class="m-cap1" data-kind="cap" data-key="drawings"><abbr title="2D drawings and sheets">Drawings</abbr></th><th scope="col" data-kind="cap" data-key="dwg"><abbr title="Opens and saves DWG">DWG</abbr></th><th scope="col" data-kind="cap" data-key="ifc"><abbr title="IFC import and export">IFC</abbr></th><th scope="col" data-kind="cap" data-key="revit"><abbr title="Revit exchange">Revit</abbr></th><th scope="col" data-kind="cap" data-key="team"><abbr title="Shared model">Shared</abbr></th><th scope="col">Pricing model</th></tr>
+      </thead>
+      <tbody>
+          <tr class="m-group" data-group="free"><th colspan="12" scope="colgroup" id="free"><span class="m-group-label"><span class="m-group-name">Free and open source</span> <span class="m-group-sub">No license fee.</span></span></th></tr>
+          <tr class="m-row" id="blender" data-group="free" data-plat="win mac linux" data-cap="dwg" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="blender-d"><span class="m-tool">Blender</span><span class="m-maker">Blender Foundation</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.blender.org/download/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.blender.org/download/#:~:text=Requires%20macOS%2013%20%28Ventura%29%20or%20newer" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes, Apple silicon</span><span class="m-txt">Apple silicon</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.blender.org/download/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Drawings: no, with Bonsai</span><span class="m-txt">with Bonsai</span></td><td class="m-part"><a class="m-ev" href="https://extensions.blender.org/add-ons/import-autocad-dxf-format-dxf/#:~:text=Import%20files%20in%20the%20Autocad%20DXF%20format" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, DXF import add-on</span><span class="m-txt">DXF import add-on</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no, with Bonsai</span><span class="m-txt">with Bonsai</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="blender-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>A general 3D modeler of meshes and curves, with its own renderer. It has no building objects, dimensions or sheets. Those come from the Bonsai add-on.</p><p>DXF import is a community extension. Mac builds need Apple silicon.</p><p class="d-meta">Price: Free, open source (GPL) &middot; <a href="https://www.blender.org" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="bonsai" data-group="free" data-plat="win mac linux" data-cap="drawings ifc team" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="bonsai-d"><span class="m-tool">Bonsai</span><span class="m-maker">Open source, on Blender &middot; 0.9</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes, in Blender</span><span class="m-txt">in Blender</span></a></td><td class="m-yes"><a class="m-ev" href="https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes, in Blender</span><span class="m-txt">in Blender</span></a></td><td class="m-yes"><a class="m-ev" href="https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes, in Blender</span><span class="m-txt">in Blender</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://docs.bonsaibim.org/studio/guides/drawings/index.html#:~:text=Bonsai%20provides%20powerful%20tools%20for%20generating%202D%20drawings" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, early drafting</span><span class="m-txt">early drafting</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">DWG: no</span></td><td class="m-yes"><a class="m-ev" href="https://bonsaibim.org/#:~:text=Every%20edit%20reads%20and%20writes%20real%20IFC" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes, native IFC</span><span class="m-txt">native IFC</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no, through IFC</span><span class="m-txt">through IFC</span></td><td class="m-part"><a class="m-ev" href="https://docs.bonsaibim.org/studio/guides/authoring/git_support.html#:~:text=Bonsai%20supports%20tracking%20the%20development%20of%20your%20IFC%20files%20with%20a%20Git%20repository" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Shared model: partly, Git, experimental</span><span class="m-txt">Git, experimental</span></a></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="bonsai-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>A Blender add-on that stores every object as IFC, so the IFC file is the project file. It adds schedules, quantities, costing, 4D scheduling and COBie.</p><p>Drawings are generated from the model as SVG, and its documentation calls the drafting tools early-stage. Merging other people&rsquo;s changes needs the separate ifcmerge tool and is experimental.</p><p class="d-meta">Price: Free, open source &middot; Bonsai Viewer, a standalone IFC viewer, is separate &middot; <a href="https://bonsaibim.org" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="freecad" data-group="free" data-plat="win mac linux" data-cap="drawings dwg ifc" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="freecad-d"><span class="m-tool">FreeCAD</span><span class="m-maker">Open source</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.freecad.org/downloads.php#:~:text=Windows%2010%20is%20the%20minimum%20supported%20version" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.freecad.org/downloads.php#:~:text=macOS%2012%20Monterey%20is%20the%20minimum%20supported%20version" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.freecad.org/downloads.php#:~:text=Multiple%20Linux%2Dbased%20OSs%20are%20supported" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.freecad.org/features.php#:~:text=create%202D%20drawings%20and%20views%20of%20your%20models" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, TechDraw</span><span class="m-txt">TechDraw</span></a></td><td class="m-part"><a class="m-ev" href="https://wiki.freecad.org/FreeCAD_and_DWG_Import" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, via converter</span><span class="m-txt">via converter</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.freecad.org/#:~:text=It%20reads%20and%20writes%20to%20many%20open%20file%20formats" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes, native IFC</span><span class="m-txt">native IFC</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no, through IFC</span><span class="m-txt">through IFC</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="freecad-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>A parametric 3D modeler with a BIM workbench built in since version 1.0: walls, slabs, windows, stairs, spaces and schedules. It works on IFC files directly. Drawings are model views placed on TechDraw pages at scale.</p><p>DWG goes through an external converter, such as the ODA File Converter. There is no RVT import.</p><p class="d-meta">Price: Free, open source (LGPL) &middot; <a href="https://www.freecad.org" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="librecad" data-group="free" data-plat="win mac linux" data-cap="drawings dwg" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="librecad-d"><span class="m-tool">LibreCAD</span><span class="m-maker">Open source</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://github.com/LibreCAD/LibreCAD" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, 2D only</span><span class="m-txt">2D only</span></a></td><td class="m-part"><a class="m-ev" href="https://github.com/LibreCAD/LibreCAD#:~:text=It%20can%20read%20DXF%2FDWG%2C%20and%20write%20DXF%2FDWG%2FPDF%2FSVG%20files" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, reads DWG</span><span class="m-txt">reads DWG</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="librecad-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>2D drafting with layers, blocks, dimensions and hatches, printing to PDF and SVG.</p><p>DXF is its native format. It reads DWG, and saving DWG needs a build compiled with DWG support.</p><p class="d-meta">Price: Free, open source (GPLv2) &middot; <a href="https://librecad.org" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="qcad" data-group="free" data-plat="win mac linux" data-cap="drawings dwg" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="qcad-d"><span class="m-tool">QCAD Community Edition</span><span class="m-maker">RibbonSoft</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.qcad.org/en/faq/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.qcad.org/en/faq/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.qcad.org/en/faq/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://www.qcad.org/en/features/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, 2D only</span><span class="m-txt">2D only</span></a></td><td class="m-part"><a class="m-ev" href="https://www.qcad.org/en/faq/#:~:text=QCAD%20Professional%20is%20the%20latest%20version%20of%20QCAD%20with%20add%2Dons%20for%20advanced%20DXF%20support%2C%20DWG%20support" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, DXF; DWG in Pro</span><span class="m-txt">DXF; DWG in Pro</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free; Professional paid</td>
+          </tr>
+          <tr class="m-detail" id="qcad-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>2D drafting with layers, blocks, dimensions, hatching and a large part library. The open-source Community Edition saves DXF.</p><p>DWG comes with QCAD Professional, a paid add-on. The download is the Professional trial, and removing the add-on leaves the Community Edition.</p><p class="d-meta">Price: Community Edition free, open source. Professional is a paid license &middot; <a href="https://www.qcad.org" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="sketchup-free" data-group="free" data-plat="web" data-cap="" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="sketchup-free-d"><span class="m-tool">SketchUp Free</span><span class="m-maker">Trimble</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-yes"><a class="m-ev" href="https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free#:~:text=core%203D%20modeler%20runs%20right%20in%20your%20web%20browser" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Drawings: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">DWG: no, paid plans</span><span class="m-txt">paid plans</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free, non-commercial</td>
+          </tr>
+          <tr class="m-detail" id="sketchup-free-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>SketchUp&rsquo;s modeler in the browser, with 10 GB of Trimble Connect storage. There is no LayOut, so no sheets. DWG and other CAD formats need a paid plan.</p><p>Trimble&rsquo;s terms limit free versions to non-commercial use.</p><p class="d-meta">Price: Free for non-commercial use &middot; <a href="https://www.trimble.com/en/legal/offering-terms/terms/english#:~:text=Customer%20may%20only%20use%20Free%20Versions%20in%20a%20non%2Dproduction%20environment%20and%20for%20non%2Dcommercial%20purposes" rel="noopener">Terms</a> &middot; <a href="https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="sweet-home-3d" data-group="free" data-plat="win mac linux ipad web" data-cap="drawings" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="sweet-home-3d-d"><span class="m-tool">Sweet Home 3D</span><span class="m-maker">eTeks</span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://www.sweethome3d.com/download.jsp" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.sweethome3d.com/download.jsp" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.sweethome3d.com/download.jsp" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-part"><a class="m-ev" href="https://www.sweethome3d.com/download.jsp#:~:text=This%20paid%20version%20contains%20more%20than%2010.000%20pieces%20of%20furniture" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">iPad: partly, paid app</span><span class="m-txt">paid app</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.sweethome3d.com/#:~:text=with%20any%20WebGL%20browser" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-part m-cap1"><a class="m-ev" href="https://www.sweethome3d.com/features/#:~:text=Print%20and%20export%20PDFs%2C%20bitmap%20or%20vector%20graphics%20images" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Drawings: partly, plan to PDF</span><span class="m-txt">plan to PDF</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">DWG: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free; mobile app paid</td>
+          </tr>
+          <tr class="m-detail" id="sweet-home-3d-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>Home and interior layout: walls, rooms, doors and windows in plan, furniture from a library, and a 3D view that updates. Plans export to PDF and vector images, the model to OBJ.</p><p>The desktop and browser versions are free and open source. The mobile app is paid.</p><p class="d-meta">Price: Free, open source (GPL). Mobile app paid &middot; <a href="https://www.sweethome3d.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="tinkercad" data-group="free" data-plat="ipad web" data-cap="team" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="tinkercad-d"><span class="m-tool">Tinkercad</span><span class="m-maker">Autodesk</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-yes"><a class="m-ev" href="https://www.tinkercad.com/ipad-app" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">iPad: yes, app</span><span class="m-txt">app</span></a></td><td class="m-yes"><a class="m-ev" href="https://www.tinkercad.com/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-no m-cap1"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Drawings: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">DWG: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-yes"><a class="m-ev" href="https://www.tinkercad.com/help-center/sharing-designs-and-collaborating" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Shared model: yes, invite link</span><span class="m-txt">invite link</span></a></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="tinkercad-d" data-group="free">
+            <td colspan="12"><div class="d-body"><p>Beginner 3D modeling by combining and subtracting basic shapes. It exports STL, OBJ, glTF and SVG, and imports STL, OBJ and SVG.</p><p>Invited collaborators edit the same design at the same time.</p><p class="d-meta">Price: Free &middot; <a href="https://www.tinkercad.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-group" data-group="watch"><th colspan="12" scope="colgroup" id="watch"><span class="m-group-label"><span class="m-group-name">To watch</span> <span class="m-group-sub">Free apps in early release or development, from one developer or a small studio.</span></span></th></tr>
+          <tr class="m-row" id="bimcraft" data-group="watch" data-plat="win mac linux web" data-cap="drawings dwg ifc" data-tier="new" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="bimcraft-d"><span class="m-tool">BimCraft</span><span class="m-maker">The Data Design Group &middot; v0.7 &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes, early builds</span><span class="m-txt">early builds</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://github.com/getcadcraft" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, views, sheets</span><span class="m-txt">views, sheets</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes, by its own account</span><span class="m-txt">by its own account</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes, by its own account</span><span class="m-txt">by its own account</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-unk"><span class="m" aria-hidden="true">?</span><span class="vh">Shared model: not stated</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="bimcraft-d" data-group="watch">
+            <td colspan="12"><div class="d-body"><p>Parametric walls, doors and windows on levels and grids, with views, schedules, sheets and clash checks, meant to feel familiar to Revit users. It does not open or save RVT.</p><p>It ships in CadCraft Studio with CadCraft, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan.</p><p class="d-meta">Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href="https://getcadcraft.com" rel="noopener">Website</a> &middot; <a href="https://github.com/getcadcraft" rel="noopener">Source</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="bimopen" data-group="watch" data-plat="win linux web" data-cap="drawings ifc" data-tier="new" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="bimopen-d"><span class="m-tool">BIMopen</span><span class="m-maker">Independent developer &middot; test builds &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes, test build</span><span class="m-txt">test build</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-yes"><a class="m-ev" href="https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes, test build</span><span class="m-txt">test build</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-yes"><a class="m-ev" href="https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://atsanna.github.io/bimopen-site/" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, PDF sheets</span><span class="m-txt">PDF sheets</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">DWG: no</span></td><td class="m-yes"><a class="m-ev" href="https://atsanna.github.io/bimopen-site/#:~:text=Export%20IFC4" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes, IFC4 export</span><span class="m-txt">IFC4 export</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="bimopen-d" data-group="watch">
+            <td colspan="12"><div class="d-body"><p>A BIM modeler from one developer, written with Claude Code. Plans export as SVG, sheets as PDF, schedules as CSV and models as IFC4. It opens IFC2x3 and IFC4.</p><p>Ceilings, phases, loadable families and DWG export are still missing. The source is not public yet. The site is in Italian.</p><p class="d-meta">Price: Free &middot; Also on Android &middot; <a href="https://atsanna.github.io/bimopen-site/" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="cadcraft" data-group="watch" data-plat="win mac linux web" data-cap="drawings dwg ifc" data-tier="new" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="cadcraft-d"><span class="m-tool">CadCraft</span><span class="m-maker">The Data Design Group &middot; v0.7 &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes, early builds</span><span class="m-txt">early builds</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://github.com/getcadcraft" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, plottable layouts</span><span class="m-txt">plottable layouts</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">DWG: yes, by its own account</span><span class="m-txt">by its own account</span></a></td><td class="m-yes"><a class="m-ev" href="https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">IFC: yes, by its own account</span><span class="m-txt">by its own account</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-unk"><span class="m" aria-hidden="true">?</span><span class="vh">Shared model: not stated</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="cadcraft-d" data-group="watch">
+            <td colspan="12"><div class="d-body"><p>Command-line 2D drafting with layers, blocks, dimensions and plottable layouts, meant to feel familiar to AutoCAD users. One of eight free apps from the same studio.</p><p>The apps ship together in CadCraft Studio, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan.</p><p class="d-meta">Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href="https://getcadcraft.com" rel="noopener">Website</a> &middot; <a href="https://github.com/getcadcraft" rel="noopener">Source</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="flatcad" data-group="watch" data-plat="web" data-cap="drawings dwg" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="flatcad-d"><span class="m-tool">FlatCad</span><span class="m-maker">Independent developer</span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-yes"><a class="m-ev" href="https://flatcad.com/about#:~:text=Any%20current%20browser%20with%20WebGL" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://flatcad.com/floor-plan-drawing#:~:text=print%20the%20plan%20at%201%3A50" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, scaled PDF</span><span class="m-txt">scaled PDF</span></a></td><td class="m-part"><a class="m-ev" href="https://flatcad.com/about#:~:text=opens%20DXF" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, DXF in and out</span><span class="m-txt">DXF in and out</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="flatcad-d" data-group="watch">
+            <td colspan="12"><div class="d-body"><p>2D drafting for laser cutting, CNC and floor plans, from one developer. It opens DXF, SVG, Illustrator and PDF files, exports DXF and SVG, and prints PDF at a true scale such as 1:50.</p><p>Its maker says it is not an architecture program, with no walls, storeys or furniture libraries. Drawings stay in the browser.</p><p class="d-meta">Price: Free &middot; <a href="https://flatcad.com" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="ingetrazo" data-group="watch" data-plat="win mac linux" data-cap="drawings dwg ifc" data-tier="new" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="ingetrazo-d"><span class="m-tool">IngeTrazo</span><span class="m-maker">IngeLibre &middot; v0.5.11 &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://ingetrazo.com/en/#:~:text=Windows%2010%2F11" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://ingetrazo.com/en/#:~:text=Apple%20Silicon%20%C2%B7%20macOS" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://ingetrazo.com/en/#:~:text=Linux%20%C2%B7%20x86_64" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://ingetrazo.com/en/#:~:text=True%20scale%2C%20guaranteed" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Drawings: yes, scaled PDF sheets</span><span class="m-txt">scaled PDF sheets</span></a></td><td class="m-part"><a class="m-ev" href="https://ingetrazo.com/en/#:~:text=IngeTrazo%20imports%20DWG%20and%20DXF%20drawings" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">DWG: partly, import, DXF out</span><span class="m-txt">import, DXF out</span></a></td><td class="m-part"><a class="m-ev" href="https://ingetrazo.com/en/#:~:text=IFC%204%20export" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">IFC: partly, IFC 4 export</span><span class="m-txt">IFC 4 export</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="ingetrazo-d" data-group="watch">
+            <td colspan="12"><div class="d-body"><p>A 3D modeler for architecture and engineering from Peru, with push-pull solids and typed lengths. An optional BIM layer, still in development, tags walls, slabs, columns and doors and exports IFC 4.</p><p>Sheets hold scaled views with dimensions tied to the model and print to vector PDF. DWG import does not work on Mac yet.</p><p>A built-in AI assistant runs on your own key, and an MCP bridge lets Claude draw in the open app.</p><p class="d-meta">Price: Free, open source (GPL-3.0), with no paid editions &middot; <a href="https://ingetrazo.com/en/" rel="noopener">Website</a> &middot; <a href="https://github.com/ingelibre/ingetrazo" rel="noopener">Source</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="openarch-bim" data-group="watch" data-plat="win mac linux" data-cap="drawings" data-tier="new" data-free="1">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="openarch-bim-d"><span class="m-tool">OpenArch BIM</span><span class="m-maker">Open source &middot; early development &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-yes"><a class="m-ev" href="https://github.com/kristiangl/OpenArchBIM" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://github.com/kristiangl/OpenArchBIM" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://github.com/kristiangl/OpenArchBIM" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Linux: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-part m-cap1"><a class="m-ev" href="https://github.com/kristiangl/OpenArchBIM" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">Drawings: partly, views, no sheets</span><span class="m-txt">views, no sheets</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">DWG: no, DXF planned</span><span class="m-txt">DXF planned</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">IFC: no, planned</span><span class="m-txt">planned</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Revit exchange: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Shared model: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="openarch-bim-d" data-group="watch">
+            <td colspan="12"><div class="d-body"><p>BIM written from scratch in Rust. It models layered walls, floors, roofs and families, with plans, elevations, sections and schedules.</p><p>In early development, with no releases yet. Sheets and PDF, DXF and IFC export are planned.</p><p class="d-meta">Price: Free, open source (AGPL-3.0) &middot; <a href="https://github.com/kristiangl/OpenArchBIM" rel="noopener">Website</a></p></div></td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="m-hscroll" aria-hidden="true" hidden><div></div></div>
+  <!-- matrix:end -->
+  <p class="m-none" id="noMatch" hidden>No tool here matches every filter selected. Clear one to see more.</p>
+
+  <div class="chooser-notes">
+    <section id="education">
+      <div class="section-label">Education licenses</div>
+      <p>Most commercial tools are free while you study or teach. Education licenses are for
+         learning only, and several mark every file and print they produce. A watermarked file
+         stays watermarked once you open it in a commercial copy, so start real projects in a
+         commercial license.</p>
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.autodesk.com/support/account/education/students-educators/overview" rel="noopener">Autodesk Education</a></div>
+        <div class="pick-meta">Revit, AutoCAD and the AEC Collection</div>
+        <div class="pick-note">Free one-year, single-user access for eligible students and educators, renewed each year while you stay eligible. For learning, teaching and research only, not commercial work.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://graphisoft.com/education" rel="noopener">Archicad Education</a></div>
+        <div class="pick-meta">Windows &middot; Mac</div>
+        <div class="pick-note">Free for students and teachers at accredited schools for a year, extended free until you finish your studies. Files carry an Educational watermark that cannot be removed.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.vectorworks.net/en-US/education" rel="noopener">Vectorworks Educational</a></div>
+        <div class="pick-meta">Windows &middot; Mac</div>
+        <div class="pick-note">A free Design Suite license for students and educators in selected countries. Educational files are watermarked, the watermark carries into files that reference or import them, and prints show it on every page.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.chiefarchitect.com/academic/" rel="noopener">Chief Architect student license</a></div>
+        <div class="pick-meta">Windows &middot; Mac</div>
+        <div class="pick-note">Chief Architect Premier, free for students in degree programs. The license runs to a set date each term and you reapply with proof of enrollment. Layout pages print with a Not for Commercial Use watermark.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://sketchup.trimble.com/en/plans-and-pricing" rel="noopener">SketchUp for Education</a></div>
+        <div class="pick-meta">Web &middot; iPad &middot; desktop, by plan</div>
+        <div class="pick-note">Free for schools with a Google Workspace for Education or Microsoft Education account. Higher-education student and educator plans cost $55 a year.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.rhino3d.com/sales/" rel="noopener">Rhino education</a></div>
+        <div class="pick-meta">Windows &middot; Mac</div>
+        <div class="pick-note">Not free: $195 for a student or faculty license, $975 for a 30-seat lab. The same as the commercial version, but not transferable. Anyone can run the 90-day evaluation once, after which saving and plug-ins stop working.</div>
+      </div>
+    </section>
+
+    <section id="viewers">
+      <div class="section-label">Free viewers</div>
+      <p>To open, measure or mark up a model or drawing without editing it, a viewer is enough.</p>
+      <div class="pick">
+        <div class="pick-name"><a href="https://viewer.autodesk.com/" rel="noopener">Autodesk Viewer</a></div>
+        <div class="pick-meta">Web</div>
+        <div class="pick-note">Opens DWG, RVT and other design files in the browser, with markup and sharing.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.autodesk.com/products/dwg-trueview/overview" rel="noopener">DWG TrueView</a></div>
+        <div class="pick-meta">Windows</div>
+        <div class="pick-note">Opens 2D and 3D DWG without AutoCAD, and converts DWG to an earlier or later version for a consultant on another release.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://bonsaibim.org/viewer.html" rel="noopener">Bonsai Viewer</a></div>
+        <div class="pick-meta">Windows &middot; Linux &middot; Apple silicon Mac</div>
+        <div class="pick-note">A standalone viewer for large IFC models, drawings and data from the Bonsai project. Free and open source.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://bimvision.eu/" rel="noopener">BIMvision</a></div>
+        <div class="pick-meta">Windows</div>
+        <div class="pick-note">An IFC model viewer, free for personal and commercial use, with paid plug-ins.</div>
+      </div>
+      <div class="pick">
+        <div class="pick-name"><a href="https://www.dalux.com/products/bim-viewer/" rel="noopener">Dalux BIM Viewer</a></div>
+        <div class="pick-meta">Desktop &middot; iPad &middot; iPhone &middot; Android</div>
+        <div class="pick-note">A free viewer for BIM models, IFC and 2D drawings, with upload plug-ins for Revit and Archicad. Free with sign-up.</div>
+      </div>
+    </section>
+
+
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link" href="index.html">&larr; architecture.tools</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="privacy.html">Privacy &amp; analytics</a>
+    <span class="crumb-sep">&middot;</span> <a class="back-link" href="feedback.html">Feedback</a>
+  </div>
+</div>
+
+<script src="assets/js/ui.js"></script>
+<script>
+/* Feature matrix: open and close detail rows, and filter the rows.
+   Platforms are OR (a row stays when it runs on ANY selected platform);
+   capabilities are AND (it must do ALL the selected ones); Shortlist /
+   Newcomers / Free keeps rows of ANY selected tier, Free read from
+   data-free. The three combine. Column headings toggle the same filters
+   as the buttons, in each of the tables. ?p= ?c= ?t= keep the choice. Without
+   this script every row and detail row shows and the filter bar stays hidden. */
+(function () {
+  'use strict';
+  document.documentElement.classList.add('js');
+  var rows = [].slice.call(document.querySelectorAll('.m-row'));
+  var groups = [].slice.call(document.querySelectorAll('.m-group'));
+  var controls = document.getElementById('controls');
+  var platBtns = [].slice.call(controls.querySelectorAll('[data-plat]'));
+  var capBtns = [].slice.call(controls.querySelectorAll('[data-cap]'));
+  var tierBtns = [].slice.call(controls.querySelectorAll('[data-tier]'));
+  var count = document.getElementById('resultCount');
+  var clear = document.getElementById('clearPlat');
+  var none = document.getElementById('noMatch');
+  var wraps = [].slice.call(document.querySelectorAll('.m-wrap'));
+  var fine = window.matchMedia('(pointer: fine)');
+  function detail(row) { return document.getElementById(row.id + '-d'); }
+  function isOpen(row) { return row.querySelector('.m-open').getAttribute('aria-expanded') === 'true'; }
+  function setOpen(row, open) {
+    row.querySelector('.m-open').setAttribute('aria-expanded', open ? 'true' : 'false');
+    detail(row).hidden = !open || row.hidden;
+  }
+
+  // detail rows close once the script runs; a #tool hash opens that one
+  rows.forEach(function (row) {
+    setOpen(row, false);
+    row.querySelector('.m-open').addEventListener('click', function () { setOpen(row, !isOpen(row)); });
+  });
+  var target = location.hash && document.getElementById(location.hash.slice(1));
+  if (target && target.classList.contains('m-row')) setOpen(target, true);
+
+  // column headings become filter keys; each table's headings carry theirs
+  var heads = [].slice.call(document.querySelectorAll('.matrix thead th[data-key]')).map(function (th) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'm-hf';
+    b.dataset.kind = th.dataset.kind;
+    b.dataset.key = th.dataset.key;
+    b.title = (th.dataset.kind === 'plat' ? 'Show tools that run on ' : 'Show tools that do ') + th.textContent.trim() + ' (' + (th.querySelector('abbr') || th).getAttribute('title') + ')';
+    while (th.firstChild) b.appendChild(th.firstChild);
+    th.appendChild(b);
+    return b;
+  });
+
+  var sel = { plat: {}, cap: {}, tier: {} };
+  try {
+    var q = new URLSearchParams(location.search);
+    (q.get('p') || '').split(',').forEach(function (k) { if (platBtns.some(function (t) { return t.dataset.plat === k; })) sel.plat[k] = true; });
+    (q.get('c') || '').split(',').forEach(function (k) { if (capBtns.some(function (t) { return t.dataset.cap === k; })) sel.cap[k] = true; });
+    (q.get('t') || '').split(',').forEach(function (k) { if (tierBtns.some(function (t) { return t.dataset.tier === k; })) sel.tier[k] = true; });
+  } catch (e) {}
+
+  function has(row, attr, k) { return (' ' + row.getAttribute(attr) + ' ').indexOf(' ' + k + ' ') >= 0; }
+  function apply() {
+    var plats = Object.keys(sel.plat), caps = Object.keys(sel.cap), tiers = Object.keys(sel.tier), shown = 0;
+    var any = plats.length || caps.length || tiers.length;
+    rows.forEach(function (row) {
+      row.hidden = (plats.length > 0 && !plats.some(function (k) { return has(row, 'data-plat', k); })) ||
+                   !caps.every(function (k) { return has(row, 'data-cap', k); }) ||
+                   (tiers.length > 0 && !sel.tier[row.getAttribute('data-tier')] && !(sel.tier.free && row.hasAttribute('data-free')));
+      setOpen(row, isOpen(row));
+      if (!row.hidden) shown++;
+    });
+    groups.forEach(function (g) {
+      g.hidden = !rows.some(function (r) { return r.dataset.group === g.dataset.group && !r.hidden; });
+    });
+    // a table with no row left goes too, heading and all
+    wraps.forEach(function (w) {
+      w.hidden = ![].some.call(w.querySelectorAll('.m-row'), function (r) { return !r.hidden; });
+      sizeBar(w);
+    });
+    platBtns.forEach(function (t) { UI.press(t, !!sel.plat[t.dataset.plat]); });
+    capBtns.forEach(function (t) { UI.press(t, !!sel.cap[t.dataset.cap]); });
+    heads.forEach(function (h) { h.setAttribute('aria-pressed', sel[h.dataset.kind][h.dataset.key] ? 'true' : 'false'); });
+    tierBtns.forEach(function (t) { UI.press(t, !!sel.tier[t.dataset.tier]); });
+    count.textContent = any ? shown + ' of ' + rows.length + ' tools' : rows.length + ' tools';
+    clear.hidden = !any;
+    none.hidden = shown > 0;
+    var qs = [];
+    if (plats.length) qs.push('p=' + plats.join(','));
+    if (caps.length) qs.push('c=' + caps.join(','));
+    if (tiers.length) qs.push('t=' + tiers.join(','));
+    try { history.replaceState(null, '', (qs.length ? '?' + qs.join('&') : location.pathname) + location.hash); } catch (e) {}
+  }
+  function flip(kind, key) {
+    if (sel[kind][key]) delete sel[kind][key]; else sel[kind][key] = true;
+    apply();
+  }
+  platBtns.forEach(function (t) { t.addEventListener('click', function () { flip('plat', t.dataset.plat); }); });
+  capBtns.forEach(function (t) { t.addEventListener('click', function () { flip('cap', t.dataset.cap); }); });
+  heads.forEach(function (h) { h.addEventListener('click', function () { flip(h.dataset.kind, h.dataset.key); }); });
+  tierBtns.forEach(function (t) { t.addEventListener('click', function () { flip('tier', t.dataset.tier); }); });
+  clear.addEventListener('click', function () { sel = { plat: {}, cap: {}, tier: {} }; apply(); });
+
+  // pinned scrollbar, one per table: shown only with a mouse and only when
+  // that table overflows
+  function sizeBar(wrap) {
+    var bar = wrap.nextElementSibling;
+    var over = !wrap.hidden && fine.matches && wrap.scrollWidth > wrap.clientWidth + 1;
+    bar.hidden = !over;
+    wrap.classList.toggle('has-hscroll', over);
+    bar.firstChild.style.width = wrap.scrollWidth + 'px';
+    bar.scrollLeft = wrap.scrollLeft;
+  }
+  function follow(from, to) {
+    // the echo from the other side finds them equal and stops
+    from.addEventListener('scroll', function () {
+      if (Math.abs(to.scrollLeft - from.scrollLeft) > 0.5) to.scrollLeft = from.scrollLeft;
+    });
+  }
+  wraps.forEach(function (wrap) {
+    var bar = wrap.nextElementSibling;
+    follow(wrap, bar);
+    follow(bar, wrap);
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(function () { sizeBar(wrap); }).observe(wrap);
+  });
+  window.addEventListener('resize', function () { wraps.forEach(sizeBar); });
+  controls.hidden = false;
+  apply();
+})();
+</script>
+</body>
+</html>
