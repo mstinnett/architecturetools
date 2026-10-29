@@ -1989,7 +1989,7 @@
     },
     {
       "id": "flatcad",
-      "group": "free",
+      "group": "watch",
       "name": "FlatCad",
       "maker": "Independent developer",
       "tier": "",
@@ -2050,7 +2050,8 @@
         "2D drafting for laser cutting, CNC and floor plans, from one developer. It opens DXF, SVG, Illustrator and PDF files, exports DXF and SVG, and prints PDF at a true scale such as 1:50.",
         "Its maker says it is not an architecture program, with no walls, storeys or furniture libraries. Drawings stay in the browser."
       ],
-      "meta": "Price: Free &middot; <a href=\"https://flatcad.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free &middot; <a href=\"https://flatcad.com\" rel=\"noopener\">Website</a>",
+      "free": true
     }
   ]
 }
