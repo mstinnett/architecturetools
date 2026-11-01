@@ -231,15 +231,15 @@
         "web": ["no", "", ""],
         "measure": ["yes", "with takeoff", "https://blueprintformac.com/construction-takeoff-software-for-mac"],
         "team": ["no", "", ""],
-        "compare": ["yes", "overlay, blink, swipe", "https://blueprintformac.com/construction-takeoff-software-for-mac"]
+        "compare": ["yes", "revision overlay", "https://blueprintformac.com/construction-takeoff-software-for-mac"]
       },
       "price": "One-time",
       "notes": [
-        "A native Mac app for markup and takeoff on construction PDFs. Clouds, callouts, stamps and status markers, with the scale set sheet by sheet from a known dimension or the printed scale, and a Verify Scale tool to check it against a printed dimension. Lengths, areas with deductions, and counts total into a markups list that exports to CSV.",
-        "Compare revisions by overlay, blink or swipe. Markups save into the PDF, and markups made in Bluebeam Revu or Acrobat open and can be edited. Files stay on the Mac, with no account, and text recognition runs on the device. There are no live shared sessions and no Windows version. It needs macOS 14 or later, on Apple silicon or Intel."
+        "A PDF markup and takeoff app for construction drawings, for Mac only. Set the scale on each sheet from a known dimension or the printed scale, then measure lengths, areas and counts. Totals export to CSV.",
+        "Compare revisions by overlay, blink or swipe. Markups save into the PDF, and markups made in Bluebeam Revu or Acrobat open for editing. Files stay on the Mac. It needs macOS 14 or later."
       ],
       "disclosure": "",
-      "meta": "Price: US$79 one-time for two Macs, with updates through version 1.x; a US$19 founder licence for the first 100 buyers &middot; <a href=\"https://blueprintformac.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$79 one-time, for two Macs &middot; <a href=\"https://blueprintformac.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "plandify",
@@ -249,18 +249,18 @@
       "tier": "new",
       "cells": {
         "win": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Windows%20download%3A%20x64"],
-        "mac": ["yes", "Apple silicon", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Mac%20download%3A%20Apple%20silicon"],
+        "mac": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Mac%20download%3A%20Apple%20silicon"],
         "linux": ["no", "", ""],
         "ipad": ["no", "", ""],
         "web": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads#:~:text=Browser%20app"],
-        "measure": ["yes", "with estimating", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Preserve%20appearance%2C%20labels%2C%20calibration%20and%20estimating%20settings"],
+        "measure": ["yes", "length, area", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Preserve%20appearance%2C%20labels%2C%20calibration%20and%20estimating%20settings"],
         "team": ["no", "", ""],
         "compare": ["no", "", ""]
       },
       "price": "Free",
       "notes": [
-        "A free PDF reader and editor for documents and drawings from one developer, in the browser or as a desktop app for Windows and Apple silicon Macs. Calibrated measurement with estimating settings, and an Offset / copy command that moves or offsets shapes and measurements by a measured distance and recalculates their quantities.",
-        "Markups save with standard PDF appearance streams, so they display in other PDF apps. It is at version 0.14 and updates often; support is by optional donation."
+        "A free PDF reader and editor from one developer, in the browser or as a desktop app for Windows and Mac. Measure lengths and areas at a calibrated scale, and offset or copy shapes and measurements by a set distance.",
+        "Markups display in other PDF apps. It is at version 0.14. The Mac version needs Apple Silicon."
       ],
       "disclosure": "",
       "meta": "Price: Free, with optional donations &middot; <a href=\"https://plandify.app\" rel=\"noopener\">Website</a>"
