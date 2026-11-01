@@ -118,7 +118,7 @@
       "price": "Free",
       "notes": [
         "A PDF markup and takeoff app from one developer that runs in the browser or as a desktop app. CAD commands such as Offset, Fillet and Trim work on markups, and an assembly turns one measurement into the materials it needs. Markups save as standard PDF annotations that open in Bluebeam Revu.",
-        "Compare clouds every difference between two revisions, and Overlay stacks them in color. Shared live markup through your own OneDrive is experimental. It is at version 0.1, and the installers are not signed, so Windows and macOS warn the first time it opens."
+        "Compare clouds every difference between two revisions, and Overlay stacks them in color. Shared live markup through your own OneDrive is experimental."
       ],
       "disclosure": "",
       "meta": "Price: Free, open source &middot; <a href=\"https://github.com/ColbyGallagher/redcolumn\" rel=\"noopener\">Website</a>"
