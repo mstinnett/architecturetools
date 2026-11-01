@@ -142,7 +142,7 @@
       "price": "Subscription or one-time",
       "notes": [
         "A PDF editor for large CAD and BIM drawing sets. Redlines, notes, shapes and large-format printing, with local files.",
-        "Set the scale by ratio or by calibrating a known length, then measure lengths and areas. Drag an older revision onto a sheet to overlay it, with additions and removals in color. The Mac version needs Apple Silicon."
+        "Set the scale by ratio or by calibrating a known length, then measure lengths and areas. Drag an older revision onto a sheet to overlay it, with additions and removals in color."
       ],
       "disclosure": "",
       "meta": "Price: &euro;12.99 a month, &euro;79.99 a year, or &euro;159 one-time with two years of updates &middot; <a href=\"https://ncored.com\" rel=\"noopener\">Website</a>"
@@ -259,8 +259,7 @@
       },
       "price": "Free",
       "notes": [
-        "A free PDF reader and editor from one developer, in the browser or as a desktop app for Windows and Mac. Measure lengths and areas at a calibrated scale, and offset or copy shapes and measurements by a set distance.",
-        "Markups display in other PDF apps. It is at version 0.14. The Mac version needs Apple Silicon."
+        "A free PDF reader and editor from one developer, in the browser or as a desktop app for Windows and Mac. Measure lengths and areas at a calibrated scale, and offset or copy shapes and measurements by a set distance. Markups display in other PDF apps."
       ],
       "disclosure": "",
       "meta": "Price: Free, with optional donations &middot; <a href=\"https://plandify.app\" rel=\"noopener\">Website</a>"
