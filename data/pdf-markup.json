@@ -265,6 +265,30 @@
       "meta": "Price: Free, with optional donations &middot; <a href=\"https://plandify.app\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "open-pdf-studio",
+      "group": "indie",
+      "name": "Open PDF Studio",
+      "maker": "OpenAEC Foundation",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
+        "mac": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
+        "linux": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
+        "ipad": ["no", "", ""],
+        "web": ["no", "", ""],
+        "measure": ["yes", "with takeoff", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Count%20tool%20with%20named%20tally%20categories"],
+        "team": ["no", "", ""],
+        "compare": ["yes", "compare, overlay", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Compare%20two%20PDF%20revisions%20in%20a%20dedicated%20compare%20tab"]
+      },
+      "price": "Free",
+      "notes": [
+        "A free, open-source PDF editor for Windows, Mac and Linux. Calibrate the scale, then measure distances, areas and perimeters, and count objects by named category. Counts, lengths and areas total in a live quantities schedule.",
+        "Compare two revisions side by side or as an overlay, with scrolling and zoom locked together."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source &middot; Also on Android &middot; <a href=\"https://github.com/OpenAEC-Foundation/open-pdf-studio\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "adequate",
       "group": "review",
       "name": "Adequate Design Review",
