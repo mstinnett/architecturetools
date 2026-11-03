@@ -567,29 +567,39 @@
       </div>
 
       <a class="cover-card cover-feature" href="pdf-markup.html">
-        <!-- A sheet with its title block, a revision cloud around one
-             room and a tagged leader: the thing every tool on the page
-             does. Strokes read the number-line tokens so it inverts
-             with the scheme; the markup is the accent. -->
+        <!-- A real sheet under review: the A-100 plan traced as an icon,
+             with its revision cloud, tag and two callouts. Strokes read the
+             number-line tokens so it inverts with the scheme; the markup is
+             the accent. -->
         <div class="card-art">
           <svg class="nl fine" viewBox="0 0 260 208" role="img"
-               aria-label="A drawing sheet with a revision cloud drawn around one room and a numbered tag on a leader">
-            <!-- sheet + title block -->
-            <rect x="30" y="20" width="200" height="168" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
-            <path d="M196 20 V188" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
-            <path d="M201 150 H225 M201 158 H225 M201 166 H218" fill="none" stroke="var(--nl-tick)" stroke-width="0.5"/>
-            <!-- plan: walls -->
-            <g fill="none" stroke="var(--nl-ink)" stroke-width="0.75">
-              <path d="M46 40 H166 V168 H46 Z"/>
-              <path d="M108 40 V96 M46 108 H90 M114 108 H166"/>
+               aria-label="A floor plan sheet marked up for review: a revision cloud with a numbered tag around one wall, and two callouts on leaders">
+            <!-- traced from a marked-up A-100 plan, in the sheet's own pixels; the
+                 title block is drawn closer to the plan than it sits on the sheet -->
+            <g transform="translate(-31.375 -2.1) scale(0.1655)" fill="none">
+              <!-- sheet edge, title block column and its bands -->
+              <rect x="250" y="200" width="1450" height="880" stroke="var(--nl-axis)" stroke-width="0.5"/>
+              <path d="M1570 200 V1080 M1570 250 H1700 M1570 560 H1700 M1570 860 H1700 M1570 990 H1700" stroke="var(--nl-axis)" stroke-width="0.5"/>
+              <path d="M1592 300 H1678 M1592 340 H1678 M1592 380 H1650 M1592 620 H1678 M1592 660 H1650 M1592 720 H1678 M1592 760 H1650 M1600 940 H1670" stroke="var(--nl-tick)" stroke-width="0.5"/>
+              <!-- the plan: outer walls, open at the patio glazing -->
+              <path d="M1150 662 H1205 L1255 915 H1490 V488 H1355 L1335 318 H310 V975 H550 V905 H625 L720 662 H840" stroke="var(--nl-ink)" stroke-width="1"/>
+              <!-- glazing across the patio: the stacking door and the fixed panel -->
+              <path d="M840 662 H1150" stroke="var(--nl-tick)" stroke-width="0.5"/>
+              <!-- interior walls -->
+              <path d="M482 318 V572 M548 318 V525 H645 V318 M645 420 H800 M645 525 H800 M310 505 H440 M310 660 H550 V905 M310 830 H500 M440 905 V975 M800 318 V660 M1255 462 H1295 V600 M1295 550 H1490 M1280 660 H1490"
+                    stroke="var(--nl-ink)" stroke-width="0.6"/>
+              <!-- the tub, the island and the patio paving line -->
+              <rect x="325" y="580" width="60" height="70" rx="22" stroke="var(--nl-tick)" stroke-width="0.5"/>
+              <rect x="878" y="428" width="132" height="34" stroke="var(--nl-tick)" stroke-width="0.5"/>
+              <!-- markup: revision cloud and its tag -->
+              <path d="M440 288 A14 14 0 0 1 464 288 A14 14 0 0 1 487 288 A14 14 0 0 1 510 288 A14 14 0 0 1 534 288 A15 15 0 0 1 534 314 A15 15 0 0 1 534 339 A15 15 0 0 1 534 365 A15 15 0 0 1 534 391 A15 15 0 0 1 534 416 A15 15 0 0 1 534 442 A15 15 0 0 1 534 467 A15 15 0 0 1 534 493 A15 15 0 0 1 534 519 A15 15 0 0 1 534 544 A15 15 0 0 1 534 570 A14 14 0 0 1 510 570 A14 14 0 0 1 487 570 A14 14 0 0 1 464 570 A14 14 0 0 1 440 570 A15 15 0 0 1 440 544 A15 15 0 0 1 440 519 A15 15 0 0 1 440 493 A15 15 0 0 1 440 467 A15 15 0 0 1 440 442 A15 15 0 0 1 440 416 A15 15 0 0 1 440 391 A15 15 0 0 1 440 365 A15 15 0 0 1 440 339 A15 15 0 0 1 440 314 A15 15 0 0 1 440 288 Z" stroke="var(--accent)" stroke-width="0.75"/>
+              <circle cx="440" cy="284" r="14" fill="var(--accent)" stroke="none"/>
+              <!-- markup: two callouts on leaders -->
+              <path d="M826 650 L862 748 M1162 664 L1112 748" stroke="var(--accent)" stroke-width="0.5"/>
+              <rect x="826" y="748" width="72" height="24" stroke="var(--accent)" stroke-width="0.75"/>
+              <rect x="1073" y="748" width="76" height="24" stroke="var(--accent)" stroke-width="0.75"/>
+              <path d="M838 760 H886 M1085 760 H1137" stroke="var(--accent)" stroke-width="0.5"/>
             </g>
-            <!-- revision cloud around the upper-right room -->
-            <path d="M118 48 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 q8 2 6 10 q8 4 2 12 q8 4 2 12 q6 6 -2 12 q-2 8 -10 6 q-6 8 -12 0 q-6 8 -12 0 q-6 8 -12 0 q-8 2 -8 -6 q-8 -4 -2 -12 q-8 -4 -2 -12 q-8 -4 -2 -12 q0 -8 10 -10 Z"
-                  fill="none" stroke="var(--accent)" stroke-width="0.75" transform="matrix(0.85 0 0 0.85 18.5 8)"/>
-            <!-- leader + delta tag -->
-            <path d="M164 96 L180 118" fill="none" stroke="var(--accent)" stroke-width="0.5"/>
-            <path d="M182 116 L190 130 H174 Z" fill="none" stroke="var(--accent)" stroke-width="0.75"/>
-            <text x="182" y="128" class="nl-snap-val" text-anchor="middle" style="font-size:8px;fill:var(--accent);stroke:none">2</text>
           </svg>
         </div>
         <div class="card-body">
