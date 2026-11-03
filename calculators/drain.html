@@ -505,6 +505,11 @@
     var sDown = down / L, sUp = up / L;
     var cDown = Drain.check(sDown, lim.min, lim.max), cUp = Drain.check(sUp, lim.min, lim.max);
     var upFits = hLimit == null || Drain.heightUsed(up, odU, alU) <= hLimit;
+    // a slope on the minimum: any drop rounded down off a step is under it,
+    // so rounding down is not an option worth showing (unless rounding up
+    // does not fit, where the shortened run is figured from it)
+    var atMin = lim.min != null && Math.abs(s / lim.min - 1) <= 1e-6;
+    var hideDown = atMin && down !== up && upFits;
 
     // the lede: one sentence, the build instruction
     var lede, cS = Drain.check(s, lim.min, lim.max);
@@ -520,6 +525,7 @@
     } else if (down === up && Drain.check(sDown, lim.min, lim.max) !== 'ok') {
       lede = 'The drop lands on ' + esc(inc.label) + ' steps at ' + esc(fmtV(down)) + ', which is ' + (cDown === 'under' ? 'under the minimum' : 'over the maximum') + '.';
     } else if (down === up) lede = 'The drop lands on ' + esc(inc.label) + ' steps: build it to <b>' + esc(fmtV(down)) + '</b>.';
+    else if (hideDown) lede = 'Round the drop up to <b>' + esc(fmtV(up)) + '</b> to hold the ' + esc(lim.minFace) + ' minimum.';
     else if (cDown === 'under' && cUp === 'ok' && upFits) lede = 'Round the drop up to <b>' + esc(fmtV(up)) + '</b>. Rounding down to ' + esc(fmtV(down)) + ' puts it under the ' + esc(lim.minFace) + ' minimum.';
     else if (cDown === 'under' && !upFits) lede = 'Rounding down to ' + esc(fmtV(down)) + ' is under the minimum and rounding up to ' + esc(fmtV(up)) + ' is over the height. Shorten the run to <b>' + esc(fmtRunMax(Math.floor(down / lim.min))) + '</b> to fall ' + esc(fmtV(down)) + ' at the minimum.';
     else if (cUp === 'over' && cDown === 'ok') lede = 'Round the drop down to <b>' + esc(fmtV(down)) + '</b>. Rounding up puts it over the ' + esc(lim.maxFace) + ' maximum.';
@@ -540,6 +546,9 @@
     if (down === up) {
       var wS = whyVoid(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit);
       r += rowHtml('On a step', esc(slopeText(sDown)), voidIf(esc(fmtV(down)), wS), whyCell(wS), false);
+    } else if (hideDown) {
+      var wH = whyVoid(sUp, lim, Drain.heightUsed(up, odU, alU), hLimit);
+      r += rowHtml('Rounded up', esc(slopeText(sUp)), voidIf(esc(fmtV(up)), wH) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(up, odU, alU))) + '</span>', whyCell(wH), false);
     } else {
       var wD = whyVoid(sDown, lim, Drain.heightUsed(down, odU, alU), hLimit), wU = whyVoid(sUp, lim, Drain.heightUsed(up, odU, alU), hLimit);
       r += rowHtml('Rounded down', esc(slopeText(sDown)), voidIf(esc(fmtV(down)), wD) + '<span class="snap-dec">height ' + esc(fmtV(Drain.heightUsed(down, odU, alU))) + '</span>', whyCell(wD), false);
