@@ -1988,6 +1988,74 @@
       "meta": "Price: Free &middot; <a href=\"https://www.tinkercad.com\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "lapin",
+      "group": "watch",
+      "name": "Lapin",
+      "maker": "Ciuntuc BIM Studio",
+      "tier": "new",
+      "cells": {
+        "win": [
+          "yes",
+          "test build",
+          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
+        ],
+        "mac": [
+          "yes",
+          "Apple silicon",
+          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
+        ],
+        "linux": [
+          "yes",
+          "test build",
+          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://lapin.ciuntucbimstudio.ro/web/"
+        ],
+        "drawings": [
+          "yes",
+          "PDF sheets",
+          "https://lapin.ciuntucbimstudio.ro/docs/sheets.html#:~:text=The%20PDF%20and%20DXF%20buttons"
+        ],
+        "dwg": [
+          "part",
+          "DXF in and out",
+          "https://lapin.ciuntucbimstudio.ro/docs/sheets.html#:~:text=A%20DXF%20opens%20in%20AutoCAD"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://lapin.ciuntucbimstudio.ro/docs/import-export.html#:~:text=Every%20wall%2C%20floor%2C%20door%20and%20roof%20is%20a%20real%20IFC%20element"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "yes",
+          "live session",
+          "https://lapin.ciuntucbimstudio.ro/docs/sharing.html#:~:text=Several%20people%20can%20work%20in%20the%20same%20project%20at%20the%20same%20time"
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "BIM built on IFC from a small Romanian studio. It models walls, floors, roofs, stairs, structure and MEP schematics, with sections, elevations and sheets printed to PDF or DXF, and it reads and writes IFC4 and IFC4X3.",
+        "A host shares the open project and others join live from the app or a browser. DWG must be saved as DXF first. The browser version runs the same app, a little slower than the desktop one."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (MIT) &middot; <a href=\"https://lapin.ciuntucbimstudio.ro/docs/\" rel=\"noopener\">Website</a>",
+      "status": "test builds",
+      "free": true
+    },
+    {
       "id": "flatcad",
       "group": "watch",
       "name": "FlatCad",
