@@ -4,7 +4,8 @@ Readers send notes from `feedback.html`, linked in every live page's footer.
 Each note goes straight to a Cloudflare D1 database in the site's own
 Cloudflare account. The owner reads them at **https://architecture.tools/inbox**,
 behind a password. Nothing depends on the reader's email app, and no third
-party beyond Cloudflare, which already hosts the site, is involved.
+party beyond Cloudflare, which already hosts the site, is involved. An email
+tells the owner a note has arrived. It carries none of the note.
 
 This is the site's one piece of server code, in the Worker that serves the
 site (`docs/HOSTING.md`). Page views never run it.
@@ -14,7 +15,7 @@ site (`docs/HOSTING.md`). Page views never run it.
 | File | What it does |
 |---|---|
 | `feedback.html` | The form. Sends in place with script; without script it is a plain form post that comes back to `#sent` or `#not-sent`. Sends the page the reader came from (this site only). |
-| `worker/feedback.js` | `POST /api/feedback`. Checks the post came from this site, drops bots (a hidden `website` field), enforces the length limits, and saves the note. Keeps the note, the optional reply address, the page, and the time. Never the IP address or browser details. |
+| `worker/feedback.js` | `POST /api/feedback`. Checks the post came from this site, drops bots (a hidden `website` field), enforces the length limits, saves the note, and sends the email notice. Keeps the note, the optional reply address, the page, and the time. Never the IP address or browser details. |
 | `worker/inbox.js` | `/inbox`. Lists the newest 500 notes. Each has a Delete button that only works from the inbox's own page. Answers 404 until both the database and the password below are set up. |
 | `worker/feedback-store.js` | The table definition and the same-site check, shared by both. |
 | `worker/index.js` | Routes the two paths to the code above (`docs/HOSTING.md`). |
@@ -38,6 +39,38 @@ The feedback form is set up as part of the site's Worker: `docs/HOSTING.md`,
 
 Until both exist the form says "Your note wasn't sent" and `/inbox` is 404.
 Nothing breaks.
+
+## Email notice
+
+Each saved note sends one email to the owner: a fixed subject and a link to
+`/inbox`. It carries nothing the reader wrote, on purpose. Mail sits in a
+mailbox that Delete on `/inbox` can't reach, so a copy of the note there would
+break the promise in `privacy.html#feedback`, and the mailbox provider would
+become a new party holding it. Putting the note in the email means updating
+that section in the same commit.
+
+Bots caught by the hidden field and notes that fail to save send nothing. A
+failed send never fails the note.
+
+It uses Cloudflare Email Service. Sends to a verified destination address are
+free on every plan. Set up in this order, **before this code reaches `main`**:
+
+1. **Verify the address.** Compute > Email Service > Email Routing >
+   Destination addresses > add your address, then press the link in the
+   email Cloudflare sends.
+2. **Onboard a sending subdomain.** Compute > Email Service > Email Sending >
+   Onboard Domain, and choose the subdomain `notify.architecture.tools`, the
+   domain in `NOTIFY_FROM` in `worker/feedback.js`.
+   - **Don't onboard Email Routing on `architecture.tools` itself.** It adds
+     MX records to the root, where the domain's mail runs through Hover today.
+   - Onboarding the root for sending adds `_dmarc` with `p=reject`, which
+     would apply to mail sent from `@architecture.tools`. The subdomain keeps
+     that off the root.
+3. **Add the secret.** The Worker > Settings > Variables and Secrets > Add,
+   type Secret, name **`NOTIFY_TO`**, value the verified address. It is a
+   secret to keep the address out of this public repo.
+
+Without `NOTIFY_TO` the Worker sends nothing, and notes still save.
 
 ## Reading and clearing notes
 
