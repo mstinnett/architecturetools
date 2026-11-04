@@ -67,6 +67,8 @@ free on every plan. The setup, in the dashboard:
 
 Without `NOTIFY_TO` the Worker sends nothing, and notes still save.
 
+Deployed and confirmed working on the live site, 2026-11-04.
+
 ## Reading and clearing notes
 
 **The privacy statement promises every note is deleted after it is read, or
