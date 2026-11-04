@@ -53,21 +53,16 @@ Bots caught by the hidden field and notes that fail to save send nothing. A
 failed send never fails the note.
 
 It uses Cloudflare Email Service. Sends to a verified destination address are
-free on every plan. Set up in this order, **before this code reaches `main`**:
+free on every plan. The setup, in the dashboard:
 
-1. **Verify the address.** Compute > Email Service > Email Routing >
-   Destination addresses > add your address, then press the link in the
-   email Cloudflare sends.
-2. **Onboard a sending subdomain.** Compute > Email Service > Email Sending >
-   Onboard Domain, and choose the subdomain `notify.architecture.tools`, the
-   domain in `NOTIFY_FROM` in `worker/feedback.js`.
-   - **Don't onboard Email Routing on `architecture.tools` itself.** It adds
-     MX records to the root, where the domain's mail runs through Hover today.
-   - Onboarding the root for sending adds `_dmarc` with `p=reject`, which
-     would apply to mail sent from `@architecture.tools`. The subdomain keeps
-     that off the root.
-3. **Add the secret.** The Worker > Settings > Variables and Secrets > Add,
-   type Secret, name **`NOTIFY_TO`**, value the verified address. It is a
+1. **Email Routing** is on for `architecture.tools`, so the domain's MX records
+   point at Cloudflare. No address at the domain receives mail unless a routing
+   rule is added.
+2. **The address is verified.** Compute > Email Service > Email Routing >
+   Destination Addresses: enter it, then press the link in the email Cloudflare
+   sends. An unverified address gets no notice.
+3. **The secret.** The Worker > Settings > Variables and Secrets > Add, type
+   Secret, name **`NOTIFY_TO`**, value the verified address, exactly. It is a
    secret to keep the address out of this public repo.
 
 Without `NOTIFY_TO` the Worker sends nothing, and notes still save.
