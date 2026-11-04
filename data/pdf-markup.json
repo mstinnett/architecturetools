@@ -218,6 +218,54 @@
       "meta": "Price: Free. Desktop Pro $74.95 one-time, iPad Pro $99 one-time &middot; Also on iPhone &middot; <a href=\"https://polypdf.com\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "krescad",
+      "group": "indie",
+      "name": "KresCAD",
+      "maker": "KresCAD",
+      "tier": "new",
+      "cells": {
+        "win": ["no", "", ""],
+        "mac": ["no", "", ""],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["yes", "desktop browser", "https://krescad.com/faq/#:~:text=Use%20a%20modern%20desktop%20or%20laptop%20browser"],
+        "measure": ["yes", "length, area", "https://krescad.com/measure-pdf-plans/#:~:text=Calibrate%20a%20PDF%20drawing%20from%20a%20known%20dimension"],
+        "team": ["no", "", ""],
+        "compare": ["no", "", ""]
+      },
+      "price": "Free",
+      "notes": [
+        "A browser workspace from architects in Melbourne. Calibrate a PDF plan, measure lengths and areas, count items, add notes and draw to scale, then export a watermark-free PDF. English OCR makes scanned plans searchable, and files stay in the browser.",
+        "It runs in desktop and laptop browsers, with tablet and phone planned. It does not import DWG or DXF. Its maker calls it experimental and asks you to check measurements against the plan."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, no account. Paid options may come later &middot; <a href=\"https://krescad.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "pdf-measure",
+      "group": "indie",
+      "name": "PDF Measure",
+      "maker": "Charmillon LLC",
+      "tier": "new",
+      "cells": {
+        "win": ["no", "", ""],
+        "mac": ["no", "", ""],
+        "linux": ["no", "", ""],
+        "ipad": ["part", "in Safari", "https://pdfmeasure.com/compare#:~:text=Any%20browser%3A%20Mac%2C%20Windows%2C%20Linux%2C%20iPad"],
+        "web": ["yes", "", "https://pdfmeasure.com/compare#:~:text=Any%20browser%3A%20Mac%2C%20Windows%2C%20Linux%2C%20iPad"],
+        "measure": ["yes", "with takeoff", "https://pdfmeasure.com/compare#:~:text=Distance%2C%20area%2C%20perimeter%2C%20angle%2C%20counts%20and%20length%20runs"],
+        "team": ["no", "", ""],
+        "compare": ["yes", "overlay", "https://pdfmeasure.com/compare#:~:text=Overlay%20one%20sheet%20on%20another"]
+      },
+      "price": "Free",
+      "notes": [
+        "A browser tool for measuring and marking up PDF plans: lengths, areas, perimeters and angles at a set scale, with counts and runs totaled across sheets and exported to CSV. Clouds, callouts and dimension lines export on a marked-up PDF, and an overlay tints one sheet over another to show changes.",
+        "Files stay on your device. Symbols are counted by clicking, and it has no unit costs. Markups move between computers as a JSON file, with no shared review."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, no account &middot; <a href=\"https://pdfmeasure.com\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "project-blueprint",
       "group": "indie",
       "name": "Project Blueprint",

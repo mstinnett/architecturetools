@@ -20,12 +20,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDF Markup Software for Architects -- architecture.tools</title>
-<meta name="description" content="Twenty-three PDF markup apps for architects in one feature matrix: platforms, scaled measurement, team review, revision comparison and price. Bluebeam Revu, Acrobat, Drawboard, PDF Expert, PDF-XChange, PDF Studio, Adequate Design Review and more.">
+<meta name="description" content="Twenty-five PDF markup apps for architects in one feature matrix: platforms, scaled measurement, team review, revision comparison and price. Bluebeam Revu, Acrobat, Drawboard, PDF Expert, PDF-XChange, PDF Studio, Adequate Design Review and more.">
 <link rel="canonical" href="https://architecture.tools/pdf-markup.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://architecture.tools/pdf-markup.html">
 <meta property="og:title" content="PDF Markup Software for Architects -- architecture.tools">
-<meta property="og:description" content="Twenty-three PDF markup apps in one feature matrix: platforms, measurement, team review and price.">
+<meta property="og:description" content="Twenty-five PDF markup apps in one feature matrix: platforms, measurement, team review and price.">
 <meta name="twitter:card" content="summary">
 <script async src="https://plausible.io/js/pa-J0glxsBAd6XLnTEgAxhDm.js"></script>
 <script>
@@ -47,6 +47,7 @@
   /* ---- page-specific only: the feature matrix and its platform filter ---- */
   .page-wide { max-width: 1440px; }
   .list-disclosure { font-size: var(--text-sm); font-weight: 300; color: var(--ink-muted); margin: calc(-1 * var(--space-md)) 0 var(--space-lg); }
+  .m-suggest { align-items: center; gap: 0.5rem; margin-bottom: var(--space-md); }
   .m-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; padding: var(--space-md) 0; border-top: 1px solid var(--rule); }
   .m-filter[hidden] { display: none; }
   .m-filter .section-label { margin: 0; }
@@ -145,11 +146,12 @@
   </div>
 
   <p class="chooser-updated">Reviewed 19 October 2026</p>
-  <p class="chooser-lede">Twenty-three apps architects use to mark up, measure and review PDF drawings,
+  <p class="chooser-lede">Twenty-five apps architects use to mark up, measure and review PDF drawings,
      grouped by what each is built for, with small independent markup tools in a group of their own,
-     and listed alphabetically within each group. Below the matrix: AI services that check a whole set for issues.
+     and listed alphabetically within each group. Below the matrix: AI services that check a whole set for issues, and one that drafts markups into a DWG.
      Open a tool&rsquo;s name for its notes and full price, and a mark for the page that shows it.</p>
   <p class="list-disclosure">One of them, Adequate Design Review, is made by the person who runs this site.</p>
+  <p class="key-row m-suggest"><span class="key-label">Missing something?</span> <a class="key-sm" href="feedback.html">Send a suggestion</a></p>
 
   <div class="m-filter" id="controls" hidden>
     <div class="m-fgroup">
@@ -164,7 +166,7 @@
       <span class="section-label" id="capLabel">Does all of</span>
       <div class="option-row" role="group" aria-labelledby="capLabel"><button type="button" class="app-toggle" aria-pressed="false" data-cap="measure">Measure</button><button type="button" class="app-toggle" aria-pressed="false" data-cap="team">Team review</button><button type="button" class="app-toggle" aria-pressed="false" data-cap="compare">Compare</button></div>
     </div>
-    <div class="m-status"><span id="resultCount" aria-live="polite">23 tools</span><button type="button" class="m-clear" id="clearPlat" hidden>Clear</button></div>
+    <div class="m-status"><span id="resultCount" aria-live="polite">25 tools</span><button type="button" class="m-clear" id="clearPlat" hidden>Clear</button></div>
   </div>
   <p class="m-legend"><span><span class="m m-yes" aria-hidden="true">&#9679;</span>Yes</span><span><span class="m m-part" aria-hidden="true">&#9680;</span>Partly, or on a paid tier</span><span><span class="m m-no" aria-hidden="true">&ndash;</span>No</span><span>Shortlist is an editorial selection, not a market-share ranking. Platforms are the main app. Web versions and phone apps often do less.</span><span>Basic annotation tools vary. The columns compare measurement and review features.</span></p>
 
@@ -229,6 +231,13 @@
           <tr class="m-detail" id="caliper-d" data-group="indie">
             <td colspan="10"><div class="d-body"><p>A PDF markup and takeoff app for Mac and Windows from a licensed architect. Set each page&rsquo;s scale by two points or read it from the printed scale, then measure lengths, areas and angles that snap to the drawing&rsquo;s own lines. Tagged areas total into a schedule that exports to CSV.</p><p>Lay one drawing over another to compare revisions, or open two side by side with scroll and zoom locked together. Markups save into the PDF itself, and files stay on the computer, with no account. After the 30-day trial, marking up stays free, and the license adds saving, printing and export.</p><p class="d-meta">Price: $149.99 one-time for each platform, with Mac and Windows licensed separately &middot; Also on the Mac App Store &middot; <a href="https://caliperapp.co" rel="noopener">Website</a></p></div></td>
           </tr>
+          <tr class="m-row" id="krescad" data-group="indie" data-plat="web" data-cap="measure" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="krescad-d"><span class="m-tool">KresCAD</span><span class="m-maker">KresCAD &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-yes"><a class="m-ev" href="https://krescad.com/faq/#:~:text=Use%20a%20modern%20desktop%20or%20laptop%20browser" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes, desktop browser</span><span class="m-txt">desktop browser</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://krescad.com/measure-pdf-plans/#:~:text=Calibrate%20a%20PDF%20drawing%20from%20a%20known%20dimension" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, length, area</span><span class="m-txt">length, area</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Compare revisions: no</span></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="krescad-d" data-group="indie">
+            <td colspan="10"><div class="d-body"><p>A browser workspace from architects in Melbourne. Calibrate a PDF plan, measure lengths and areas, count items, add notes and draw to scale, then export a watermark-free PDF. English OCR makes scanned plans searchable, and files stay in the browser.</p><p>It runs in desktop and laptop browsers, with tablet and phone planned. It does not import DWG or DXF. Its maker calls it experimental and asks you to check measurements against the plan.</p><p class="d-meta">Price: Free, no account. Paid options may come later &middot; <a href="https://krescad.com" rel="noopener">Website</a></p></div></td>
+          </tr>
           <tr class="m-row" id="ncored" data-group="indie" data-plat="win mac" data-cap="measure compare" data-tier="new">
             <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="ncored-d"><span class="m-tool">Ncored</span><span class="m-maker">Noir architects &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
             <td class="m-yes"><a class="m-ev" href="https://ncored.com/#:~:text=full%20Windows%20build%20that%20runs%20on%20Windows%2010" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Windows: yes</span></a></td><td class="m-yes"><a class="m-ev" href="https://ncored.com/#:~:text=built%20natively%20for%20Apple%20Silicon" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Mac: yes</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">iPad: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Web: no</span></td><td class="m-yes m-cap1"><a class="m-ev" href="https://ncored.com/#:~:text=Set%20the%20scale%20by%20ratio%20or%20calibrate%20on%20a%20known%20length" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, length, area</span><span class="m-txt">length, area</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-yes"><a class="m-ev" href="https://ncored.com/#:~:text=Drag%20an%20older%20revision%20onto%20the%20drawing" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, revision overlay</span><span class="m-txt">revision overlay</span></a></td><td class="m-price">Subscription or one-time</td>
@@ -242,6 +251,13 @@
           </tr>
           <tr class="m-detail" id="open-pdf-studio-d" data-group="indie">
             <td colspan="10"><div class="d-body"><p>A free, open-source PDF editor for Windows, Mac and Linux. Calibrate the scale, then measure distances, areas and perimeters, and count objects by named category. Counts, lengths and areas total in a live quantities schedule.</p><p>Compare two revisions side by side or as an overlay, with scrolling and zoom locked together.</p><p class="d-meta">Price: Free, open source &middot; Also on Android &middot; <a href="https://github.com/OpenAEC-Foundation/open-pdf-studio" rel="noopener">Website</a></p></div></td>
+          </tr>
+          <tr class="m-row" id="pdf-measure" data-group="indie" data-plat="ipad web" data-cap="measure compare" data-tier="new">
+            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="pdf-measure-d"><span class="m-tool">PDF Measure</span><span class="m-maker">Charmillon LLC &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
+            <td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Windows: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Mac: no</span></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Linux: no</span></td><td class="m-part"><a class="m-ev" href="https://pdfmeasure.com/compare#:~:text=Any%20browser%3A%20Mac%2C%20Windows%2C%20Linux%2C%20iPad" rel="noopener"><span class="m" aria-hidden="true">&#9680;</span><span class="vh">iPad: partly, in Safari</span><span class="m-txt">in Safari</span></a></td><td class="m-yes"><a class="m-ev" href="https://pdfmeasure.com/compare#:~:text=Any%20browser%3A%20Mac%2C%20Windows%2C%20Linux%2C%20iPad" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Web: yes</span></a></td><td class="m-yes m-cap1"><a class="m-ev" href="https://pdfmeasure.com/compare#:~:text=Distance%2C%20area%2C%20perimeter%2C%20angle%2C%20counts%20and%20length%20runs" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Scaled measurement: yes, with takeoff</span><span class="m-txt">with takeoff</span></a></td><td class="m-no"><span class="m" aria-hidden="true">&ndash;</span><span class="vh">Team review: no</span></td><td class="m-yes"><a class="m-ev" href="https://pdfmeasure.com/compare#:~:text=Overlay%20one%20sheet%20on%20another" rel="noopener"><span class="m" aria-hidden="true">&#9679;</span><span class="vh">Compare revisions: yes, overlay</span><span class="m-txt">overlay</span></a></td><td class="m-price">Free</td>
+          </tr>
+          <tr class="m-detail" id="pdf-measure-d" data-group="indie">
+            <td colspan="10"><div class="d-body"><p>A browser tool for measuring and marking up PDF plans: lengths, areas, perimeters and angles at a set scale, with counts and runs totaled across sheets and exported to CSV. Clouds, callouts and dimension lines export on a marked-up PDF, and an overlay tints one sheet over another to show changes.</p><p>Files stay on your device. Symbols are counted by clicking, and it has no unit costs. Markups move between computers as a JSON file, with no shared review.</p><p class="d-meta">Price: Free, no account &middot; <a href="https://pdfmeasure.com" rel="noopener">Website</a></p></div></td>
           </tr>
           <tr class="m-row" id="plandify" data-group="indie" data-plat="win mac web" data-cap="measure" data-tier="new">
             <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="plandify-d"><span class="m-tool">PlanDiFy</span><span class="m-maker">Khaleel Obaidi &middot; <span class="m-tier m-tier-new">newcomer</span></span></button></th>
@@ -391,6 +407,17 @@
       </div>
 
       <p>If your set cannot leave the office, or you check alone against your own list, <a href="#adequate">Adequate Design Review</a> in the matrix above runs the review offline on your machine: a checklist you work through, with the evidence and a report kept for each revision. It finds nothing on its own. It is made by the person who runs this site.</p>
+    </section>
+
+    <section id="ai-drafting">
+      <div class="section-label">Also: AI drafting from markups</div>
+      <p>The apps above stop at the marked-up PDF, and someone then makes the changes in the drawing. This service makes them. It needs the DWG as well as the markup, and a person still checks each sheet before it goes out.</p>
+
+      <div class="pick">
+        <div class="pick-name"><a href="https://infracad.org" rel="noopener">InfraCAD AutoDrafter</a></div>
+        <div class="pick-meta">Web &middot; AutoCAD drawings &middot; first $20 free, then pay per sheet</div>
+        <div class="pick-note">Upload a DWG with a marked-up PDF or a written request. It makes the edits with AutoCAD in Autodesk&rsquo;s cloud, asks when something needs your decision, and returns the DWG with a report of what it drafted. Most sheets cost $4 to $10, plans start at $99 a month, and a sheet it can&rsquo;t deliver costs nothing. Your files go to Autodesk&rsquo;s cloud and to its AI providers, and are deleted 14 days after a sheet finishes unless your admin changes that. Its founder is an electrical engineer, and Civil 3D support is planned.</div>
+      </div>
     </section>
 
     <section id="platforms">
