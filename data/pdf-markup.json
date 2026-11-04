@@ -8,7 +8,7 @@
     {
       "key": "review",
       "name": "Built around a review process",
-      "sub": "Review kept as a record: issues, checklists, versions."
+      "sub": "Review kept as a record: issues, tasks, versions."
     },
     {
       "key": "indie",
@@ -361,30 +361,6 @@
       "meta": "Price: Free, open source &middot; Also on Android &middot; <a href=\"https://github.com/OpenAEC-Foundation/open-pdf-studio\" rel=\"noopener\">Website</a>"
     },
     {
-      "id": "adequate",
-      "group": "review",
-      "name": "Adequate Design Review",
-      "maker": "Adequate Design &middot; in beta",
-      "tier": "new",
-      "cells": {
-        "win": ["yes", "", ""],
-        "mac": ["yes", "", ""],
-        "linux": ["yes", "", ""],
-        "ipad": ["no", "", ""],
-        "web": ["no", "", ""],
-        "measure": ["yes", "", ""],
-        "team": ["no", "", ""],
-        "compare": ["yes", "revision overlay", ""]
-      },
-      "price": "In beta",
-      "notes": [
-        "For checking a set against a checklist before it is issued, rather than marking it up freehand. Load your existing Excel or Word checklists, note each item, annotate the PDF or image directly, and attach captured parts of the drawing to the item they answer. Measure to scale, overlay any two revisions and align them to see what changed. Reports export as PDF, with a log kept per revision.",
-        "Runs locally and offline on Windows, Mac and Linux, so the set stays on your machine. It is for one reviewer, without live team sessions, and it does not detect issues automatically: you work through the checklist yourself."
-      ],
-      "disclosure": "Made by the person who runs this site.",
-      "meta": "Price: not yet set; in beta &middot; <a href=\"https://adequate.design\" rel=\"noopener\">Website</a>"
-    },
-    {
       "id": "drawboard-projects",
       "group": "review",
       "name": "Drawboard Projects",
@@ -403,7 +379,7 @@
       "price": "Subscription",
       "notes": [
         "Drawboard&rsquo;s team product for drawing review. Drawings live in one project with versions, markups sync live, and tasks are pinned to a spot on a sheet with an owner and a status, collected into task lists such as a punch list or RFIs. Overlay stacks up to five revisions in different colors. Clients and consultants join as guests without a paid license.",
-        "Task lists track what was found. There is no checklist of items to review a set against. On a Mac it runs in the browser."
+        "On a Mac it runs in the browser."
       ],
       "disclosure": "",
       "meta": "Price: From $29 per user a month &middot; <a href=\"https://www.drawboard.com/projects\" rel=\"noopener\">Website</a>"

@@ -505,8 +505,7 @@ promote them as each is ready, not to land them all at once.
   which are now redirect stubs.
   Platforms are native apps plus "web" as its own platform; web never
   stands in for Windows/Mac/Linux. "Most used"/"Most established" ranks are
-  editorial and labelled so. Adequate Design Review is listed on the PDF
-  page with a disclosure. Prices are rounded from third-party sources —
+  editorial and labelled so. Prices are rounded from third-party sources —
   re-check vendor facts when updating.
   `bim-cad.html` (BIM, Modeling & Drafting, promoted 2026-10-29) is the PDF
   markup page's matrix for authoring tools: platforms, drawings, DWG, IFC,
