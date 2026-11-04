@@ -10,8 +10,8 @@ import { schema, sameOrigin } from './feedback-store.js';
 const MAX = { message: 4000, contact: 200, page: 200 };
 // Bytes. A full-length note survives URL encoding in any script.
 const MAX_BODY = 64 * 1024;
-// On the subdomain onboarded for sending (docs/FEEDBACK.md "Email notice").
-const NOTIFY_FROM = 'feedback@notify.architecture.tools';
+// On the domain set up for Email Routing (docs/FEEDBACK.md "Email notice").
+const NOTIFY_FROM = 'feedback@architecture.tools';
 
 // The reader's answer never waits on this, and a failed send loses nothing:
 // the note is already saved.
