@@ -54,6 +54,17 @@ function get(path, { user = 'me', password = PASSWORD } = {}) {
 }
 const env = (db) => ({ FEEDBACK_DB: db, INBOX_PASSWORD: PASSWORD });
 
+// A stand-in for the send_email binding, and the ctx a Worker is handed.
+function mailer({ fails = false } = {}) {
+  const sent = [];
+  return { sent, send: async (m) => { if (fails) throw new Error('refused'); sent.push(m); return { messageId: 'x' }; } };
+}
+function context() {
+  const waits = [];
+  return { waitUntil: (p) => waits.push(p), done: () => Promise.all(waits) };
+}
+const OWNER = 'owner@example.com';
+
 // ---- the collector ----
 await check('a note is stored, trimmed, with its page and time', async () => {
   const db = d1();
@@ -125,6 +136,59 @@ await check('with no database bound the form reports unavailable', async () => {
   const res = await send({ request: post('/api/feedback', { message: 'x' }), env: {} });
   assert.equal(res.status, 503);
   assert.deepEqual(await res.json(), { ok: false, error: 'unavailable' });
+});
+
+// ---- the email notice ----
+const noticeEnv = (db, mail) => ({ ...env(db), NOTIFY_EMAIL: mail, NOTIFY_TO: OWNER });
+const secret = 'The note says something private.';
+
+await check('a saved note sends one notice, to the owner, with a link to the inbox', async () => {
+  const db = d1(), mail = mailer(), ctx = context();
+  const res = await handleFeedback(post('/api/feedback', { message: secret }), noticeEnv(db, mail), ctx);
+  await ctx.done();
+  assert.equal(res.status, 200);
+  assert.equal(mail.sent.length, 1);
+  assert.equal(mail.sent[0].to, OWNER);
+  assert.ok(mail.sent[0].text.includes(SITE + '/inbox'));
+});
+
+await check('the notice carries nothing the reader wrote', async () => {
+  const db = d1(), mail = mailer(), ctx = context();
+  await handleFeedback(post('/api/feedback', { message: secret, contact: 'reader@example.org', page: '/private-page' }), noticeEnv(db, mail), ctx);
+  await ctx.done();
+  const all = JSON.stringify(mail.sent[0]);
+  for (const typed of ['something private', 'reader@example.org', '/private-page']) assert.ok(!all.includes(typed), typed);
+});
+
+await check('a failed send still saves the note and answers ok', async () => {
+  const db = d1(), mail = mailer({ fails: true }), ctx = context();
+  const quiet = console.error; console.error = () => {};
+  const res = await handleFeedback(post('/api/feedback', { message: secret }), noticeEnv(db, mail), ctx);
+  await ctx.done();
+  console.error = quiet;
+  assert.equal(res.status, 200);
+  assert.equal(rows(db).length, 1);
+});
+
+await check('bots, rejected notes and failed saves send no notice', async () => {
+  const mail = mailer(), ctx = context();
+  await handleFeedback(post('/api/feedback', { message: 'spam', website: 'x' }), noticeEnv(d1(), mail), ctx);
+  await handleFeedback(post('/api/feedback', { message: '   ' }), noticeEnv(d1(), mail), ctx);
+  const broken = { batch: async () => { throw new Error('down'); }, prepare: () => ({ bind: () => ({}) }) };
+  const quiet = console.error; console.error = () => {};
+  await handleFeedback(post('/api/feedback', { message: secret }), noticeEnv(broken, mail), ctx);
+  console.error = quiet;
+  await ctx.done();
+  assert.equal(mail.sent.length, 0);
+});
+
+await check('without the secret nothing is sent and the note saves', async () => {
+  const db = d1(), mail = mailer(), ctx = context();
+  const res = await handleFeedback(post('/api/feedback', { message: secret }), { ...env(db), NOTIFY_EMAIL: mail }, ctx);
+  await ctx.done();
+  assert.equal(res.status, 200);
+  assert.equal(mail.sent.length, 0);
+  assert.equal(rows(db).length, 1);
 });
 
 // ---- the inbox ----

@@ -2,15 +2,33 @@
 // Each note becomes one row in the D1 database bound as FEEDBACK_DB, read at
 // /inbox. Kept: what the reader typed, the page they came from, and the time.
 // Not kept: their IP address, browser details, or any cookie
-// (privacy.html#feedback).
+// (privacy.html#feedback). When a note is saved the owner gets an email that
+// says so, with none of the note in it (docs/FEEDBACK.md "Email notice").
 import { schema, sameOrigin } from './feedback-store.js';
 
 // Character limits, matched by the maxlength attributes in feedback.html.
 const MAX = { message: 4000, contact: 200, page: 200 };
 // Bytes. A full-length note survives URL encoding in any script.
 const MAX_BODY = 64 * 1024;
+// On the subdomain onboarded for sending (docs/FEEDBACK.md "Email notice").
+const NOTIFY_FROM = 'feedback@notify.architecture.tools';
 
-export async function handleFeedback(request, env) {
+// The reader's answer never waits on this, and a failed send loses nothing:
+// the note is already saved.
+async function notify(env, inbox) {
+  try {
+    await env.NOTIFY_EMAIL.send({
+      to: env.NOTIFY_TO,
+      from: NOTIFY_FROM,
+      subject: 'New feedback on architecture.tools',
+      text: `A new note is waiting at ${inbox}\n`,
+    });
+  } catch (err) {
+    console.error('feedback: notice failed', err);
+  }
+}
+
+export async function handleFeedback(request, env, ctx) {
   // The page's script asks for JSON. A plain form post (no script) is sent
   // back to the page, where :target shows the outcome.
   const json = (request.headers.get('Accept') || '').includes('application/json');
@@ -48,5 +66,6 @@ export async function handleFeedback(request, env) {
     console.error('feedback: insert failed', err);
     return done(500, 'unavailable');
   }
+  if (env.NOTIFY_EMAIL && env.NOTIFY_TO) ctx.waitUntil(notify(env, new URL('/inbox', request.url).href));
   return done(200);
 }

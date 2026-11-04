@@ -23,6 +23,11 @@
     { "binding": "FEEDBACK_DB", "database_name": "architecturetools-feedback" }
   ],
 
+  // The notice sent when a note arrives. It goes to the Worker secret
+  // NOTIFY_TO, which must be a verified destination address in this account
+  // (docs/FEEDBACK.md "Email notice"). Kept out of this file: the repo is public.
+  "send_email": [{ "name": "NOTIFY_EMAIL" }],
+
   // Off, so Cloudflare keeps no per-request log of the Worker that this site
   // could read (privacy.html#hosting, #feedback). Turning it on changes what
   // the privacy statement promises.

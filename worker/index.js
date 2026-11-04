@@ -6,10 +6,10 @@ import { handleFeedback } from './feedback.js';
 import { handleInbox } from './inbox.js';
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/feedback') {
-      if (request.method === 'POST') return handleFeedback(request, env);
+      if (request.method === 'POST') return handleFeedback(request, env, ctx);
       return new Response('Method not allowed', { status: 405, headers: { Allow: 'POST' } });
     }
     if (pathname === '/inbox') return handleInbox(request, env);
