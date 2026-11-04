@@ -200,11 +200,6 @@
   .cover-feature .card-art svg.fine { max-width: 24rem; }
   .cover-feature .card-art svg.fine * { vector-effect: non-scaling-stroke; }
   .cover-feature + .cover-feature { margin-top: var(--space-md); }
-  /* the layer list drawn into the BIM plate: UI text at the drawing's scale */
-  .cover-card svg.nl text.bim-ui { font-size: 6.5px; font-weight: 300; fill: var(--nl-ink); stroke: none; }
-  .cover-card svg.nl text.bim-ui.is-on { fill: var(--accent); }
-  .cover-card svg.nl text.bim-ui-head { font-size: 5.5px; font-weight: 400; letter-spacing: 0.1em;
-                                        text-transform: uppercase; fill: var(--nl-axis); }
   .cover-feature .card-body { display: flex; flex-direction: column; padding: 1.4rem 1.6rem 1.5rem; }
   .cover-feature .card-name { font-size: var(--text-xl); line-height: 1.2; }
   .cover-feature .card-desc { margin-top: var(--space-sm); font-size: var(--text-base); }
@@ -614,44 +609,69 @@
       </a>
 
       <a class="cover-card cover-feature" href="bim-cad.html">
-        <!-- A federated model, exploded: structure, the floor and its
-             walls, and the MEP runs, each layer filled so it hides the one
-             below, beside the layer list a model keeps them in. The selected
-             layer is the accent. -->
+        <!-- A federated model, exploded: structure, architecture, HVAC and
+             electrical, each a full isometric of the footprint and filled so
+             it hides the layer below. Leaders tie each layer to a row of the
+             model's table; the selected row and its layer are the accent. -->
         <div class="card-art">
-          <svg class="nl fine" viewBox="0 0 260 208" role="img" aria-label="An exploded axonometric of a building model in three layers, structure, architecture and MEP, beside a layer list with the MEP layer selected">
-            <path d="M157.7 108.4 L157.7 31.4 M224.4 146.9 L224.4 69.9 M186.3 168.9 L186.3 91.9 M119.6 130.4 L119.6 53.4" fill="none" stroke="var(--nl-tick)" stroke-width="0.5" stroke-dasharray="2 2"/>
-            <path d="M157.7 123.8 L157.7 108.4 M138.7 134.8 L138.7 119.4 M119.6 145.8 L119.6 130.4 M191.1 143.1 L191.1 127.7 M172.0 154.1 L172.0 138.7 M152.9 165.1 L152.9 149.7 M224.4 162.3 L224.4 146.9 M205.3 173.3 L205.3 157.9 M186.3 184.3 L186.3 168.9" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
-            <path d="M157.7 108.4 L224.4 146.9 M138.7 119.4 L205.3 157.9 M119.6 130.4 L186.3 168.9 M157.7 108.4 L119.6 130.4 M191.1 127.7 L152.9 149.7 M224.4 146.9 L186.3 168.9" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
-            <path d="M157.7 121.0 L162.5 123.8 L157.7 126.5 L152.9 123.8 Z M138.7 132.1 L143.4 134.8 L138.7 137.6 L133.9 134.8 Z M119.6 143.1 L124.4 145.8 L119.6 148.6 L114.8 145.8 Z M191.1 140.3 L195.8 143.1 L191.1 145.8 L186.3 143.1 Z M172.0 151.3 L176.8 154.1 L172.0 156.8 L167.2 154.1 Z M152.9 162.3 L157.7 165.1 L152.9 167.8 L148.2 165.1 Z M224.4 159.6 L229.2 162.3 L224.4 165.1 L219.6 162.3 Z M205.3 170.6 L210.1 173.3 L205.3 176.1 L200.6 173.3 Z M186.3 181.6 L191.1 184.3 L186.3 187.1 L181.5 184.3 Z" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
-            <path d="M119.6 96.9 L119.6 99.6 L186.3 138.1 L224.4 116.1 L224.4 113.4 L186.3 135.4 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.75" stroke-linejoin="round"/>
-            <path d="M157.7 74.8 L224.4 113.4 L186.3 135.4 L119.6 96.9 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.75" stroke-linejoin="round"/>
-            <path d="M186.3 135.4 L186.3 138.1" fill="none" stroke="var(--nl-ink)" stroke-width="0.75"/>
-            <path d="M119.6 96.9 L157.7 74.8 L224.4 113.4 M119.6 84.8 L157.7 62.7 L224.4 101.2 M157.7 74.8 L157.7 62.7 M119.6 96.9 L119.6 84.8 M224.4 113.4 L224.4 101.2" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
-            <path d="M191.1 82.0 L168.2 95.2 L168.2 107.3 M168.2 95.2 L185.3 105.1 L185.3 117.2" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
-            <path d="M164.4 37.4 L213.0 65.5 L204.4 70.4" fill="none" stroke="var(--accent)" stroke-width="0.75"/>
-            <path d="M140.6 40.2 L140.6 46.8 L197.7 79.8 L204.4 75.9 L204.4 69.3 L197.7 73.2 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
-            <path d="M147.2 36.3 L204.4 69.3 L197.7 73.2 L140.6 40.2 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
-            <path d="M197.7 73.2 L197.7 79.8" fill="none" stroke="var(--accent)" stroke-width="0.75"/>
-            <path d="M169.1 73.2 L169.1 78.7 L174.9 82.0 L188.2 74.3 L188.2 68.8 L174.9 76.5 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
-            <path d="M182.5 65.5 L188.2 68.8 L174.9 76.5 L169.1 73.2 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
-            <path d="M174.9 76.5 L174.9 82.0" fill="none" stroke="var(--accent)" stroke-width="0.75"/>
-            <path d="M132.0 50.1 L162.5 67.7 L156.8 71.0" fill="none" stroke="var(--accent)" stroke-width="0.75"/>
-            <rect x="8" y="66" width="62" height="68" rx="2" fill="var(--card)" stroke="var(--nl-axis)" stroke-width="0.5"/>
-            <path d="M8 83 H70 M8 100 H70 M8 117 H70" stroke="var(--nl-axis)" stroke-width="0.5"/>
-            <text x="14" y="77" class="bim-ui bim-ui-head">Layers</text>
-            <rect x="14" y="88.5" width="6" height="6" stroke="var(--accent)" stroke-width="0.6" fill="var(--accent)"/>
-            <text x="25" y="94" class="bim-ui is-on">MEP</text>
-            <path d="M70 91.5 H75 L140.6 43.5" fill="none" stroke="var(--accent)" stroke-width="0.5"/>
-            <circle cx="140.6" cy="43.5" r="1.5" fill="var(--accent)" stroke="none"/>
-            <rect x="14" y="105.5" width="6" height="6" stroke="var(--nl-ink)" stroke-width="0.6" fill="none"/>
-            <text x="25" y="111" class="bim-ui">Architecture</text>
-            <path d="M70 108.5 H75 L134.8 89.5" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
-            <circle cx="134.8" cy="89.5" r="1.5" fill="var(--nl-axis)" stroke="none"/>
-            <rect x="14" y="122.5" width="6" height="6" stroke="var(--nl-ink)" stroke-width="0.6" fill="none"/>
-            <text x="25" y="128" class="bim-ui">Structure</text>
-            <path d="M70 125.5 H75 L134.8 121.6" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
-            <circle cx="134.8" cy="121.6" r="1.5" fill="var(--nl-axis)" stroke="none"/>
+          <svg class="nl fine" viewBox="0 0 260 208" role="img" aria-label="An exploded axonometric of a building model in four layers, structure, architecture, HVAC and electrical, linked to rows of a table with the HVAC row selected">
+            <path d="M163.0 126.0 L163.0 16.0 M223.6 161.0 L223.6 51.0 M189.0 181.0 L189.0 71.0 M128.4 146.0 L128.4 36.0" fill="none" stroke="var(--nl-tick)" stroke-width="0.5" stroke-dasharray="2 2"/>
+            <path d="M163.0 137.5 L167.3 140.0 L163.0 142.5 L158.7 140.0 Z M145.7 147.5 L150.0 150.0 L145.7 152.5 L141.4 150.0 Z M128.4 157.5 L132.7 160.0 L128.4 162.5 L124.0 160.0 Z M193.3 155.0 L197.7 157.5 L193.3 160.0 L189.0 157.5 Z M176.0 165.0 L180.3 167.5 L176.0 170.0 L171.7 167.5 Z M158.7 175.0 L163.0 177.5 L158.7 180.0 L154.3 177.5 Z M223.6 172.5 L228.0 175.0 L223.6 177.5 L219.3 175.0 Z M206.3 182.5 L210.6 185.0 L206.3 187.5 L202.0 185.0 Z M189.0 192.5 L193.3 195.0 L189.0 197.5 L184.7 195.0 Z" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <path d="M163.0 140.0 L163.0 126.0 M145.7 150.0 L145.7 136.0 M128.4 160.0 L128.4 146.0 M193.3 157.5 L193.3 143.5 M176.0 167.5 L176.0 153.5 M158.7 177.5 L158.7 163.5 M223.6 175.0 L223.6 161.0 M206.3 185.0 L206.3 171.0 M189.0 195.0 L189.0 181.0" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
+            <path d="M163.0 126.0 L223.6 161.0 M145.7 136.0 L206.3 171.0 M128.4 146.0 L189.0 181.0 M163.0 126.0 L128.4 146.0 M193.3 143.5 L158.7 163.5 M223.6 161.0 L189.0 181.0" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
+            <path d="M128.4 114.5 L128.4 117.0 L189.0 152.0 L223.6 132.0 L223.6 129.5 L189.0 149.5 Z M189.0 149.5 L189.0 152.0" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M163.0 94.5 L223.6 129.5 L189.0 149.5 L128.4 114.5 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M129.7 106.2 L163.0 87.0 L222.3 121.2" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
+            <path d="M128.4 105.5 L163.0 85.5 L223.6 120.5" fill="none" stroke="var(--nl-ink)" stroke-width="0.6"/>
+            <path d="M192.0 112.8 L192.0 103.8 L172.5 115.0 L172.5 124.0" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6"/>
+            <path d="M172.5 124.0 L172.5 115.0 L189.0 124.5 L189.0 133.5" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6"/>
+            <path d="M141.8 108.2 L141.8 99.2 L157.8 108.5 L157.8 117.5" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6"/>
+            <path d="M128.4 105.5 L128.4 114.5 L189.0 149.5 L190.3 148.8 L190.3 139.8 L189.0 140.5 Z M189.0 140.5 L189.0 149.5" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <path d="M129.7 104.8 L190.3 139.8 L189.0 140.5 L128.4 105.5 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <path d="M189.0 139.0 L189.0 148.0 L190.3 148.8 L223.6 129.5 L223.6 120.5 L190.3 139.8 Z M190.3 139.8 L190.3 148.8" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <path d="M222.3 119.8 L223.6 120.5 L190.3 139.8 L189.0 139.0 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <path d="M163.0 53.0 L223.6 88.0 L189.0 108.0 L128.4 73.0 Z" fill="var(--card)" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <path d="M172.5 64.5 L177.7 67.5 L172.5 70.5 L167.3 67.5 Z M152.6 76.0 L157.8 79.0 L152.6 82.0 L147.4 79.0 Z M202.0 81.5 L207.2 84.5 L202.0 87.5 L196.8 84.5 Z M182.1 93.0 L187.3 96.0 L182.1 99.0 L176.9 96.0 Z" fill="none" stroke="var(--accent)" stroke-width="0.5"/>
+            <path d="M150.9 68.5 L150.9 72.0 L154.3 74.0 L174.3 62.5 L174.3 59.0 L154.3 70.5 Z M154.3 70.5 L154.3 74.0" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M170.8 57.0 L174.3 59.0 L154.3 70.5 L150.9 68.5 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M180.3 85.5 L180.3 89.0 L183.8 91.0 L203.7 79.5 L203.7 76.0 L183.8 87.5 Z M183.8 87.5 L183.8 91.0" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M200.2 74.0 L203.7 76.0 L183.8 87.5 L180.3 85.5 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M150.5 57.8 L150.5 63.3 L196.4 89.8 L201.5 86.8 L201.5 81.2 L196.4 84.2 Z M196.4 84.2 L196.4 89.8" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M155.6 54.8 L201.5 81.2 L196.4 84.2 L150.5 57.8 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M193.3 84.5 L193.3 97.5 L200.2 101.5 L211.5 95.0 L211.5 82.0 L200.2 88.5 Z M200.2 88.5 L200.2 101.5" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M204.6 78.0 L211.5 82.0 L200.2 88.5 L193.3 84.5 Z" fill="var(--card)" stroke="var(--accent)" stroke-width="0.75" stroke-linejoin="round"/>
+            <path d="M163.0 16.0 L223.6 51.0 L189.0 71.0 L128.4 36.0 Z" fill="var(--card)" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <path d="M156.1 31.5 L165.6 26.0 M156.1 31.5 L146.6 37.0 M176.0 43.0 L185.5 37.5 M176.0 43.0 L166.5 48.5 M195.9 54.5 L205.4 49.0 M195.9 54.5 L186.4 60.0" fill="none" stroke="var(--nl-ink)" stroke-width="0.5"/>
+            <path d="M160.2 24.0 L160.2 25.2 L167.9 29.7 L171.1 27.8 L171.1 26.7 L167.9 28.5 Z M167.9 28.5 L167.9 29.7" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M163.3 22.2 L171.1 26.7 L167.9 28.5 L160.2 24.0 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M141.1 35.0 L141.1 36.2 L148.9 40.7 L152.0 38.8 L152.0 37.7 L148.9 39.5 Z M148.9 39.5 L148.9 40.7" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M144.2 33.2 L152.0 37.7 L148.9 39.5 L141.1 35.0 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M180.1 35.5 L180.1 36.7 L187.9 41.2 L191.0 39.3 L191.0 38.2 L187.9 40.0 Z M187.9 40.0 L187.9 41.2" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M183.2 33.7 L191.0 38.2 L187.9 40.0 L180.1 35.5 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M161.0 46.5 L161.0 47.7 L168.8 52.2 L171.9 50.3 L171.9 49.2 L168.8 51.0 Z M168.8 51.0 L168.8 52.2" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M164.1 44.7 L171.9 49.2 L168.8 51.0 L161.0 46.5 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M200.0 47.0 L200.0 48.2 L207.8 52.7 L210.9 50.8 L210.9 49.7 L207.8 51.5 Z M207.8 51.5 L207.8 52.7" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M203.1 45.2 L210.9 49.7 L207.8 51.5 L200.0 47.0 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M180.9 57.9 L180.9 59.1 L188.7 63.7 L191.8 61.8 L191.8 60.7 L188.7 62.5 Z M188.7 62.5 L188.7 63.7" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M184.1 56.2 L191.8 60.7 L188.7 62.5 L180.9 57.9 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M149.6 27.8 L149.6 29.2 L201.5 59.2 L204.1 57.7 L204.1 56.2 L201.5 57.8 Z M201.5 57.8 L201.5 59.2" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <path d="M152.2 26.2 L204.1 56.2 L201.5 57.8 L149.6 27.8 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <path d="M143.1 19.5 L143.1 28.5 L147.4 31.0 L154.3 27.0 L154.3 18.0 L147.4 22.0 Z M147.4 22.0 L147.4 31.0" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <path d="M150.0 15.5 L154.3 18.0 L147.4 22.0 L143.1 19.5 Z" fill="var(--card)" stroke="var(--nl-ink)" stroke-width="0.6" stroke-linejoin="round"/>
+            <rect x="8" y="58" width="72" height="96" rx="1.5" fill="var(--card)" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <rect x="8" y="58" width="72" height="12" fill="var(--nl-axis)" fill-opacity="0.14" stroke="none"/>
+            <rect x="8" y="82" width="72" height="12" fill="var(--accent)" fill-opacity="0.12" stroke="none"/>
+            <path d="M8 70 H80 M8 82 H80 M8 94 H80 M8 106 H80 M8 118 H80 M8 130 H80 M8 142 H80 M30 58 V154 M48 58 V154 M64 58 V154" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <path d="M11.5 64.0 H20.5 M33.5 64.0 H40.1 M51.5 64.0 H56.9 M67.5 64.0 H72.9 M11.5 76.0 H20.2 M33.5 76.0 H39.1 M51.5 76.0 H57.5 M67.5 76.0 H72.3 M11.5 100.0 H24.6 M33.5 100.0 H39.8 M51.5 100.0 H58.2 M67.5 100.0 H72.9 M11.5 112.0 H19.7 M33.5 112.0 H39.1 M51.5 112.0 H56.6 M67.5 112.0 H76.1 M11.5 124.0 H25.1 M33.5 124.0 H43.3 M51.5 124.0 H59.5 M67.5 124.0 H72.5 M11.5 136.0 H20.8 M33.5 136.0 H42.2 M51.5 136.0 H59.2 M67.5 136.0 H75.8 M11.5 148.0 H25.5 M33.5 148.0 H39.0 M51.5 148.0 H58.5 M67.5 148.0 H74.9" fill="none" stroke="var(--nl-tick)" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M11.5 88.0 H18.8 M33.5 88.0 H40.9 M51.5 88.0 H60.1 M67.5 88.0 H75.5" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M80 76.0 H85 L134.4 39.5" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <circle cx="134.4" cy="39.5" r="1.4" fill="var(--nl-axis)" stroke="none"/>
+            <path d="M80 88.0 H85 L134.4 76.5" fill="none" stroke="var(--accent)" stroke-width="0.5"/>
+            <circle cx="134.4" cy="76.5" r="1.4" fill="var(--accent)" stroke="none"/>
+            <path d="M80 100.0 H85 L134.4 119.3" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <circle cx="134.4" cy="119.3" r="1.4" fill="var(--nl-axis)" stroke="none"/>
+            <path d="M80 112.0 H85 L134.4 149.5" fill="none" stroke="var(--nl-axis)" stroke-width="0.5"/>
+            <circle cx="134.4" cy="149.5" r="1.4" fill="var(--nl-axis)" stroke="none"/>
           </svg>
         </div>
         <div class="card-body">
