@@ -6,11 +6,6 @@
       "sub": "Markup and scaled measurement organized around sheets."
     },
     {
-      "key": "review",
-      "name": "Built around a review process",
-      "sub": "Review kept as a record: issues, tasks, versions."
-    },
-    {
       "key": "indie",
       "name": "Small independent tools",
       "sub": "Markup, measurement and comparison from one developer or a small studio."
@@ -362,7 +357,7 @@
     },
     {
       "id": "drawboard-projects",
-      "group": "review",
+      "group": "sets",
       "name": "Drawboard Projects",
       "maker": "Drawboard",
       "tier": "leader",
