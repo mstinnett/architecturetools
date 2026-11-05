@@ -6,6 +6,11 @@
       "sub": "Markup and scaled measurement organized around sheets."
     },
     {
+      "key": "drafting",
+      "name": "Drafting plus PDF",
+      "sub": "CAD drawing commands alongside markup and measurement."
+    },
+    {
       "key": "indie",
       "name": "Small independent tools",
       "sub": "Markup, measurement and comparison from one developer or a small studio."
@@ -96,7 +101,7 @@
     },
     {
       "id": "redcolumn",
-      "group": "indie",
+      "group": "drafting",
       "name": "redcolumn",
       "maker": "Open source",
       "tier": "new",
