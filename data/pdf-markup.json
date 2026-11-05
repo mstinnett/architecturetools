@@ -124,6 +124,30 @@
       "meta": "Price: Free, open source &middot; <a href=\"https://github.com/ColbyGallagher/redcolumn\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "sketchweave",
+      "group": "drafting",
+      "name": "SketchWeave",
+      "maker": "SketchWeave",
+      "tier": "new",
+      "cells": {
+        "win": ["no", "", ""],
+        "mac": ["no", "", ""],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["yes", "", "https://www.sketchweave.com/#:~:text=SketchWeave%20runs%20in%20your%20browser"],
+        "measure": ["yes", "length", "https://www.sketchweave.com/markups-sketching#:~:text=measure%20distances%20in%20feet%20and%20inches"],
+        "team": ["yes", "Team Pro", "https://www.sketchweave.com/#:~:text=Message%20your%20team%20about%20each%20sheet"],
+        "compare": ["yes", "overlay", "https://www.sketchweave.com/#:~:text=Compare%20previous%20versions%20of%20drawings"]
+      },
+      "price": "Subscription",
+      "notes": [
+        "A browser app from designers in Ontario that organizes a drawing set by sheet. Each uploaded PDF page is matched to its sheet and stored as a new version, and the markups carry over to the new version. Built-in 2D CAD, with typed lengths, dimensions that resize the shape, offset and trim, draws the answer to a markup to scale and places it on the sheet.",
+        "Every mark has a status, from Markup through backcheck to Done, and each finished round of review is kept as a package. It also tracks QAQC checklists per sheet and merges a submission into one PDF. It works alongside Revit, AutoCAD or Archicad, not in place of them."
+      ],
+      "disclosure": "",
+      "meta": "Price: CA$5 a month for one person, CA$8 a seat a month for a team; 14-day free trial, and a free view-only account for invited teammates &middot; <a href=\"https://www.sketchweave.com\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "ncored",
       "group": "indie",
       "name": "Ncored",
