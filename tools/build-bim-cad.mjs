@@ -4,7 +4,7 @@
    =========================================================================
    The same shape as build-pdf-markup.mjs, with this page's columns. The JSON
    is the source of truth for every tool: its group, its tier ("leader" for
-   an editorial shortlist pick, "new" for a newcomer, "" for neither), one
+   an editorial top pick, "new" for a newcomer, "" for neither), one
    cell per column, price, notes. Every tool in the "free" group, and any
    tool with "free": true (a free edition elsewhere in the table), carries
    data-free for the Free filter.
@@ -103,7 +103,7 @@ function rowsFor(g, cols) {
     // a "?" platform is not a platform the tool runs on, and a "?" capability is not one it does
     const plat = PLATS.filter(k => t.cells[k] && ['yes', 'part'].includes(t.cells[k][0])).join(' ');
     const caps = CAPS.filter(k => t.cells[k] && ['yes', 'part'].includes(t.cells[k][0])).join(' ');
-    const TIER = { leader: 'shortlist', new: 'newcomer' };
+    const TIER = { leader: 'top pick', new: 'newcomer' };
     if (t.tier && !TIER[t.tier]) fail(t.id + ': unknown tier ' + t.tier);
     const free = g.key === 'free' || t.free;
     const maker = t.maker + (t.status ? ` &middot; ${t.status}` : '') + (t.tier ? ` &middot; <span class="m-tier m-tier-${t.tier}">${TIER[t.tier]}</span>` : '');
