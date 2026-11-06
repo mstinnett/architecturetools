@@ -2,18 +2,13 @@
   "groups": [
     {
       "key": "sets",
-      "name": "Established industry tools",
-      "sub": "Markup and measurement built around drawing sets."
+      "name": "Built for drawings",
+      "sub": "Markup and scaled measurement organized around sheets."
     },
     {
       "key": "drafting",
       "name": "Drafting plus PDF",
       "sub": "CAD drawing commands alongside markup and measurement."
-    },
-    {
-      "key": "indie",
-      "name": "Small independent tools",
-      "sub": "Markup, measurement and comparison from one developer or a small studio."
     },
     {
       "key": "editors",
@@ -77,7 +72,7 @@
     },
     {
       "id": "caliper",
-      "group": "indie",
+      "group": "sets",
       "name": "Caliper",
       "maker": "Caliper App LLC",
       "tier": "new",
@@ -101,7 +96,7 @@
     },
     {
       "id": "layr",
-      "group": "indie",
+      "group": "sets",
       "name": "Layr",
       "maker": "Layr PDF",
       "tier": "new",
@@ -173,7 +168,7 @@
     },
     {
       "id": "ncored",
-      "group": "indie",
+      "group": "sets",
       "name": "Ncored",
       "maker": "Noir architects",
       "tier": "new",
@@ -197,7 +192,7 @@
     },
     {
       "id": "pdf-studio",
-      "group": "sets",
+      "group": "editors",
       "name": "PDF Studio Pro",
       "maker": "Qoppa",
       "tier": "",
@@ -220,7 +215,7 @@
     },
     {
       "id": "pdf-xchange",
-      "group": "sets",
+      "group": "editors",
       "name": "PDF-XChange Editor",
       "maker": "PDF-XChange",
       "tier": "",
@@ -243,7 +238,7 @@
     },
     {
       "id": "polypdf",
-      "group": "indie",
+      "group": "sets",
       "name": "PolyPDF",
       "maker": "PolyPDF",
       "tier": "new",
@@ -267,7 +262,7 @@
     },
     {
       "id": "reviff",
-      "group": "indie",
+      "group": "sets",
       "name": "REVIFF",
       "maker": "AEC DX Labs",
       "tier": "new",
@@ -315,7 +310,7 @@
     },
     {
       "id": "pdf-measure",
-      "group": "indie",
+      "group": "sets",
       "name": "PDF Measure",
       "maker": "Charmillon LLC",
       "tier": "new",
@@ -339,7 +334,7 @@
     },
     {
       "id": "project-blueprint",
-      "group": "indie",
+      "group": "sets",
       "name": "Project Blueprint",
       "maker": "Independent developer",
       "tier": "new",
@@ -363,7 +358,7 @@
     },
     {
       "id": "plandify",
-      "group": "indie",
+      "group": "sets",
       "name": "PlanDiFy",
       "maker": "PlanDiFy",
       "tier": "new",
@@ -386,7 +381,7 @@
     },
     {
       "id": "open-pdf-studio",
-      "group": "indie",
+      "group": "sets",
       "name": "Open PDF Studio",
       "maker": "OpenAEC Foundation",
       "tier": "new",
