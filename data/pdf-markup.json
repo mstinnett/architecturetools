@@ -365,21 +365,21 @@
       "id": "plandify",
       "group": "indie",
       "name": "PlanDiFy",
-      "maker": "Khaleel Obaidi",
+      "maker": "PlanDiFy",
       "tier": "new",
       "cells": {
         "win": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Windows%20download%3A%20x64"],
         "mac": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Mac%20download%3A%20Apple%20silicon"],
-        "linux": ["no", "", ""],
+        "linux": ["yes", "", "https://plandify.app/download/"],
         "ipad": ["no", "", ""],
         "web": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads#:~:text=Browser%20app"],
-        "measure": ["yes", "length, area", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Preserve%20appearance%2C%20labels%2C%20calibration%20and%20estimating%20settings"],
+        "measure": ["yes", "with takeoff", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Preserve%20appearance%2C%20labels%2C%20calibration%20and%20estimating%20settings"],
         "team": ["no", "", ""],
         "compare": ["no", "", ""]
       },
       "price": "Free",
       "notes": [
-        "A free PDF reader and editor from one developer, in the browser or as a desktop app for Windows and Mac. Measure lengths and areas at a calibrated scale, and offset or copy shapes and measurements by a set distance. Markups display in other PDF apps."
+        "A free PDF reader and editor, in the browser or as a desktop app for Windows, Mac and Linux. Full measurement tools at a calibrated scale, including length, area, perimeter and takeoff. Offset or copy shapes and measurements by a set distance. Markups display in other PDF apps."
       ],
       "disclosure": "",
       "meta": "Price: Free, with optional donations &middot; <a href=\"https://plandify.app\" rel=\"noopener\">Website</a>"
