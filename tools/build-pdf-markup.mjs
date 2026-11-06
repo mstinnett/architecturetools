@@ -68,7 +68,7 @@ for (const g of groups) {
     const TIER = { leader: 'shortlist', new: 'newcomer' };
     if (t.tier && !TIER[t.tier]) fail(t.id + ': unknown tier ' + t.tier);
     const maker = t.maker + (t.tier ? ` &middot; <span class="m-tier m-tier-${t.tier}">${TIER[t.tier]}</span>` : '');
-    out += `          <tr class="m-row" id="${t.id}" data-group="${g.key}" data-plat="${plat}" data-cap="${caps}"${t.tier ? ` data-tier="${t.tier}"` : ''}>\n`;
+    out += `          <tr class="m-row" id="${t.id}" data-group="${g.key}" data-plat="${plat}" data-cap="${caps}"${t.tier ? ` data-tier="${t.tier}"` : ''}${/^Free\b/.test(t.price) ? ' data-cost="free"' : ''}>\n`;
     out += `            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="${t.id}-d"><span class="m-tool">${t.name}</span><span class="m-maker">${maker}</span></button></th>\n`;
     out += '            ' + COLS.map(([k, label], i) => cell(t, k, label, i)).join('') + `<td class="m-price">${t.price}</td>\n`;
     out += '          </tr>\n';
