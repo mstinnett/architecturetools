@@ -2,8 +2,8 @@
   "groups": [
     {
       "key": "sets",
-      "name": "Built for drawing sets",
-      "sub": "Markup and scaled measurement organized around sheets."
+      "name": "Established drawing tools",
+      "sub": "Long-running markup and measurement apps built around drawing sets."
     },
     {
       "key": "drafting",
