@@ -100,6 +100,30 @@
       "meta": "Price: $149.99 one-time for each platform, with Mac and Windows licensed separately &middot; Also on the Mac App Store &middot; <a href=\"https://caliperapp.co\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "layr",
+      "group": "indie",
+      "name": "Layr",
+      "maker": "Layr PDF",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
+        "mac": ["yes", "Apple Silicon", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["yes", "", "https://www.layrpdf.com/#:~:text=Draw%20and%20mark%20up%20without%20installing%20the%20desktop%20app"],
+        "measure": ["yes", "with takeoff", "https://www.layrpdf.com/#:~:text=Take%20off%20calibrated%20measurements%2C%20count%20areas"],
+        "team": ["part", "shared viewing", "https://www.layrpdf.com/#:~:text=View%20shared%20drawings%20and%20markups"],
+        "compare": ["part", "side by side", "https://www.layrpdf.com/#:~:text=True%20split-screen%20for%20comparing%20drawings"]
+      },
+      "price": "Subscription",
+      "notes": [
+        "A drawing review app for Windows, Apple Silicon Macs and the browser, from one developer who marks up drawings every day. It is built to keep 400-page plan sets and 400&nbsp;MB CAD PDFs responsive, with commands and shortcuts modeled on the pro PDF tools. Measure and count from a calibrated scale, and read page numbers, sheet names and scales across the set in one pass.",
+        "A markup register finds every mark by type, page, author and status. Bluebeam and Acrobat markups open and stay editable. Others can view shared drawings and markups in the browser, and revisions compare in a split screen, with no overlay. After the 7-day trial, editing stops, but files still open, print and save. A license runs on one device at a time."
+      ],
+      "disclosure": "",
+      "meta": "Price: US$5 a month or US$35 a year for one person, US$30 a user a year for a team with a two-seat minimum; 25&nbsp;GB of cloud storage per person; 7-day free trial &middot; <a href=\"https://www.layrpdf.com\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "redcolumn",
       "group": "drafting",
       "name": "redcolumn",
