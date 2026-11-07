@@ -8,7 +8,7 @@
     {
       "key": "drafting",
       "name": "2D and 3D drafting",
-      "sub": "Plans and details drawn in DWG, shared as files and external references."
+      "sub": "Plans and details drawn in DWG or DXF, shared as files and external references."
     },
     {
       "key": "modeling",
@@ -18,23 +18,13 @@
     {
       "key": "task",
       "name": "Task-specific modelers and simulators",
-      "sub": "Built for one building system or one kind of analysis, from framing through fabrication."
+      "sub": "Built for one job, such as framing, fabrication, interior layout or simulation."
     },
     {
       "key": "browser",
       "name": "In the browser",
       "sub": "Newer tools that run in a web browser, several people in one file.",
       "webOnly": true
-    },
-    {
-      "key": "free",
-      "name": "Free and open source",
-      "sub": "No license fee."
-    },
-    {
-      "key": "watch",
-      "name": "To watch",
-      "sub": "Free apps in early release or development, from one developer or a small studio."
     }
   ],
   "tools": [
@@ -435,6 +425,413 @@
       "meta": "Price: $1,166 a year or $2,616 perpetual &middot; <a href=\"https://www.bricsys.com/bricscad-bim\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "freecad",
+      "group": "bim",
+      "name": "FreeCAD",
+      "maker": "Open source",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.freecad.org/downloads.php#:~:text=Windows%2010%20is%20the%20minimum%20supported%20version"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.freecad.org/downloads.php#:~:text=macOS%2012%20Monterey%20is%20the%20minimum%20supported%20version"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.freecad.org/downloads.php#:~:text=Multiple%20Linux%2Dbased%20OSs%20are%20supported"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "TechDraw",
+          "https://www.freecad.org/features.php#:~:text=create%202D%20drawings%20and%20views%20of%20your%20models"
+        ],
+        "dwg": [
+          "part",
+          "via converter",
+          "https://wiki.freecad.org/FreeCAD_and_DWG_Import"
+        ],
+        "ifc": [
+          "yes",
+          "native IFC",
+          "https://www.freecad.org/#:~:text=It%20reads%20and%20writes%20to%20many%20open%20file%20formats"
+        ],
+        "revit": [
+          "no",
+          "through IFC",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A parametric 3D modeler with a BIM workbench built in since version 1.0: walls, slabs, windows, stairs, spaces and schedules. It works on IFC files directly. Drawings are model views placed on TechDraw pages at scale.",
+        "DWG goes through an external converter, such as the ODA File Converter. There is no RVT import."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (LGPL) &middot; <a href=\"https://www.freecad.org\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
+      "id": "bonsai",
+      "group": "bim",
+      "name": "Bonsai",
+      "maker": "Open source, on Blender",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "in Blender",
+          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
+        ],
+        "mac": [
+          "yes",
+          "in Blender",
+          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
+        ],
+        "linux": [
+          "yes",
+          "in Blender",
+          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "early drafting",
+          "https://docs.bonsaibim.org/studio/guides/drawings/index.html#:~:text=Bonsai%20provides%20powerful%20tools%20for%20generating%202D%20drawings"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "yes",
+          "native IFC",
+          "https://bonsaibim.org/#:~:text=Every%20edit%20reads%20and%20writes%20real%20IFC"
+        ],
+        "revit": [
+          "no",
+          "through IFC",
+          ""
+        ],
+        "team": [
+          "part",
+          "Git, experimental",
+          "https://docs.bonsaibim.org/studio/guides/authoring/git_support.html#:~:text=Bonsai%20supports%20tracking%20the%20development%20of%20your%20IFC%20files%20with%20a%20Git%20repository"
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A Blender add-on that stores every object as IFC, so the IFC file is the project file. It adds schedules, quantities, costing, 4D scheduling and COBie.",
+        "Drawings are generated from the model as SVG, and its documentation calls the drafting tools early-stage. Merging other people&rsquo;s changes needs the separate ifcmerge tool and is experimental."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source &middot; Bonsai Viewer, a standalone IFC viewer, is separate &middot; <a href=\"https://bonsaibim.org\" rel=\"noopener\">Website</a>",
+      "status": "0.9",
+      "free": true
+    },
+    {
+      "id": "openarch-bim",
+      "group": "bim",
+      "name": "OpenArch BIM",
+      "maker": "Open source",
+      "tier": "new",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "part",
+          "views, no sheets",
+          "https://github.com/kristiangl/OpenArchBIM"
+        ],
+        "dwg": [
+          "no",
+          "DXF planned",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "planned",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "BIM written from scratch in Rust. It models layered walls, floors, roofs and families, with plans, elevations, sections and schedules.",
+        "In early development, with no releases yet. Sheets and PDF, DXF and IFC export are planned."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (AGPL-3.0) &middot; <a href=\"https://github.com/kristiangl/OpenArchBIM\" rel=\"noopener\">Website</a>",
+      "status": "early development",
+      "free": true
+    },
+    {
+      "id": "bimopen",
+      "group": "bim",
+      "name": "BIMopen",
+      "maker": "Independent developer",
+      "tier": "new",
+      "cells": {
+        "win": [
+          "yes",
+          "test build",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "yes",
+          "test build",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
+        ],
+        "drawings": [
+          "yes",
+          "PDF sheets",
+          "https://atsanna.github.io/bimopen-site/"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "yes",
+          "IFC4 export",
+          "https://atsanna.github.io/bimopen-site/#:~:text=Export%20IFC4"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A BIM modeler from one developer, written with Claude Code. Plans export as SVG, sheets as PDF, schedules as CSV and models as IFC4. It opens IFC2x3 and IFC4.",
+        "Ceilings, phases, loadable families and DWG export are still missing. The source is not public yet. The site is in Italian."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free &middot; Also on Android &middot; <a href=\"https://atsanna.github.io/bimopen-site/\" rel=\"noopener\">Website</a>",
+      "status": "test builds",
+      "free": true
+    },
+    {
+      "id": "bimcraft",
+      "group": "bim",
+      "name": "BimCraft",
+      "maker": "The Data Design Group",
+      "tier": "new",
+      "status": "v0.7",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "early builds",
+          "https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today"
+        ],
+        "drawings": [
+          "yes",
+          "views, sheets",
+          "https://github.com/getcadcraft"
+        ],
+        "dwg": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "ifc": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "unk",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "Parametric walls, doors and windows on levels and grids, with views, schedules, sheets and clash checks, meant to feel familiar to Revit users. It does not open or save RVT.",
+        "It ships in CadCraft Studio with CadCraft, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href=\"https://getcadcraft.com\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "lapin",
+      "group": "bim",
+      "name": "Lapin",
+      "maker": "Ciuntuc BIM Studio",
+      "tier": "new",
+      "cells": {
+        "win": [
+          "yes",
+          "test build",
+          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
+        ],
+        "mac": [
+          "yes",
+          "Apple silicon",
+          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
+        ],
+        "linux": [
+          "yes",
+          "test build",
+          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://lapin.ciuntucbimstudio.ro/web/"
+        ],
+        "drawings": [
+          "yes",
+          "PDF sheets",
+          "https://lapin.ciuntucbimstudio.ro/docs/sheets.html#:~:text=The%20PDF%20and%20DXF%20buttons"
+        ],
+        "dwg": [
+          "part",
+          "DXF in and out",
+          "https://lapin.ciuntucbimstudio.ro/docs/sheets.html#:~:text=A%20DXF%20opens%20in%20AutoCAD"
+        ],
+        "ifc": [
+          "yes",
+          "",
+          "https://lapin.ciuntucbimstudio.ro/docs/import-export.html#:~:text=Every%20wall%2C%20floor%2C%20door%20and%20roof%20is%20a%20real%20IFC%20element"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "yes",
+          "live session",
+          "https://lapin.ciuntucbimstudio.ro/docs/sharing.html#:~:text=Several%20people%20can%20work%20in%20the%20same%20project%20at%20the%20same%20time"
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "BIM built on IFC from a small Romanian studio. It models walls, floors, roofs, stairs, structure and MEP schematics, with sections, elevations and sheets printed to PDF or DXF, and it reads and writes IFC4 and IFC4X3.",
+        "A host shares the open project and others join live from the app or a browser. DWG must be saved as DXF first. The browser version runs the same app, a little slower than the desktop one."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (MIT) &middot; <a href=\"https://lapin.ciuntucbimstudio.ro/docs/\" rel=\"noopener\">Website</a>",
+      "status": "test builds",
+      "free": true
+    },
+    {
       "id": "autocad",
       "group": "drafting",
       "name": "AutoCAD",
@@ -632,6 +1029,274 @@
       "meta": "Price: Standard $899, Professional $1,399 perpetual &middot; <a href=\"https://www.zwsoft.com/product/zwcad\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "librecad",
+      "group": "drafting",
+      "name": "LibreCAD",
+      "maker": "Open source",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "2D only",
+          "https://github.com/LibreCAD/LibreCAD"
+        ],
+        "dwg": [
+          "part",
+          "reads DWG",
+          "https://github.com/LibreCAD/LibreCAD#:~:text=It%20can%20read%20DXF%2FDWG%2C%20and%20write%20DXF%2FDWG%2FPDF%2FSVG%20files"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "2D drafting with layers, blocks, dimensions and hatches, printing to PDF and SVG.",
+        "DXF is its native format. It reads DWG, and saving DWG needs a build compiled with DWG support."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPLv2) &middot; <a href=\"https://librecad.org\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
+      "id": "qcad",
+      "group": "drafting",
+      "name": "QCAD Community Edition",
+      "maker": "RibbonSoft",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.qcad.org/en/faq/"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.qcad.org/en/faq/"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.qcad.org/en/faq/"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "2D only",
+          "https://www.qcad.org/en/features/"
+        ],
+        "dwg": [
+          "part",
+          "DXF; DWG in Pro",
+          "https://www.qcad.org/en/faq/#:~:text=QCAD%20Professional%20is%20the%20latest%20version%20of%20QCAD%20with%20add%2Dons%20for%20advanced%20DXF%20support%2C%20DWG%20support"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free; Professional paid",
+      "notes": [
+        "2D drafting with layers, blocks, dimensions, hatching and a large part library. The open-source Community Edition saves DXF.",
+        "DWG comes with QCAD Professional, a paid add-on. The download is the Professional trial, and removing the add-on leaves the Community Edition."
+      ],
+      "disclosure": "",
+      "meta": "Price: Community Edition free, open source. Professional is a paid license &middot; <a href=\"https://www.qcad.org\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
+      "id": "cadcraft",
+      "group": "drafting",
+      "name": "CadCraft",
+      "maker": "The Data Design Group",
+      "tier": "new",
+      "status": "v0.7",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "early builds",
+          "https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today"
+        ],
+        "drawings": [
+          "yes",
+          "plottable layouts",
+          "https://github.com/getcadcraft"
+        ],
+        "dwg": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "ifc": [
+          "yes",
+          "by its own account",
+          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "unk",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "Command-line 2D drafting with layers, blocks, dimensions and plottable layouts, meant to feel familiar to AutoCAD users. One of eight free apps from the same studio.",
+        "The apps ship together in CadCraft Studio, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href=\"https://getcadcraft.com\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "flatcad",
+      "group": "drafting",
+      "name": "FlatCad",
+      "maker": "Independent developer",
+      "tier": "",
+      "cells": {
+        "win": [
+          "no",
+          "",
+          ""
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://flatcad.com/about#:~:text=Any%20current%20browser%20with%20WebGL"
+        ],
+        "drawings": [
+          "yes",
+          "scaled PDF",
+          "https://flatcad.com/floor-plan-drawing#:~:text=print%20the%20plan%20at%201%3A50"
+        ],
+        "dwg": [
+          "part",
+          "DXF in and out",
+          "https://flatcad.com/about#:~:text=opens%20DXF"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "2D drafting for laser cutting, CNC and floor plans, from one developer. It opens DXF, SVG, Illustrator and PDF files, exports DXF and SVG, and prints PDF at a true scale such as 1:50.",
+        "Its maker says it is not an architecture program, with no walls, storeys or furniture libraries. Drawings stay in the browser."
+      ],
+      "meta": "Price: Free &middot; <a href=\"https://flatcad.com\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
       "id": "sketchup",
       "group": "modeling",
       "name": "SketchUp Pro",
@@ -764,6 +1429,275 @@
       "meta": "Price: $995 one-time, upgrade $595. A 90-day evaluation is free &middot; <a href=\"https://www.rhino3d.com\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "blender",
+      "group": "modeling",
+      "name": "Blender",
+      "maker": "Blender Foundation",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.blender.org/download/"
+        ],
+        "mac": [
+          "yes",
+          "Apple silicon",
+          "https://www.blender.org/download/#:~:text=Requires%20macOS%2013%20%28Ventura%29%20or%20newer"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.blender.org/download/"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "no",
+          "with Bonsai",
+          ""
+        ],
+        "dwg": [
+          "part",
+          "DXF import add-on",
+          "https://extensions.blender.org/add-ons/import-autocad-dxf-format-dxf/#:~:text=Import%20files%20in%20the%20Autocad%20DXF%20format"
+        ],
+        "ifc": [
+          "no",
+          "with Bonsai",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A general 3D modeler of meshes and curves, with its own renderer. It has no building objects, dimensions or sheets. Those come from the Bonsai add-on.",
+        "DXF import is a community extension. Mac builds need Apple silicon."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL) &middot; <a href=\"https://www.blender.org\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
+      "id": "sketchup-free",
+      "group": "modeling",
+      "name": "SketchUp Free",
+      "maker": "Trimble",
+      "tier": "",
+      "cells": {
+        "win": [
+          "no",
+          "",
+          ""
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free#:~:text=core%203D%20modeler%20runs%20right%20in%20your%20web%20browser"
+        ],
+        "drawings": [
+          "no",
+          "",
+          ""
+        ],
+        "dwg": [
+          "no",
+          "paid plans",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free, non-commercial",
+      "notes": [
+        "SketchUp&rsquo;s modeler in the browser, with 10 GB of Trimble Connect storage. There is no LayOut, so no sheets. DWG and other CAD formats need a paid plan.",
+        "Trimble&rsquo;s terms limit free versions to non-commercial use."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free for non-commercial use &middot; <a href=\"https://www.trimble.com/en/legal/offering-terms/terms/english#:~:text=Customer%20may%20only%20use%20Free%20Versions%20in%20a%20non%2Dproduction%20environment%20and%20for%20non%2Dcommercial%20purposes\" rel=\"noopener\">Terms</a> &middot; <a href=\"https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
+      "id": "ingetrazo",
+      "group": "modeling",
+      "name": "IngeTrazo",
+      "maker": "IngeLibre",
+      "tier": "new",
+      "status": "v0.5.11",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://ingetrazo.com/en/#:~:text=Windows%2010%2F11"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://ingetrazo.com/en/#:~:text=Apple%20Silicon%20%C2%B7%20macOS"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://ingetrazo.com/en/#:~:text=Linux%20%C2%B7%20x86_64"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "scaled PDF sheets",
+          "https://ingetrazo.com/en/#:~:text=True%20scale%2C%20guaranteed"
+        ],
+        "dwg": [
+          "part",
+          "import, DXF out",
+          "https://ingetrazo.com/en/#:~:text=IngeTrazo%20imports%20DWG%20and%20DXF%20drawings"
+        ],
+        "ifc": [
+          "part",
+          "IFC 4 export",
+          "https://ingetrazo.com/en/#:~:text=IFC%204%20export"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A 3D modeler for architecture and engineering from Peru, with push-pull solids and typed lengths. An optional BIM layer, still in development, tags walls, slabs, columns and doors and exports IFC 4.",
+        "Sheets hold scaled views with dimensions tied to the model and print to vector PDF. DWG import does not work on Mac yet.",
+        "A built-in AI assistant runs on your own key, and an MCP bridge lets Claude draw in the open app."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL-3.0), with no paid editions &middot; <a href=\"https://ingetrazo.com/en/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/ingelibre/ingetrazo\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "tinkercad",
+      "group": "modeling",
+      "name": "Tinkercad",
+      "maker": "Autodesk",
+      "tier": "",
+      "cells": {
+        "win": [
+          "no",
+          "",
+          ""
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "yes",
+          "app",
+          "https://www.tinkercad.com/ipad-app"
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://www.tinkercad.com/"
+        ],
+        "drawings": [
+          "no",
+          "",
+          ""
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "yes",
+          "invite link",
+          "https://www.tinkercad.com/help-center/sharing-designs-and-collaborating"
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "Beginner 3D modeling by combining and subtracting basic shapes. It exports STL, OBJ, glTF and SVG, and imports STL, OBJ and SVG.",
+        "Invited collaborators edit the same design at the same time."
+      ],
+      "meta": "Price: Free &middot; <a href=\"https://www.tinkercad.com\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
       "id": "axionbim",
       "group": "task",
       "name": "AXIONBIM",
@@ -860,7 +1794,7 @@
         "web": [
           "yes",
           "",
-          "https://lumbercad.com/#:~:text=Start%20building%20for%20free"
+          "https://lumbercad.com/beta#:~:text=LumberCAD%20should%20work%20across%20all%20modern%20browsers"
         ],
         "drawings": [
           "yes",
@@ -885,16 +1819,83 @@
         "team": [
           "part",
           "view and copy links",
-          "https://lumbercad.com/#:~:text=Share%20your%20build%20with%20a%20link"
+          "https://lumbercad.com/beta#:~:text=anyone%20with%20the%20link%20will%20be%20able%20to%20view%20and%20copy%20the%20build"
         ]
       },
       "price": "Free during beta",
       "notes": [
-        "Plans builds in dimensional lumber, for people without CAD experience. Parts snap together from a catalog of more than 300 components, a live cut list labels the parts and works out the cuts, and a documentation builder makes PDF plans with views, elevations, dimensions and material lists.",
-        "It exports STEP, OBJ, STL, DXF and GLB. A link shares a build that others can view or copy. Windows and Mac downloads are listed as coming soon."
+        "Plans builds in dimensional lumber, for people without CAD experience, from the Framexpert team. Parts snap together from a catalog of more than 300 components, the cut list splits parts into stock lengths and works out the cuts, and a documentation builder makes PDF plans with views, elevations, dimensions and material lists.",
+        "It exports STEP, OBJ, STL, DXF and GLB. Builds are private unless shared, and a shared link lets others view or copy a build but not change it. It does no structural analysis. Windows and Mac downloads are listed as coming soon."
       ],
       "disclosure": "",
-      "meta": "Price: Free during the public beta. The price after it is not announced &middot; <a href=\"https://lumbercad.com/\" rel=\"noopener\">Website</a>",
+      "meta": "Price: Free during the public beta, which is expected to run until early 2027. The price after it is undecided &middot; <a href=\"https://lumbercad.com/beta\" rel=\"noopener\">About the beta</a> &middot; <a href=\"https://lumbercad.com/\" rel=\"noopener\">Website</a>",
+      "free": true
+    },
+    {
+      "id": "sweet-home-3d",
+      "group": "task",
+      "name": "Sweet Home 3D",
+      "maker": "eTeks",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/download.jsp"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/download.jsp"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/download.jsp"
+        ],
+        "ipad": [
+          "part",
+          "paid app",
+          "https://www.sweethome3d.com/download.jsp#:~:text=This%20paid%20version%20contains%20more%20than%2010.000%20pieces%20of%20furniture"
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://www.sweethome3d.com/#:~:text=with%20any%20WebGL%20browser"
+        ],
+        "drawings": [
+          "part",
+          "plan to PDF",
+          "https://www.sweethome3d.com/features/#:~:text=Print%20and%20export%20PDFs%2C%20bitmap%20or%20vector%20graphics%20images"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free; mobile app paid",
+      "notes": [
+        "Home and interior layout: walls, rooms, doors and windows in plan, furniture from a library, and a 3D view that updates. Plans export to PDF and vector images, the model to OBJ.",
+        "The desktop and browser versions are free and open source. The mobile app is paid."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL). Mobile app paid &middot; <a href=\"https://www.sweethome3d.com\" rel=\"noopener\">Website</a>",
       "free": true
     },
     {
@@ -1256,1009 +2257,6 @@
       ],
       "disclosure": "",
       "meta": "Price: $21 a month, with DWG $38 a month &middot; <a href=\"https://www.rayon.design\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "freecad",
-      "group": "free",
-      "name": "FreeCAD",
-      "maker": "Open source",
-      "tier": "",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://www.freecad.org/downloads.php#:~:text=Windows%2010%20is%20the%20minimum%20supported%20version"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://www.freecad.org/downloads.php#:~:text=macOS%2012%20Monterey%20is%20the%20minimum%20supported%20version"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://www.freecad.org/downloads.php#:~:text=Multiple%20Linux%2Dbased%20OSs%20are%20supported"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "no",
-          "",
-          ""
-        ],
-        "drawings": [
-          "yes",
-          "TechDraw",
-          "https://www.freecad.org/features.php#:~:text=create%202D%20drawings%20and%20views%20of%20your%20models"
-        ],
-        "dwg": [
-          "part",
-          "via converter",
-          "https://wiki.freecad.org/FreeCAD_and_DWG_Import"
-        ],
-        "ifc": [
-          "yes",
-          "native IFC",
-          "https://www.freecad.org/#:~:text=It%20reads%20and%20writes%20to%20many%20open%20file%20formats"
-        ],
-        "revit": [
-          "no",
-          "through IFC",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "A parametric 3D modeler with a BIM workbench built in since version 1.0: walls, slabs, windows, stairs, spaces and schedules. It works on IFC files directly. Drawings are model views placed on TechDraw pages at scale.",
-        "DWG goes through an external converter, such as the ODA File Converter. There is no RVT import."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (LGPL) &middot; <a href=\"https://www.freecad.org\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "bonsai",
-      "group": "free",
-      "name": "Bonsai",
-      "maker": "Open source, on Blender",
-      "tier": "",
-      "cells": {
-        "win": [
-          "yes",
-          "in Blender",
-          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
-        ],
-        "mac": [
-          "yes",
-          "in Blender",
-          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
-        ],
-        "linux": [
-          "yes",
-          "in Blender",
-          "https://docs.bonsaibim.org/studio/quickstart/installation.html#:~:text=works%20on%20Linux%2C%20Mac%2C%20and%20Windows"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "no",
-          "",
-          ""
-        ],
-        "drawings": [
-          "yes",
-          "early drafting",
-          "https://docs.bonsaibim.org/studio/guides/drawings/index.html#:~:text=Bonsai%20provides%20powerful%20tools%20for%20generating%202D%20drawings"
-        ],
-        "dwg": [
-          "no",
-          "",
-          ""
-        ],
-        "ifc": [
-          "yes",
-          "native IFC",
-          "https://bonsaibim.org/#:~:text=Every%20edit%20reads%20and%20writes%20real%20IFC"
-        ],
-        "revit": [
-          "no",
-          "through IFC",
-          ""
-        ],
-        "team": [
-          "part",
-          "Git, experimental",
-          "https://docs.bonsaibim.org/studio/guides/authoring/git_support.html#:~:text=Bonsai%20supports%20tracking%20the%20development%20of%20your%20IFC%20files%20with%20a%20Git%20repository"
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "A Blender add-on that stores every object as IFC, so the IFC file is the project file. It adds schedules, quantities, costing, 4D scheduling and COBie.",
-        "Drawings are generated from the model as SVG, and its documentation calls the drafting tools early-stage. Merging other people&rsquo;s changes needs the separate ifcmerge tool and is experimental."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source &middot; Bonsai Viewer, a standalone IFC viewer, is separate &middot; <a href=\"https://bonsaibim.org\" rel=\"noopener\">Website</a>",
-      "status": "0.9"
-    },
-    {
-      "id": "blender",
-      "group": "free",
-      "name": "Blender",
-      "maker": "Blender Foundation",
-      "tier": "",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://www.blender.org/download/"
-        ],
-        "mac": [
-          "yes",
-          "Apple silicon",
-          "https://www.blender.org/download/#:~:text=Requires%20macOS%2013%20%28Ventura%29%20or%20newer"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://www.blender.org/download/"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "no",
-          "",
-          ""
-        ],
-        "drawings": [
-          "no",
-          "with Bonsai",
-          ""
-        ],
-        "dwg": [
-          "part",
-          "DXF import add-on",
-          "https://extensions.blender.org/add-ons/import-autocad-dxf-format-dxf/#:~:text=Import%20files%20in%20the%20Autocad%20DXF%20format"
-        ],
-        "ifc": [
-          "no",
-          "with Bonsai",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "A general 3D modeler of meshes and curves, with its own renderer. It has no building objects, dimensions or sheets. Those come from the Bonsai add-on.",
-        "DXF import is a community extension. Mac builds need Apple silicon."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (GPL) &middot; <a href=\"https://www.blender.org\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "librecad",
-      "group": "free",
-      "name": "LibreCAD",
-      "maker": "Open source",
-      "tier": "",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://librecad.org/#:~:text=cross%2Dplatform%20support%20for%20macOS%2C%20Windows%2C%20and%20Linux"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "no",
-          "",
-          ""
-        ],
-        "drawings": [
-          "yes",
-          "2D only",
-          "https://github.com/LibreCAD/LibreCAD"
-        ],
-        "dwg": [
-          "part",
-          "reads DWG",
-          "https://github.com/LibreCAD/LibreCAD#:~:text=It%20can%20read%20DXF%2FDWG%2C%20and%20write%20DXF%2FDWG%2FPDF%2FSVG%20files"
-        ],
-        "ifc": [
-          "no",
-          "",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "2D drafting with layers, blocks, dimensions and hatches, printing to PDF and SVG.",
-        "DXF is its native format. It reads DWG, and saving DWG needs a build compiled with DWG support."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (GPLv2) &middot; <a href=\"https://librecad.org\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "qcad",
-      "group": "free",
-      "name": "QCAD Community Edition",
-      "maker": "RibbonSoft",
-      "tier": "",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://www.qcad.org/en/faq/"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://www.qcad.org/en/faq/"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://www.qcad.org/en/faq/"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "no",
-          "",
-          ""
-        ],
-        "drawings": [
-          "yes",
-          "2D only",
-          "https://www.qcad.org/en/features/"
-        ],
-        "dwg": [
-          "part",
-          "DXF; DWG in Pro",
-          "https://www.qcad.org/en/faq/#:~:text=QCAD%20Professional%20is%20the%20latest%20version%20of%20QCAD%20with%20add%2Dons%20for%20advanced%20DXF%20support%2C%20DWG%20support"
-        ],
-        "ifc": [
-          "no",
-          "",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free; Professional paid",
-      "notes": [
-        "2D drafting with layers, blocks, dimensions, hatching and a large part library. The open-source Community Edition saves DXF.",
-        "DWG comes with QCAD Professional, a paid add-on. The download is the Professional trial, and removing the add-on leaves the Community Edition."
-      ],
-      "disclosure": "",
-      "meta": "Price: Community Edition free, open source. Professional is a paid license &middot; <a href=\"https://www.qcad.org\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "sketchup-free",
-      "group": "free",
-      "name": "SketchUp Free",
-      "maker": "Trimble",
-      "tier": "",
-      "cells": {
-        "win": [
-          "no",
-          "",
-          ""
-        ],
-        "mac": [
-          "no",
-          "",
-          ""
-        ],
-        "linux": [
-          "no",
-          "",
-          ""
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "yes",
-          "",
-          "https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free#:~:text=core%203D%20modeler%20runs%20right%20in%20your%20web%20browser"
-        ],
-        "drawings": [
-          "no",
-          "",
-          ""
-        ],
-        "dwg": [
-          "no",
-          "paid plans",
-          ""
-        ],
-        "ifc": [
-          "no",
-          "",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free, non-commercial",
-      "notes": [
-        "SketchUp&rsquo;s modeler in the browser, with 10 GB of Trimble Connect storage. There is no LayOut, so no sheets. DWG and other CAD formats need a paid plan.",
-        "Trimble&rsquo;s terms limit free versions to non-commercial use."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free for non-commercial use &middot; <a href=\"https://www.trimble.com/en/legal/offering-terms/terms/english#:~:text=Customer%20may%20only%20use%20Free%20Versions%20in%20a%20non%2Dproduction%20environment%20and%20for%20non%2Dcommercial%20purposes\" rel=\"noopener\">Terms</a> &middot; <a href=\"https://sketchup.trimble.com/en/plans-and-pricing/sketchup-free\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "sweet-home-3d",
-      "group": "free",
-      "name": "Sweet Home 3D",
-      "maker": "eTeks",
-      "tier": "",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://www.sweethome3d.com/download.jsp"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://www.sweethome3d.com/download.jsp"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://www.sweethome3d.com/download.jsp"
-        ],
-        "ipad": [
-          "part",
-          "paid app",
-          "https://www.sweethome3d.com/download.jsp#:~:text=This%20paid%20version%20contains%20more%20than%2010.000%20pieces%20of%20furniture"
-        ],
-        "web": [
-          "yes",
-          "",
-          "https://www.sweethome3d.com/#:~:text=with%20any%20WebGL%20browser"
-        ],
-        "drawings": [
-          "part",
-          "plan to PDF",
-          "https://www.sweethome3d.com/features/#:~:text=Print%20and%20export%20PDFs%2C%20bitmap%20or%20vector%20graphics%20images"
-        ],
-        "dwg": [
-          "no",
-          "",
-          ""
-        ],
-        "ifc": [
-          "no",
-          "",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free; mobile app paid",
-      "notes": [
-        "Home and interior layout: walls, rooms, doors and windows in plan, furniture from a library, and a 3D view that updates. Plans export to PDF and vector images, the model to OBJ.",
-        "The desktop and browser versions are free and open source. The mobile app is paid."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (GPL). Mobile app paid &middot; <a href=\"https://www.sweethome3d.com\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "openarch-bim",
-      "group": "watch",
-      "name": "OpenArch BIM",
-      "maker": "Open source",
-      "tier": "new",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://github.com/kristiangl/OpenArchBIM"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://github.com/kristiangl/OpenArchBIM"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://github.com/kristiangl/OpenArchBIM"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "no",
-          "",
-          ""
-        ],
-        "drawings": [
-          "part",
-          "views, no sheets",
-          "https://github.com/kristiangl/OpenArchBIM"
-        ],
-        "dwg": [
-          "no",
-          "DXF planned",
-          ""
-        ],
-        "ifc": [
-          "no",
-          "planned",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "BIM written from scratch in Rust. It models layered walls, floors, roofs and families, with plans, elevations, sections and schedules.",
-        "In early development, with no releases yet. Sheets and PDF, DXF and IFC export are planned."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (AGPL-3.0) &middot; <a href=\"https://github.com/kristiangl/OpenArchBIM\" rel=\"noopener\">Website</a>",
-      "status": "early development",
-      "free": true
-    },
-    {
-      "id": "bimopen",
-      "group": "watch",
-      "name": "BIMopen",
-      "maker": "Independent developer",
-      "tier": "new",
-      "cells": {
-        "win": [
-          "yes",
-          "test build",
-          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
-        ],
-        "mac": [
-          "no",
-          "",
-          ""
-        ],
-        "linux": [
-          "yes",
-          "test build",
-          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "yes",
-          "",
-          "https://atsanna.github.io/bimopen-site/#:~:text=Browser%2C%20Windows%2C%20Linux%20e%20Android"
-        ],
-        "drawings": [
-          "yes",
-          "PDF sheets",
-          "https://atsanna.github.io/bimopen-site/"
-        ],
-        "dwg": [
-          "no",
-          "",
-          ""
-        ],
-        "ifc": [
-          "yes",
-          "IFC4 export",
-          "https://atsanna.github.io/bimopen-site/#:~:text=Export%20IFC4"
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "A BIM modeler from one developer, written with Claude Code. Plans export as SVG, sheets as PDF, schedules as CSV and models as IFC4. It opens IFC2x3 and IFC4.",
-        "Ceilings, phases, loadable families and DWG export are still missing. The source is not public yet. The site is in Italian."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free &middot; Also on Android &middot; <a href=\"https://atsanna.github.io/bimopen-site/\" rel=\"noopener\">Website</a>",
-      "status": "test builds",
-      "free": true
-    },
-    {
-      "id": "cadcraft",
-      "group": "watch",
-      "name": "CadCraft",
-      "maker": "The Data Design Group",
-      "tier": "new",
-      "status": "v0.7",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "yes",
-          "early builds",
-          "https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today"
-        ],
-        "drawings": [
-          "yes",
-          "plottable layouts",
-          "https://github.com/getcadcraft"
-        ],
-        "dwg": [
-          "yes",
-          "by its own account",
-          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
-        ],
-        "ifc": [
-          "yes",
-          "by its own account",
-          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "unk",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "Command-line 2D drafting with layers, blocks, dimensions and plottable layouts, meant to feel familiar to AutoCAD users. One of eight free apps from the same studio.",
-        "The apps ship together in CadCraft Studio, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href=\"https://getcadcraft.com\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>",
-      "free": true
-    },
-    {
-      "id": "bimcraft",
-      "group": "watch",
-      "name": "BimCraft",
-      "maker": "The Data Design Group",
-      "tier": "new",
-      "status": "v0.7",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://getcadcraft.com/#:~:text=CadCraft%20Studio%20installs%20on%20Windows%2C%20macOS%2C%20Linux%20and%20Android"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "yes",
-          "early builds",
-          "https://getcadcraft.com/#:~:text=Early%20builds%20run%20in%20your%20browser%20today"
-        ],
-        "drawings": [
-          "yes",
-          "views, sheets",
-          "https://github.com/getcadcraft"
-        ],
-        "dwg": [
-          "yes",
-          "by its own account",
-          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
-        ],
-        "ifc": [
-          "yes",
-          "by its own account",
-          "https://getcadcraft.com/#:~:text=DWG%2C%20DXF%2C%20IFC%2C%20STEP%2C%20PDF%20and%20LandXML%20in%20and%20out"
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "unk",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "Parametric walls, doors and windows on levels and grids, with views, schedules, sheets and clash checks, meant to feel familiar to Revit users. It does not open or save RVT.",
-        "It ships in CadCraft Studio with CadCraft, and early builds run in the browser. The downloads are not code-signed yet. Saving in the browser needs a paid team plan."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; Also on Android &middot; <a href=\"https://getcadcraft.com\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>",
-      "free": true
-    },
-    {
-      "id": "ingetrazo",
-      "group": "watch",
-      "name": "IngeTrazo",
-      "maker": "IngeLibre",
-      "tier": "new",
-      "status": "v0.5.11",
-      "cells": {
-        "win": [
-          "yes",
-          "",
-          "https://ingetrazo.com/en/#:~:text=Windows%2010%2F11"
-        ],
-        "mac": [
-          "yes",
-          "",
-          "https://ingetrazo.com/en/#:~:text=Apple%20Silicon%20%C2%B7%20macOS"
-        ],
-        "linux": [
-          "yes",
-          "",
-          "https://ingetrazo.com/en/#:~:text=Linux%20%C2%B7%20x86_64"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "no",
-          "",
-          ""
-        ],
-        "drawings": [
-          "yes",
-          "scaled PDF sheets",
-          "https://ingetrazo.com/en/#:~:text=True%20scale%2C%20guaranteed"
-        ],
-        "dwg": [
-          "part",
-          "import, DXF out",
-          "https://ingetrazo.com/en/#:~:text=IngeTrazo%20imports%20DWG%20and%20DXF%20drawings"
-        ],
-        "ifc": [
-          "part",
-          "IFC 4 export",
-          "https://ingetrazo.com/en/#:~:text=IFC%204%20export"
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "A 3D modeler for architecture and engineering from Peru, with push-pull solids and typed lengths. An optional BIM layer, still in development, tags walls, slabs, columns and doors and exports IFC 4.",
-        "Sheets hold scaled views with dimensions tied to the model and print to vector PDF. DWG import does not work on Mac yet.",
-        "A built-in AI assistant runs on your own key, and an MCP bridge lets Claude draw in the open app."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (GPL-3.0), with no paid editions &middot; <a href=\"https://ingetrazo.com/en/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/ingelibre/ingetrazo\" rel=\"noopener\">Source</a>",
-      "free": true
-    },
-    {
-      "id": "tinkercad",
-      "group": "free",
-      "name": "Tinkercad",
-      "maker": "Autodesk",
-      "tier": "",
-      "cells": {
-        "win": [
-          "no",
-          "",
-          ""
-        ],
-        "mac": [
-          "no",
-          "",
-          ""
-        ],
-        "linux": [
-          "no",
-          "",
-          ""
-        ],
-        "ipad": [
-          "yes",
-          "app",
-          "https://www.tinkercad.com/ipad-app"
-        ],
-        "web": [
-          "yes",
-          "",
-          "https://www.tinkercad.com/"
-        ],
-        "drawings": [
-          "no",
-          "",
-          ""
-        ],
-        "dwg": [
-          "no",
-          "",
-          ""
-        ],
-        "ifc": [
-          "no",
-          "",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "yes",
-          "invite link",
-          "https://www.tinkercad.com/help-center/sharing-designs-and-collaborating"
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "Beginner 3D modeling by combining and subtracting basic shapes. It exports STL, OBJ, glTF and SVG, and imports STL, OBJ and SVG.",
-        "Invited collaborators edit the same design at the same time."
-      ],
-      "meta": "Price: Free &middot; <a href=\"https://www.tinkercad.com\" rel=\"noopener\">Website</a>"
-    },
-    {
-      "id": "lapin",
-      "group": "watch",
-      "name": "Lapin",
-      "maker": "Ciuntuc BIM Studio",
-      "tier": "new",
-      "cells": {
-        "win": [
-          "yes",
-          "test build",
-          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
-        ],
-        "mac": [
-          "yes",
-          "Apple silicon",
-          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
-        ],
-        "linux": [
-          "yes",
-          "test build",
-          "https://lapin.ciuntucbimstudio.ro/docs/#:~:text=The%20desktop%20app%20for%20Windows%2C%20macOS%20and%20Linux"
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "yes",
-          "",
-          "https://lapin.ciuntucbimstudio.ro/web/"
-        ],
-        "drawings": [
-          "yes",
-          "PDF sheets",
-          "https://lapin.ciuntucbimstudio.ro/docs/sheets.html#:~:text=The%20PDF%20and%20DXF%20buttons"
-        ],
-        "dwg": [
-          "part",
-          "DXF in and out",
-          "https://lapin.ciuntucbimstudio.ro/docs/sheets.html#:~:text=A%20DXF%20opens%20in%20AutoCAD"
-        ],
-        "ifc": [
-          "yes",
-          "",
-          "https://lapin.ciuntucbimstudio.ro/docs/import-export.html#:~:text=Every%20wall%2C%20floor%2C%20door%20and%20roof%20is%20a%20real%20IFC%20element"
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "yes",
-          "live session",
-          "https://lapin.ciuntucbimstudio.ro/docs/sharing.html#:~:text=Several%20people%20can%20work%20in%20the%20same%20project%20at%20the%20same%20time"
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "BIM built on IFC from a small Romanian studio. It models walls, floors, roofs, stairs, structure and MEP schematics, with sections, elevations and sheets printed to PDF or DXF, and it reads and writes IFC4 and IFC4X3.",
-        "A host shares the open project and others join live from the app or a browser. DWG must be saved as DXF first. The browser version runs the same app, a little slower than the desktop one."
-      ],
-      "disclosure": "",
-      "meta": "Price: Free, open source (MIT) &middot; <a href=\"https://lapin.ciuntucbimstudio.ro/docs/\" rel=\"noopener\">Website</a>",
-      "status": "test builds",
-      "free": true
-    },
-    {
-      "id": "flatcad",
-      "group": "watch",
-      "name": "FlatCad",
-      "maker": "Independent developer",
-      "tier": "",
-      "cells": {
-        "win": [
-          "no",
-          "",
-          ""
-        ],
-        "mac": [
-          "no",
-          "",
-          ""
-        ],
-        "linux": [
-          "no",
-          "",
-          ""
-        ],
-        "ipad": [
-          "no",
-          "",
-          ""
-        ],
-        "web": [
-          "yes",
-          "",
-          "https://flatcad.com/about#:~:text=Any%20current%20browser%20with%20WebGL"
-        ],
-        "drawings": [
-          "yes",
-          "scaled PDF",
-          "https://flatcad.com/floor-plan-drawing#:~:text=print%20the%20plan%20at%201%3A50"
-        ],
-        "dwg": [
-          "part",
-          "DXF in and out",
-          "https://flatcad.com/about#:~:text=opens%20DXF"
-        ],
-        "ifc": [
-          "no",
-          "",
-          ""
-        ],
-        "revit": [
-          "no",
-          "",
-          ""
-        ],
-        "team": [
-          "no",
-          "",
-          ""
-        ]
-      },
-      "price": "Free",
-      "notes": [
-        "2D drafting for laser cutting, CNC and floor plans, from one developer. It opens DXF, SVG, Illustrator and PDF files, exports DXF and SVG, and prints PDF at a true scale such as 1:50.",
-        "Its maker says it is not an architecture program, with no walls, storeys or furniture libraries. Drawings stay in the browser."
-      ],
-      "meta": "Price: Free &middot; <a href=\"https://flatcad.com\" rel=\"noopener\">Website</a>",
-      "free": true
     }
   ]
 }
