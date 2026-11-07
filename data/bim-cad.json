@@ -1830,6 +1830,73 @@
       "meta": "Price: Indie $175 one-time, Studio $299 one-time. A 30-day trial is free for non-commercial use &middot; <a href=\"https://www.plasticity.xyz/buy\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://www.plasticity.xyz/\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "moi",
+      "group": "modeling",
+      "name": "MoI (Moment of Inspiration)",
+      "maker": "Triple Squid Software Design",
+      "tier": "",
+      "status": "v4; v5 in beta",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "http://moi3d.com/download.htm#:~:text=Windows%207%2F8%2F10%2F11%2064-bit%20or%20Mac%20OSX%2010.8%2B"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "http://moi3d.com/download.htm#:~:text=Windows%207%2F8%2F10%2F11%2064-bit%20or%20Mac%20OSX%2010.8%2B"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "part",
+          "dimensions, text",
+          "http://moi3d.com/4.0/whatsnew.htm#:~:text=add%20dimensions%20and%20text%20to%20your%20model%20to%20use%20for%202D%20documentation"
+        ],
+        "dwg": [
+          "part",
+          "DXF in and out",
+          "http://moi3d.com/4.0/whatsnew.htm#:~:text=DXF%20import%20-%20support%20reading%20layers%20and%20import%2Fexport%20of%20dimension%20entities"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "One-time",
+      "notes": [
+        "NURBS modeling built around 2D curves and booleans, from a single developer. It exports meshes, including n-gons, for rendering and 3D printing, and 3DM, STEP and IGES for other CAD tools. It has no building objects or sheets.",
+        "Version 5 is in beta for license holders, announced on the MoI forum. One license covers both the Windows and Mac versions."
+      ],
+      "disclosure": "",
+      "meta": "Price: $295 one-time, upgrade from any earlier version $100. A 90-day trial is free &middot; <a href=\"http://moi3d.com/purchase.htm\" rel=\"noopener\">Purchase</a> &middot; <a href=\"http://moi3d.com/forum/?webtag=MOI&amp;msg=11970.1\" rel=\"noopener\">Version 5 beta</a> &middot; <a href=\"http://moi3d.com/\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "axionbim",
       "group": "task",
       "name": "AXIONBIM",
