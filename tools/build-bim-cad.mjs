@@ -4,9 +4,9 @@
    =========================================================================
    The same shape as build-pdf-markup.mjs, with this page's columns. The JSON
    is the source of truth for every tool: its group, its tier ("leader" for
-   an editorial shortlist pick, "new" for a newcomer, "" for neither), one
-   cell per column, price, notes. Every tool in the "free" group, and any
-   tool with "free": true (a free edition elsewhere in the table), carries
+   an editorial top pick, "new" for a newcomer, "" for neither), one
+   cell per column, price, notes. Groups say only what a tool is built for:
+   any tool with "free": true (free, open source or a free edition) carries
    data-free for the Free filter.
 
    A cell is [value, label, evidence]:
@@ -103,9 +103,9 @@ function rowsFor(g, cols) {
     // a "?" platform is not a platform the tool runs on, and a "?" capability is not one it does
     const plat = PLATS.filter(k => t.cells[k] && ['yes', 'part'].includes(t.cells[k][0])).join(' ');
     const caps = CAPS.filter(k => t.cells[k] && ['yes', 'part'].includes(t.cells[k][0])).join(' ');
-    const TIER = { leader: 'shortlist', new: 'newcomer' };
+    const TIER = { leader: 'top pick', new: 'newcomer' };
     if (t.tier && !TIER[t.tier]) fail(t.id + ': unknown tier ' + t.tier);
-    const free = g.key === 'free' || t.free;
+    const free = t.free;
     const maker = t.maker + (t.status ? ` &middot; ${t.status}` : '') + (t.tier ? ` &middot; <span class="m-tier m-tier-${t.tier}">${TIER[t.tier]}</span>` : '');
     out += `          <tr class="m-row" id="${t.id}" data-group="${g.key}" data-plat="${plat}" data-cap="${caps}"${t.tier ? ` data-tier="${t.tier}"` : ''}${free ? ' data-free="1"' : ''}>\n`;
     out += `            <th scope="row" class="m-name"><button type="button" class="m-open" aria-expanded="true" aria-controls="${t.id}-d"><span class="m-tool">${t.name}</span><span class="m-maker">${maker}</span></button></th>\n`;

@@ -2,18 +2,13 @@
   "groups": [
     {
       "key": "sets",
-      "name": "Built for drawing sets",
+      "name": "Built for drawings",
       "sub": "Markup and scaled measurement organized around sheets."
     },
     {
       "key": "drafting",
       "name": "Drafting plus PDF",
       "sub": "CAD drawing commands alongside markup and measurement."
-    },
-    {
-      "key": "indie",
-      "name": "Small independent tools",
-      "sub": "Markup, measurement and comparison from one developer or a small studio."
     },
     {
       "key": "editors",
@@ -77,7 +72,7 @@
     },
     {
       "id": "caliper",
-      "group": "indie",
+      "group": "sets",
       "name": "Caliper",
       "maker": "Caliper App LLC",
       "tier": "new",
@@ -101,13 +96,13 @@
     },
     {
       "id": "layr",
-      "group": "indie",
+      "group": "sets",
       "name": "Layr",
       "maker": "Layr PDF",
       "tier": "new",
       "cells": {
         "win": ["yes", "", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
-        "mac": ["yes", "Apple Silicon", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
+        "mac": ["yes", "", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
         "linux": ["no", "", ""],
         "ipad": ["no", "", ""],
         "web": ["yes", "", "https://www.layrpdf.com/#:~:text=Draw%20and%20mark%20up%20without%20installing%20the%20desktop%20app"],
@@ -173,7 +168,7 @@
     },
     {
       "id": "ncored",
-      "group": "indie",
+      "group": "sets",
       "name": "Ncored",
       "maker": "Noir architects",
       "tier": "new",
@@ -197,7 +192,7 @@
     },
     {
       "id": "pdf-studio",
-      "group": "sets",
+      "group": "editors",
       "name": "PDF Studio Pro",
       "maker": "Qoppa",
       "tier": "",
@@ -220,7 +215,7 @@
     },
     {
       "id": "pdf-xchange",
-      "group": "sets",
+      "group": "editors",
       "name": "PDF-XChange Editor",
       "maker": "PDF-XChange",
       "tier": "",
@@ -243,7 +238,7 @@
     },
     {
       "id": "polypdf",
-      "group": "indie",
+      "group": "sets",
       "name": "PolyPDF",
       "maker": "PolyPDF",
       "tier": "new",
@@ -267,7 +262,7 @@
     },
     {
       "id": "reviff",
-      "group": "indie",
+      "group": "sets",
       "name": "REVIFF",
       "maker": "AEC DX Labs",
       "tier": "new",
@@ -315,7 +310,7 @@
     },
     {
       "id": "pdf-measure",
-      "group": "indie",
+      "group": "sets",
       "name": "PDF Measure",
       "maker": "Charmillon LLC",
       "tier": "new",
@@ -339,7 +334,7 @@
     },
     {
       "id": "project-blueprint",
-      "group": "indie",
+      "group": "sets",
       "name": "Project Blueprint",
       "maker": "Independent developer",
       "tier": "new",
@@ -363,30 +358,30 @@
     },
     {
       "id": "plandify",
-      "group": "indie",
+      "group": "sets",
       "name": "PlanDiFy",
-      "maker": "Khaleel Obaidi",
+      "maker": "PlanDiFy",
       "tier": "new",
       "cells": {
         "win": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Windows%20download%3A%20x64"],
         "mac": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Mac%20download%3A%20Apple%20silicon"],
-        "linux": ["no", "", ""],
-        "ipad": ["no", "", ""],
+        "linux": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.250#:~:text=Linux%20x64%20AppImage%20ZIP"],
+        "ipad": ["part", "in Safari", "https://plandify.app/app/"],
         "web": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads#:~:text=Browser%20app"],
-        "measure": ["yes", "length, area", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Preserve%20appearance%2C%20labels%2C%20calibration%20and%20estimating%20settings"],
+        "measure": ["yes", "with takeoff", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.245#:~:text=supports%20native%20takeoffs%20with%20custom%20columns"],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""]
+        "compare": ["yes", "revision overlay", "https://plandify.app/help/"]
       },
       "price": "Free",
       "notes": [
-        "A free PDF reader and editor from one developer, in the browser or as a desktop app for Windows and Mac. Measure lengths and areas at a calibrated scale, and offset or copy shapes and measurements by a set distance. Markups display in other PDF apps."
+        "A free PDF reader and editor, in the browser or as a desktop app for Windows, Mac and Linux. The browser app also works in Safari on iPad. Full measurement tools at a calibrated scale, including length, area, perimeter and takeoff. Compare revisions with an overlay. Offset or copy shapes and measurements by a set distance. Markups display in other PDF apps."
       ],
       "disclosure": "",
       "meta": "Price: Free, with optional donations &middot; <a href=\"https://plandify.app\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "open-pdf-studio",
-      "group": "indie",
+      "group": "sets",
       "name": "Open PDF Studio",
       "maker": "OpenAEC Foundation",
       "tier": "new",

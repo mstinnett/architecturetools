@@ -3,7 +3,7 @@
    pdf-markup.html (between the matrix:start / matrix:end comments).
    =========================================================================
    The JSON is the source of truth for every tool: its group, whether it is
-   its tier ("leader" for an editorial shortlist pick, "new" for a newcomer, "" for neither), one cell per column, price, notes.
+   its tier ("leader" for an editorial top pick, "new" for a newcomer, "" for neither), one cell per column, price, notes.
 
    A cell is [value, label, evidence]:
      value     yes | part | no
@@ -65,7 +65,7 @@ for (const g of groups) {
     ids.add(t.id);
     const plat = PLATS.filter(k => t.cells[k][0] !== 'no').join(' ');
     const caps = CAPS.filter(k => t.cells[k][0] !== 'no').join(' ');
-    const TIER = { leader: 'shortlist', new: 'newcomer' };
+    const TIER = { leader: 'top pick', new: 'newcomer' };
     if (t.tier && !TIER[t.tier]) fail(t.id + ': unknown tier ' + t.tier);
     const maker = t.maker + (t.tier ? ` &middot; <span class="m-tier m-tier-${t.tier}">${TIER[t.tier]}</span>` : '');
     out += `          <tr class="m-row" id="${t.id}" data-group="${g.key}" data-plat="${plat}" data-cap="${caps}"${t.tier ? ` data-tier="${t.tier}"` : ''}${/^Free\b/.test(t.price) ? ' data-cost="free"' : ''}>\n`;
