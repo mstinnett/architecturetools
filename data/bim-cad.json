@@ -16,6 +16,11 @@
       "sub": "Massing, form and design studies by editing geometry directly."
     },
     {
+      "key": "task",
+      "name": "Task-specific modelers and simulators",
+      "sub": "Built for one building system or one kind of analysis, from framing through fabrication."
+    },
+    {
       "key": "browser",
       "name": "In the browser",
       "sub": "Newer tools that run in a web browser, several people in one file.",
@@ -757,6 +762,140 @@
       ],
       "disclosure": "",
       "meta": "Price: $995 one-time, upgrade $595. A 90-day evaluation is free &middot; <a href=\"https://www.rhino3d.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "axionbim",
+      "group": "task",
+      "name": "AXIONBIM",
+      "maker": "AXIONBIM",
+      "tier": "new",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://axionbim.com/about#:~:text=The%20program%20runs%20on%20Windows"
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "sheets, PDF/A",
+          "https://axionbim.com/#:~:text=Your%20drawings%20and%20lists%20are%20produced%20from%20the%20same%20model"
+        ],
+        "dwg": [
+          "yes",
+          "export",
+          "https://axionbim.com/#:~:text=Deliver%20your%20sheets%20as%20DXF%20and%20DWG"
+        ],
+        "ifc": [
+          "yes",
+          "IFC 4.3",
+          "https://axionbim.com/#:~:text=Your%20model%20is%20exported%20in%20an%20open%20standard"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "Light steel framing for prefab buildings. It frames wall, floor and roof panels from a DXF plan to your company&rsquo;s framing rules, lays out roof and wall cladding, and writes machine files for roll-forming lines. Quantities, quotes and drawing sheets come from the same model.",
+        "It does no structural analysis. The model goes to an analysis program as IFC. Howick and AFF machine files are marked experimental. The interface is in English and Turkish."
+      ],
+      "disclosure": "",
+      "meta": "Price: on request, yearly per license, in four plans. A 7-day trial of the top plan needs no card &middot; <a href=\"https://axionbim.com/pricing\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://axionbim.com/\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "lumbercad",
+      "group": "task",
+      "name": "LumberCAD",
+      "maker": "LumberCAD Inc.",
+      "tier": "new",
+      "status": "public beta",
+      "cells": {
+        "win": [
+          "no",
+          "coming soon",
+          ""
+        ],
+        "mac": [
+          "no",
+          "coming soon",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://lumbercad.com/#:~:text=Start%20building%20for%20free"
+        ],
+        "drawings": [
+          "yes",
+          "PDF plans",
+          "https://lumbercad.com/#:~:text=generate%20and%20modify%20fully%20featured%20plans"
+        ],
+        "dwg": [
+          "part",
+          "DXF export",
+          "https://lumbercad.com/#:~:text=Export%20to%20.STEP%2C%20.OBJ%2C%20.STL%2C%20.DXF%2C%20and%20.GLB"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "part",
+          "view and copy links",
+          "https://lumbercad.com/#:~:text=Share%20your%20build%20with%20a%20link"
+        ]
+      },
+      "price": "Free during beta",
+      "notes": [
+        "Plans builds in dimensional lumber, for people without CAD experience. Parts snap together from a catalog of more than 300 components, a live cut list labels the parts and works out the cuts, and a documentation builder makes PDF plans with views, elevations, dimensions and material lists.",
+        "It exports STEP, OBJ, STL, DXF and GLB. A link shares a build that others can view or copy. Windows and Mac downloads are listed as coming soon."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free during the public beta. The price after it is not announced &middot; <a href=\"https://lumbercad.com/\" rel=\"noopener\">Website</a>",
+      "free": true
     },
     {
       "id": "motif",
