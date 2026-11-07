@@ -1297,6 +1297,72 @@
       "free": true
     },
     {
+      "id": "draftsight",
+      "group": "drafting",
+      "name": "DraftSight",
+      "maker": "Dassault Syst&egrave;mes",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.draftsight.com/support/system-requirements"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.draftsight.com/support/system-requirements#:~:text=Available%20for%20Professional%20and%20Premium%20versions"
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "",
+          "https://www.draftsight.com/product/2d-cad/features#:~:text=Sheet%20Set%20Manager"
+        ],
+        "dwg": [
+          "yes",
+          "native",
+          "https://www.draftsight.com/#:~:text=All%20versions%20work%20natively%20with%20DWG%20files"
+        ],
+        "ifc": [
+          "part",
+          "import, Premium",
+          "https://www.draftsight.com/2d-cad/bim-module#:~:text=DraftSight%20Premium%20lets%20you%20import%20Revit%20(.RVT)%20and%20Industry%20Foundation%20Classes%20(.IFC)%20files"
+        ],
+        "revit": [
+          "part",
+          "RVT import, Premium",
+          "https://www.draftsight.com/2d-cad/bim-module#:~:text=DraftSight%20Premium%20lets%20you%20import%20Revit%20(.RVT)%20and%20Industry%20Foundation%20Classes%20(.IFC)%20files"
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "DWG drafting with commands familiar from AutoCAD, including AutoLISP. Premium adds 3D modeling, custom blocks, the Sheet Set Manager and a BIM module that imports Revit and IFC models for plans, sections and elevations.",
+        "There is no longer a free version. Perpetual licenses are sold only through resellers."
+      ],
+      "disclosure": "",
+      "meta": "Price: Professional $299 a year, Premium $599 a year, network licenses from $399 a year. A 30-day trial of Premium is free &middot; <a href=\"https://www.draftsight.com/how-to-buy\" rel=\"noopener\">How to buy</a> &middot; <a href=\"https://www.draftsight.com\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "sketchup",
       "group": "modeling",
       "name": "SketchUp Pro",
@@ -1696,6 +1762,72 @@
       ],
       "meta": "Price: Free &middot; <a href=\"https://www.tinkercad.com\" rel=\"noopener\">Website</a>",
       "free": true
+    },
+    {
+      "id": "plasticity",
+      "group": "modeling",
+      "name": "Plasticity",
+      "maker": "Plasticity",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.plasticity.xyz/#:~:text=Download%20for%20Windows"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.plasticity.xyz/#:~:text=Download%20for%20macOS"
+        ],
+        "linux": [
+          "yes",
+          "Ubuntu",
+          "https://www.plasticity.xyz/#:~:text=Download%20for%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "part",
+          "hidden-line SVG",
+          "https://www.plasticity.xyz/buy#:~:text=Generate%20technical%20SVG%20drawings%20from%203D%20models"
+        ],
+        "dwg": [
+          "part",
+          "import, Studio, Windows",
+          "https://www.plasticity.xyz/buy#:~:text=DXF%2FDWG%20import%20for%20Windows%20only"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "One-time",
+      "notes": [
+        "Solid and surface modeling for product, vehicle and game design, built on the Parasolid kernel. It edits geometry directly, with no history tree. It has no building objects or sheets.",
+        "Hidden-line export makes SVG drawings from a model. DWG and DXF import is in the Studio license, on Windows only. Each license includes 12 months of updates, and companies with more than 10 employees need Studio."
+      ],
+      "disclosure": "",
+      "meta": "Price: Indie $175 one-time, Studio $299 one-time. A 30-day trial is free for non-commercial use &middot; <a href=\"https://www.plasticity.xyz/buy\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://www.plasticity.xyz/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "axionbim",
