@@ -102,7 +102,7 @@
       "tier": "new",
       "cells": {
         "win": ["yes", "", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
-        "mac": ["yes", "Apple Silicon", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
+        "mac": ["yes", "", "https://www.layrpdf.com/download#:~:text=Windows%2010%20%2F%2011%20and%20macOS%20Apple%20Silicon"],
         "linux": ["no", "", ""],
         "ipad": ["no", "", ""],
         "web": ["yes", "", "https://www.layrpdf.com/#:~:text=Draw%20and%20mark%20up%20without%20installing%20the%20desktop%20app"],
