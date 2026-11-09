@@ -2031,6 +2031,74 @@
       "free": true
     },
     {
+      "id": "ketchup",
+      "group": "task",
+      "name": "KetchUp",
+      "maker": "Ketchup3D",
+      "tier": "new",
+      "status": "v0.6.5",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://ketchup3d.github.io/app/#:~:text=Download%20for%20Windows"
+        ],
+        "mac": [
+          "yes",
+          "Apple Silicon",
+          "https://ketchup3d.github.io/app/#:~:text=Download%20for%20macOS"
+        ],
+        "linux": [
+          "yes",
+          "AppImage",
+          "https://ketchup3d.github.io/app/#:~:text=Download%20for%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://github.com/Ketchup3D/app#:~:text=in%20a%20desktop%20browser%20through%20WebAssembly"
+        ],
+        "drawings": [
+          "part",
+          "dimensions",
+          "https://ketchup3d.github.io/app/#:~:text=use%20Tape%20Measure%20and%20Dimensions%20to%20inspect%20your%20design"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A push-pull modeler for woodworking and furniture, with typed lengths, snapping, groups and reusable components. It imports SketchUp geometry and exports OBJ without materials. It has no building objects or sheets.",
+        "The browser editor saves to browser storage, so clearing browser data can delete your work. Download a .ketchup project file to keep a copy. It needs a mouse and does not run on phones or tablets."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (MIT), with no account needed &middot; <a href=\"https://ketchup3d.github.io/app/play/\" rel=\"noopener\">Browser editor</a> &middot; <a href=\"https://ketchup3d.github.io/app/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/Ketchup3D/app\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
       "id": "sweet-home-3d",
       "group": "task",
       "name": "Sweet Home 3D",
