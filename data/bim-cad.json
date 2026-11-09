@@ -1897,6 +1897,74 @@
       "meta": "Price: $295 one-time, upgrade from any earlier version $100. A 90-day trial is free &middot; <a href=\"http://moi3d.com/purchase.htm\" rel=\"noopener\">Purchase</a> &middot; <a href=\"http://moi3d.com/forum/?webtag=MOI&amp;msg=11970.1\" rel=\"noopener\">Version 5 beta</a> &middot; <a href=\"http://moi3d.com/\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "hew",
+      "group": "modeling",
+      "name": "Hew",
+      "maker": "Hew",
+      "tier": "new",
+      "status": "v1.4.0",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://hew3d.com/download#:~:text=Windows%2010%20or%20later"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://hew3d.com/download#:~:text=macOS%2013%20or%20later"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://hew3d.com/download#:~:text=Needs%20WebKitGTK%204.1"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://hew3d.com/#:~:text=The%20same%20full%20app%20in%20a%20browser"
+        ],
+        "drawings": [
+          "part",
+          "scaled PDF",
+          "https://hew3d.com/learn/printing/#:~:text=Dimensions%20and%20text%20print%20at%20the%20size%20they%20show%20on%20screen"
+        ],
+        "dwg": [
+          "no",
+          "",
+          ""
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A solids-first push-pull modeler for people who learned on SketchUp: woodworkers, builders, makers and architects. It opens and saves SketchUp files from version 3 to 2027 without SketchUp installed, and exports STL, 3MF, glTF and USDZ. It has no building objects and no DWG, IFC or STEP.",
+        "Print writes scaled vector PDF with dimensions, section cuts and a title block, and an SVG export gives a true-size hidden-line drawing. The browser version at app.hew3d.com runs the same app, and a read-only phone mode shows measurements in the shop."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (AGPL-3.0), with no account or paid tier &middot; <a href=\"https://hew3d.com/download\" rel=\"noopener\">Download</a> &middot; <a href=\"https://hew3d.com/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/hew3d/hew\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
       "id": "axionbim",
       "group": "task",
       "name": "AXIONBIM",
