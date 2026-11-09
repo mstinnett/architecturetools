@@ -346,12 +346,12 @@
         "web": ["yes", "", "https://liteaeco.com/tools/pdf-viewer.html#:~:text=Files%20never%20leave%20your%20computer"],
         "measure": ["part", "2-point scale", "https://liteaeco.com/tools/pdf-viewer.html#:~:text=Calibrate%3A%20click%202%20points"],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""]
+        "compare": ["yes", "swipe, diff", "https://liteaeco.com/tools/pdf-viewer.html"]
       },
       "price": "Free",
       "notes": [
         "A browser viewer for multi-page plan sets: annotate, comment, stamp, fill forms, rotate pages and jump between sheets. It calibrates a scale from two points. Pages can be extracted, split and downloaded as a ZIP.",
-        "Files stay on your computer, and certificate signing (PAdES) happens in the browser. It has no shared review and no sheet comparison."
+        "Files stay on your computer, and certificate signing (PAdES) happens in the browser. It compares two sheets side by side, with a swipe or as a diff. It has no shared review."
       ],
       "disclosure": "",
       "meta": "Price: Free, open source (Apache 2.0), no account &middot; <a href=\"https://liteaeco.com/tools/pdf-viewer.html\" rel=\"noopener\">Open PDFScope</a> &middot; <a href=\"https://liteaeco.com/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/ltorrecilla/liteaeco\" rel=\"noopener\">Source</a>"
