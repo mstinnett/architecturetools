@@ -40,6 +40,8 @@ PDF Studio Pro, Xournal++, Preview.
   (`polypdf.com/downloads/PolyPDFMac.dmg`, about 275 MB) doesn't say which
   Macs it supports, and neither does polypdf.com/versions. Inspecting the
   binary would settle it.
+- **Deta Studio** (checked 12 November 2026). deta.studio says only
+  "Desktop apps for Mac and Windows", with no processor requirement.
 
 ## PlanDiFy — claims from the developer (6 November 2026)
 

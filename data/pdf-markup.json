@@ -333,6 +333,30 @@
       "meta": "Price: Free, no account &middot; <a href=\"https://pdfmeasure.com\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "deta-studio",
+      "group": "sets",
+      "name": "Deta Studio",
+      "maker": "Deta",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://www.deta.studio/#:~:text=Desktop%20apps%20for%20Mac%20and%20Windows"],
+        "mac": ["yes", "", "https://www.deta.studio/#:~:text=Desktop%20apps%20for%20Mac%20and%20Windows"],
+        "linux": ["no", "", ""],
+        "ipad": ["part", "in browser", "https://www.deta.studio/#:~:text=any%20modern%20browser%20on%20Mac%2C%20Windows%2C%20iPad"],
+        "web": ["yes", "", "https://www.deta.studio/#:~:text=Deta%20Cloud%20runs%20in%20any%20modern%20browser"],
+        "measure": ["yes", "with takeoff", "https://www.deta.studio/#:~:text=Calibrated%20lengths%2C%20areas%2C%20and%20counts"],
+        "team": ["yes", "live, free guests", "https://www.deta.studio/#:~:text=Review%20a%20cloud%20drawing%20together%20and%20see%20each%20markup%20as%20it%20happens"],
+        "compare": ["yes", "revision overlay", "https://www.deta.studio/#:~:text=Overlay%20two%20revisions%20and%20every%20change%20lights%20up"]
+      },
+      "price": "Free tier, subscription or one-time",
+      "notes": [
+        "A drawing review app from architects, for Mac and Windows, with a cloud version in the browser. Calibrate a sheet once, then measure lengths, areas, perimeters and counts to scale, metric or imperial. The desktop app opens and saves PDFs on your computer, offline.",
+        "Deta Cloud adds shared drawings with markups that appear live, version history, and takeoff tables built from markups. Contractors and clients open a shared link to view and comment without an account. Overlay two revisions to highlight every change, on local PDFs or cloud versions."
+      ],
+      "disclosure": "",
+      "meta": "Price: Desktop $89 one-time for Mac and Windows, with a 30-day free trial. Deta Cloud is free for up to five documents, then $12.50 a user a month (Pro) or $17 a seat a month (Studio, three-seat minimum), billed yearly &middot; Free desktop license for educators and students &middot; <a href=\"https://www.deta.studio/\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "pdfscope",
       "group": "sets",
       "name": "PDFScope",
