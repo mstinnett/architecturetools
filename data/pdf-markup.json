@@ -229,12 +229,38 @@
         "team": ["no", "", ""],
         "compare": ["part", "Plus edition", "https://help.pdf-xchange.com/pdfxe11/compare-documents.html#:~:text=a%20license%20for%20PDF%2DXChange%20Editor%20Plus%20is%20required"]
       },
-      "price": "One-time",
+      "price": "Free tier, one-time",
       "notes": [
-        "A Windows editor for one person working alone. Clouds, callouts, stamps, and calibrated length, perimeter and area measurement. The Plus edition compares two documents. It has no shared review."
+        "A Windows editor for one person working alone. Clouds, callouts, stamps, and calibrated length, perimeter and area measurement, with measurements exported to a CSV file. The free version includes all of the measuring tools.",
+        "The Plus edition compares two documents. It has no shared review."
       ],
       "disclosure": "",
-      "meta": "Price: One-time license &middot; <a href=\"https://www.pdf-xchange.com/product/pdf-xchange-editor\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free for markup and measurement. Editor US$62 and Editor Plus US$79, one-time, each with a year of updates. Further years of updates cost about 25% of the license price &middot; <a href=\"https://www.pdf-xchange.com/product/pdf-xchange-editor\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "pdfelement",
+      "group": "editors",
+      "name": "PDFelement",
+      "maker": "Wondershare",
+      "tier": "",
+      "cells": {
+        "win": ["yes", "", "https://pdf.wondershare.com/guide/pdfelement-windows.html#:~:text=Wondershare%20PDFelement%20for%20Windows%20is%20a%20powerful%20PDF%20tool"],
+        "mac": ["yes", "", "https://pdf.wondershare.com/guide/pdfelement-mac.html#:~:text=PDFelement%20for%20Mac%20is%20a%20powerful%20PDF%20tool"],
+        "linux": ["no", "", ""],
+        "ipad": ["yes", "", "https://pdf.wondershare.com/guide/pdfelement-ios.html#:~:text=PDFelement%20for%20iOS%20delivers%20professional-grade%20tools"],
+        "web": ["yes", "", "https://pdf.wondershare.com/guide/document-cloud.html#:~:text=Wondershare%20PDFelement%20Cloud%20supports%20annotation%20and%20comment"],
+        "measure": ["yes", "scale ratio", "https://pdf.wondershare.com/guide/pdf-measuring-tool.html#:~:text=change%20the%20scale%20by%20right"],
+        "team": ["yes", "PDFelement Cloud", "https://pdf.wondershare.com/guide/document-cloud.html#:~:text=If%20you%20need%20to%20collect%20comments%20and%20reviews%20for%20your%20document%20from%20others"],
+        "compare": ["yes", "file comparison", "https://pdf.wondershare.com/guide/compare-pdf.html#:~:text=Any%20differences%20between%20the%20two%20PDFs%20will%20be%20highlighted"]
+      },
+      "price": "Subscription or one-time",
+      "notes": [
+        "A general PDF editor for Windows, Mac, iPad and Android, with OCR, page editing and conversion. Measures distance, perimeter, polygon area and circle area, and adds up several measurements for you. You set the drawing scale by typing a ratio.",
+        "Compare two PDFs side by side with insertions, deletions and changes highlighted. To collect comments from others, share a document by link or email through PDFelement Cloud.",
+        "The free version lets you try measurement and comparison for 14 days. After that they need a paid plan."
+      ],
+      "disclosure": "",
+      "meta": "Price: For Windows only, US$51.99 one-time for version 13, US$31.99 a year, or US$11.99 a quarter. Plans that add Mac, iPad and phone cost about US$10 more. Prices shown as discounts &middot; Also on iPhone, Android &middot; <a href=\"https://pdf.wondershare.com/store/windows-individuals.html\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://pdf.wondershare.com/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "polypdf",

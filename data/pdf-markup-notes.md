@@ -63,3 +63,17 @@ Relayed by the developer, then added to the page:
 - Pricing: US$149 one-time per platform, two computers per licence, Mac and Windows sold separately. Introductory US$19 for the first 100 licences on each platform. The page shows a live Mac count; we don't print it.
 - Earlier "US$79 for two Macs" was out of date.
 - Notes no longer state macOS 14 or the Windows version; the Mac requirement is still macOS 14 or later, Apple silicon and Intel.
+
+## PDFelement — added (checked 12 November 2026)
+
+- Pricing from pdf.wondershare.com/store/windows-individuals.html, US prices. Each plan has a cross-platform and a single-platform (Windows only) price: quarterly $21.99 / $11.99; yearly auto-renew $76.99 / $67.99; yearly manual renew $41.99 / $31.99; 2-year $119.99 / $109.99; perpetual (v13) $61.99 / $51.99. A second "V13 Discounts" perpetual box shows $118.99 / $110.49. All are shown against higher struck-through prices, so they may be promotional.
+- The plan comparison lists "Measure (Distance/Perimeter/Area)" and Compare as a 14-day trial on the free version.
+- The measuring guide (Windows) sets the scale by typing a "Scale Ratio" in Measurement Settings. It shows no calibration on a known length; not confirmed either way. Measurement on Mac and iPad not checked.
+- Team review is PDFelement Cloud: share by link or email to collect comments.
+
+## PDF-XChange Editor — re-checked (12 November 2026)
+
+- Current version 11.1.2.0, Windows 10 and later, including an ARM64 installer.
+- The feature list marks distance, perimeter and area measurement, Calibrate Measurement Scales and Export Measurements to CSV as free features. Compare Documents is licensed (Plus).
+- Single-user license US$62 (Editor) or US$79 (Editor Plus), one year of maintenance included; renewal about 25% of the license price a year.
+- Price column changed from "One-time" to "Free tier, one-time", so it now appears under the Free filter.
