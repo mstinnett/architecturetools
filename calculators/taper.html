@@ -195,7 +195,7 @@
   };
   var DEFAULT_GRID = { imperial: 3048, metric: 4800 };
   var STEP = { imperial: 6 * IN, metric: 100 * MM };     // drain placement
-  var BAND = { imperial: IN, metric: 25 * MM };          // one band of taper (every other one hatched, denser as it deepens)
+  var BAND = { imperial: IN, metric: 25 * MM };          // one band of taper (hatch flips per band, denser as it deepens)
   // six drains on one roof area: more and the roof is better split into
   // separate drainage areas, each with its own taper
   var MAX_DRAINS = 6;
@@ -445,26 +445,28 @@
     cv.style.width = (L * k) + 'px'; cv.style.height = (W * k) + 'px'; cv.style.left = mL + 'px'; cv.style.top = mT + 'px';
     var ctx = cv.getContext('2d'), img = ctx.createImageData(cv.width, cv.height), px = img.data;
     var cs = getComputedStyle(document.documentElement);
-    // every other band is hatched the way the converter's number line
-    // hatches its residual (45° strokes, 0.6px wide, in --nl-hatch), and the
-    // hatch tightens with depth: open in the first hatched band off the drain,
-    // dense at the high points. The plain bands between keep each band edge
-    // crisp. The hatch is phased to the drawing's origin so it doesn't shift
-    // with margins.
+    // the bands are hatched the way the converter's number line hatches its
+    // residual (45° strokes, 0.6px wide, in --nl-hatch). The hatch flips
+    // direction band to band, so each band edge reads as a crisp change, and
+    // it tightens with depth: open at the first band off the drain, dense at
+    // the high points. The band at the drain itself stays clear. The hatch is
+    // phased to the drawing's origin so it doesn't shift with margins.
     var ink = parseColor(cs.getPropertyValue('--nl-hatch') || '#0a0a0a'), band = BAND[state.target];
     var P_OPEN = 12, P_DENSE = 3, HALF = 0.3, pxH = 0.5 / dpr, R2 = Math.SQRT1_2;
-    var top = hi ? Math.max(1, Math.floor(hi.h / band)) : 1, nH = Math.ceil(top / 2), pitch = [];
+    var top = hi ? Math.max(1, Math.floor(hi.h / band)) : 1, pitch = [];
     // geometric steps, so each one reads as the same change in density
-    for (var bi = 1; bi <= top; bi += 2) { var q = nH > 1 ? (bi - 1) / 2 / (nH - 1) : 0; pitch[bi] = P_OPEN * Math.pow(P_DENSE / P_OPEN, q); }
+    for (var bi = 1; bi <= top; bi++) pitch[bi] = P_OPEN * Math.pow(P_DENSE / P_OPEN, top > 1 ? (bi - 1) / (top - 1) : 0);
     for (var j = 0; j < cv.height; j++) {
       for (var i = 0; i < cv.width; i++) {
         var o = (j * cv.width + i) * 4, a = 0;
         if (state.drains.length) {
           var x = (i + 0.5) / dpr / k, y = (j + 0.5) / dpr / k;
           var b = Math.min(top, Math.floor(taperAt(x, y, s) / band));
-          if (b % 2) {
-            // distance, in CSS px, from this pixel to the nearest hatch stroke
-            var P = pitch[b], u = ((i + 0.5) / dpr + mL + (j + 0.5) / dpr + mT) * R2 % P;
+          if (b > 0) {
+            // distance, in CSS px, from this pixel to the nearest hatch stroke:
+            // odd bands run /, even bands run \
+            var sx = (i + 0.5) / dpr + mL, sy = (j + 0.5) / dpr + mT, P = pitch[b];
+            var u = (((b % 2 ? sx + sy : sx - sy) * R2) % P + P) % P;
             var d = Math.min(u, P - u);
             a = Math.max(0, Math.min(HALF, d + pxH) - Math.max(-HALF, d - pxH)) / (2 * pxH);
           }
