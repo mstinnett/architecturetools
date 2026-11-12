@@ -405,6 +405,30 @@
       "meta": "Price: US$149 one-time for each platform, covering two computers, with Mac and Windows licensed separately. Introductory price of US$19 while it lasts &middot; 14-day free trial &middot; <a href=\"https://blueprintformac.com\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "notch",
+      "group": "sets",
+      "name": "Notch",
+      "maker": "Notch",
+      "tier": "new",
+      "cells": {
+        "win": ["no", "", ""],
+        "mac": ["yes", "", "https://apps.apple.com/app/notch-the-modern-pdf-editor/id6814556460"],
+        "linux": ["no", "", ""],
+        "ipad": ["yes", "", "https://notch.build/blog/notch-for-iphone-and-ipad"],
+        "web": ["yes", "", "https://notch.build/"],
+        "measure": ["yes", "with takeoff", "https://notch.build/features/takeoff#:~:text=calibrate%20by%20drawing%20a%20line%20of%20known%20length"],
+        "team": ["yes", "live, view links", "https://notch.build/features/collaboration#:~:text=Teammates'%20markups%20appear%20live%20as%20they%20draw"],
+        "compare": ["yes", "revision overlay", "https://notch.build/features/compare#:~:text=Overlay%20two%20issues%20of%20a%20sheet"]
+      },
+      "price": "Free tier, subscription",
+      "notes": [
+        "A PDF editor for construction and design teams, in the browser and as an app for Mac, iPhone and iPad. Set each page's scale from a standard preset or a known line, then measure lengths, areas, perimeters and counts. Quantities export to a spreadsheet.",
+        "Overlay two revisions in tint, diff or fade. Teammates' markups appear live, and a view link opens the latest drawing with no account."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free for basic markup. Solo $8 a month and Pro $16 a month, billed yearly ($12 and $24 billed monthly), with a 14-day free trial. Pro adds a shared team workspace, with Collaborator seats at $6 a month &middot; <a href=\"https://notch.build/\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "plandify",
       "group": "sets",
       "name": "PlanDiFy",
