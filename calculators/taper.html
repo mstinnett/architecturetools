@@ -50,7 +50,7 @@
   .build-row .units { margin-left: auto; display: flex; gap: 0.3rem; align-items: center; }
   .key-sm[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: var(--shadow-press); }
 
-  /* the plan: shaded bands of taper, drains you place and drag */
+  /* the plan: hatched bands of taper, drains you place and drag */
   .tp-wrap { position: relative; touch-action: none; user-select: none; -webkit-user-select: none; }
   .tp-wrap canvas { display: block; position: absolute; left: 0; top: 0; }
   svg.tp { display: block; position: relative; max-width: 100%; height: auto; overflow: visible; }
@@ -195,7 +195,7 @@
   };
   var DEFAULT_GRID = { imperial: 3048, metric: 4800 };
   var STEP = { imperial: 6 * IN, metric: 100 * MM };     // drain placement
-  var BAND = { imperial: IN, metric: 25 * MM };          // one shaded band of taper
+  var BAND = { imperial: IN, metric: 25 * MM };          // one band of taper (every other one hatched)
   // six drains on one roof area: more and the roof is better split into
   // separate drainage areas, each with its own taper
   var MAX_DRAINS = 6;
@@ -445,15 +445,24 @@
     cv.style.width = (L * k) + 'px'; cv.style.height = (W * k) + 'px'; cv.style.left = mL + 'px'; cv.style.top = mT + 'px';
     var ctx = cv.getContext('2d'), img = ctx.createImageData(cv.width, cv.height), px = img.data;
     var cs = getComputedStyle(document.documentElement);
-    var acc = parseColor(cs.getPropertyValue('--accent')), band = BAND[state.target];
-    var hiH = hi ? hi.h : 0;
+    // every other band is hatched the way the converter's number line hatches
+    // its residual: 45° strokes, 6px apart, 0.6px wide, in --nl-hatch. The
+    // hatch is phased to the drawing's origin so it doesn't shift with margins.
+    var ink = parseColor(cs.getPropertyValue('--nl-hatch') || '#0a0a0a'), band = BAND[state.target];
+    var PITCH = 6, HALF = 0.3, pxH = 0.5 / dpr, R2 = Math.SQRT1_2;
     for (var j = 0; j < cv.height; j++) {
       for (var i = 0; i < cv.width; i++) {
-        var x = (i + 0.5) / dpr / k, y = (j + 0.5) / dpr / k;
-        var t = state.drains.length ? taperAt(x, y, s) : 0, b = Math.floor(t / band);
-        var a = state.drains.length ? (0.05 + 0.32 * (hiH ? t / hiH : 0)) * (b % 2 ? 1 : 0.72) : 0;
-        var o = (j * cv.width + i) * 4;
-        px[o] = acc[0]; px[o + 1] = acc[1]; px[o + 2] = acc[2]; px[o + 3] = Math.round(a * 255);
+        var o = (j * cv.width + i) * 4, a = 0;
+        if (state.drains.length) {
+          var x = (i + 0.5) / dpr / k, y = (j + 0.5) / dpr / k;
+          if (Math.floor(taperAt(x, y, s) / band) % 2) {
+            // distance, in CSS px, from this pixel to the nearest hatch stroke
+            var u = ((i + 0.5) / dpr + mL + (j + 0.5) / dpr + mT) * R2 % PITCH;
+            var d = Math.min(u, PITCH - u);
+            a = Math.max(0, Math.min(HALF, d + pxH) - Math.max(-HALF, d - pxH)) / (2 * pxH);
+          }
+        }
+        px[o] = ink[0]; px[o + 1] = ink[1]; px[o + 2] = ink[2]; px[o + 3] = Math.round(Math.min(1, a) * 255);
       }
     }
     ctx.putImageData(img, 0, 0);
