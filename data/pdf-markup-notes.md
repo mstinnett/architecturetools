@@ -56,3 +56,10 @@ Relayed by the developer, then added to the page:
 - iPad: the browser app works in Safari, so the cell is "partly, in Safari",
   linking to plandify.app/app/.
 - No longer in beta; maker shown as "PlanDiFy", not a personal name.
+
+## Project Blueprint — Windows (checked 12 November 2026)
+
+- Windows edition on sale, per the owner. Requirements on blueprintformac.com/windows: "Windows 10 (version 1809 or later) or Windows 11, 64-bit". On Arm it runs through Windows' x64 emulation; no native Arm build stated.
+- Pricing: US$149 one-time per platform, two computers per licence, Mac and Windows sold separately. Introductory US$19 for the first 100 licences on each platform. The page shows a live Mac count; we don't print it.
+- Earlier "US$79 for two Macs" was out of date.
+- Notes no longer state macOS 14 or the Windows version; the Mac requirement is still macOS 14 or later, Apple silicon and Intel.

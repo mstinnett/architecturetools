@@ -387,7 +387,7 @@
       "maker": "Independent developer",
       "tier": "new",
       "cells": {
-        "win": ["no", "", ""],
+        "win": ["yes", "", "https://blueprintformac.com/windows"],
         "mac": ["yes", "", "https://blueprintformac.com/"],
         "linux": ["no", "", ""],
         "ipad": ["no", "", ""],
@@ -398,11 +398,11 @@
       },
       "price": "One-time",
       "notes": [
-        "A PDF markup and takeoff app for construction drawings, for Mac only. Set the scale on each sheet from a known dimension or the printed scale, then measure lengths, areas and counts. Totals export to CSV.",
-        "Compare revisions by overlay, blink or swipe. Markups save into the PDF, and markups made in Bluebeam Revu or Acrobat open for editing. Files stay on the Mac. It needs macOS 14 or later."
+        "A PDF markup and takeoff app for construction drawings, for Mac and Windows. Set each sheet's scale, then measure lengths, areas and counts, with totals exported to CSV.",
+        "Compare revisions by overlay, blink or swipe. Markups save into the PDF, and markups from Bluebeam Revu or Acrobat open for editing. Files stay on your computer."
       ],
       "disclosure": "",
-      "meta": "Price: US$79 one-time, for two Macs &middot; <a href=\"https://blueprintformac.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$149 one-time for each platform, covering two computers, with Mac and Windows licensed separately. Introductory price of US$19 while it lasts &middot; 14-day free trial &middot; <a href=\"https://blueprintformac.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "plandify",
