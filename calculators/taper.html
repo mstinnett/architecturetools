@@ -454,6 +454,10 @@
     var ink = parseColor(cs.getPropertyValue('--nl-hatch') || '#0a0a0a'), band = BAND[state.target];
     var P_OPEN = 14, P_DENSE = 3, HALF = 0.3, pxH = 0.5 / dpr, R2 = Math.SQRT1_2;
     var top = hi ? Math.max(1, Math.floor(hi.h / band)) : 1, pitch = [];
+    // on a small plan a band can be narrower than the open pitch, which would
+    // leave it all but bare: hold the open pitch to about half a band's width
+    // (a band is band / s of plan, times k px), never tighter than the dense one
+    if (s > 0) P_OPEN = Math.max(P_DENSE * 1.5, Math.min(P_OPEN, band / s * k * 0.5));
     // geometric steps, so each one reads as the same change in density
     for (var bi = 0; bi <= top; bi++) pitch[bi] = P_OPEN * Math.pow(P_DENSE / P_OPEN, bi / top);
     // a contour is the pixels within half a CSS px of a band edge; across a
