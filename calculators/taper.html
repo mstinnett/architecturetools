@@ -446,20 +446,27 @@
     var ctx = cv.getContext('2d'), img = ctx.createImageData(cv.width, cv.height), px = img.data;
     var cs = getComputedStyle(document.documentElement);
     // the taper is hatched the way the converter's number line hatches its
-    // residual (45° strokes, 0.6px wide, in --nl-hatch), everywhere, since the
-    // slope runs everywhere. The hatch tightens band by band with depth: open
-    // at the drain, dense at the high points. A thin contour marks each band
-    // edge, one per band of taper, as on a taper plan. The hatch is phased to
-    // the drawing's origin so it doesn't shift with margins.
+    // residual (45° strokes in --nl-hatch), everywhere, since the slope runs
+    // everywhere. The hatch darkens band by band with depth, two ways at
+    // once: the strokes draw closer (pitch) and heavier (weight), so it runs
+    // from a light, open hatch at the drain to a dark, dense one at the high
+    // points. Spacing alone squeezes into too narrow a range on a phone. A
+    // thin contour marks each band edge, one per band of taper, as on a taper
+    // plan. The hatch is phased to the drawing's origin so it doesn't shift
+    // with margins.
     var ink = parseColor(cs.getPropertyValue('--nl-hatch') || '#0a0a0a'), band = BAND[state.target];
-    var P_OPEN = 14, P_DENSE = 3, HALF = 0.3, pxH = 0.5 / dpr, R2 = Math.SQRT1_2;
-    var top = hi ? Math.max(1, Math.floor(hi.h / band)) : 1, pitch = [];
+    var P_OPEN = 14, P_DENSE = 2.5, W_OPEN = 0.4, W_DENSE = 1.2, pxH = 0.5 / dpr, R2 = Math.SQRT1_2;
+    var top = hi ? Math.max(1, Math.floor(hi.h / band)) : 1, pitch = [], halfW = [];
     // on a small plan a band can be narrower than the open pitch, which would
     // leave it all but bare: hold the open pitch to about half a band's width
-    // (a band is band / s of plan, times k px), never tighter than the dense one
-    if (s > 0) P_OPEN = Math.max(P_DENSE * 1.5, Math.min(P_OPEN, band / s * k * 0.5));
-    // geometric steps, so each one reads as the same change in density
-    for (var bi = 0; bi <= top; bi++) pitch[bi] = P_OPEN * Math.pow(P_DENSE / P_OPEN, bi / top);
+    // (a band is band / s of plan, times k px), never tighter than 1.6x dense
+    if (s > 0) P_OPEN = Math.max(P_DENSE * 1.6, Math.min(P_OPEN, band / s * k * 0.5));
+    // geometric steps, so each one reads as the same change in tone
+    for (var bi = 0; bi <= top; bi++) {
+      var q = bi / top;
+      pitch[bi] = P_OPEN * Math.pow(P_DENSE / P_OPEN, q);
+      halfW[bi] = W_OPEN * Math.pow(W_DENSE / W_OPEN, q) / 2;
+    }
     // a contour is the pixels within half a CSS px of a band edge; across a
     // plane the taper changes by s per unit of plan, so that's s / 2k of taper
     var cW = s * 0.5 / k;
@@ -473,7 +480,7 @@
           if (tt > cW && (r < cW || band - r < cW)) a = 0.85;
           else {
             // distance, in CSS px, from this pixel to the nearest hatch stroke
-            var P = pitch[b], u = ((i + 0.5) / dpr + mL + (j + 0.5) / dpr + mT) * R2 % P;
+            var P = pitch[b], HALF = halfW[b], u = ((i + 0.5) / dpr + mL + (j + 0.5) / dpr + mT) * R2 % P;
             var d = Math.min(u, P - u);
             a = Math.max(0, Math.min(HALF, d + pxH) - Math.max(-HALF, d - pxH)) / (2 * pxH);
           }
