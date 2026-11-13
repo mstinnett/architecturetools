@@ -454,13 +454,51 @@
     });
     return depth;
   }
+  // a quarter-turn view of the plan: rot turns clockwise. toView takes a plan
+  // point to (u across, v down); fromView takes it back.
+  function toView(rot, L, W, x, y) {
+    return rot === 1 ? { u: W - y, v: x } : rot === 2 ? { u: L - x, v: W - y } : rot === 3 ? { u: y, v: L - x } : { u: x, v: y };
+  }
+  function fromView(rot, L, W, u, v) {
+    return rot === 1 ? { x: v, y: W - u } : rot === 2 ? { x: L - u, y: W - v } : rot === 3 ? { x: L - v, y: u } : { x: u, y: v };
+  }
+  // the turn a phone opens on: the one that brings a highest edge, or else
+  // the highest place nearest an edge, up to the top, by the dimension
+  // string and in the first view. A turn that stands a long roof on end
+  // (more than twice as tall as wide) is passed over. Ties go to the wider
+  // view, then the fewer turns.
+  function lexLess(a, b) { for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] < b[i]; return false; }
+  function bestTurn(L, W, hi) {
+    var best = 0, bestKey = null;
+    for (var r = 0; r < 4; r++) {
+      var Lv = r % 2 ? W : L, Wv = r % 2 ? L : W;
+      var tooTall = Wv > 2 * Lv ? 1 : 0;
+      var near = Infinity;
+      if (hi) {
+        // a run counts by its middle, so an edge only scores as on top when
+        // it lies along the top, not when one end touches a top corner
+        hi.runs.forEach(function (q) { near = Math.min(near, toView(r, L, W, (q.x1 + q.x2) / 2, (q.y1 + q.y2) / 2).v); });
+        hi.points.forEach(function (q) { near = Math.min(near, toView(r, L, W, q.x, q.y).v); });
+      }
+      var keyR = [tooTall, hi ? near : 0, Wv > Lv ? 1 : 0, r];
+      if (!bestKey || lexLess(keyR, bestKey)) { best = r; bestKey = keyR; }
+    }
+    return best;
+  }
   function drawPlan(L, W, s, hi) {
     var avail = Math.min(els.plan.clientWidth || 640, 680);
     setDense(avail);
-    // the view: the plan as drawn, a quarter turn clockwise when rotated
+    // the view: the plan as drawn, turned rot quarter turns clockwise
     // (narrow plans only). u runs across the view, v down it.
-    var rot = NARROW && !!state.rot, Lv = rot ? W : L, Wv = rot ? L : W;
-    function uOf(d) { return rot ? W - d.y : d.x; }
+    // a narrow plan's tallest comfortable drawing: most of the screen
+    var hMax = Math.max(220, Math.round((window.innerHeight || 700) * 0.7));
+    if (NARROW && !state.rotManual && !drag) {
+      // until Rotate is pressed, each new roof size opens on its best turn
+      var key = L + 'x' + W;
+      if (state.rotKey !== key) { state.rot = bestTurn(L, W, hi); state.rotKey = key; }
+    }
+    var rot = NARROW ? (state.rot || 0) : 0, Lv = rot % 2 ? W : L, Wv = rot % 2 ? L : W;
+    function uOf(d) { return toView(rot, L, W, d.x, d.y).u; }
     var sides = NARROW ? null : dimsFor(L, W), chain = NARROW ? chainFor(Lv, uOf) : null;
     var k = 1, depth, mT, mL, mB, mR, anyShort = false;
     function shortAt(kk) {
@@ -470,6 +508,9 @@
     if (NARROW) {
       mL = mR = mB = EDGE;
       k = (avail - mL - mR) / Lv;
+      // full width, unless that runs a long roof far down the screen: then
+      // it's held to the screen's height and centred
+      if (Wv * k > hMax) { k = hMax / Wv; mL = mR = (avail - Lv * k) / 2; }
       shortAt(k);
       mT = (chain.length ? GAP + (anyShort ? LBL : 0) + TIER : GAP) + PAD;
     } else {
@@ -492,7 +533,7 @@
     // X and Y take view coordinates; PX takes a plan point
     function X(u) { return mL + u * k; }
     function Y(v) { return mT + v * k; }
-    function PX(x, y) { return rot ? { x: X(W - y), y: Y(x) } : { x: X(x), y: Y(y) }; }
+    function PX(x, y) { var q = toView(rot, L, W, x, y); return { x: X(q.u), y: Y(q.v) }; }
     function f(n) { return n.toFixed(1); }
     // the bands, on a canvas under the drawing
     var dpr = window.devicePixelRatio || 1;
@@ -531,7 +572,7 @@
         var o = (j * cv.width + i) * 4, a = 0;
         if (state.drains.length) {
           var vu = (i + 0.5) / dpr / k, vv = (j + 0.5) / dpr / k;
-          var tt = rot ? taperAt(vv, W - vu, s) : taperAt(vu, vv, s);
+          var pp = fromView(rot, L, W, vu, vv), tt = taperAt(pp.x, pp.y, s);
           var b = Math.min(top, Math.floor(tt / band));
           var r = tt - Math.floor(tt / band) * band;
           if (tt > cW && (r < cW || band - r < cW)) a = 0.85;
@@ -597,7 +638,7 @@
       edits += '<input class="tp-edit is-all is-v" id="tpdW" data-overall="wid" aria-label="Roof width" value="' + esc(fmtNear(W)) + '" style="left:' + f(xo) + 'px;top:' + f(Y(W / 2)) + 'px" spellcheck="false" autocomplete="off">';
     } else {
       // the one dimension string, and the overall a tier above it
-      var yl = Y(0) - GAP, yo = yl - (chain.length ? (anyShort ? LBL : 0) + TIER : 0), ov = rot ? 'wid' : 'len';
+      var yl = Y(0) - GAP, yo = yl - (chain.length ? (anyShort ? LBL : 0) + TIER : 0), ov = rot % 2 ? 'wid' : 'len';
       if (chain.length) {
         var ticks = {};
         chain.forEach(function (sg) { ticks[sg.a] = 1; ticks[sg.b] = 1; });
@@ -626,7 +667,7 @@
         });
       }
       g += '<line class="tp-dl is-all" x1="' + f(X(0)) + '" y1="' + f(yo) + '" x2="' + f(X(Lv)) + '" y2="' + f(yo) + '"/>';
-      edits += '<input class="tp-edit is-all" id="tpdO" data-overall="' + ov + '" aria-label="Roof ' + (rot ? 'width' : 'length') + '" value="' + esc(fmtNear(Lv)) + '" style="left:' + f(X(Lv / 2)) + 'px;top:' + f(yo) + 'px;width:' + lblW(fmtNear(Lv)) + 'px" spellcheck="false" autocomplete="off">';
+      edits += '<input class="tp-edit is-all" id="tpdO" data-overall="' + ov + '" aria-label="Roof ' + (rot % 2 ? 'width' : 'length') + '" value="' + esc(fmtNear(Lv)) + '" style="left:' + f(X(Lv / 2)) + 'px;top:' + f(yo) + 'px;width:' + lblW(fmtNear(Lv)) + 'px" spellcheck="false" autocomplete="off">';
     }
     if (hi) {
       // every equally high place: runs as heavy lines, points as dots. One
@@ -654,8 +695,6 @@
     els.plan.insertAdjacentHTML('beforeend', '<svg class="tp" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" role="img" aria-label="Roof plan with drains, their dimensions and taper bands">' + g + '</svg>' + edits);
     if (active) { var el = document.getElementById(active); if (el) el.focus({ preventScroll: true }); }
     els.planTools.hidden = !NARROW;
-    // the button names the side it will bring to the top
-    if (NARROW) els.rotBtn.innerHTML = '&#8635; Show ' + esc(fmtNear(Wv)) + ' side';
     els.dimHint.textContent = NARROW ? 'type a dimension in the string above it' : 'type a dimension from its nearest corner';
   }
   function parseColor(c) {
@@ -672,7 +711,7 @@
   function planAt(e) {
     var svg = els.plan.querySelector('svg'), r = svg.getBoundingClientRect(), sc = r.width / fig.w;
     var u = ((e.clientX - r.left) / sc - fig.mL) / fig.k, v = ((e.clientY - r.top) / sc - fig.mT) / fig.k;
-    var x = fig.rot ? v : u, y = fig.rot ? fig.W - u : v;
+    var pp = fromView(fig.rot, fig.L, fig.W, u, v), x = pp.x, y = pp.y;
     var hold = 8 / (fig.k * sc), st = STEP[state.target];
     function snap(v, size) {
       var marks = [0, size / 2, size];
@@ -735,7 +774,9 @@
       if (!cv2 || cv2.error || u < 0 || u > fig.Lv) { el.classList.add('is-bad'); el.title = cv2 && !cv2.error ? 'past the far edge' : 'a length, e.g. 12\'-6" or 3.8m'; return; }
       el.dataset.drains.split(',').forEach(function (i) {
         var dd = state.drains[+i]; if (!dd) return;
-        if (fig.rot) dd.y = fig.W - u; else dd.x = u;
+        // u along the view's top is one plan axis, running one way or the other
+        var r = fig.rot;
+        if (r === 0) dd.x = u; else if (r === 1) dd.y = fig.W - u; else if (r === 2) dd.x = fig.L - u; else dd.y = u;
       });
       render();
       return;
@@ -788,7 +829,7 @@
     if (b.dataset.units) setTarget(b.dataset.units); else state.grid = +b.dataset.grid;
     render();
   });
-  els.rotBtn.addEventListener('click', function () { state.rot = !state.rot; render(); });
+  els.rotBtn.addEventListener('click', function () { state.rot = ((state.rot || 0) + 1) % 4; state.rotManual = true; render(); });
   window.addEventListener('resize', function () { clearTimeout(window.__tp); window.__tp = setTimeout(render, 120); });
   document.addEventListener('schemechange', render);
 
