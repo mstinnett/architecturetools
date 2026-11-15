@@ -86,3 +86,13 @@ Relayed by the developer, then added to the page:
 - Measurement: sets a sheet scale or calibrates from a known dimension; lengths, perimeters, areas, angles and counts. Neither page mentions totals, a schedule or CSV export, so the label is "length, area, count", not "with takeoff".
 - Compare: "overlay comparison of two sheets" appears only in the store description, so that cell links to the store page. The store page renders with JavaScript, so the text-fragment link may not highlight.
 - Not tested hands-on; everything is from the developer's own listing.
+
+## Tools 4 All SVG Editor — added (checked 15 November 2026)
+
+- Source: tools-4all.com/svg-editor and the editor's own scripts. Not tested hands-on with a drawing set.
+- The site owner reports the developer fixed earlier performance problems and that it is now fast enough for AEC drawing sets. The developer is interested in AEC use. The page itself says it keeps panning and zooming fast "even with tens of thousands of shapes".
+- Placed under Reading, notes and sketching, beside Concepts: it is an illustration tool first, not a markup app.
+- Opens PDF (one page, or all pages as the pages of one drawing), DXF and HPGL plot files, among many design formats. Exports SVG, PNG, JPEG, WebP and PDF.
+- Measure tool: length, area and angle in the document's or rulers' units (px, mm, cm, in, pt, pc). No drawing scale or calibration found, so the measure cell is "no". Revisit if it gains a scale.
+- iPad cell "partly, in browser": the page says it edits full screen on phones and desktops; not tried on an iPad.
+- No tier: not marked as a newcomer, since its launch date isn't known.

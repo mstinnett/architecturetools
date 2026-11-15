@@ -783,6 +783,30 @@
       ],
       "disclosure": "",
       "meta": "Price: Free tier; PDF workflows require a paid plan &middot; Also on Android &middot; <a href=\"https://concepts.app/en/architects/\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "tools4all-svg",
+      "group": "notes",
+      "name": "SVG Editor",
+      "maker": "Tools 4 All",
+      "tier": "",
+      "cells": {
+        "win": ["no", "", ""],
+        "mac": ["no", "", ""],
+        "linux": ["no", "", ""],
+        "ipad": ["part", "in browser", "https://tools-4all.com/svg-editor#:~:text=full-screen%20editing%20on%20phones%20and%20desktops"],
+        "web": ["yes", "", "https://tools-4all.com/svg-editor#:~:text=A%20fast%2C%20professional%20vector%20editor%20in%20your%20browser"],
+        "measure": ["no", "", ""],
+        "team": ["no", "", ""],
+        "compare": ["no", "", ""]
+      },
+      "price": "Free",
+      "notes": [
+        "A vector illustration editor that runs in the browser. It opens a multi-page PDF as the pages of one drawing, with the linework as editable vectors, and also opens DXF and HPGL plot files. Useful for turning drawings into diagrams and presentation graphics, then exporting PDF, SVG or PNG.",
+        "Files stay on the computer, with no account. A measure tool gives lengths, areas and angles in the document&rsquo;s own units, but it has no drawing scale or calibration, no shared review and no revision compare."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, no account &middot; <a href=\"https://tools-4all.com/svg-editor\" rel=\"noopener\">Website</a>"
     }
   ]
 }
