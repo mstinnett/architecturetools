@@ -789,7 +789,7 @@
       "group": "notes",
       "name": "SVG Editor",
       "maker": "Tools 4 All",
-      "tier": "",
+      "tier": "new",
       "cells": {
         "win": ["no", "", ""],
         "mac": ["no", "", ""],

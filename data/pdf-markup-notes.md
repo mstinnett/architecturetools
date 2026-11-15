@@ -95,4 +95,4 @@ Relayed by the developer, then added to the page:
 - Opens PDF (one page, or all pages as the pages of one drawing), DXF and HPGL plot files, among many design formats. Exports SVG, PNG, JPEG, WebP and PDF.
 - Measure tool: length, area and angle in the document's or rulers' units (px, mm, cm, in, pt, pc). No drawing scale or calibration found, so the measure cell is "no". Revisit if it gains a scale.
 - iPad cell "partly, in browser": the page says it edits full screen on phones and desktops; not tried on an iPad.
-- No tier: not marked as a newcomer, since its launch date isn't known.
+- Marked as a newcomer at the site owner's call.
