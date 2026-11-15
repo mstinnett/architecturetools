@@ -177,7 +177,7 @@ They are part of the site structure, but they do not need premature renaming or 
     ├── HOSTING.md                  # Cloudflare Worker hosting, deploys, the move from GitHub Pages
     ├── FEEDBACK.md                 # The feedback form and its private inbox
     ├── REFERENCES.md               # Citation ledger — every code/standard cited, with status
-    ├── voice.md                    # Recommendation-copy voice & glossary
+    ├── voice.md                    # Site voice, tone & glossary
     └── decisions/                  # Autonomous work system (state, backlog, queue, guide)
 ```
 

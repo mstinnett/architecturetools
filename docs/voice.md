@@ -3,6 +3,77 @@
 The recommendation copy speaks to one architect, mid-purchase, choosing a machine
 for their work. Not to an audience, about architects.
 
+## Who's talking
+
+A practicing architect who uses these apps every day. That is the site's whole
+standing, so say it where trust gets decided: the about page, the methodology
+page, and the opening of an editorial page. Say it once, plainly, as a fact
+about where the picks come from, not as a badge ("built by an architect" in a
+corner, "our experts" anywhere).
+
+- Site copy speaks as **we** for the site's judgments ("we recommend").
+  First person **I** belongs to signed writing: the about page, posts and
+  emails under the architect's name.
+- Cover sheets and plates stay descriptive (see `SITE_FRAMEWORK.md`). The
+  credential doesn't go there.
+
+## Tone
+
+Four traits. Every surface has all four, and the recommendation cells show
+them most quietly.
+
+- **Practitioner.** Examples come from the office, not the spec sheet: a Revit
+  model of one building, a deadline-week render, a consultant on a different
+  version. Name the app, the file, the number.
+- **Candid.** Say where the evidence stops. When two options are close, say
+  they're close. "We don't know yet" is allowed. A range beats a falsely
+  precise point (the calculator rule holds everywhere).
+- **On the reader's side.** The goal is the right machine, and that is often
+  the cheaper one. Say "you don't need this" when it's true. If the site earns
+  anything from a link, say so in one sentence on the page that has the link.
+- **Plain and calm.** Short sentences, periods. Warm through usefulness, not
+  cheerleading: no exclamation points, no hype words (game-changing,
+  powerhouse, beast, next-level), no urgency that isn't real.
+
+## Figurative language
+
+Three tiers. When unsure which tier a phrase is in, write the literal version.
+
+- **Analogies: allowed.** An explicit comparison that explains a mechanism by
+  pointing at something the reader already knows ("Like a plotter queue,
+  production rendering takes whatever cores you give it and finishes sooner").
+  Draw them from the architect's own world: drawing sets, consultants, site
+  work, the plotter. It has to do the explaining. If the literal sentence is as
+  clear, use the literal sentence. One per piece is plenty.
+- **Metaphors: sparingly.** An implied comparison ("the GPU draws the scene
+  while the CPU waits") earns a place only when it is clearer than the literal
+  phrasing and not one of the stock phrases below. In recommendation notes and
+  calculator mechanism copy, state the mechanism instead: those surfaces keep
+  their own bans (Rules below, and Calculator pages above).
+- **Worn-out phrases: never, on any surface.** Banned: sweet spot, sky's the
+  limit, earns its place, it shows, heavy lifting, workhorse, beast,
+  powerhouse, future-proof, game-changer, take it to the next level, punches
+  above its weight, a no-brainer, bang for your buck. Add to this list when
+  one slips through.
+
+## Where the rules apply
+
+The rules below were written for recommendation cells and are strictest there.
+Other surfaces take the tone and the figurative tiers above, plus:
+
+- **Recommendation cells:** The shape, Rules, and Glossary below, in full.
+- **Calculator pages:** the next section, plus Rules where they fit.
+- **Cover sheets and plates:** descriptive only. What the tool takes in and
+  gives back. No thesis, no claims of worth.
+- **A-series editorial:** the most room. Judgment in first person plural,
+  decision logic shown, analogies welcome. Still lead with the answer.
+- **About and methodology:** who's talking and how picks are made. Here the
+  process is the content, so "No process leaks" does not apply.
+- **Feedback form, errors, empty states:** one sentence on what happened, one
+  on what to do. No apology theater.
+- **Off the site (email, posts, replies):** same tone, signed in first person.
+  Lead with the specific fact, and point to the page that has the rest.
+
 ## Calculator pages (operator rulings, 2026-07)
 
 The calculator voice extends the rules below; these came out of the
@@ -46,8 +117,11 @@ scale/slope/tile redesigns and are the standard for every tool page.
 
 - **Speak to the buyer.** "You primarily work on documents," not "the work is
   document-primary."
-- **No metaphors.** State the mechanism or the fact. Banned: heavy, heaviest,
-  load, it shows, earns its place, idle, covers, sweet spot, sky's the limit.
+- **State the mechanism.** No metaphor in notes or frames, and none of the
+  worn-out phrases (Figurative language, above). Also banned here, because
+  they hide what the part does: heavy, heaviest, load, idle, covers. A short
+  analogy is allowed only when it decides or locates in fewer words than the
+  literal version.
 - **No empty intensifiers.** real, actually, genuinely, only-for-emphasis.
 - **Plain over jargon.** Say what a term means in words an architect owns:
   "one operation at a time," not "single-threaded." Keep terms met at work or
