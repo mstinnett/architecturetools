@@ -77,3 +77,12 @@ Relayed by the developer, then added to the page:
 - The feature list marks distance, perimeter and area measurement, Calibrate Measurement Scales and Export Measurements to CSV as free features. Compare Documents is licensed (Plus).
 - Single-user license US$62 (Editor) or US$79 (Editor Plus), one year of maintenance included; renewal about 25% of the license price a year.
 - Price column changed from "One-time" to "Free tier, one-time", so it now appears under the Free filter.
+
+## RedDraft — added (checked 15 November 2026)
+
+- Source: Microsoft Store listing 9P7Z6Q9B6127 (publisher Kongy Labs LLC, released 29 October 2026, version 1.0.17) and kongylabs.com/apps/reddraft/. No ratings yet.
+- Windows 10 version 1809 or later, x64 only. No Mac, iPad or browser version stated.
+- Price US$49.99, shown as 50% off US$99.99 with the promotion ending 30 December 2026. Re-check the meta line after that date. The store also offers a free trial; its length isn't stated.
+- Measurement: sets a sheet scale or calibrates from a known dimension; lengths, perimeters, areas, angles and counts. Neither page mentions totals, a schedule or CSV export, so the label is "length, area, count", not "with takeoff".
+- Compare: "overlay comparison of two sheets" appears only in the store description, so that cell links to the store page. The store page renders with JavaScript, so the text-fragment link may not highlight.
+- Not tested hands-on; everything is from the developer's own listing.

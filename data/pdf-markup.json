@@ -502,6 +502,30 @@
       "meta": "Price: Free, open source &middot; Also on Android &middot; <a href=\"https://github.com/OpenAEC-Foundation/open-pdf-studio\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "reddraft",
+      "group": "sets",
+      "name": "RedDraft",
+      "maker": "Kongy Labs",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://apps.microsoft.com/detail/9p7z6q9b6127"],
+        "mac": ["no", "", ""],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["no", "", ""],
+        "measure": ["yes", "length, area, count", "https://kongylabs.com/apps/reddraft/#:~:text=Set%20the%20sheet%20scale%20or%20calibrate%20from%20a%20dimension"],
+        "team": ["no", "", ""],
+        "compare": ["yes", "overlay", "https://apps.microsoft.com/detail/9p7z6q9b6127#:~:text=overlay%20comparison%20of%20two%20sheets"]
+      },
+      "price": "One-time",
+      "notes": [
+        "A keyboard-driven PDF markup app for Windows, aimed at engineers and architects reviewing drawing sets. Set each sheet&rsquo;s scale or calibrate from a known dimension, then take lengths, perimeters, areas, angles and counts that snap to endpoints, midpoints and intersections on the drawing&rsquo;s own linework, with ortho and angle locks as in CAD.",
+        "Clouds, callouts, stamps and other markups save as standard PDF annotations, so they open in any PDF viewer and stay editable. A tool chest and block library hold your own symbols, an overlay compares two sheets, and a second window puts plans and sections on separate monitors. Files stay on the computer, with no account. It has no shared review, and the listing describes no takeoff totals or export."
+      ],
+      "disclosure": "",
+      "meta": "Price: US$49.99 one-time on the Microsoft Store, shown as half off US$99.99 until 30 December 2026; free trial &middot; <a href=\"https://kongylabs.com/apps/reddraft/\" rel=\"noopener\">Website</a>"
+    },
+    {
       "id": "drawboard-projects",
       "group": "sets",
       "name": "Drawboard Projects",
