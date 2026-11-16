@@ -96,3 +96,25 @@ Relayed by the developer, then added to the page:
 - Measure tool: length, area and angle in the document's or rulers' units (px, mm, cm, in, pt, pc). No drawing scale or calibration found, so the measure cell is "no". Revisit if it gains a scale.
 - iPad cell "partly, in browser": the page says it edits full screen on phones and desktops; not tried on an iPad.
 - Marked as a newcomer at the site owner's call.
+
+## PDF Annotator — added (checked 16 November 2026)
+
+- Source: pdfannotator.com/en/, /en/how (feature list), /en/shop and /en/aboutus. GRAHL software design, near Munich; PDF Annotator 1 released January 2005; measuring and dimensioning added in version 7 (2018); version 10 released 2025.
+- Windows only ("designed for computers running Microsoft Windows"). No Mac, iPad or browser version.
+- Measurement: preset or custom scales, or the scale taken from a known dimension; distances, perimeters, areas, angles, plus dimension objects saved in the PDF. No count tool, totals or measurement export mentioned, so the label is "length, area", not "with takeoff".
+- No shared review (file-based: save to PDF, email) and no document comparison anywhere on the site.
+- Price US$79.95 per user (1–4 users), perpetual, one-time; two years of upgrades and support US$39.94; volume tiers down to US$23.95 at 1,000+ users. 30-day trial; 60-day money-back guarantee.
+- Listed under General PDF editors (page tools, stamps, merging), not as a newcomer.
+
+## Protakeoff — added (checked 16 November 2026)
+
+- Source: protakeoff.org home, /pricing, /download and /compare/bluebeam-alternative. The site renders with JavaScript; a plain fetch returns only page titles, so the text was read in a headless browser. Text-fragment links may not highlight.
+- Protakeoff LLC. Version 0.1.31 (November 2026); "© 2026". No launch date stated; the 0.1.x version marks it as new, so it is a newcomer.
+- Windows 10+ x64; macOS 12+, Apple Silicon and Intel builds. The download page tells Mac users to run `xattr -dr com.apple.quarantine`, which suggests the Mac build isn't notarized; noted on the page.
+- Measurement: per-sheet or per-region calibration, lengths, areas with cutouts, counts, AutoCount, priced assemblies, PDF/Excel/CSV export → "with takeoff".
+- Team cell is "part": the Team plan lists "Real-time team sync" and a shared template library, but nothing says markups are shared or reviewed live.
+- Compare: blue/red overlay of revised sets.
+- Price: Solo US$13/month or US$120/year; Team (6 seats) US$76/month or US$500/year; 30-day trial, no card. Volume pricing above 30 seats by email.
+- It's a takeoff/estimating app more than a markup tool; the maker's own FAQ says it doesn't replace Bluebeam's review role. Listed under Built for drawings with that caveat in the notes.
+- Also ships an MCP connector for ChatGPT, Claude or Antigravity (new in 0.1.31); not mentioned on the page.
+- Not tested hands-on.

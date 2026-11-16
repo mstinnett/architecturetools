@@ -807,6 +807,54 @@
       ],
       "disclosure": "",
       "meta": "Price: Free, no account &middot; <a href=\"https://tools-4all.com/svg-editor\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "pdf-annotator",
+      "group": "editors",
+      "name": "PDF Annotator",
+      "maker": "GRAHL software design",
+      "tier": "",
+      "cells": {
+        "win": ["yes", "", "https://www.pdfannotator.com/en/#:~:text=PDF%20Annotator%20is%20designed%20for%20computers%20running%20Microsoft"],
+        "mac": ["no", "", ""],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["no", "", ""],
+        "measure": ["yes", "length, area", "https://www.pdfannotator.com/en/how#:~:text=Pick%20up%20the%20scale%20from%20a%20known%20dimension"],
+        "team": ["no", "", ""],
+        "compare": ["no", "", ""]
+      },
+      "price": "One-time",
+      "notes": [
+        "A long-running Windows app for marking up PDFs with a pen or a mouse, from a German developer; the first version came out in 2005. Pick a preset scale, define your own or take it from a known dimension, then measure distances, perimeters, areas and angles, or place dimensions that stay in the PDF.",
+        "Over 330 symbol stamps plus date, signature and custom stamps, and page tools for merging, numbering and watermarks. Markups save into the PDF, so anyone can open them in another viewer, and stamps and settings can be shared across an office. Files stay on the computer. There is no shared review, no document comparison and no takeoff totals."
+      ],
+      "disclosure": "",
+      "meta": "Price: US$79.95 per user, one-time, for the current version 10; two years of upgrades and support add US$39.94; volume pricing from five users &middot; 30-day free trial &middot; <a href=\"https://www.pdfannotator.com/en/\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "protakeoff",
+      "group": "sets",
+      "name": "Protakeoff",
+      "maker": "Protakeoff LLC",
+      "tier": "new",
+      "cells": {
+        "win": ["yes", "", "https://protakeoff.org/download#:~:text=Install%20the%20desktop%20app%20for%20Windows"],
+        "mac": ["yes", "", "https://protakeoff.org/download#:~:text=Install%20the%20desktop%20app%20for%20Windows%2C%20Apple%20Silicon%20Mac%2C%20or%20Intel%20Mac"],
+        "linux": ["no", "", ""],
+        "ipad": ["no", "", ""],
+        "web": ["no", "", ""],
+        "measure": ["yes", "with takeoff", "https://protakeoff.org/#:~:text=Point%2Dand%2Dclick%20areas%2C%20lengths%2C%20and%20counts"],
+        "team": ["part", "Team plan sync", "https://protakeoff.org/pricing#:~:text=Real%2Dtime%20team%20sync"],
+        "compare": ["yes", "overlay", "https://protakeoff.org/compare/bluebeam-alternative#:~:text=Blue%2Fred%20overlay%20for%20revised%20plan%20sets"]
+      },
+      "price": "Subscription",
+      "notes": [
+        "A takeoff and estimating app for contractors, for Windows and Mac, first released in 2026 (version 0.1.31 in November 2026). Calibrate each sheet or region, then measure lengths, areas with cutouts, and counts, with snapping and ortho lock. AutoCount finds repeated symbols and asks you to approve each match. Assemblies of material, labor and waste turn quantities into a priced estimate that exports to PDF, Excel or CSV.",
+        "Blue and red overlays compare revised sheets, and an AI step renames pages from their title blocks. Files stay on the computer and it works offline. It is built for takeoff rather than drawing review: the maker says it does not replace Bluebeam&rsquo;s markup and collaboration role. The Team plan adds &ldquo;real-time team sync&rdquo; and a shared template library, but the site doesn&rsquo;t describe shared markup. On a Mac the app needs a Terminal command after install before it will open."
+      ],
+      "disclosure": "",
+      "meta": "Price: Solo US$13 a month or US$120 a year for one user; Team US$76 a month or US$500 a year for six users &middot; 30-day free trial, no card &middot; <a href=\"https://protakeoff.org/\" rel=\"noopener\">Website</a>"
     }
   ]
 }
