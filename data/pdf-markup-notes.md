@@ -115,6 +115,6 @@ Relayed by the developer, then added to the page:
 - Team cell is "part": the Team plan lists "Real-time team sync" and a shared template library, but nothing says markups are shared or reviewed live.
 - Compare: blue/red overlay of revised sets.
 - Price: Solo US$13/month or US$120/year; Team (6 seats) US$76/month or US$500/year; 30-day trial, no card. Volume pricing above 30 seats by email.
-- It's a takeoff/estimating app more than a markup tool; the maker's own FAQ says it doesn't replace Bluebeam's review role. Listed under Built for drawings with that caveat in the notes.
+- It's a takeoff/estimating app more than a markup tool; the maker's own FAQ says it doesn't replace Bluebeam's review role. That line was taken off the page at the owner's request (16 November 2026).
 - Also ships an MCP connector for ChatGPT, Claude or Antigravity (new in 0.1.31); not mentioned on the page.
 - Not tested hands-on.
