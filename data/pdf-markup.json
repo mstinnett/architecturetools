@@ -826,11 +826,11 @@
       },
       "price": "One-time",
       "notes": [
-        "A long-running Windows app for marking up PDFs with a pen or a mouse, from a German developer; the first version came out in 2005. Pick a preset scale, define your own or take it from a known dimension, then measure distances, perimeters, areas and angles, or place dimensions that stay in the PDF.",
-        "Over 330 symbol stamps plus date, signature and custom stamps, and page tools for merging, numbering and watermarks. Markups save into the PDF, so anyone can open them in another viewer, and stamps and settings can be shared across an office. Files stay on the computer. There is no shared review, no document comparison and no takeoff totals."
+        "A long-running Windows app (since 2005) for marking up PDFs with a pen or mouse. Pick a preset or custom scale, or take one from a known dimension, then measure distances, perimeters, areas and angles. Dimensions stay in the PDF.",
+        "Symbol, date, signature and custom stamps, plus merging, page numbering and watermarking tools. Markups save into the PDF and open in any viewer. Works offline. No shared review, document comparison or takeoff totals."
       ],
       "disclosure": "",
-      "meta": "Price: US$79.95 per user, one-time, for the current version 10; two years of upgrades and support add US$39.94; volume pricing from five users &middot; 30-day free trial &middot; <a href=\"https://www.pdfannotator.com/en/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$79.95 per user, one-time, for version 10. Two years of upgrades and support add US$39.94. Volume pricing from five users &middot; 30-day free trial &middot; <a href=\"https://www.pdfannotator.com/en/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "protakeoff",
@@ -850,11 +850,11 @@
       },
       "price": "Subscription",
       "notes": [
-        "A takeoff and estimating app for contractors, for Windows and Mac, first released in 2026 (version 0.1.31 in November 2026). Calibrate each sheet or region, then measure lengths, areas with cutouts, and counts, with snapping and ortho lock. AutoCount finds repeated symbols and asks you to approve each match. Assemblies of material, labor and waste turn quantities into a priced estimate that exports to PDF, Excel or CSV.",
-        "Blue and red overlays compare revised sheets, and an AI step renames pages from their title blocks. Files stay on the computer and it works offline. The Team plan adds &ldquo;real-time team sync&rdquo; and a shared template library, but the site doesn&rsquo;t describe shared markup. On a Mac the app needs a Terminal command after install before it will open."
+        "A takeoff and estimating app for contractors, first released in 2026. Calibrate each sheet or region, then measure lengths, areas with cutouts, and counts, with snapping and ortho lock. AutoCount finds repeated symbols for you to approve. Assemblies of material, labor and waste price the quantities, and the estimate exports to PDF, Excel or CSV.",
+        "Blue and red overlays compare revised sheets, and AI renames pages from their title blocks. Works offline. The Team plan adds team sync and a shared template library, but no shared markup is described. On a Mac, you run a Terminal command after installing before the app will open."
       ],
       "disclosure": "",
-      "meta": "Price: Solo US$13 a month or US$120 a year for one user; Team US$76 a month or US$500 a year for six users &middot; 30-day free trial, no card &middot; <a href=\"https://protakeoff.org/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Solo US$13 a month or US$120 a year for one user. Team US$76 a month or US$500 a year for six users &middot; 30-day free trial, no card &middot; <a href=\"https://protakeoff.org/\" rel=\"noopener\">Website</a>"
     }
   ]
 }
