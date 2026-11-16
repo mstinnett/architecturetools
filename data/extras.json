@@ -82,7 +82,6 @@
     {
       "type": "builder",
       "name": "BOXX APEXX",
-      "price": "$3,000--$8,000",
       "note": "Workstations tuned for CAD, often overclocked for the single-core speed Revit and Rhino want. Phone support and a long warranty.",
       "workloadProfiles": [
         "drafting",
@@ -96,7 +95,6 @@
     {
       "type": "builder",
       "name": "Puget Systems",
-      "price": "$2,500--$8,000",
       "note": "Custom workstations with published CAD and render benchmarks. They spec the build with you and support it after.",
       "workloadProfiles": [
         "drafting",
@@ -110,7 +108,6 @@
     {
       "type": "builder",
       "name": "BIMBOX",
-      "price": "$2,500--$6,000",
       "note": "PCs built and tuned for Revit and BIM, with help setting them up. Aimed at architecture firms.",
       "workloadProfiles": [
         "drafting",
@@ -124,7 +121,6 @@
     {
       "type": "mini",
       "name": "ASUS ExpertCenter PB64",
-      "price": "$600--$900",
       "note": "Up to 64 GB, drives four 4K displays. Mounts behind a monitor, and quiet.",
       "workloadProfiles": [
         "review",
@@ -139,7 +135,6 @@
     {
       "type": "mini",
       "name": "ASUS ExpertCenter PN55",
-      "price": "$600--$800",
       "note": "The AMD mini, with a stronger integrated GPU for light 3D. Up to 96 GB, and drives four 4K displays.",
       "workloadProfiles": [
         "review",
@@ -157,7 +152,6 @@
     {
       "type": "mini",
       "name": "ASUS NUC 16 Pro / NUC 15 Pro+",
-      "price": "$1,100--$1,500",
       "note": "Drives four 4K displays, and Thunderbolt 4 runs a dock from one cable. Get the 15 Pro+, which ASUS sells assembled. The 16 Pro is newer, but ASUS sells it only as a kit, without memory, storage, or Windows.",
       "workloadProfiles": [
         "review",
@@ -168,7 +162,6 @@
     {
       "type": "mini",
       "name": "Lenovo ThinkCentre M90q Gen 6",
-      "price": "$700--$1,000",
       "note": "Up to 64 GB. A reliable business mini. vPro adds no value if you're buying for yourself, so don't pay extra for it.",
       "workloadProfiles": [
         "review",
@@ -183,7 +176,6 @@
     {
       "type": "office",
       "name": "Lenovo ThinkCentre Neo 50t Gen 6",
-      "price": "$800--$1,200",
       "note": "32 GB, with a full GPU slot. Order the RTX 3050 option to drive a 3D viewport. The stock power supply won't run a faster GPU.",
       "workloadProfiles": [
         "review",
@@ -200,7 +192,6 @@
     {
       "type": "office",
       "name": "Dell Tower Plus",
-      "price": "$900--$1,400",
       "note": "Up to an RTX 5070 from the factory, enough for modeling and light visualization.",
       "workloadProfiles": [
         "review",
@@ -217,7 +208,6 @@
     {
       "type": "office",
       "name": "HP ProDesk 4 Tower G1i",
-      "price": "$800--$1,200",
       "note": "A plain corporate desktop: cheap, reliable, and everywhere. Fine for documents and 2D, not built for 3D.",
       "workloadProfiles": [
         "review",
@@ -232,7 +222,6 @@
     {
       "type": "workstation",
       "name": "Dell Pro Max Tower T2",
-      "price": "$1,300--$2,500",
       "note": "Certified for pro software. Pro GPUs only, no GeForce.",
       "workloadProfiles": [
         "review",
@@ -249,7 +238,6 @@
     {
       "type": "workstation",
       "name": "HP Z2 Tower G1i",
-      "price": "$1,200--$2,500",
       "note": "Certified for pro software, and quiet. Pro GPUs only.",
       "workloadProfiles": [
         "review",
@@ -262,7 +250,6 @@
     {
       "type": "workstation",
       "name": "Lenovo ThinkStation P3 Tower Gen 2",
-      "price": "$1,200--$2,500",
       "note": "Up to 256 GB and pro GPUs. A high memory ceiling for large models.",
       "workloadProfiles": [
         "review",
@@ -279,7 +266,6 @@
     {
       "type": "gaming",
       "name": "HP Omen 35L",
-      "price": "$1,800--$2,400",
       "note": "RTX 5070 Ti and 32 GB from the factory. Mainstream and widely stocked, with a standard layout that's easy to upgrade later.",
       "workloadProfiles": [
         "modeling",
@@ -302,7 +288,6 @@
     {
       "type": "gaming",
       "name": "MSI MAG Infinite S3",
-      "price": "$1,600--$2,200",
       "note": "RTX 5070, 750W PSU, clean design. Less gamer aesthetic than most. It ships with 16 GB, so add memory.",
       "workloadProfiles": [
         "modeling",
@@ -315,7 +300,6 @@
     {
       "type": "gaming",
       "name": "CyberPowerPC Gamer Xtreme",
-      "price": "$1,500--$2,200",
       "note": "Configurable. Order it with an RTX 5070 and 32 GB to start visualization on a budget.",
       "workloadProfiles": [
         "modeling",
@@ -338,7 +322,6 @@
     {
       "type": "gaming",
       "name": "iBuyPower",
-      "price": "$1,800--$2,800",
       "note": "Custom config. Pick your CPU, GPU, and RAM.",
       "workloadProfiles": [
         "viz",
@@ -376,7 +359,6 @@
     {
       "id": "m5k27",
       "name": "27\" 5K",
-      "price": 800,
       "platform": "both",
       "width": 39,
       "height": 25
@@ -384,7 +366,6 @@
     {
       "id": "m6k32",
       "name": "32\" 6K",
-      "price": 1300,
       "platform": "both",
       "width": 46,
       "height": 29
@@ -392,7 +373,6 @@
     {
       "id": "m4k27",
       "name": "27\" 4K",
-      "price": 500,
       "platform": "both",
       "width": 39,
       "height": 24
@@ -400,7 +380,6 @@
     {
       "id": "m1k24",
       "name": "24\" 1080p",
-      "price": 200,
       "platform": "both",
       "width": 34,
       "height": 21
@@ -408,7 +387,6 @@
     {
       "id": "muw34",
       "name": "34\" UW",
-      "price": 1000,
       "platform": "win",
       "width": 52,
       "height": 22
@@ -416,7 +394,6 @@
     {
       "id": "masd",
       "name": "Studio Display",
-      "price": 1600,
       "platform": "both",
       "width": 39,
       "height": 25
@@ -427,7 +404,6 @@
       "category": "one",
       "platform": "win",
       "name": "HP ZBook Ultra G1a",
-      "price": "$3,500--$4,500",
       "weight": "3.3 lbs",
       "note": "Ryzen AI Max+ 395, 128 GB unified, 14-inch OLED. The integrated Radeon stands in for a discrete GPU, strong for modeling. The 128 GB holds large visualization scenes, but the integrated GPU is too slow to render them. Battery is the weak point.",
       "workloadProfiles": [
@@ -439,7 +415,6 @@
       "category": "one",
       "platform": "win",
       "name": "Lenovo ThinkPad P1 Gen 9",
-      "price": "$3,200--$4,500",
       "weight": "3.9 lbs",
       "note": "Core Ultra X9 (Panther Lake), RTX PRO 2000 (8 GB), up to 64 GB, tandem OLED. A true workstation at this weight, with the best keyboard here.",
       "workloadProfiles": [
@@ -459,7 +434,6 @@
       "category": "one",
       "platform": "win",
       "name": "Asus ProArt P16",
-      "price": "$2,200--$2,600",
       "weight": "4.2 lbs",
       "note": "Ryzen AI 9 HX 370, RTX 5070, up to 64 GB, 16-inch 4K OLED. A polished creator laptop. Memory is soldered, so configure it up front.",
       "workloadProfiles": [
@@ -477,7 +451,6 @@
       "category": "one",
       "platform": "win",
       "name": "Asus ROG Zephyrus G16",
-      "price": "$2,000--$2,500",
       "weight": "4.1 lbs",
       "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. Lighter than a workstation, with an excellent screen.",
       "maxVram": 24,
@@ -493,7 +466,6 @@
       "category": "one",
       "platform": "win",
       "name": "Asus ROG Zephyrus G14",
-      "price": "$1,800--$2,200",
       "weight": "3.3 lbs",
       "note": "Core Ultra 9 386H, RTX 5070 Ti, 14-inch OLED. Memory is soldered, so configure it up front. The thin 14-inch chassis runs the GPU at lower wattage, so it trails heavier machines.",
       "workloadProfiles": [
@@ -506,7 +478,6 @@
       "category": "one",
       "platform": "win",
       "name": "Razer Blade 16",
-      "price": "$2,500--$3,200",
       "weight": "4.7 lbs",
       "note": "Core Ultra 9 386H, RTX 5070 Ti up to 5090, 16-inch OLED. The thinnest way to carry a 5090. Premium build, but Razer's support is inconsistent.",
       "maxVram": 24,
@@ -521,7 +492,6 @@
       "category": "desk",
       "platform": "win",
       "name": "Lenovo Legion Pro 7i Gen 11",
-      "price": "$3,400--$4,600",
       "weight": "5.5 lbs",
       "note": "Core Ultra 9 290HX Plus, up to RTX 5090, 16-inch OLED. Gaming-desktop power for the price. Loud, and desk-bound.",
       "maxVram": 24,
@@ -546,7 +516,6 @@
       "category": "desk",
       "platform": "win",
       "name": "Lenovo ThinkPad P16 Gen 3",
-      "price": "$3,800--$4,500",
       "weight": "5.8 lbs",
       "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB), up to 192 GB ECC. A flagship mobile workstation, certified for pro apps.",
       "maxVram": 24,
@@ -565,7 +534,6 @@
       "category": "desk",
       "platform": "win",
       "name": "HP ZBook Fury 16 G1i",
-      "price": "$4,000--$4,800",
       "weight": "6.0 lbs",
       "note": "Core Ultra 9 290HX Plus, RTX PRO 5000 (24 GB), up to 192 GB. A 280W adapter and three-fan vapor chamber give it the best sustained-rendering thermals here.",
       "maxVram": 24,
@@ -587,7 +555,6 @@
       "category": "desk",
       "platform": "win",
       "name": "Dell Pro Max 16 Plus",
-      "price": "$3,500--$4,200",
       "weight": "6.3 lbs",
       "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB ECC), 128 GB, 4K OLED. Replaceable memory makes it the serviceable pick. AEC Magazine rates it highly.",
       "maxVram": 24,
@@ -602,7 +569,6 @@
       "category": "travel",
       "platform": "win",
       "name": "Lenovo ThinkPad X1 Carbon Gen 14",
-      "price": "$2,100--$2,800",
       "weight": "2.2 lbs",
       "note": "Core Ultra (Panther Lake), 32 GB, 14-inch. The standard ultraportable. All-day battery, no discrete GPU, for documents and drafting.",
       "workloadProfiles": [
@@ -619,7 +585,6 @@
       "category": "travel",
       "platform": "win",
       "name": "Lenovo ThinkPad X9 14 Aura Edition",
-      "price": "$1,600--$2,300",
       "weight": "2.7 lbs",
       "note": "Core Ultra 7 (Lunar Lake), 32 GB, 14-inch 2.8K OLED. A premium ultraportable for documents and drafting, with no discrete GPU.",
       "workloadProfiles": [
@@ -639,7 +604,6 @@
       "category": "travel",
       "platform": "win",
       "name": "ASUS ExpertBook P5",
-      "price": "$1,100--$1,300",
       "weight": "2.8 lbs",
       "note": "Core Ultra 5 or 7 (Lunar Lake), up to 32 GB, 14-inch 2.5K 144Hz. A business laptop at a budget price, with all-day battery. Memory is built into the chip, so get 32 GB up front.",
       "workloadProfiles": [
@@ -656,7 +620,6 @@
       "category": "student",
       "platform": "win",
       "name": "Asus TUF Gaming A16",
-      "price": "$1,000--$1,400",
       "weight": "4.8 lbs",
       "note": "Ryzen 7, RTX 5060 (8 GB), upgradeable to 64 GB, 16-inch. Durable to MIL-STD and affordable, with long battery life for a gaming laptop.",
       "workloadProfiles": [
@@ -674,7 +637,6 @@
       "category": "student",
       "platform": "win",
       "name": "Lenovo LOQ 15",
-      "price": "$900--$1,200",
       "weight": "5.2 lbs",
       "note": "RTX 5050/5060 run at full wattage, up to 32 GB across two slots. The budget pick, and easy to upgrade later. Buy the Intel model — the budget Ryzen 7 250's older cores drag in CAD.",
       "workloadProfiles": [
@@ -692,7 +654,6 @@
       "category": "student",
       "platform": "win",
       "name": "Acer Predator Helios Neo 16",
-      "price": "$1,400--$1,800",
       "weight": "5.5 lbs",
       "note": "Core Ultra 9 275HX, up to RTX 5070 Ti (12 GB), 16-inch 2.5K OLED. A high-wattage GPU for studios that need real-time visualization without a workstation price.",
       "maxVram": 12,
@@ -717,7 +678,6 @@
       "category": "mac_p",
       "platform": "mac",
       "name": "MacBook Air 15\" M5",
-      "price": "$1,300--$1,500",
       "weight": "3.3 lbs",
       "note": "M5, fanless, up to 32 GB unified, 15-inch. All-day battery for documents and light drafting, though the fanless design slows it under sustained load.",
       "workloadProfiles": [
@@ -734,7 +694,6 @@
       "category": "mac_p",
       "platform": "mac",
       "name": "MacBook Pro 14\" M5 Pro",
-      "price": "$2,200--$2,800",
       "weight": "3.5 lbs",
       "note": "M5 Pro, up to 64 GB unified, 14-inch XDR. The everyday Mac for ArchiCAD, Rhino, and SketchUp.",
       "workloadProfiles": [
@@ -760,7 +719,6 @@
       "category": "mac_p",
       "platform": "mac",
       "name": "MacBook Pro 16\" M5 Pro",
-      "price": "$2,700--$3,200",
       "weight": "4.7 lbs",
       "note": "M5 Pro, up to 64 GB unified, 16-inch XDR. More screen and sustained power than the 14-inch. The one-machine Mac.",
       "workloadProfiles": [
@@ -781,7 +739,6 @@
       "category": "mac_p",
       "platform": "mac",
       "name": "MacBook Pro 16\" M5 Max",
-      "price": "$3,900--$4,800",
       "weight": "4.7 lbs",
       "note": "M5 Max, up to 128 GB unified, 16-inch XDR. Serious GPU cores for Enscape and V-Ray on Metal.",
       "workloadProfiles": [
@@ -807,7 +764,6 @@
       "category": "mac_s",
       "platform": "mac",
       "name": "MacBook Air 13\" M5",
-      "price": "$1,100--$1,300",
       "weight": "2.7 lbs",
       "note": "M5, fanless, up to 32 GB unified, 13-inch. The budget Mac. Small screen, so dock it to a monitor, and it slows under sustained load.",
       "workloadProfiles": [
@@ -825,7 +781,6 @@
       "category": "mac_s",
       "platform": "mac",
       "name": "MacBook Pro 14\" M5",
-      "price": "$1,600--$1,800",
       "weight": "3.4 lbs",
       "note": "Base M5 with a fan, 14-inch XDR. Better sustained performance than the Air, for modeling on the move.",
       "workloadProfiles": [

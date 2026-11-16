@@ -116,13 +116,13 @@ const winByProfile = buildSpecs('data/specs-win.csv', (r, where) => {
   checkRef(GPUs, r.gpu, where, 'gpu', 'gpus.csv');
   const cell = { cpu: r.cpu, cpuNote: r.cpuNote, gpu: r.gpu };
   if (r.gpuNote) cell.gpuNote = r.gpuNote; // blank = inherit the GPU's catalog note
-  cell.ram = r.ram; cell.ramNote = r.ramNote; cell.storage = r.storage; cell.priceRange = r.price;
+  cell.ram = r.ram; cell.ramNote = r.ramNote; cell.storage = r.storage;
   return cell;
 });
 
 const macByProfile = buildSpecs('data/specs-mac.csv', (r, where) => {
   checkRef(Chips, r.chip, where, 'chip', 'chips.csv');
-  return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, memoryNote: r.memoryNote, storage: r.storage, price: r.price };
+  return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, memoryNote: r.memoryNote, storage: r.storage };
 });
 
 // ---- laptop spec (Setup: Laptop) ----

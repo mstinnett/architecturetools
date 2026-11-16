@@ -37,8 +37,8 @@ renders it as "Updated *month year*".
 4. Commit the changed `.csv`.
 
 Any spreadsheet works (Excel, LibreOffice), and you can also edit the `.csv` as
-plain text. Numbers may wrap some fields in quotes on export (e.g. prices and
-notes that contain commas) — that's expected and the build handles it.
+plain text. Numbers may wrap some fields in quotes on export (e.g. notes that
+contain commas) — that's expected and the build handles it.
 
 ## How a spec cell works
 
@@ -54,7 +54,7 @@ The `cpuNote` / `gpuNote` columns control the note shown for that cell:
 | `plain text` | replace the note for this cell only |
 | `+ text` | add this line on top of the component's standard note |
 
-So the RTX 5090's `$2,900+` street-price caveat lives once in `catalog.csv`, and
+So the RTX 5090's `32 GB VRAM` note lives once in `gpus.csv`, and
 each cell adds its own flavor with `+ maximum viz`, `+ no scene too large`, etc.
 
 ## Publishing
