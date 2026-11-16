@@ -439,7 +439,7 @@
       "category": "one",
       "platform": "win",
       "name": "Lenovo ThinkPad P1 Gen 9",
-      "price": "$2,800--$3,400",
+      "price": "$3,200--$4,500",
       "weight": "3.9 lbs",
       "note": "Core Ultra X9 (Panther Lake), RTX PRO 2000 (8 GB), up to 64 GB, tandem OLED. A true workstation at this weight, with the best keyboard here.",
       "workloadProfiles": [
@@ -520,10 +520,10 @@
     {
       "category": "desk",
       "platform": "win",
-      "name": "Lenovo Legion Pro 7i Gen 10",
-      "price": "$2,200--$2,800",
+      "name": "Lenovo Legion Pro 7i Gen 11",
+      "price": "$3,400--$4,600",
       "weight": "5.5 lbs",
-      "note": "Core Ultra 9 275HX, up to RTX 5090, 16-inch OLED. Gaming-desktop power for the price. Loud, and desk-bound.",
+      "note": "Core Ultra 9 290HX Plus, up to RTX 5090, 16-inch OLED. Gaming-desktop power for the price. Loud, and desk-bound.",
       "maxVram": 24,
       "workloadProfiles": [
         "viz",
@@ -567,7 +567,7 @@
       "name": "HP ZBook Fury 16 G1i",
       "price": "$4,000--$4,800",
       "weight": "6.0 lbs",
-      "note": "Core Ultra 9 285HX, RTX PRO 5000 (24 GB), up to 192 GB. A 280W adapter and three-fan vapor chamber give it the best sustained-rendering thermals here.",
+      "note": "Core Ultra 9 290HX Plus, RTX PRO 5000 (24 GB), up to 192 GB. A 280W adapter and three-fan vapor chamber give it the best sustained-rendering thermals here.",
       "maxVram": 24,
       "workloadProfiles": [
         "viz",
@@ -602,7 +602,7 @@
       "category": "travel",
       "platform": "win",
       "name": "Lenovo ThinkPad X1 Carbon Gen 14",
-      "price": "$1,500--$1,800",
+      "price": "$2,100--$2,800",
       "weight": "2.2 lbs",
       "note": "Core Ultra (Panther Lake), 32 GB, 14-inch. The standard ultraportable. All-day battery, no discrete GPU, for documents and drafting.",
       "workloadProfiles": [
@@ -632,6 +632,23 @@
         },
         "drafting": {
           "value": true
+        }
+      }
+    },
+    {
+      "category": "travel",
+      "platform": "win",
+      "name": "ASUS ExpertBook P5",
+      "price": "$1,100--$1,300",
+      "weight": "2.8 lbs",
+      "note": "Core Ultra 5 or 7 (Lunar Lake), up to 32 GB, 14-inch 2.5K 144Hz. A business laptop at a budget price, with all-day battery. Memory is built into the chip, so get 32 GB up front.",
+      "workloadProfiles": [
+        "review",
+        "drafting"
+      ],
+      "recommendedFor": {
+        "review": {
+          "cheapest": true
         }
       }
     },
@@ -666,9 +683,6 @@
         "review"
       ],
       "recommendedFor": {
-        "review": {
-          "cheapest": true
-        },
         "drafting": {
           "cheapest": true
         }
