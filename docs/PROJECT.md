@@ -254,10 +254,10 @@ The picker fetches `assets/data/hardware-data.json` at runtime, but that file is
 The CSVs open as a clean grid in Numbers (or any spreadsheet) — the point of the
 format, since a 72-row matrix is far nicer to edit there than as JSON.
 
-**No duplication.** A spec cell names a component by catalog key (`rtx5090`), not
+**No duplication.** A spec cell names a component by catalog key (`rtx5080`), not
 the full model string. Its `cpuNote`/`gpuNote` cell is **blank** to inherit the
 catalog note, **plain text** to replace it, or **`+ text`** to add a line on top
-of it. So the RTX 5090's `32 GB VRAM` note lives once in `gpus.csv` and each
+of it. So the RTX 5080's `16 GB VRAM` note lives once in `gpus.csv` and each
 build adds its own flavor. `hydrateSpecs()` in `picker.html` resolves these
 references at load into the flat `{ cpu, cpuNote, gpu, gpuNote, ... }` shape the
 render code expects.

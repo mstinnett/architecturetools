@@ -17,7 +17,7 @@
 //
 // Workflow: edit a CSV in Numbers, "Export To → CSV", commit. CI rebuilds the
 // JSON (or run `node tools/build-data.mjs` locally). Spec cells reference catalog
-// entries by key (e.g. gpu = "rtx5090"); a cell's cpuNote/gpuNote is blank to
+// entries by key (e.g. gpu = "rtx5080"); a cell's cpuNote/gpuNote is blank to
 // inherit the catalog note, plain text to replace it, or "+ text" to add a line
 // on top of it — resolved in the browser by hydrateSpecs() in picker.html.
 import { readFileSync, writeFileSync } from 'node:fs';

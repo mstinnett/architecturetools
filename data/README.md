@@ -42,7 +42,7 @@ contain commas) — that's expected and the build handles it.
 
 ## How a spec cell works
 
-A cell names a CPU/GPU/chip by its **catalog key** (e.g. `rtx5090`, `x3d`), not the
+A cell names a CPU/GPU/chip by its **catalog key** (e.g. `rtx5080`, `x3d`), not the
 full model name. Change a name or a shared note once in `cpus.csv` / `gpus.csv` /
 `chips.csv` and every spec that references it updates.
 
@@ -54,7 +54,7 @@ The `cpuNote` / `gpuNote` columns control the note shown for that cell:
 | `plain text` | replace the note for this cell only |
 | `+ text` | add this line on top of the component's standard note |
 
-So the RTX 5090's `32 GB VRAM` note lives once in `gpus.csv`, and
+So the RTX 5080's `16 GB VRAM` note lives once in `gpus.csv`, and
 each cell adds its own flavor with `+ maximum viz`, `+ no scene too large`, etc.
 
 ## Publishing
