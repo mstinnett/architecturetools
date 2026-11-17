@@ -1900,6 +1900,74 @@
       "meta": "Price: Indie $175 one-time, Studio $299 one-time. A 30-day trial is free for non-commercial use &middot; <a href=\"https://www.plasticity.xyz/buy\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://www.plasticity.xyz/\" rel=\"noopener\">Website</a>"
     },
     {
+      "id": "sketchcraft",
+      "group": "modeling",
+      "name": "SketchCraft",
+      "maker": "Jason Sutter",
+      "tier": "new",
+      "status": "v0.3.5",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://github.com/jasonsutter87/sketchcraft#:~:text=runs%20on%20Mac%2C%20Windows%20and%20Linux"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://github.com/jasonsutter87/sketchcraft#:~:text=runs%20on%20Mac%2C%20Windows%20and%20Linux"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://github.com/jasonsutter87/sketchcraft#:~:text=runs%20on%20Mac%2C%20Windows%20and%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "scaled PDF sheets",
+          "https://github.com/jasonsutter87/sketchcraft/blob/main/docs/guide/06-presenting.md#:~:text=true%20scale%20with%20a%20title%20block"
+        ],
+        "dwg": [
+          "part",
+          "with free helper",
+          "https://github.com/jasonsutter87/sketchcraft#:~:text=DWG%20with%20a%20free%20helper"
+        ],
+        "ifc": [
+          "part",
+          "import with helper",
+          "https://github.com/jasonsutter87/sketchcraft/blob/main/docs/guide/05-files.md#:~:text=3D%20DXF%2C%20DWG%2C%20IFC"
+        ],
+        "revit": [
+          "no",
+          "through IFC",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A push-pull modeler that works like SketchUp, with the same tools and shortcuts, and opens SketchUp files. Groups, components, tags and section cuts organize a model, and a 2D DWG or DXF floor plan can be raised into walls with openings.",
+        "Drawing sheets print to PDF at true scale with a title block. It saves DWG and IFC as well as glTF, OBJ, STL and PDF. Opening DWG or IFC needs a free converter installed, and the app shows how. First released in November 2026. Windows and Mac warn on first launch because the app is not signed yet."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (MIT), with no account needed &middot; <a href=\"https://github.com/jasonsutter87/sketchcraft/releases/latest\" rel=\"noopener\">Download</a> &middot; <a href=\"https://github.com/jasonsutter87/sketchcraft\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
       "id": "sketchup-free",
       "group": "modeling",
       "name": "SketchUp Free",
