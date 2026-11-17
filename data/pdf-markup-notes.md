@@ -118,3 +118,13 @@ Relayed by the developer, then added to the page:
 - It's a takeoff/estimating app more than a markup tool; the maker's own FAQ says it doesn't replace Bluebeam's review role. That line was taken off the page at the owner's request (16 November 2026).
 - Also ships an MCP connector for ChatGPT, Claude or Antigravity (new in 0.1.31); not mentioned on the page.
 - Not tested hands-on.
+
+## Groundbook — added to AI drawing checkers (checked 17 November 2026)
+
+- Source: groundbook.ai home, /pricing/, /security/, /integrations/, /about/, /sample-plan-review-report/ and /learn/ai-assisted-and-manual-plan-review/ (suggested by the owner). Matter0, Inc., San Francisco and Seattle. Site renders with JavaScript; read in a headless browser.
+- Checks: cross-discipline conflicts, drawings against specifications, your own QA/QC or permit checklists, and state and local codes and amendments, citing each code section. Also sells takeoff, submittal review, overlay, back check and site plans; not on the page.
+- Price: drawing pages $1 each, reference drawing pages $0.25, specs and other documents $0.05; $100 minimum per project; first eligible project free; cross-file conflict and code checks priced on top (no figure published); exact quote before payment. Prepaid credits from $20, bonus up to 15% on large packages. No seats.
+- Imports from Bluebeam Studio (firm needs a Core, Complete or Max subscription), Autodesk Construction Cloud, ProjectWise, SharePoint, Google Drive, Box, Dropbox, Egnyte, Fieldwire. Accepts PDF and DWG.
+- Output: findings linked to the source sheets in the app, plus a downloadable review log. No Bluebeam markup export found, so the page doesn't claim one.
+- Privacy: project data not used to train models, including by its AI providers; hosted on AWS in the US; deleted data recoverable for 90 days, then removed.
+- The /learn comparison article (9 direct matches, 8 partial, 100 further observations against one manual plan check) is the vendor's own editorial comparison, not an independent benchmark; not cited on the page.
