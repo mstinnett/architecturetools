@@ -128,3 +128,9 @@ Relayed by the developer, then added to the page:
 - Output: findings linked to the source sheets in the app, plus a downloadable review log. The app has an export, but the site doesn't say in what format (likely marked-up PDFs). The page says only that findings "can be exported", at the owner's request; it doesn't claim Bluebeam markups.
 - Privacy: project data not used to train models, including by its AI providers; hosted on AWS in the US; deleted data recoverable for 90 days, then removed.
 - The /learn comparison article (9 direct matches, 8 partial, 100 further observations against one manual plan check) is the vendor's own editorial comparison, not an independent benchmark; not cited on the page.
+
+## Open PDF Studio — updated (checked 17 November 2026)
+
+- New site: open-aec.com/en/open-pdf-studio/ (v2026.47.0). Website link now points there, with GitHub as Source.
+- Web cell changed to yes: the app runs in the browser and the file stays on the computer. The FAQ says the web version runs on an iPad too; iPad stays "no" because the column is for the main app.
+- Licence LGPL-3.0. Compare now shows additions green, removals red, with a list of changes. Markups are standard PDF annotations with author, status and replies (no live shared review, so Team stays "no").

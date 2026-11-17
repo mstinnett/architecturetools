@@ -2660,6 +2660,210 @@
       ],
       "disclosure": "",
       "meta": "Price: Solo $60 a month, Organization $100 a month &middot; <a href=\"https://www.snaptrude.com\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "open-cad-studio",
+      "group": "drafting",
+      "name": "Open CAD Studio",
+      "maker": "Hakan Seven",
+      "tier": "new",
+      "status": "v2026.46",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.opencadstudio.com/#:~:text=Windows%20%C2%B7%20Linux%20%C2%B7%20macOS"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.opencadstudio.com/#:~:text=Windows%20%C2%B7%20Linux%20%C2%B7%20macOS"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.opencadstudio.com/#:~:text=Windows%20%C2%B7%20Linux%20%C2%B7%20macOS"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://www.opencadstudio.com/#:~:text=Use%20the%20web%20app%20without%20an%20account%20or%20installation"
+        ],
+        "drawings": [
+          "yes",
+          "layouts, viewports",
+          "https://www.opencadstudio.com/#:~:text=Arrange%20paper%2Dspace%20layouts%20with%20viewports%20and%20plot%20styles"
+        ],
+        "dwg": [
+          "yes",
+          "R14 to 2018",
+          "https://www.opencadstudio.com/#:~:text=Open%20and%20save%20DWG%20and%20DXF%20directly"
+        ],
+        "ifc": [
+          "no",
+          "",
+          ""
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "Command-line 2D drafting with object snaps, layers, blocks, external references, dimensions and paper-space layouts, meant to feel familiar to AutoCAD users. It opens and saves DWG and DXF directly, and models 3D solids with extrude, revolve, sweep, loft and Booleans.",
+        "The browser version needs no account and saves to your computer. Printing, PDF output and plugins need the desktop app. A new version has come out each week since September 2026, and the developer asks you to keep backups of production drawings. An unofficial hosted copy at opencad.studio adds paid project storage with revision history and client links, from $7 a month."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL-3.0), with no account needed &middot; <a href=\"https://www.opencadstudio.com/app/\" rel=\"noopener\">Browser app</a> &middot; <a href=\"https://www.opencadstudio.com/download/\" rel=\"noopener\">Download</a> &middot; <a href=\"https://www.opencadstudio.com/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/HakanSeven12/OpenCADStudio\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "modelcraft",
+      "group": "modeling",
+      "name": "ModelCraft",
+      "maker": "The Data Design Group",
+      "tier": "new",
+      "status": "v0.10",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://getcadcraft.com/apps/modelcraft#:~:text=Available%20on%20all%20platforms%20using%20CadCraft%20Studio"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://getcadcraft.com/apps/modelcraft#:~:text=Available%20on%20all%20platforms%20using%20CadCraft%20Studio"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://getcadcraft.com/apps/modelcraft#:~:text=Available%20on%20all%20platforms%20using%20CadCraft%20Studio"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "yes",
+          "",
+          "https://getcadcraft.com/apps/modelcraft#:~:text=Use%20ModelCraft%20in%20your%20browser"
+        ],
+        "drawings": [
+          "no",
+          "",
+          ""
+        ],
+        "dwg": [
+          "part",
+          "import site plans",
+          "https://getcadcraft.com/apps/modelcraft#:~:text=Import%20site%20plans"
+        ],
+        "ifc": [
+          "part",
+          "export",
+          "https://getcadcraft.com/apps/modelcraft#:~:text=Export%20to%20BimCraft%20and%20other%20BIM%20tools"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "unk",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "A push-pull modeler for early design, meant to feel familiar to SketchUp users, with inference snapping, groups, components and saved scenes. Bring in a DWG site plan to model on, and send the massing to BimCraft as IFC.",
+        "One of eight free apps from the CadCraft studio. On the desktop it comes inside CadCraft Studio, and it also runs in the browser. Saving in the browser needs a paid team plan, but exporting a copy is free."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (Apache-2.0). SuperCad Studio, which is to combine the eight apps in one window, is a separate commercial product at $250 a seat &middot; <a href=\"https://getcadcraft.com/use/modelcraft\" rel=\"noopener\">Browser app</a> &middot; <a href=\"https://getcadcraft.com/apps/modelcraft\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/getcadcraft\" rel=\"noopener\">Source</a>",
+      "free": true
+    },
+    {
+      "id": "constructcraft",
+      "group": "bim",
+      "name": "ConstructCraft",
+      "maker": "Francis Rebou&ccedil;as",
+      "tier": "new",
+      "status": "v0.12.0",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://github.com/francisreboucas/constructcraft#:~:text=Each%20release%20has%20installers"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://github.com/francisreboucas/constructcraft#:~:text=Each%20release%20has%20installers"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://github.com/francisreboucas/constructcraft#:~:text=Each%20release%20has%20installers"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "sheets, PDF",
+          "https://github.com/francisreboucas/constructcraft#:~:text=export%20to%20vector%20PDF%20and%20SVG"
+        ],
+        "dwg": [
+          "part",
+          "underlays",
+          "https://github.com/francisreboucas/constructcraft#:~:text=DWG%20and%20DXF%20underlays"
+        ],
+        "ifc": [
+          "yes",
+          "IFC4 out, IFC in",
+          "https://github.com/francisreboucas/constructcraft#:~:text=IFC4%20export"
+        ],
+        "revit": [
+          "no",
+          "through IFC",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Free",
+      "notes": [
+        "BIM authoring meant to feel familiar to Revit users. Walls, doors, floors, roofs, stairs, rooms, structure, and plumbing and electrical systems live in one model, and plans, sections, schedules and sheets update with it. Sheets export to vector PDF.",
+        "It opens IFC2X3 and IFC4, saves IFC4 and imports SketchUp files. DWG and DXF come in as underlays to trace over. It does not open Revit files. First released in October 2026. The builds are not code-signed yet, so Windows and Mac warn on first launch."
+      ],
+      "disclosure": "",
+      "meta": "Price: Free, open source (GPL-3.0) &middot; <a href=\"https://github.com/francisreboucas/constructcraft/releases\" rel=\"noopener\">Download</a> &middot; <a href=\"https://github.com/francisreboucas/constructcraft\" rel=\"noopener\">Source</a>",
+      "free": true
     }
   ]
 }

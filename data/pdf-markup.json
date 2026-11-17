@@ -488,18 +488,18 @@
         "mac": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
         "linux": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
         "ipad": ["no", "", ""],
-        "web": ["no", "", ""],
+        "web": ["yes", "", "https://open-aec.com/en/open-pdf-studio/#:~:text=Open%20your%20own%20PDF%20in%20the%20browser"],
         "measure": ["yes", "with takeoff", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Count%20tool%20with%20named%20tally%20categories"],
         "team": ["no", "", ""],
         "compare": ["yes", "compare, overlay", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Compare%20two%20PDF%20revisions%20in%20a%20dedicated%20compare%20tab"]
       },
       "price": "Free",
       "notes": [
-        "A free, open-source PDF editor for Windows, Mac and Linux. Calibrate the scale, then measure distances, areas and perimeters, and count objects by named category. Counts, lengths and areas total in a live quantities schedule.",
-        "Compare two revisions side by side or as an overlay, with scrolling and zoom locked together."
+        "A free, open-source PDF editor for construction drawings, on the desktop, as an Android tablet app and in the browser. Place a scale region, several per sheet if needed, then measure distances, areas, perimeters and angles, and count objects by named category. Measurements total in a quantities schedule that saves as CSV.",
+        "Compare two revisions overlaid, side by side or with a swipe line, with additions in green, removals in red and a list of changes. Markups save as standard PDF annotations, each with an author, status and replies. In the browser, your file stays on your computer."
       ],
       "disclosure": "",
-      "meta": "Price: Free, open source &middot; Also on Android &middot; <a href=\"https://github.com/OpenAEC-Foundation/open-pdf-studio\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free, open source (LGPL-3.0) &middot; Also on Android &middot; <a href=\"https://open-aec.com/en/open-pdf-studio/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/OpenAEC-Foundation/open-pdf-studio\" rel=\"noopener\">Source</a>"
     },
     {
       "id": "reddraft",
