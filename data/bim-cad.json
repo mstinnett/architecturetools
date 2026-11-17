@@ -2864,6 +2864,72 @@
       "disclosure": "",
       "meta": "Price: Free, open source (GPL-3.0) &middot; <a href=\"https://github.com/francisreboucas/constructcraft/releases\" rel=\"noopener\">Download</a> &middot; <a href=\"https://github.com/francisreboucas/constructcraft\" rel=\"noopener\">Source</a>",
       "free": true
+    },
+    {
+      "id": "nanocad-construction",
+      "group": "drafting",
+      "name": "nanoCAD Construction",
+      "maker": "Nanosoft",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://nanocad.com/support/system-requirements/nanocad-platform/#:~:text=Windows%C2%AE%2011"
+        ],
+        "mac": [
+          "no",
+          "",
+          ""
+        ],
+        "linux": [
+          "no",
+          "",
+          ""
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "title blocks, sheets",
+          "https://nanocad.com/products/nanocad-construction-module/features/#:~:text=drawing%20borders%20and%20title%20blocks%20that%20are%20parametric"
+        ],
+        "dwg": [
+          "yes",
+          "native",
+          "https://nanocad.com/products/nanocad-platform/#:~:text=supports%20all%20active%20versions%20of%20DWG"
+        ],
+        "ifc": [
+          "part",
+          "import, export",
+          "https://nanocad.com/products/nanocad-construction-module/features/#:~:text=Generating%203D%20models%20and%20IFC%2Dformat%20documentation"
+        ],
+        "revit": [
+          "no",
+          "",
+          ""
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription",
+      "notes": [
+        "DWG drafting meant to feel familiar to AutoCAD users, with a Construction module for building drawings. Walls join automatically, doors and windows come from a parts library, and rooms report their areas and finishes. Parametric title blocks, level and section marks, and a table editor that links to Excel speed up the sheets.",
+        "The building objects live in DWG drawings, not one model, though a Project Manager builds a 3D model and an IFC file from them."
+      ],
+      "disclosure": "",
+      "meta": "Price: US$459 a year for nanoCAD with the Construction module, on 1- or 3-year subscriptions. The platform alone is US$289 a year &middot; 30-day free trial &middot; <a href=\"https://nanocad.com/products/nanocad-construction-module/\" rel=\"noopener\">Website</a>"
     }
   ]
 }
