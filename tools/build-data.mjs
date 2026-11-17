@@ -17,7 +17,7 @@
 //
 // Workflow: edit a CSV in Numbers, "Export To → CSV", commit. CI rebuilds the
 // JSON (or run `node tools/build-data.mjs` locally). Spec cells reference catalog
-// entries by key (e.g. gpu = "rtx5090"); a cell's cpuNote/gpuNote is blank to
+// entries by key (e.g. gpu = "rtx5080"); a cell's cpuNote/gpuNote is blank to
 // inherit the catalog note, plain text to replace it, or "+ text" to add a line
 // on top of it — resolved in the browser by hydrateSpecs() in picker.html.
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -116,13 +116,13 @@ const winByProfile = buildSpecs('data/specs-win.csv', (r, where) => {
   checkRef(GPUs, r.gpu, where, 'gpu', 'gpus.csv');
   const cell = { cpu: r.cpu, cpuNote: r.cpuNote, gpu: r.gpu };
   if (r.gpuNote) cell.gpuNote = r.gpuNote; // blank = inherit the GPU's catalog note
-  cell.ram = r.ram; cell.ramNote = r.ramNote; cell.storage = r.storage; cell.priceRange = r.price;
+  cell.ram = r.ram; cell.ramNote = r.ramNote; cell.storage = r.storage;
   return cell;
 });
 
 const macByProfile = buildSpecs('data/specs-mac.csv', (r, where) => {
   checkRef(Chips, r.chip, where, 'chip', 'chips.csv');
-  return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, memoryNote: r.memoryNote, storage: r.storage, price: r.price };
+  return { chip: r.chip, cpuNote: r.cpuNote, memory: r.memory, memoryNote: r.memoryNote, storage: r.storage };
 });
 
 // ---- laptop spec (Setup: Laptop) ----

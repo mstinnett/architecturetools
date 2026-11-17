@@ -28,7 +28,7 @@ for their work. Not to an audience, about architects.
 - **One decision per note.** Don't borrow an adjacent decision to land a line.
 - **No cross-tier references.** A note describes its own cell's part, not another
   tier's.
-- **Don't repeat the title.** The cell shows the chip, GPU, RAM, and price beside
+- **Don't repeat the title.** The cell shows the chip, GPU, and RAM beside
   the note. Don't restate them ("the M4 Max," "64 GB"). Name a chip only to steer
   between options ("skip the Ultra").
 - **No comparatives to unseen tiers.** "More cores" than what? The reader sees one
