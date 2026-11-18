@@ -2930,6 +2930,72 @@
       ],
       "disclosure": "",
       "meta": "Price: US$459 a year for nanoCAD with the Construction module, on 1- or 3-year subscriptions. The platform alone is US$289 a year &middot; 30-day free trial &middot; <a href=\"https://nanocad.com/products/nanocad-construction-module/\" rel=\"noopener\">Website</a>"
+    },
+    {
+      "id": "gstarcad",
+      "group": "drafting",
+      "name": "GstarCAD",
+      "maker": "Gstarsoft",
+      "tier": "",
+      "cells": {
+        "win": [
+          "yes",
+          "",
+          "https://www.gstarcad.net/cad/#:~:text=engineered%20to%20run%20natively%20on%20Windows%2C%20macOS%2C%20and%20Linux"
+        ],
+        "mac": [
+          "yes",
+          "",
+          "https://www.gstarcad.net/cad/#:~:text=engineered%20to%20run%20natively%20on%20Windows%2C%20macOS%2C%20and%20Linux"
+        ],
+        "linux": [
+          "yes",
+          "",
+          "https://www.gstarcad.net/cad/#:~:text=engineered%20to%20run%20natively%20on%20Windows%2C%20macOS%2C%20and%20Linux"
+        ],
+        "ipad": [
+          "no",
+          "",
+          ""
+        ],
+        "web": [
+          "no",
+          "",
+          ""
+        ],
+        "drawings": [
+          "yes",
+          "layouts",
+          "https://www.gstarcad.net/cad/#:~:text=sheet%20set%20layouts"
+        ],
+        "dwg": [
+          "yes",
+          "native",
+          "https://www.gstarcad.net/cad/#:~:text=Native%20DWG%2FDXF%20support"
+        ],
+        "ifc": [
+          "part",
+          "Professional",
+          "https://www.gstarcad.uk/"
+        ],
+        "revit": [
+          "part",
+          "import, Professional",
+          "https://www.gstarcad.uk/"
+        ],
+        "team": [
+          "no",
+          "",
+          ""
+        ]
+      },
+      "price": "Subscription or one-time",
+      "notes": [
+        "DWG drafting with commands and an interface modeled on AutoCAD, including LISP. Standard is 2D only. Professional adds 3D modeling, dynamic blocks, IFC import and export, and Revit file import.",
+        "Versions for Windows, Mac and Linux are sold separately at the same prices."
+      ],
+      "disclosure": "",
+      "meta": "Price: Standard $749 perpetual or $299 a year. Professional $949 perpetual or $399 a year. Sales often cut these by up to 30% &middot; 30-day free trial &middot; <a href=\"https://www.gstarcad.net/eshop\" rel=\"noopener\">Store</a> &middot; <a href=\"https://www.gstarcad.net/cad/\" rel=\"noopener\">Website</a>"
     }
   ]
 }
