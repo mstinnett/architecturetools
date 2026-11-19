@@ -2560,8 +2560,8 @@
         ],
         "dwg": [
           "part",
-          "paid tier",
-          "https://docs.rayon.design/documentation/import-export/exporting-and-printing"
+          "paid plans",
+          "https://www.rayon.design/pricing"
         ],
         "ifc": [
           "no",
@@ -2574,14 +2574,14 @@
           ""
         ],
         "team": [
-          "yes",
-          "",
-          "https://docs.rayon.design/documentation/import-export/exporting-and-printing"
+          "part",
+          "Studio plan",
+          "https://www.rayon.design/pricing"
         ],
         "3d": [
           "no",
-          "due in V4",
-          "https://aecmag.com/cad/rayon-raises-e10m-for-3d-and-agentic-ai/#:~:text=Rayon%20says%20V4%2C%20due%20later%20this%20year%2C%20will%20bring%203D"
+          "beta only",
+          "https://www.rayon.design/blog/rayon-v4"
         ],
         "bim": [
           "part",
@@ -2593,13 +2593,13 @@
           "https://www.rayon.design/#:~:text=professional-grade%20CAD%20software%20for%20interior%20architects%20and%20designers"
         ]
       },
-      "price": "Subscription",
+      "price": "Free; export paid",
       "notes": [
-        "Shared 2D plans for interiors and space planning. It imports DWG, DXF and PDF, and several people edit one file at once.",
-        "Rayon says version 4, due by the end of 2026, adds 3D."
+        "Shared 2D plans for interiors and space planning. It imports DWG, DXF and PDF. Several people edit one file at once on the Studio plan, and every plan has unlimited viewers and commenters.",
+        "Version 4, released in November 2026, adds 3D modeling and an AI agent, both in beta. 3D is free on every plan while it is in beta."
       ],
       "disclosure": "",
-      "meta": "Price: $21 a month, with DWG $38 a month &middot; <a href=\"https://www.rayon.design\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free for one seat, without PDF, DWG or DXF export. Solo $45 a month or $456 a year. Studio $96 a month or $984 a year for three seats, extra seats $45 a month. AI use draws on monthly credits. Solo and Studio have a 14-day trial &middot; <a href=\"https://www.rayon.design/pricing\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://www.rayon.design\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "snaptrude",

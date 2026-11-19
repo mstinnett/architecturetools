@@ -96,7 +96,7 @@ html = html.replace(/<li class="watch-item">([\s\S]*?)<\/li>/g, (all, body) => {
   const n = /href="#source-(\d+)"/.exec(body)?.[1];
   return n ? `<li class="watch-item" data-source="${sources[Number(n) - 1].url}">${body}</li>` : all;
 });
-const pricingNote = '    <p id="pricing-note">* Pricing accessed on <time datetime="2026-10-19">19 October 2026</time>. Prices are USD. Annual amounts are billed yearly; monthly amounts use monthly billing. Plan, region, taxes and license terms can affect the total. Qonic pricing varies by configuration. Autodesk Flex rates are tokens per day of use.</p>\n';
+const pricingNote = '    <p id="pricing-note">* Pricing accessed on <time datetime="2026-10-19">19 October 2026</time>. Prices are USD. Annual amounts are billed yearly; monthly amounts use monthly billing. Plan, region, taxes and license terms can affect the total. Rayon pricing accessed on <time datetime="2026-11-19">19 November 2026</time>. Qonic pricing varies by configuration. Autodesk Flex rates are tokens per day of use.</p>\n';
 html = html.replace(/(<div class="page-footer">[\s\S]*?<\/div>)\s*/, (_, footer) => footer + '\n' + notes.replace('    <ol class="source-list">', pricingNote + '    <ol class="source-list">'));
 html = html.replace(/[ \t]+$/gm, '');
 writeFileSync(path, html);
