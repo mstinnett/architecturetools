@@ -461,8 +461,8 @@
       "maker": "PlanDiFy",
       "tier": "new",
       "cells": {
-        "win": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Windows%20download%3A%20x64"],
-        "mac": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.233#:~:text=Mac%20download%3A%20Apple%20silicon"],
+        "win": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.15.0#:~:text=Windows%3A%20run%20the%20signed%20x64%20Setup%20executable"],
+        "mac": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.15.0#:~:text=macOS%3A%20extract%20the%20signed%20and%20Apple%2Dnotarized%20Apple%20silicon%20ZIP"],
         "linux": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads/releases/tag/v0.14.250#:~:text=Linux%20x64%20AppImage%20ZIP"],
         "ipad": ["part", "in Safari", "https://plandify.app/app/"],
         "web": ["yes", "", "https://github.com/godlyko/PlanDiFy-downloads#:~:text=Browser%20app"],
@@ -484,14 +484,14 @@
       "maker": "OpenAEC Foundation",
       "tier": "new",
       "cells": {
-        "win": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
-        "mac": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
-        "linux": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=A%20free%2C%20open-source%20PDF%20editor%20and%20annotator%20for%20Windows%2C%20macOS%2C%20Linux%2C%20and%20Android"],
+        "win": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=on%20Windows%2C%20macOS%2C%20Linux%2C%20Android%20and%20in%20the%20browser"],
+        "mac": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=on%20Windows%2C%20macOS%2C%20Linux%2C%20Android%20and%20in%20the%20browser"],
+        "linux": ["yes", "", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=on%20Windows%2C%20macOS%2C%20Linux%2C%20Android%20and%20in%20the%20browser"],
         "ipad": ["no", "", ""],
         "web": ["yes", "", "https://open-aec.com/en/open-pdf-studio/#:~:text=Open%20your%20own%20PDF%20in%20the%20browser"],
-        "measure": ["yes", "with takeoff", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Count%20tool%20with%20named%20tally%20categories"],
+        "measure": ["yes", "with takeoff", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Count%20objects%20by%20category%20and%20collect%20counts%2C%20lengths%20and%20areas"],
         "team": ["no", "", ""],
-        "compare": ["yes", "compare, overlay", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Compare%20two%20PDF%20revisions%20in%20a%20dedicated%20compare%20tab"]
+        "compare": ["yes", "compare, overlay", "https://github.com/OpenAEC-Foundation/open-pdf-studio#:~:text=Compare%20two%20revisions%20side%20by%20side%20or%20on%20top%20of%20each%20other"]
       },
       "price": "Free",
       "notes": [
@@ -547,7 +547,7 @@
         "On a Mac it runs in the browser."
       ],
       "disclosure": "",
-      "meta": "Price: From $29 per user a month &middot; <a href=\"https://www.drawboard.com/projects\" rel=\"noopener\">Website</a>"
+      "meta": "Price: From $29 per user a month, or $270 a year billed annually &middot; <a href=\"https://www.drawboard.com/projects\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "acrobat",
@@ -571,7 +571,7 @@
         "Sort and filter the Comments list by author, page, type or status."
       ],
       "disclosure": "",
-      "meta": "Price: Subscription &middot; Also on iPhone, Android &middot; <a href=\"https://www.adobe.com/acrobat/acrobat-pro.html\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Acrobat Pro US$19.99 a month on an annual plan, US$29.99 month to month, or US$239.88 a year prepaid &middot; Also on iPhone, Android &middot; <a href=\"https://www.adobe.com/acrobat/acrobat-pro.html\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "foxit",
@@ -587,14 +587,14 @@
         "web": ["yes", "", "https://www.foxit.com/pdf-editor/pricing/#:~:text=Windows%2C%20macOS%20%26%20Web%20apps"],
         "measure": ["yes", "", "https://resource-cms.foxit.com/foxit-pdf-editor-for-windows/about-measure-tools#:~:text=There%20are%20ten%20measurement%20tools%20in%20Foxit%20PDF%20Editor"],
         "team": ["yes", "shared review", "https://www.foxit.com/blog/collaborate-with-shared-review/"],
-        "compare": ["yes", "file comparison", "https://www.foxit.com/blog/seeing-double-how-to-compare-pdfs-in-foxit-reader-and-foxit-phantompdf/#:~:text=To%20compare%20two%20versions%20of%20the%20same%20PDF%20document"]
+        "compare": ["yes", "file comparison", "https://resource-cms.foxit.com/foxit-pdf-editor-for-windows/compare-pdf-files#:~:text=The%20Document%20Compare%20feature%20lets%20you%20see%20the%20difference%20in%20two%20versions%20of%20a%20PDF"]
       },
-      "price": "Subscription",
+      "price": "Subscription or one-time",
       "notes": [
         "A general PDF editor with measurement, file comparison and shared review. Firms often license it for office documents."
       ],
       "disclosure": "",
-      "meta": "Price: About $130 per user a year, $160 with the iPad and phone apps &middot; Also on iPhone, Android &middot; <a href=\"https://www.foxit.com/pdf-editor/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: About $130 per user a year, $160 with the iPad and phone apps. Foxit PDF Editor 14 is also sold for $209.99 per user, one-time &middot; Also on iPhone, Android &middot; <a href=\"https://www.foxit.com/pdf-editor/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "master-pdf",
@@ -618,7 +618,7 @@
         "You set the drawing scale by typing a ratio. It has no tool for calibrating on a known length."
       ],
       "disclosure": "",
-      "meta": "Price: One-time license &middot; <a href=\"https://code-industry.net/masterpdfeditor/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$79.95 one-time, with a year of updates; later years of updates cost half. Volume pricing from 10 users &middot; Free trial, which watermarks output &middot; <a href=\"https://code-industry.net/masterpdfeditor/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "pdf-expert",
@@ -636,13 +636,13 @@
         "team": ["no", "", ""],
         "compare": ["no", "", ""]
       },
-      "price": "Subscription",
+      "price": "Subscription or one-time",
       "notes": [
         "A PDF editor for Mac and iPad with Apple Pencil support. Highlights, shapes, ink, stamps and notes that sync across your devices.",
         "The paid tier calibrates a sheet and measures distance, area and perimeter on Mac and iPad."
       ],
       "disclosure": "",
-      "meta": "Price: Subscription &middot; Also on iPhone &middot; <a href=\"https://pdfexpert.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$79.99 a year for Mac, iPad and iPhone, or US$139.99 one-time for the Mac only; 7-day free trial &middot; Also on iPhone &middot; <a href=\"https://pdfexpert.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "documents",
@@ -665,7 +665,7 @@
         "A file manager that opens PDFs with annotation built in. For carrying a set to site, pulling files from cloud storage, and noting what you see on the sheet."
       ],
       "disclosure": "",
-      "meta": "Price: Free, paid tier &middot; Also on iPhone &middot; <a href=\"https://documents.io/app\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free; Documents Plus US$9.99 a month or US$49.99 a year &middot; Also on iPhone &middot; <a href=\"https://documents.io/app\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "trace",
@@ -683,13 +683,13 @@
         "team": ["no", "", ""],
         "compare": ["no", "", ""]
       },
-      "price": "Subscription",
+      "price": "Free tier, subscription",
       "notes": [
         "Sketch a design response over a plan or photo. Set the drawing scale, then dimension it and measure room areas.",
         "Available on iPad and iPhone. It does not provide a shared comment log."
       ],
       "disclosure": "",
-      "meta": "Price: Subscription &middot; Also on iPhone &middot; <a href=\"https://morpholio.com/trace\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free tier; Trace Pro US$24.99 a year after a one-month free trial, or US$7.99 a month &middot; Also on iPhone &middot; <a href=\"https://morpholioapps.com/trace/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "okular",
@@ -776,13 +776,13 @@
         "team": ["no", "", ""],
         "compare": ["no", "", ""]
       },
-      "price": "Free tier, subscription",
+      "price": "Free tier, subscription or one-time",
       "notes": [
         "A vector sketching app on an infinite canvas, used by architects for concept sketches. Import a PDF plan, set its scale or calibrate on a known length, and sketch and measure over it.",
         "It has no shared review."
       ],
       "disclosure": "",
-      "meta": "Price: Free tier; PDF workflows require a paid plan &middot; Also on Android &middot; <a href=\"https://concepts.app/en/architects/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free tier; PDF import needs Essentials, US$39.99 one-time for one platform, or the subscription, US$4.99 a month or US$29.99 a year &middot; Also on Android &middot; <a href=\"https://concepts.app/en/architects/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "tools4all-svg",
