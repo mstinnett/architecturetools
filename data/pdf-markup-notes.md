@@ -134,3 +134,13 @@ Relayed by the developer, then added to the page:
 - New site: open-aec.com/en/open-pdf-studio/ (v2026.47.0). Website link now points there, with GitHub as Source.
 - Web cell changed to yes: the app runs in the browser and the file stays on the computer. The FAQ says the web version runs on an iPad too; iPad stays "no" because the column is for the main app.
 - Licence LGPL-3.0. Compare now shows additions green, removals red, with a list of changes. Markups are standard PDF annotations with author, status and replies (no live shared review, so Team stays "no").
+
+## Archiboost — added to AI drawing checkers (checked 19 November 2026)
+
+- Source: archiboost.ai home, /qaqc, /pricing and /blogs/archiboost-raises-6-2-million. Archiboost AI, San Francisco; incorporated March 2025; co-founders Georgios Kontominas, AIA (CEO) and Vasu Jogani (CTO). $6.2M pre-seed and seed, announced 3 November 2026.
+- Checks: cross-sheet coordination, code and accessibility, specifications and schedules, firm standards, each finding citing its source.
+- Intake: manual upload, or connect from Autodesk Forma or Procore. The site also lists Revit, Autodesk Docs, Bluebeam, Newforma, SharePoint, Google Drive and Outlook as integrations, without saying how each is used, so the page names only Procore and Forma.
+- Output: findings marked up on the documents, with Assign and "Open in Revit" actions. No Bluebeam markup or Excel export is stated, so the page doesn't claim one.
+- Price: not published ("We'll scope a plan with you") → "priced through sales". No trial mentioned.
+- Privacy: "Never trained on your data"; SOC 2 Type II; AES-256 at rest, TLS 1.3 in transit.
+- Also sells Project Copilot, Construction Administration and a Detail Library; not on the page. Vendor claims (550,000+ sheets reviewed, up to six times the issues of manual review) not cited.
