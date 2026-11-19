@@ -44,7 +44,7 @@
         "The full desktop app is Windows only. Support for Revu for Mac ended in June 2023; Revu for iPad was withdrawn from sale in December 2025. Mac users can use the web app. Check the mobile feature list before relying on it for site measurement."
       ],
       "disclosure": "",
-      "meta": "Price: Subscription; price and features depend on plan &middot; Also on iPhone &middot; <a href=\"https://www.bluebeam.com/product/markups-and-data/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$260 (Basics), US$330 (Core), US$440 (Complete) or US$590 (Max, introductory price) a user a year, billed annually; 14-day free trial. Overlay, compare and full takeoff need Core or above &middot; Also on iPhone, Android &middot; <a href=\"https://www.bluebeam.com/product/markups-and-data/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "drawboard-pdf",
@@ -77,12 +77,12 @@
       "maker": "Caliper App LLC",
       "tier": "new",
       "cells": {
-        "win": ["yes", "", "https://caliperapp.co/#:~:text=Windows%2010%20%2F%2011%20%E2%80%94%20Microsoft%20Store"],
+        "win": ["yes", "", "https://caliperapp.co/#:~:text=Windows%2010%20version%201809%20or%20later"],
         "mac": ["yes", "", "https://caliperapp.co/#:~:text=macOS%2014%20Sonoma%20or%20later%20%E2%80%94%20Mac%20App%20Store%20or%20direct"],
         "linux": ["no", "", ""],
         "ipad": ["no", "", ""],
         "web": ["no", "", ""],
-        "measure": ["yes", "with takeoff", "https://caliperapp.co/#:~:text=Linear%2C%20poly%2C%20area%20and%20angle%20dimensions"],
+        "measure": ["yes", "with takeoff", "https://caliperapp.co/#:~:text=Trace%20lengths%2C%20areas%20and%20perimeters"],
         "team": ["no", "", ""],
         "compare": ["yes", "revision overlay", "https://caliperapp.co/#:~:text=Lay%20one%20drawing%20over%20another%20with%20adjustable%20opacity"]
       },
@@ -107,13 +107,13 @@
         "ipad": ["no", "", ""],
         "web": ["yes", "", "https://www.layrpdf.com/#:~:text=Draw%20and%20mark%20up%20without%20installing%20the%20desktop%20app"],
         "measure": ["yes", "with takeoff", "https://www.layrpdf.com/#:~:text=Take%20off%20calibrated%20measurements%2C%20count%20areas"],
-        "team": ["part", "shared viewing", "https://www.layrpdf.com/#:~:text=View%20shared%20drawings%20and%20markups"],
+        "team": ["yes", "live review", "https://www.layrpdf.com/guides/live-pdf-markup#:~:text=see%20each%20other's%20markups%20as%20they%20happen"],
         "compare": ["part", "side by side", "https://www.layrpdf.com/#:~:text=True%20split-screen%20for%20comparing%20drawings"]
       },
       "price": "Subscription",
       "notes": [
         "A drawing review app for Windows, Apple Silicon Macs and the browser. Emphasizes high performance with large sets and commands and shortcuts modeled on the pro PDF tools. Measure and count from a calibrated scale, and read page numbers, sheet names and scales across the set in one pass.",
-        "A familiar Bluebeam-style markup drawer, and Bluebeam and Acrobat markups open and stay editable. Others can view shared drawings and markups in the browser, and revisions compare in a split screen, though it lacks overlay. After the 7-day trial, editing stops, but files still open, print and save. A license runs on one device at a time."
+        "A familiar Bluebeam-style markup drawer, and Bluebeam and Acrobat markups open and stay editable. Shared cloud projects show each other&rsquo;s markups live, on the desktop or in the browser, and revisions compare in a split screen, though it lacks overlay. After the 7-day trial, editing stops, but files still open, print and save. A license runs on one device at a time."
       ],
       "disclosure": "",
       "meta": "Price: US$5 a month or US$35 a year for one person, US$30 a user a year for a team with a two-seat minimum; 25&nbsp;GB of cloud storage per person; 7-day free trial &middot; <a href=\"https://www.layrpdf.com\" rel=\"noopener\">Website</a>"
@@ -188,13 +188,13 @@
         "Set the scale by ratio or by calibrating a known length, then measure lengths and areas. Drag an older revision onto a sheet to overlay it, with additions and removals in color."
       ],
       "disclosure": "",
-      "meta": "Price: &euro;12.99 a month, &euro;79.99 a year, or &euro;159 one-time with two years of updates &middot; <a href=\"https://ncored.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: &euro;12.99 a month, &euro;79.99 a year, or &euro;159 one-time (limited offer) with updates to the version you buy; 14-day free trial &middot; <a href=\"https://ncored.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "pdf-studio",
       "group": "editors",
-      "name": "PDF Studio Pro",
-      "maker": "Qoppa",
+      "name": "Xodo PDF Studio",
+      "maker": "Xodo",
       "tier": "",
       "cells": {
         "win": ["yes", "", "https://www.qoppa.com/pdfstudio/#:~:text=Works%20on%20Windows%2C%20Mac%2C%20%26%20Linux"],
@@ -206,12 +206,12 @@
         "team": ["no", "", ""],
         "compare": ["yes", "overlay", "https://www.qoppa.com/files/pdfstudio/guide/overlay-comparison.htm#:~:text=especially%20useful%20for%20architects%20and%20engineers"]
       },
-      "price": "One-time",
+      "price": "Subscription or one-time",
       "notes": [
-        "Markup, calibrated measurement and document comparison on Windows, Mac and Linux, for a one-time license."
+        "Markup, calibrated measurement and document comparison on Windows, Mac and Linux, by subscription or a one-time license. Formerly Qoppa PDF Studio."
       ],
       "disclosure": "",
-      "meta": "Price: One-time license &middot; <a href=\"https://www.qoppa.com/pdfstudio/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$240 one-time with three years of updates, or US$9.99 a month billed yearly (US$19.99 billed monthly) &middot; <a href=\"https://xodo.com/pdf-studio\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "pdf-xchange",
@@ -260,7 +260,7 @@
         "The free version lets you try measurement and comparison for 14 days. After that they need a paid plan."
       ],
       "disclosure": "",
-      "meta": "Price: For Windows only, US$51.99 one-time for version 13, US$31.99 a year, or US$11.99 a quarter. Plans that add Mac, iPad and phone cost about US$10 more. Prices shown as discounts &middot; Also on iPhone, Android &middot; <a href=\"https://pdf.wondershare.com/store/windows-individuals.html\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://pdf.wondershare.com/\" rel=\"noopener\">Website</a>"
+      "meta": "Price: For Windows only, US$103.99 one-time for version 13, US$63.99 a year, or US$109.99 for two years. Plans that add Mac, iPad and phone cost about US$8&ndash;10 more. Prices shown as discounts &middot; Also on iPhone, Android &middot; <a href=\"https://pdf.wondershare.com/store/windows-individuals.html\" rel=\"noopener\">Pricing</a> &middot; <a href=\"https://pdf.wondershare.com/\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "polypdf",
@@ -300,12 +300,12 @@
         "web": ["no", "", ""],
         "measure": ["no", "", ""],
         "team": ["no", "", ""],
-        "compare": ["yes", "diff, clouds", "https://www.reviff.com"]
+        "compare": ["yes", "diff, overlay, clouds", "https://www.reviff.com"]
       },
       "price": "Free",
       "notes": [
         "A revision comparison app for Windows from one architectural designer. Open two versions of a sheet, as PDFs or images, and it clouds each area that changed, with added and removed content in different colors. When the sheets don&rsquo;t line up, Auto-align corrects scale and offset, and Partial Align realigns one region.",
-        "It compares; it does not mark up or measure. The comparison runs on your computer, with no upload, account or watermark."
+        "It compares; it does not mark up or measure. The comparison runs on your computer, with no upload, account or watermark. Version 2.0 adds an overlay mode and, as beta features after a one-time sign-in, a review report with a decision and note on each change and optional AI summaries by Claude or Gemini."
       ],
       "disclosure": "",
       "meta": "Price: Free, on the Microsoft Store &middot; <a href=\"https://www.reviff.com\" rel=\"noopener\">Website</a>"
@@ -324,12 +324,12 @@
         "web": ["yes", "desktop browser", "https://krescad.com/faq/#:~:text=Use%20a%20modern%20desktop%20or%20laptop%20browser"],
         "measure": ["yes", "length, area", "https://krescad.com/measure-pdf-plans/#:~:text=Calibrate%20a%20PDF%20drawing%20from%20a%20known%20dimension"],
         "team": ["no", "", ""],
-        "compare": ["no", "", ""]
+        "compare": ["yes", "highlights, overlay", "https://krescad.com/compare-pdf-drawings/#:~:text=KresCAD%20compares%20an%20earlier%20PDF%20with%20the%20current%20drawing"]
       },
       "price": "Free",
       "notes": [
-        "A browser workspace from architects in Melbourne. Calibrate a PDF plan, measure lengths and areas, count items, add notes and draw to scale, then export a watermark-free PDF. English OCR makes scanned plans searchable, and files stay in the browser.",
-        "It runs in desktop and laptop browsers, with tablet and phone planned. It does not import DWG or DXF. Its maker calls it experimental and asks you to check measurements against the plan."
+        "A browser workspace from architects in Melbourne. Calibrate a PDF plan, measure lengths and areas, count items, add notes and draw to scale, then export a watermark-free PDF. OCR in seven languages makes scanned plans searchable, and files stay in the browser.",
+        "Compare drawings highlights what changed between two revisions, with a slider to check each one. It runs in desktop and laptop browsers, with tablet and phone planned. It does not import DWG or DXF. Its maker calls it experimental and asks you to check measurements against the plan."
       ],
       "disclosure": "",
       "meta": "Price: Free, no account. Paid options may come later &middot; <a href=\"https://krescad.com\" rel=\"noopener\">Website</a>"
@@ -352,7 +352,7 @@
       },
       "price": "Free",
       "notes": [
-        "A browser tool for measuring and marking up PDF plans: lengths, areas, perimeters and angles at a set scale, with counts and runs totaled across sheets and exported to CSV. Clouds, callouts and dimension lines export on a marked-up PDF, and an overlay tints one sheet over another to show changes.",
+        "A browser tool for measuring and marking up PDF plans: lengths, areas, perimeters and angles at a set scale, with counts and runs totaled across sheets and exported to CSV. Clouds, callouts and dimension lines export on a marked-up PDF, and an overlay tints one sheet over another to show changes. DWG and DXF drawings open too, each layout as a sheet at its scale.",
         "Files stay on your device. Symbols are counted by clicking, and it has no unit costs. Markups move between computers as a JSON file, with no shared review."
       ],
       "disclosure": "",
@@ -377,7 +377,7 @@
       "price": "Free tier, subscription or one-time",
       "notes": [
         "A drawing review app from architects, for Mac and Windows, with a cloud version in the browser. Calibrate a sheet once, then measure lengths, areas, perimeters and counts to scale, metric or imperial. The desktop app opens and saves PDFs on your computer, offline.",
-        "Deta Cloud adds shared drawings with markups that appear live, version history, and takeoff tables built from markups. Contractors and clients open a shared link to view and comment without an account. Overlay two revisions to highlight every change, on local PDFs or cloud versions."
+        "Deta Cloud adds shared drawings with markups that appear live, version history, and takeoff tables built from markups. Contractors and clients open a shared link to view without an account, and sign in to comment. Overlay two revisions to highlight every change, on local PDFs or cloud versions."
       ],
       "disclosure": "",
       "meta": "Price: Desktop $89 one-time for Mac and Windows, with a 30-day free trial. Deta Cloud is free for up to five documents, then $12.50 a user a month (Pro) or $17 a seat a month (Studio, three-seat minimum), billed yearly &middot; Free desktop license for educators and students &middot; <a href=\"https://www.deta.studio/\" rel=\"noopener\">Website</a>"
@@ -393,42 +393,42 @@
         "mac": ["no", "", ""],
         "linux": ["no", "", ""],
         "ipad": ["no", "", ""],
-        "web": ["yes", "", "https://liteaeco.com/tools/pdf-viewer.html#:~:text=Files%20never%20leave%20your%20computer"],
-        "measure": ["part", "2-point scale", "https://liteaeco.com/tools/pdf-viewer.html#:~:text=Calibrate%3A%20click%202%20points"],
+        "web": ["yes", "", "https://liteaeco.com/tools/pdfscope.html"],
+        "measure": ["yes", "with takeoff", "https://liteaeco.com/tools/pdfscope.html"],
         "team": ["no", "", ""],
-        "compare": ["yes", "swipe, diff", "https://liteaeco.com/tools/pdf-viewer.html"]
+        "compare": ["yes", "overlay, swipe, diff", "https://liteaeco.com/tools/pdfscope.html"]
       },
       "price": "Free",
       "notes": [
-        "A browser viewer for multi-page plan sets: annotate, comment, stamp, fill forms, rotate pages and jump between sheets. It calibrates a scale from two points. Pages can be extracted, split and downloaded as a ZIP.",
-        "Files stay on your computer, and certificate signing (PAdES) happens in the browser. It compares two sheets side by side, with a swipe or as a diff. It has no shared review."
+        "A browser viewer for multi-page plan sets: annotate, comment, stamp, fill forms, rotate pages and jump between sheets. Calibrate each sheet, or give a detail its own scale, then measure lengths, perimeters, areas and counts, with totals in tables on the sheet and a CSV export. Pages can be extracted, split and downloaded as a ZIP.",
+        "Files stay on your computer, and certificate signing (PAdES) happens in the browser. It compares two sheets side by side, with a swipe, an overlay or as a diff. It has no shared review."
       ],
       "disclosure": "",
-      "meta": "Price: Free, open source (Apache 2.0), no account &middot; <a href=\"https://liteaeco.com/tools/pdf-viewer.html\" rel=\"noopener\">Open PDFScope</a> &middot; <a href=\"https://liteaeco.com/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/ltorrecilla/liteaeco\" rel=\"noopener\">Source</a>"
+      "meta": "Price: Free, open source (Apache 2.0), no account &middot; <a href=\"https://liteaeco.com/tools/pdfscope.html\" rel=\"noopener\">Open PDFScope</a> &middot; <a href=\"https://liteaeco.com/\" rel=\"noopener\">Website</a> &middot; <a href=\"https://github.com/ltorrecilla/liteaeco\" rel=\"noopener\">Source</a>"
     },
     {
       "id": "project-blueprint",
       "group": "sets",
       "name": "Project Blueprint",
-      "maker": "Independent developer",
+      "maker": "Blueprint Labs",
       "tier": "new",
       "cells": {
-        "win": ["yes", "", "https://blueprintformac.com/windows"],
-        "mac": ["yes", "", "https://blueprintformac.com/"],
-        "linux": ["no", "", ""],
+        "win": ["yes", "", "https://projectblueprinthq.com/windows"],
+        "mac": ["yes", "", "https://projectblueprinthq.com/"],
+        "linux": ["part", "beta", "https://projectblueprinthq.com/linux"],
         "ipad": ["no", "", ""],
         "web": ["no", "", ""],
-        "measure": ["yes", "with takeoff", "https://blueprintformac.com/construction-takeoff-software-for-mac"],
+        "measure": ["yes", "with takeoff", "https://projectblueprinthq.com/construction-takeoff-software-for-mac"],
         "team": ["no", "", ""],
-        "compare": ["yes", "revision overlay", "https://blueprintformac.com/construction-takeoff-software-for-mac"]
+        "compare": ["yes", "revision overlay", "https://projectblueprinthq.com/construction-takeoff-software-for-mac"]
       },
       "price": "One-time",
       "notes": [
-        "A PDF markup and takeoff app for construction drawings, for Mac and Windows. Set each sheet's scale, then measure lengths, areas and counts, with totals exported to CSV.",
-        "Compare revisions by overlay, blink or swipe. Markups save into the PDF, and markups from Bluebeam Revu or Acrobat open for editing. Files stay on your computer."
+        "A PDF markup and takeoff app for construction drawings, for Mac and Windows, with Linux in beta. Set each sheet's scale, then measure lengths, areas and counts, with totals exported to CSV.",
+        "Overlay two revisions to compare them. Markups save into the PDF, and markups from Bluebeam Revu or Acrobat open for editing. Files stay on your computer."
       ],
       "disclosure": "",
-      "meta": "Price: US$149 one-time for each platform, covering two computers, with Mac and Windows licensed separately. Introductory price of US$19 while it lasts &middot; 14-day free trial &middot; <a href=\"https://blueprintformac.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: US$149 one-time with a year of updates, covering any two computers, Mac, Windows or Linux. Founder price of US$19, with every 1.x update, while it lasts &middot; 14-day free trial &middot; <a href=\"https://projectblueprinthq.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "notch",
