@@ -144,3 +144,12 @@ Relayed by the developer, then added to the page:
 - Price: not published ("We'll scope a plan with you") → "priced through sales". No trial mentioned.
 - Privacy: "Never trained on your data"; SOC 2 Type II; AES-256 at rest, TLS 1.3 in transit.
 - Also sells Project Copilot, Construction Administration and a Detail Library; not on the page. Vendor claims (550,000+ sheets reviewed, up to six times the issues of manual review) not cited.
+
+## Full review (19 November 2026)
+
+- Every tool and the sections below the matrix re-checked against vendor pages, rendered in a headless browser with billing toggles clicked. Changes are in the git history for this date.
+- PDF Studio is now Xodo PDF Studio (qoppa.com banner: "Qoppa PDF Studio is now Xodo PDF Studio!"), sold by subscription or a US$240 perpetual licence with three years of updates.
+- Project Blueprint moved to projectblueprinthq.com. One licence now covers any two computers, Mac, Windows or Linux (Linux in beta), so the earlier "Mac and Windows licensed separately" above is out of date. Maker is Blueprint Labs Ltd, Auckland. Only overlay compare is documented now, so "blink or swipe" was removed.
+- PDFelement prices are promotional and moved between 12 and 19 November; re-check before relying on them.
+- Not re-confirmed: REVIFF's "no watermark" (no longer stated on its site); Acrobat help pages (403 to automated tools); Pro Lifetime of PDF Expert including the construction toolset.
+- Autodesk renamed Construction Cloud to Autodesk Forma and Docs to Forma Data Management on 24 March 2026; the AI checker and platform text now uses the new names.

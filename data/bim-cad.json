@@ -434,7 +434,7 @@
       "id": "bricscad-bim",
       "group": "bim",
       "name": "BricsCAD BIM",
-      "maker": "Bricsys",
+      "maker": "Octave (Bricsys)",
       "tier": "",
       "cells": {
         "win": [
@@ -494,7 +494,7 @@
         "Revit files come in as geometry. Shared work is file-based."
       ],
       "disclosure": "",
-      "meta": "Price: $1,166 a year or $2,616 perpetual &middot; <a href=\"https://www.bricsys.com/bricscad-bim\" rel=\"noopener\">Website</a>"
+      "meta": "Price: $1,166 a year or $2,616 perpetual &middot; <a href=\"https://bricscad.octave.com/bricscad/bim\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "chief",
@@ -560,7 +560,7 @@
         "It imports and exports DXF, DWG, 3DS, SKP, STL and DAE, but not IFC."
       ],
       "disclosure": "",
-      "meta": "Price: $1,995 a year &middot; <a href=\"https://www.chiefarchitect.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: $1,995 a year or $229 a month &middot; <a href=\"https://www.chiefarchitect.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "freecad",
@@ -901,7 +901,7 @@
       "id": "bricscad",
       "group": "drafting",
       "name": "BricsCAD Lite / Pro",
-      "maker": "Bricsys",
+      "maker": "Octave (Bricsys)",
       "tier": "",
       "cells": {
         "win": [
@@ -961,7 +961,7 @@
         "IFC and Revit import are in BricsCAD BIM only."
       ],
       "disclosure": "",
-      "meta": "Price: Lite $345 a year or $780 perpetual. Pro $780 a year or $1,752 perpetual &middot; <a href=\"https://www.bricsys.com/bricscad\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Lite $345 a year or $780 perpetual. Pro $780 a year or $1,752 perpetual &middot; <a href=\"https://bricscad.octave.com/bricscad\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "cadcraft",
@@ -1332,22 +1332,22 @@
         "drawings": [
           "yes",
           "",
-          "https://www.zwsoft.com/product/zwcad/pricing"
+          "https://www.zwsoft.com/product/zwcad"
         ],
         "dwg": [
           "yes",
           "",
-          "https://www.zwsoft.com/product/zwcad/pricing"
+          "https://www.zwsoft.com/product/zwcad"
         ],
         "ifc": [
           "part",
           "Professional",
-          "https://www.zwsoft.com/product/zwcad/pricing"
+          "https://www.zwsoft.com/product/zwcad"
         ],
         "revit": [
           "part",
           "Professional, import",
-          "https://www.zwsoft.com/product/zwcad/pricing"
+          "https://www.zwsoft.com/product/zwcad"
         ],
         "team": [
           "no",
@@ -1360,7 +1360,7 @@
         "Standard covers 2D drafting, annotation and plotting in DWG. Professional adds 3D modeling, IFC editing and RVT import."
       ],
       "disclosure": "",
-      "meta": "Price: Standard $899, Professional $1,399 perpetual &middot; <a href=\"https://www.zwsoft.com/product/zwcad\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Not sold in the US, says ZWSOFT. Elsewhere from $899 perpetual &middot; <a href=\"https://www.zwsoft.com/product/zwcad\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "sketchup",
@@ -1492,7 +1492,7 @@
         "Rhino.Inside.Revit runs Rhino and Grasshopper inside Revit on Windows. Shared work runs through worksessions of linked files."
       ],
       "disclosure": "",
-      "meta": "Price: $995 one-time, upgrade $595. A 90-day evaluation is free &middot; <a href=\"https://www.rhino3d.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: $995 one-time, upgrade $595, or $395 until 1 March 2027. A 90-day evaluation is free &middot; <a href=\"https://www.rhino3d.com\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "blender",
@@ -2411,7 +2411,7 @@
         "Revit and Rhino models stream in, and IFC files import. Nothing exports back to Revit yet. Motif Review is a separate product."
       ],
       "disclosure": "",
-      "meta": "Price: Design $150 a month, Review $25 a month &middot; <a href=\"https://motif.io\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Design from $150 a month per active user, on annual plans. Review $25 a month per seat &middot; <a href=\"https://motif.io/pricing\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "qonic",
@@ -2465,13 +2465,13 @@
           "https://www.qonic.com/#:~:text=The%20fastest%20agentic%20BIM%20platform%20to%20model%2C%20coordinate%20and%20deliver"
         ]
       },
-      "price": "Subscription",
+      "price": "Free; paid plans",
       "notes": [
         "Opens large RVT and IFC models in the browser for coordination, quantities and editing. A Revit plugin moves changes both ways.",
         "Since April 2026 it draws annotated plans and sections that update with the model and export to DWG."
       ],
       "disclosure": "",
-      "meta": "Price: depends on configuration. The full configuration is $240 a month or $2,582 a year &middot; <a href=\"https://www.qonic.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Free for one user and one project. Paid plans start at $133 a month or $1,429 a year per user for the core platform. Coordination, Drawings and Planning add-ons are priced by portfolio area; all three at the default size bring a seat to $240 a month or $2,582 a year &middot; <a href=\"https://www.qonic.com/pricing\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "rayon",
@@ -2585,13 +2585,13 @@
           "https://www.snaptrude.com/#:~:text=Model%20in%20both%202D%20and%203D"
         ]
       },
-      "price": "Subscription",
+      "price": "Free; export paid",
       "notes": [
         "Concept to schematic design. Models start from a brief or a sketch, drawings update live, and several people work in one model at once.",
         "Snaptrude describes Revit exchange as two-way. Its pages and release notes differ on how."
       ],
       "disclosure": "",
-      "meta": "Price: Solo $60 a month, Organization $100 a month &middot; <a href=\"https://www.snaptrude.com\" rel=\"noopener\">Website</a>"
+      "meta": "Price: Pro $600 a year or $60 a month. Max $1,200 a year or $125 a month, per seat. A free plan has one project and no exports &middot; <a href=\"https://www.snaptrude.com/pricing\" rel=\"noopener\">Website</a>"
     },
     {
       "id": "open-cad-studio",
